@@ -1,0 +1,39 @@
+{
+  "resources": [
+    {
+      "type": "aws:ec2:instance",
+      "links": [
+        {
+          "pred": "image",
+          "obj": "arn:aws:ec2:us-east-1:012345678901:image/ami-abcd1234",
+          "type": "transient_resource_link"
+        },
+        {
+          "pred": "instance_type",
+          "obj": "t2.2xlarge",
+          "type": "simple"
+        },
+        {
+          "pred": "state",
+          "obj": "stopped",
+          "type": "simple"
+        },
+        {
+          "pred": "vpc",
+          "obj": "arn:aws:ec2:us-west-2:012345678901:vpc/vpc-01234567890abcdef",
+          "type": "resource_link"
+        },
+        {
+          "pred": "subnet",
+          "obj": "arn:aws:ec2:us-west-2:012345678901:subnet/subnet-abcdef01234567890",
+          "type": "resource_link"
+        },
+        {
+          "pred": "Name",
+          "obj": "my-instance",
+          "type": "tag"
+        }
+      }
+    ]
+  ]
+}

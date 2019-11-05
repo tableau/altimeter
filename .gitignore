@@ -1,0 +1,42 @@
+# MacOS desktop services store files
+.DS_Store*
+
+# JetBrains IDE project files (e.g. PyCharm)
+.idea
+
+# Python binary artifacts we generally never want to check in.
+*.pyc
+__pycache__/
+
+# Artifacts from coverage
+cover/
+.coverage
+htmlcov/
+
+# mypy cache
+.mypy_cache
+
+# Build artifacts
+dist/
+build/
+.eggs/
+*.egg-info/
+*.whl
+
+# Typical root venv dir
+venv/
+.env/
+
+# Terraform temporary files
+.terraform/
+*.tfstate*
+
+# vim, emacs swap files
+.*.s??
+*~
+
+# sphinx sources we generally don't want to add
+altimeter*.rst
+modules.rst
+doc/html/**/*
+public/**

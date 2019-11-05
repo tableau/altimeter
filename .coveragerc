@@ -1,0 +1,3 @@
+[report]
+# show specific missing line number ranges in coverage report
+show_missing = True

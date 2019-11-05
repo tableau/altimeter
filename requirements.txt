@@ -1,0 +1,4 @@
+aws-requests-auth==0.4.2
+rdflib==4.2.2
+structlog==18.2.0
+boto3>=1.9.130
