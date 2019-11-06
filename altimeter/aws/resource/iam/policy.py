@@ -1,5 +1,5 @@
 """Resource for IAM Policies"""
-from typing import Type, TypeVar
+from typing import Type
 
 from botocore.client import BaseClient
 
@@ -8,8 +8,6 @@ from altimeter.aws.resource.iam import IAMResourceSpec
 from altimeter.aws.resource.util import policy_doc_dict_to_sorted_str
 from altimeter.core.graph.field.scalar_field import ScalarField
 from altimeter.core.graph.schema import Schema
-
-T = TypeVar("T", bound="IAMPolicyResourceSpec")
 
 
 class IAMPolicyResourceSpec(IAMResourceSpec):
@@ -24,7 +22,7 @@ class IAMPolicyResourceSpec(IAMResourceSpec):
 
     @classmethod
     def list_from_aws(
-        cls: Type[T], client: BaseClient, account_id: str, region: str
+        cls: Type["IAMPolicyResourceSpec"], client: BaseClient, account_id: str, region: str
     ) -> ListFromAWSResult:
         """Return a dict of dicts of the format:
 

@@ -1,5 +1,5 @@
 """Resource for Transit Gateway VPC Attachments"""
-from typing import Type, TypeVar
+from typing import Type
 
 from botocore.client import BaseClient
 
@@ -11,8 +11,6 @@ from altimeter.core.graph.field.dict_field import AnonymousDictField
 from altimeter.core.graph.field.list_field import AnonymousListField
 from altimeter.core.graph.field.resource_link_field import EmbeddedResourceLinkField
 from altimeter.core.graph.field.scalar_field import ScalarField
-
-T = TypeVar("T", bound="TransitGatewayVpcAttachmentResourceSpec")
 
 
 class TransitGatewayVpcAttachmentResourceSpec(EC2ResourceSpec):
@@ -32,7 +30,10 @@ class TransitGatewayVpcAttachmentResourceSpec(EC2ResourceSpec):
 
     @classmethod
     def list_from_aws(
-        cls: Type[T], client: BaseClient, account_id: str, region: str
+        cls: Type["TransitGatewayVpcAttachmentResourceSpec"],
+        client: BaseClient,
+        account_id: str,
+        region: str,
     ) -> ListFromAWSResult:
         paginator = client.get_paginator("describe_transit_gateway_vpc_attachments")
         attachments = {}

@@ -1,12 +1,10 @@
-from typing import Any, Type, TypeVar
+from typing import Any, Type
 from unittest import TestCase
 
 from altimeter.core.graph.graph_spec import GraphSpec
 from altimeter.core.multilevel_counter import MultilevelCounter
 from altimeter.core.resource.resource import Resource
 from altimeter.core.resource.resource_spec import ResourceScanResult, ResourceSpec
-
-T = TypeVar("T", bound="TestResourceSpecA")
 
 
 class TestResourceSpecA(ResourceSpec):
@@ -17,15 +15,13 @@ class TestResourceSpecA(ResourceSpec):
         return "test:a"
 
     @classmethod
-    def scan(cls: Type[T], scan_accessor: Any) -> ResourceScanResult:
+    def scan(cls: Type["TestResourceSpecA"], scan_accessor: Any) -> ResourceScanResult:
         resources = [
             Resource(resource_id="123", type_name=cls.type_name, links=[]),
             Resource(resource_id="456", type_name=cls.type_name, links=[]),
         ]
         return ResourceScanResult(resources=resources, stats=MultilevelCounter(), errors=[])
 
-
-T = TypeVar("T", bound="TestResourceSpecB")
 
 
 class TestResourceSpecB(ResourceSpec):
@@ -36,7 +32,7 @@ class TestResourceSpecB(ResourceSpec):
         return "test:b"
 
     @classmethod
-    def scan(cls: Type[T], scan_accessor: Any) -> ResourceScanResult:
+    def scan(cls: Type["TestResourceSpecB"], scan_accessor: Any) -> ResourceScanResult:
         resources = [
             Resource(resource_id="abc", type_name=cls.type_name, links=[]),
             Resource(resource_id="def", type_name=cls.type_name, links=[]),

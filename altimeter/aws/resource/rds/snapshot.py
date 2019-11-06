@@ -1,5 +1,5 @@
 """Resource for RDS Snapshot"""
-from typing import Type, TypeVar
+from typing import Type
 
 from botocore.client import BaseClient
 
@@ -14,8 +14,6 @@ from altimeter.core.graph.field.resource_link_field import (
 )
 from altimeter.core.graph.field.scalar_field import ScalarField
 from altimeter.core.graph.schema import Schema
-
-T = TypeVar("T", bound="RDSSnapshotResourceSpec")
 
 
 class RDSSnapshotResourceSpec(RDSResourceSpec):
@@ -41,7 +39,9 @@ class RDSSnapshotResourceSpec(RDSResourceSpec):
     )
 
     @classmethod
-    def generate_instance_arn(cls: Type[T], account_id: str, region: str, resource_id: str) -> str:
+    def generate_instance_arn(
+        cls: Type["RDSSnapshotResourceSpec"], account_id: str, region: str, resource_id: str
+    ) -> str:
         """Generate an ARN for this resource, e.g. arn:aws:rds:<region>:<account>:db:<name>
         """
         return ":".join(
@@ -58,7 +58,7 @@ class RDSSnapshotResourceSpec(RDSResourceSpec):
 
     @classmethod
     def list_from_aws(
-        cls: Type[T], client: BaseClient, account_id: str, region: str
+        cls: Type["RDSSnapshotResourceSpec"], client: BaseClient, account_id: str, region: str
     ) -> ListFromAWSResult:
         dbinstances = {}
         paginator = client.get_paginator("describe_db_snapshots")

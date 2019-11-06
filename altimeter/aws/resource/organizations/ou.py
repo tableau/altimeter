@@ -1,5 +1,5 @@
 """Resource representing an AWS Organizational Unit."""
-from typing import Any, Dict, List, Type, TypeVar
+from typing import Any, Dict, List, Type
 
 from botocore.client import BaseClient
 
@@ -9,8 +9,6 @@ from altimeter.aws.resource.organizations.org import OrgResourceSpec
 from altimeter.core.graph.field.scalar_field import ScalarField
 from altimeter.core.graph.field.resource_link_field import ResourceLinkField
 from altimeter.core.graph.schema import Schema
-
-T = TypeVar("T", bound="OUResourceSpec")
 
 
 class OUResourceSpec(OrganizationsResourceSpec):
@@ -22,12 +20,12 @@ class OUResourceSpec(OrganizationsResourceSpec):
     )
 
     @classmethod
-    def get_full_type_name(cls: Type[T]) -> str:
+    def get_full_type_name(cls: Type["OUResourceSpec"]) -> str:
         return f"{cls.provider_name}:{cls.type_name}"
 
     @classmethod
     def list_from_aws(
-        cls: Type[T], client: BaseClient, account_id: str, region: str
+        cls: Type["OUResourceSpec"], client: BaseClient, account_id: str, region: str
     ) -> ListFromAWSResult:
         """Return a dict of dicts of the format:
 
@@ -59,7 +57,7 @@ class OUResourceSpec(OrganizationsResourceSpec):
 
     @classmethod
     def _recursively_get_ou_details_for_parent(
-        cls: Type[T], client: BaseClient, parent_id: str, parent_path: str
+        cls: Type["OUResourceSpec"], client: BaseClient, parent_id: str, parent_path: str
     ) -> List[Dict[str, Any]]:
         ous = []
         paginator = client.get_paginator("list_organizational_units_for_parent")

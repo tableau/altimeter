@@ -1,5 +1,5 @@
 """Resource for Transit Gateways"""
-from typing import Any, Dict, List, Type, TypeVar
+from typing import Any, Dict, List, Type
 
 from botocore.client import BaseClient
 
@@ -12,8 +12,6 @@ from altimeter.core.graph.field.resource_link_field import ResourceLinkField
 from altimeter.core.graph.field.scalar_field import ScalarField
 from altimeter.core.graph.field.tags_field import TagsField
 from altimeter.core.graph.schema import Schema
-
-T = TypeVar("T", bound="TransitGatewayResourceSpec")
 
 
 class TransitGatewayResourceSpec(EC2ResourceSpec):
@@ -38,7 +36,7 @@ class TransitGatewayResourceSpec(EC2ResourceSpec):
 
     @classmethod
     def list_from_aws(
-        cls: Type[T], client: BaseClient, account_id: str, region: str
+        cls: Type["TransitGatewayResourceSpec"], client: BaseClient, account_id: str, region: str
     ) -> ListFromAWSResult:
         """Return a dict of dicts of the format:
 

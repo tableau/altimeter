@@ -1,11 +1,9 @@
 """Base class for AWS organizations resources."""
-from typing import Type, TypeVar
+from typing import Type
 
 from botocore.client import BaseClient
 
 from altimeter.aws.resource.resource_spec import ScanGranularity, AWSResourceSpec
-
-T = TypeVar("T", bound="OrganizationsResourceSpec")
 
 
 class OrganizationsResourceSpec(AWSResourceSpec):
@@ -15,7 +13,9 @@ class OrganizationsResourceSpec(AWSResourceSpec):
     scan_granularity = ScanGranularity.ACCOUNT
 
     @classmethod
-    def skip_resource_scan(cls: Type[T], client: BaseClient, account_id: str, region: str) -> bool:
+    def skip_resource_scan(
+        cls: Type["OrganizationsResourceSpec"], client: BaseClient, account_id: str, region: str
+    ) -> bool:
         """Return a bool indicating whether this resource class scan should be skipped,
         in this case skip if the current account is not an org master."""
         resp = client.describe_organization()

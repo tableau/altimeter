@@ -1,5 +1,5 @@
 """Resource representing an AWS Account"""
-from typing import List, Type, TypeVar
+from typing import List, Type
 
 from botocore.client import BaseClient
 
@@ -8,8 +8,6 @@ from altimeter.aws.resource.unscanned_account import UnscannedAccountResourceSpe
 from altimeter.core.resource.resource_spec import ResourceSpec
 from altimeter.core.graph.field.scalar_field import ScalarField
 from altimeter.core.graph.schema import Schema
-
-T = TypeVar("T", bound="AccountResourceSpec")
 
 
 class AccountResourceSpec(AWSResourceSpec):
@@ -22,12 +20,12 @@ class AccountResourceSpec(AWSResourceSpec):
     allow_clobber: List[Type[ResourceSpec]] = [UnscannedAccountResourceSpec]
 
     @classmethod
-    def get_full_type_name(cls: Type[T]) -> str:
+    def get_full_type_name(cls: Type["AccountResourceSpec"]) -> str:
         return f"{cls.provider_name}:{cls.type_name}"
 
     @classmethod
     def list_from_aws(
-        cls: Type[T], client: BaseClient, account_id: str, region: str
+        cls: Type["AccountResourceSpec"], client: BaseClient, account_id: str, region: str
     ) -> ListFromAWSResult:
         """This resource is somewhat synthetic, this method simply returns a dict of form
             {'account_arn': {account_dict}"""
@@ -38,6 +36,8 @@ class AccountResourceSpec(AWSResourceSpec):
         return ListFromAWSResult(resources=accounts)
 
     @classmethod
-    def generate_arn(cls: Type[T], account_id: str, region: str, resource_id: str) -> str:
+    def generate_arn(
+        cls: Type["AccountResourceSpec"], account_id: str, region: str, resource_id: str
+    ) -> str:
         """Generate an ARN for this resource"""
         return f"arn:aws::::account/{resource_id}"

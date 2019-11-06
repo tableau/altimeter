@@ -1,6 +1,6 @@
 """Resource representing an AWS Account as viewed in Orgs. This tags
 on things like the Org itself and the OU in which this account lives."""
-from typing import Any, Dict, List, Type, TypeVar
+from typing import Any, Dict, List, Type
 
 from botocore.client import BaseClient
 
@@ -12,8 +12,6 @@ from altimeter.aws.resource.unscanned_account import UnscannedAccountResourceSpe
 from altimeter.core.graph.field.resource_link_field import ResourceLinkField
 from altimeter.core.graph.field.scalar_field import ScalarField
 from altimeter.core.graph.schema import Schema
-
-T = TypeVar("T", bound="OrgsAccountResourceSpec")
 
 
 class OrgsAccountResourceSpec(OrganizationsResourceSpec):
@@ -32,12 +30,12 @@ class OrgsAccountResourceSpec(OrganizationsResourceSpec):
     allow_clobber = [UnscannedAccountResourceSpec]
 
     @classmethod
-    def get_full_type_name(cls: Type[T]) -> str:
+    def get_full_type_name(cls: Type["OrgsAccountResourceSpec"]) -> str:
         return f"{cls.provider_name}:{cls.type_name}"
 
     @classmethod
     def list_from_aws(
-        cls: Type[T], client: BaseClient, account_id: str, region: str
+        cls: Type["OrgsAccountResourceSpec"], client: BaseClient, account_id: str, region: str
     ) -> ListFromAWSResult:
         """Return a dict of dicts of the format:
 
@@ -77,7 +75,7 @@ class OrgsAccountResourceSpec(OrganizationsResourceSpec):
 
     @classmethod
     def _recursively_get_ou_details_for_parent(
-        cls: Type[T], client: BaseClient, parent_id: str, parent_path: str
+        cls: Type["OrgsAccountResourceSpec"], client: BaseClient, parent_id: str, parent_path: str
     ) -> List[Dict[str, Any]]:
         ous = []
         paginator = client.get_paginator("list_organizational_units_for_parent")

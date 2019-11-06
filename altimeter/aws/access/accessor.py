@@ -5,7 +5,7 @@ from datetime import datetime
 import json
 import os
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Type, TypeVar
+from typing import Any, Dict, List, Optional, Type
 
 import boto3
 
@@ -103,9 +103,6 @@ class SessionCache:
         return None
 
 
-AS = TypeVar("AS", bound="AccessStep")
-
-
 @dataclass(frozen=True)
 class AccessStep:
     """Represents a single access step to get to an account.
@@ -138,7 +135,7 @@ class AccessStep:
         }
 
     @classmethod
-    def from_dict(cls: Type[AS], data: Dict[str, Any]) -> AS:
+    def from_dict(cls: Type["AccessStep"], data: Dict[str, Any]) -> "AccessStep":
         """Create an AccessStep from a dict containing AccessStep data.
         Args:
             data: AccessStep data dict
@@ -163,9 +160,6 @@ class AccessStep:
                     )
         account_id = data.get("account_id")
         return cls(role_name=role_name, external_id=external_id, account_id=account_id)
-
-
-MHA = TypeVar("MHA", bound="MultiHopAccessor")
 
 
 class MultiHopAccessor:
@@ -261,7 +255,7 @@ class MultiHopAccessor:
         }
 
     @classmethod
-    def from_dict(cls: Type[MHA], data: Dict[str, Any]) -> MHA:
+    def from_dict(cls: Type["MultiHopAccessor"], data: Dict[str, Any]) -> "MultiHopAccessor":
         """Build a MultiHopAccessor from a dict representation.
 
         Args:
@@ -279,9 +273,6 @@ class MultiHopAccessor:
         if role_session_name is None:
             raise ValueError(f"{cls.__name__} missing key 'role_session_name': {data}")
         return cls(role_session_name, access_steps)
-
-
-AC = TypeVar("AC", bound="Accessor")
 
 
 @dataclass(frozen=True)
@@ -346,7 +337,7 @@ class Accessor:
         return data
 
     @classmethod
-    def from_dict(cls: Type[AC], data: Dict[str, Any]) -> AC:
+    def from_dict(cls: Type["Accessor"], data: Dict[str, Any]) -> "Accessor":
         """Create an Accessor from a dict representation.
 
         Args:
@@ -363,7 +354,7 @@ class Accessor:
         return cls(multi_hop_accessors=multi_hop_accessors)
 
     @classmethod
-    def from_file(cls: Type[AC], filepath: Path) -> AC:
+    def from_file(cls: Type["Accessor"], filepath: Path) -> "Accessor":
         """Create an Accessor from json content in a file
 
         Args:

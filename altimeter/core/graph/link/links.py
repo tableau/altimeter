@@ -1,5 +1,5 @@
 """A Link represents the predicate-object portion of a triple."""
-from typing import Any, Dict, Type, TypeVar
+from typing import Any, Dict, Type
 
 from rdflib import BNode, Graph, Literal, Namespace, RDF, XSD
 
@@ -32,9 +32,6 @@ class SimpleLink(Link):
                 datatype = XSD.nonNegativeInteger
         literal = Literal(self.obj, datatype=datatype)
         graph.add((subj, getattr(namespace, self.pred), literal))
-
-
-ML = TypeVar("ML", bound="MultiLink")
 
 
 class MultiLink(Link):
@@ -74,7 +71,7 @@ class MultiLink(Link):
         graph.add((subj, getattr(namespace, self.pred), map_node))
 
     @classmethod
-    def from_dict(cls: Type[ML], pred: str, obj: Any) -> ML:
+    def from_dict(cls: Type["MultiLink"], pred: str, obj: Any) -> "MultiLink":
         """Create a MultiLink object from a dict
 
         Args:

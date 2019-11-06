@@ -1,7 +1,7 @@
 """A GraphSet represents the contents of a Graph."""
 from collections import defaultdict
 import json
-from typing import Any, DefaultDict, Dict, List, Type, TypeVar
+from typing import Any, DefaultDict, Dict, List, Type
 
 from rdflib import BNode, Graph, Literal, Namespace, RDF
 
@@ -14,8 +14,6 @@ from altimeter.core.graph.node_cache import NodeCache
 from altimeter.core.multilevel_counter import MultilevelCounter
 from altimeter.core.resource.resource import Resource
 from altimeter.core.resource.resource_spec import ResourceSpec
-
-T = TypeVar("T", bound="GraphSet")
 
 
 class GraphSet:
@@ -139,7 +137,7 @@ class GraphSet:
             self.resources.append(merged_resource)
 
     @classmethod
-    def from_dict(cls: Type[T], data: Dict[str, Any]) -> T:
+    def from_dict(cls: Type["GraphSet"], data: Dict[str, Any]) -> "GraphSet":
         """Create a GraphSet from a dict.
 
         Args:
@@ -168,7 +166,7 @@ class GraphSet:
             stats=stats,
         )
 
-    def merge(self, other: T) -> None:
+    def merge(self, other: "GraphSet") -> None:
         """Merge another GraphSet into this GraphSet.
 
         Args:

@@ -1,5 +1,5 @@
 """Resource for EBSVolumes"""
-from typing import Type, TypeVar
+from typing import Type
 
 from botocore.client import BaseClient
 
@@ -13,8 +13,6 @@ from altimeter.core.graph.field.resource_link_field import ResourceLinkField
 from altimeter.core.graph.field.scalar_field import ScalarField
 from altimeter.core.graph.field.tags_field import TagsField
 from altimeter.core.graph.schema import Schema
-
-T = TypeVar("T", bound="EBSVolumeResourceSpec")
 
 
 class EBSVolumeResourceSpec(EC2ResourceSpec):
@@ -45,7 +43,7 @@ class EBSVolumeResourceSpec(EC2ResourceSpec):
 
     @classmethod
     def list_from_aws(
-        cls: Type[T], client: BaseClient, account_id: str, region: str
+        cls: Type["EBSVolumeResourceSpec"], client: BaseClient, account_id: str, region: str
     ) -> ListFromAWSResult:
         """Return a dict of dicts of the format:
 

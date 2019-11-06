@@ -1,12 +1,10 @@
 import abc
 import inspect
-from typing import TypeVar, Any, Dict
+from typing import Any, Dict
 
 from rdflib import BNode, Namespace, Graph
 
 from altimeter.core.graph.node_cache import NodeCache
-
-L = TypeVar("L", bound="Link")
 
 
 class Link(abc.ABC):

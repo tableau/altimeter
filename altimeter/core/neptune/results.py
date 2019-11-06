@@ -2,10 +2,7 @@
 from collections import Counter
 import csv
 import io
-from typing import Any, Dict, List, Type, TypeVar, Union
-
-
-QRS = TypeVar("QRS", bound="QueryResultSet")
+from typing import Any, Dict, List, Type, Union
 
 
 class QueryResultSet:
@@ -22,7 +19,9 @@ class QueryResultSet:
         self.length = len(self.values)
 
     @classmethod
-    def from_sparql_endpoint_json(cls: Type[QRS], resp: Dict[str, Any]) -> QRS:
+    def from_sparql_endpoint_json(
+        cls: Type["QueryResultSet"], resp: Dict[str, Any]
+    ) -> "QueryResultSet":
         """Build a QueryResultSet object from the returned data
         of a sparql endpoint json query (has top level field 'head' and
         results')
@@ -85,7 +84,7 @@ class QueryResultSet:
         return stats
 
     @classmethod
-    def from_dict(cls: Type[QRS], data: Dict[str, Any]) -> QRS:
+    def from_dict(cls: Type["QueryResultSet"], data: Dict[str, Any]) -> "QueryResultSet":
         fields = data.get("fields")
         if fields is None:
             raise ValueError(f"{cls.__name__} missing key 'fields': {data}")

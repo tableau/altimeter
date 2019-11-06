@@ -1,5 +1,5 @@
 """Resource representing an AWS Region"""
-from typing import Type, TypeVar
+from typing import Type
 
 from botocore.client import BaseClient
 
@@ -7,8 +7,6 @@ from altimeter.aws.resource.resource_spec import ScanGranularity, ListFromAWSRes
 from altimeter.aws.resource.ec2 import EC2ResourceSpec
 from altimeter.core.graph.field.scalar_field import ScalarField
 from altimeter.core.graph.schema import Schema
-
-T = TypeVar("T", bound="RegionResourceSpec")
 
 
 class RegionResourceSpec(EC2ResourceSpec):
@@ -19,12 +17,12 @@ class RegionResourceSpec(EC2ResourceSpec):
     schema = Schema(ScalarField("RegionName", "name"), ScalarField("OptInStatus"))
 
     @classmethod
-    def get_full_type_name(cls: Type[T]) -> str:
+    def get_full_type_name(cls: Type["RegionResourceSpec"]) -> str:
         return f"{cls.provider_name}:{cls.type_name}"
 
     @classmethod
     def list_from_aws(
-        cls: Type[T], client: BaseClient, account_id: str, region: str
+        cls: Type["RegionResourceSpec"], client: BaseClient, account_id: str, region: str
     ) -> ListFromAWSResult:
         """Return a dict of dicts of the format:
 

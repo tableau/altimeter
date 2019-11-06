@@ -4,16 +4,14 @@ import abc
 import inspect
 from dataclasses import dataclass, field
 from enum import Enum, auto
-from typing import Dict, Any, List, TypeVar, Type
+from typing import Dict, Any, List, Type
 
 from botocore.client import BaseClient
 from botocore.exceptions import ClientError
 
-from altimeter.aws.log import AWSLogEvents
 from altimeter.aws.scan.aws_accessor import AWSAccessor
 from altimeter.core.graph.exceptions import SchemaParseException
 from altimeter.core.graph.link import ResourceLinkLink
-from altimeter.core.log import Logger
 from altimeter.core.resource.resource import Resource
 from altimeter.core.resource.resource_spec import ResourceSpec, ResourceScanResult
 
@@ -43,9 +41,6 @@ class ListFromAWSResult:
     errors: List[str] = field(default_factory=list)
 
 
-T = TypeVar("T", bound="AWSResourceSpec")
-
-
 class AWSResourceSpec(ResourceSpec):
     """AWSResourceSpec is a subclass of ResourceSpec which is used to define
     ResourceSpecs for AWS resources"""
@@ -54,7 +49,7 @@ class AWSResourceSpec(ResourceSpec):
     service_name: str = ""
     scan_granularity: ScanGranularity = ScanGranularity.REGION
 
-    def __init_subclass__(cls: Type[T], **kwargs: Any) -> None:
+    def __init_subclass__(cls: Type["AWSResourceSpec"], **kwargs: Any) -> None:
         if not inspect.isabstract(cls):
             for required in ("service_name",):
                 if not getattr(cls, required):
@@ -64,7 +59,7 @@ class AWSResourceSpec(ResourceSpec):
         return super().__init_subclass__(**kwargs)
 
     @classmethod
-    def get_full_type_name(cls: Type[T]) -> str:
+    def get_full_type_name(cls: Type["AWSResourceSpec"]) -> str:
         """Get the fully qualified type name for this class, generally something like
         aws:ec2:instance, aws:iam:role, etc.
 
@@ -74,7 +69,7 @@ class AWSResourceSpec(ResourceSpec):
         return f"{cls.provider_name}:{cls.service_name}:{cls.type_name}"
 
     @classmethod
-    def get_client_name(cls: Type[T]) -> str:
+    def get_client_name(cls: Type["AWSResourceSpec"]) -> str:
         """Get the boto3 client name to be used for scanning resources of this type.
         Generally this is the same as cls.service_name but in some cases it is not.
 
@@ -84,7 +79,9 @@ class AWSResourceSpec(ResourceSpec):
         return cls.service_name
 
     @classmethod
-    def generate_id(cls: Type[T], short_resource_id: str, context: Dict[str, Any]) -> str:
+    def generate_id(
+        cls: Type["AWSResourceSpec"], short_resource_id: str, context: Dict[str, Any]
+    ) -> str:
         """Generate a full id (arn) given a short resource id.
 
         Args:
@@ -102,7 +99,9 @@ class AWSResourceSpec(ResourceSpec):
         )
 
     @classmethod
-    def generate_arn(cls: Type[T], account_id: str, region: str, resource_id: str) -> str:
+    def generate_arn(
+        cls: Type["AWSResourceSpec"], account_id: str, region: str, resource_id: str
+    ) -> str:
         """Generate an ARN for this resource
 
         Args:
@@ -121,7 +120,9 @@ class AWSResourceSpec(ResourceSpec):
         )
 
     @classmethod
-    def skip_resource_scan(cls: Type[T], client: BaseClient, account_id: str, region: str) -> bool:
+    def skip_resource_scan(
+        cls: Type["AWSResourceSpec"], client: BaseClient, account_id: str, region: str
+    ) -> bool:
         """Return a bool indicating whether this resource class scan should be skipped.
         Args:
             client: boto3 client
@@ -136,7 +137,7 @@ class AWSResourceSpec(ResourceSpec):
     @classmethod
     @abc.abstractmethod
     def list_from_aws(
-        cls: Type[T], client: BaseClient, account_id: str, region: str
+        cls: Type["AWSResourceSpec"], client: BaseClient, account_id: str, region: str
     ) -> ListFromAWSResult:
         """Return a ListFromAWSResult object by calling the appropriate
         AWS API calls to list/describe the resource represented by this class.
@@ -151,7 +152,7 @@ class AWSResourceSpec(ResourceSpec):
         """
 
     @classmethod
-    def scan(cls: Type[T], scan_accessor: AWSAccessor) -> ResourceScanResult:
+    def scan(cls: Type["AWSResourceSpec"], scan_accessor: AWSAccessor) -> ResourceScanResult:
         """Scan this ResourceSpec
 
        Args:
@@ -172,7 +173,9 @@ class AWSResourceSpec(ResourceSpec):
         )
 
     @classmethod
-    def _list_from_aws(cls: Type[T], scan_accessor: AWSAccessor) -> ListFromAWSResult:
+    def _list_from_aws(
+        cls: Type["AWSResourceSpec"], scan_accessor: AWSAccessor
+    ) -> ListFromAWSResult:
         try:
             resource_client = scan_accessor.client(cls.get_client_name())
             if cls.skip_resource_scan(
@@ -193,7 +196,9 @@ class AWSResourceSpec(ResourceSpec):
 
     @classmethod
     def _list_from_aws_result_to_resources(
-        cls: Type[T], list_from_aws_result: ListFromAWSResult, context: Dict[str, str]
+        cls: Type["AWSResourceSpec"],
+        list_from_aws_result: ListFromAWSResult,
+        context: Dict[str, str],
     ) -> List[Resource]:
         resources: List[Resource] = []
         for arn, resource_dict in list_from_aws_result.resources.items():
