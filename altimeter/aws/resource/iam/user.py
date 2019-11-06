@@ -1,5 +1,5 @@
 """Resource for IAM Users"""
-from typing import Any, List, Dict, Type, TypeVar
+from typing import Any, List, Dict, Type
 
 from botocore.client import BaseClient
 
@@ -9,9 +9,6 @@ from altimeter.core.graph.field.dict_field import EmbeddedDictField
 from altimeter.core.graph.field.list_field import ListField
 from altimeter.core.graph.field.scalar_field import ScalarField
 from altimeter.core.graph.schema import Schema
-
-
-T = TypeVar("T", bound="IAMUserResourceSpec")
 
 
 class IAMUserResourceSpec(IAMResourceSpec):
@@ -39,7 +36,7 @@ class IAMUserResourceSpec(IAMResourceSpec):
 
     @classmethod
     def list_from_aws(
-        cls: Type[T], client: BaseClient, account_id: str, region: str
+        cls: Type["IAMUserResourceSpec"], client: BaseClient, account_id: str, region: str
     ) -> ListFromAWSResult:
         """Return a dict of dicts of the format:
 

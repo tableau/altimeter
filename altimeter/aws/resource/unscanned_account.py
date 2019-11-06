@@ -1,5 +1,5 @@
 """Resource representing an unscanned AWS Account"""
-from typing import List, Type, TypeVar
+from typing import List, Type
 
 from botocore.client import BaseClient
 
@@ -11,8 +11,6 @@ from altimeter.core.resource.resource import Resource
 from altimeter.core.resource.resource_spec import ResourceScanResult
 from altimeter.aws.scan.aws_accessor import AWSAccessor
 
-T = TypeVar("T", bound="UnscannedAccountResourceSpec")
-
 
 class UnscannedAccountResourceSpec(AWSResourceSpec):
     """Resource representing an unscanned AWS Account"""
@@ -23,7 +21,9 @@ class UnscannedAccountResourceSpec(AWSResourceSpec):
     schema = Schema()
 
     @classmethod
-    def create_resource(cls: Type[T], account_id: str, errors: List[str]) -> Resource:
+    def create_resource(
+        cls: Type["UnscannedAccountResourceSpec"], account_id: str, errors: List[str]
+    ) -> Resource:
         links: List[Link] = []
         links.append(SimpleLink(pred="account_id", obj=account_id))
         for error in errors:
@@ -36,20 +36,24 @@ class UnscannedAccountResourceSpec(AWSResourceSpec):
         )
 
     @classmethod
-    def get_full_type_name(cls: Type[T]) -> str:
+    def get_full_type_name(cls: Type["UnscannedAccountResourceSpec"]) -> str:
         return f"{cls.provider_name}:{cls.type_name}"
 
     @classmethod
     def list_from_aws(
-        cls: Type[T], client: BaseClient, account_id: str, region: str
+        cls: Type["UnscannedAccountResourceSpec"], client: BaseClient, account_id: str, region: str
     ) -> ListFromAWSResult:
         """List resources from AWS using client."""
 
     @classmethod
-    def generate_arn(cls: Type[T], account_id: str, region: str, resource_id: str) -> str:
+    def generate_arn(
+        cls: Type["UnscannedAccountResourceSpec"], account_id: str, region: str, resource_id: str
+    ) -> str:
         """Generate an ARN for this resource"""
         return f"arn:aws::::account/{resource_id}"
 
     @classmethod
-    def scan(cls: Type[T], scan_accessor: AWSAccessor) -> ResourceScanResult:
+    def scan(
+        cls: Type["UnscannedAccountResourceSpec"], scan_accessor: AWSAccessor
+    ) -> ResourceScanResult:
         raise NotImplementedError(f"{cls.__name__} is not a scannable ResourceSpec class.")

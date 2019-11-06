@@ -1,4 +1,4 @@
-from typing import Any, Type, TypeVar
+from typing import Any, Type
 from unittest import TestCase
 
 from altimeter.core.graph.exceptions import (
@@ -14,8 +14,6 @@ from altimeter.core.resource.resource_spec import ResourceScanResult, ResourceSp
 from altimeter.core.resource.exceptions import ResourceSpecClassNotFoundException
 
 
-T = TypeVar("T", bound="TestResourceSpecA")
-
 
 class TestResourceSpecA(ResourceSpec):
     type_name = "a"
@@ -25,11 +23,9 @@ class TestResourceSpecA(ResourceSpec):
         return "test:a"
 
     @classmethod
-    def scan(cls: Type[T], scan_accessor: Any) -> ResourceScanResult:
+    def scan(cls: Type["TestResourceSpecA"], scan_accessor: Any) -> ResourceScanResult:
         raise NotImplementedError()
 
-
-T = TypeVar("T", bound="TestResourceSpecB")
 
 
 class TestResourceSpecB(ResourceSpec):
@@ -40,7 +36,7 @@ class TestResourceSpecB(ResourceSpec):
         return "test:b"
 
     @classmethod
-    def scan(cls: Type[T], scan_accessor: Any) -> ResourceScanResult:
+    def scan(cls: Type["TestResourceSpecB"], scan_accessor: Any) -> ResourceScanResult:
         raise NotImplementedError()
 
 

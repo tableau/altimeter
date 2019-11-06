@@ -1,5 +1,5 @@
 """Resource for RDS"""
-from typing import Type, TypeVar
+from typing import Type
 
 from botocore.client import BaseClient
 
@@ -23,8 +23,6 @@ from altimeter.core.graph.field.scalar_field import ScalarField
 from altimeter.core.graph.field.tags_field import TagsField
 from altimeter.core.graph.schema import Schema
 from altimeter.core.log import Logger
-
-T = TypeVar("T", bound="RDSInstanceResourceSpec")
 
 
 class RDSInstanceResourceSpec(RDSResourceSpec):
@@ -106,7 +104,7 @@ class RDSInstanceResourceSpec(RDSResourceSpec):
 
     @classmethod
     def list_from_aws(
-        cls: Type[T], client: BaseClient, account_id: str, region: str
+        cls: Type["RDSInstanceResourceSpec"], client: BaseClient, account_id: str, region: str
     ) -> ListFromAWSResult:
         logger = Logger()
         dbinstances = {}

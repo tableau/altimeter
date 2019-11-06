@@ -5,7 +5,7 @@ import abc
 from collections import defaultdict
 from dataclasses import dataclass
 import inspect
-from typing import Any, DefaultDict, Dict, List, Set, Type, TypeVar
+from typing import Any, DefaultDict, Dict, List, Set, Type
 
 from altimeter.core.resource.exceptions import (
     MultipleResourceSpecClassesFoundException,
@@ -35,9 +35,6 @@ class ResourceScanResult:
         }
 
 
-RS = TypeVar("RS", bound="ResourceSpec")
-
-
 class ResourceSpec(abc.ABC):
     """A ResourceSpec defines how an individual resource (e.g. EC2 Instances) JSON
     is converted into graph data.  It contains a Schema which contains a set of
@@ -50,7 +47,7 @@ class ResourceSpec(abc.ABC):
     # UnscannedAccountResourceSpec generated resources to overwrite AccountResourceSpecs.
     allow_clobber: List[Type] = []
 
-    def __init_subclass__(cls: Type[RS], **kwargs: Any) -> None:
+    def __init_subclass__(cls: Type["ResourceSpec"], **kwargs: Any) -> None:
         if not inspect.isabstract(cls):
             for required in ("schema", "type_name"):
                 if not getattr(cls, required):
@@ -61,7 +58,7 @@ class ResourceSpec(abc.ABC):
 
     @classmethod
     @abc.abstractmethod
-    def scan(cls: Type[RS], scan_accessor: Any) -> ResourceScanResult:
+    def scan(cls: Type["ResourceSpec"], scan_accessor: Any) -> ResourceScanResult:
         """Scan for this ResourceSpec using scan_accessor and return a ResourceScanResult.
 
         Args:
@@ -72,7 +69,7 @@ class ResourceSpec(abc.ABC):
         """
 
     @classmethod
-    def get_full_type_name(cls: Type[RS]) -> str:
+    def get_full_type_name(cls: Type["ResourceSpec"]) -> str:
         """Get the fully qualified type name for this class.  Generally this is something like
         aws:ec2:type_name.
 
@@ -82,7 +79,9 @@ class ResourceSpec(abc.ABC):
         return cls.type_name
 
     @classmethod
-    def generate_id(cls: Type[RS], short_resource_id: str, context: Dict[str, Any]) -> str:
+    def generate_id(
+        cls: Type["ResourceSpec"], short_resource_id: str, context: Dict[str, Any]
+    ) -> str:
         """Generate a full id for this type given a short_resource_id.
 
         Args:
@@ -95,7 +94,7 @@ class ResourceSpec(abc.ABC):
         return f"{cls.type_name}:{short_resource_id}"
 
     @staticmethod
-    def get_by_class_name(class_name: str) -> Type[RS]:
+    def get_by_class_name(class_name: str) -> Type["ResourceSpec"]:
         """Get a ResourceSpec class by class name.
 
         Args:
@@ -125,7 +124,7 @@ class ResourceSpec(abc.ABC):
         )
 
     @staticmethod
-    def get_by_full_type_name(type_name: str) -> List[Type[RS]]:
+    def get_by_full_type_name(type_name: str) -> List[Type["ResourceSpec"]]:
         """Get a ResourceSpec classes by full_type name.
 
         Args:
@@ -138,7 +137,7 @@ class ResourceSpec(abc.ABC):
             ResourceSpecClassNotFoundException if no ResourceSpec classes could be
             found matching type_name.
         """
-        subclasses: List[Type[RS]] = get_concrete_subclasses(ResourceSpec)
+        subclasses: List[Type[ResourceSpec]] = get_concrete_subclasses(ResourceSpec)
         candidates = []
         for subclass in subclasses:
             if subclass.get_full_type_name() == type_name:

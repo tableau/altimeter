@@ -2,10 +2,7 @@
 fashion."""
 
 from collections import defaultdict
-from typing import Any, DefaultDict, Dict, Type, TypeVar, Union
-
-
-T = TypeVar("T", bound="MultilevelCounter")
+from typing import Any, DefaultDict, Dict, Type, Union
 
 
 class MultilevelCounter:
@@ -73,7 +70,7 @@ class MultilevelCounter:
             category = categories[0]
             self.multilevel_counters[category].increment(*categories[1:])
 
-    def merge(self, other: T) -> None:
+    def merge(self, other: "MultilevelCounter") -> None:
         """Merge another MultilevelCounter into this counter.
 
         Args:
@@ -95,7 +92,9 @@ class MultilevelCounter:
         return data
 
     @classmethod
-    def from_dict(cls: Type[T], stats_data: Dict[str, Any]) -> T:
+    def from_dict(
+        cls: Type["MultilevelCounter"], stats_data: Dict[str, Any]
+    ) -> "MultilevelCounter":
         """Create a MultilevelCounter from a dict.
 
         Args:

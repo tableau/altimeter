@@ -1,5 +1,5 @@
 """Resource for CloudWatchEvents Rules"""
-from typing import Type, TypeVar
+from typing import Type
 
 from botocore.client import BaseClient
 
@@ -9,8 +9,6 @@ from altimeter.core.graph.field.dict_field import EmbeddedDictField
 from altimeter.core.graph.field.list_field import ListField
 from altimeter.core.graph.field.scalar_field import ScalarField
 from altimeter.core.graph.schema import Schema
-
-T = TypeVar("T", bound="EventsRuleResourceSpec")
 
 
 class EventsRuleResourceSpec(EventsResourceSpec):
@@ -31,7 +29,7 @@ class EventsRuleResourceSpec(EventsResourceSpec):
 
     @classmethod
     def list_from_aws(
-        cls: Type[T], client: BaseClient, account_id: str, region: str
+        cls: Type["EventsRuleResourceSpec"], client: BaseClient, account_id: str, region: str
     ) -> ListFromAWSResult:
         """Return a dict of dicts of the format:
 

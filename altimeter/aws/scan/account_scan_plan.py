@@ -1,12 +1,10 @@
 """An AccountScanPlan defines how to scan an account."""
 from dataclasses import dataclass
-from typing import Any, Dict, List, Optional, Type, TypeVar
+from typing import Any, Dict, List, Optional, Type
 
 import boto3
 
 from altimeter.aws.access.accessor import Accessor
-
-T = TypeVar("T", bound="AccountScanPlan")
 
 
 @dataclass(frozen=True)
@@ -45,7 +43,9 @@ class AccountScanPlan:
         }
 
     @classmethod
-    def from_dict(cls: Type[T], account_scan_plan_dict: Dict[str, Any]) -> T:
+    def from_dict(
+        cls: Type["AccountScanPlan"], account_scan_plan_dict: Dict[str, Any]
+    ) -> "AccountScanPlan":
         """Create an AccountScanPlan from a dict
 
         Args:

@@ -1,5 +1,5 @@
 """Resource for load balancers"""
-from typing import Type, TypeVar
+from typing import Type
 
 from botocore.client import BaseClient
 
@@ -16,8 +16,6 @@ from altimeter.core.graph.field.resource_link_field import (
 )
 from altimeter.core.graph.field.scalar_field import ScalarField
 from altimeter.core.graph.schema import Schema
-
-T = TypeVar("T", bound="LoadBalancerResourceSpec")
 
 
 class LoadBalancerResourceSpec(ElasticLoadBalancingResourceSpec):
@@ -55,7 +53,7 @@ class LoadBalancerResourceSpec(ElasticLoadBalancingResourceSpec):
 
     @classmethod
     def list_from_aws(
-        cls: Type[T], client: BaseClient, account_id: str, region: str
+        cls: Type["LoadBalancerResourceSpec"], client: BaseClient, account_id: str, region: str
     ) -> ListFromAWSResult:
         """Return a dict of dicts of the format:
 

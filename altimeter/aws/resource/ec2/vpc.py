@@ -1,5 +1,5 @@
 """Resource for VPCs"""
-from typing import Type, TypeVar
+from typing import Type
 
 from botocore.client import BaseClient
 
@@ -8,8 +8,6 @@ from altimeter.aws.resource.ec2 import EC2ResourceSpec
 from altimeter.core.graph.field.scalar_field import ScalarField
 from altimeter.core.graph.field.tags_field import TagsField
 from altimeter.core.graph.schema import Schema
-
-T = TypeVar("T", bound="VPCResourceSpec")
 
 
 class VPCResourceSpec(EC2ResourceSpec):
@@ -22,7 +20,7 @@ class VPCResourceSpec(EC2ResourceSpec):
 
     @classmethod
     def list_from_aws(
-        cls: Type[T], client: BaseClient, account_id: str, region: str
+        cls: Type["VPCResourceSpec"], client: BaseClient, account_id: str, region: str
     ) -> ListFromAWSResult:
         """Return a dict of dicts of the format:
 

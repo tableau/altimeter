@@ -1,5 +1,5 @@
 """Resource for IAM Policies"""
-from typing import Any, Type, TypeVar, List, Dict
+from typing import Any, Type, List, Dict
 
 from botocore.client import BaseClient
 
@@ -8,9 +8,6 @@ from altimeter.core.graph.field.dict_field import AnonymousDictField
 from altimeter.core.graph.schema import Schema
 from altimeter.aws.resource.resource_spec import ListFromAWSResult
 from altimeter.aws.resource.dynamodb import DynamoDBResourceSpec
-
-
-T = TypeVar("T", bound="DynamoDbTableResourceSpec")
 
 
 class DynamoDbTableResourceSpec(DynamoDBResourceSpec):
@@ -57,7 +54,7 @@ class DynamoDbTableResourceSpec(DynamoDBResourceSpec):
 
     @classmethod
     def list_from_aws(
-        cls: Type[T], client: BaseClient, account_id: str, region: str
+        cls: Type["DynamoDbTableResourceSpec"], client: BaseClient, account_id: str, region: str
     ) -> ListFromAWSResult:
         table_names: List[str] = []
         tables: Dict[str, Dict[str, Any]] = {}

@@ -1,5 +1,5 @@
 """Resource for S3Buckets"""
-from typing import Dict, List, Type, TypeVar
+from typing import Dict, List, Type
 
 from botocore.client import BaseClient
 from botocore.exceptions import ClientError
@@ -16,8 +16,6 @@ from altimeter.core.graph.field.scalar_field import ScalarField
 from altimeter.core.graph.field.tags_field import TagsField
 from altimeter.core.graph.schema import Schema
 from altimeter.core.log import Logger
-
-T = TypeVar("T", bound="S3BucketResourceSpec")
 
 
 class S3BucketAccessDeniedException(AltimeterException):
@@ -58,7 +56,7 @@ class S3BucketResourceSpec(S3ResourceSpec):
 
     @classmethod
     def list_from_aws(
-        cls: Type[T], client: BaseClient, account_id: str, region: str
+        cls: Type["S3BucketResourceSpec"], client: BaseClient, account_id: str, region: str
     ) -> ListFromAWSResult:
         """Return a dict of dicts of the format:
 

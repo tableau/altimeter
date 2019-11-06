@@ -4,7 +4,7 @@ from dataclasses import dataclass
 import logging
 import os
 import sys
-from typing import Any, Dict, List, Tuple, Type, TypeVar, Union
+from typing import Any, Dict, List, Tuple, Type, Union
 
 import structlog
 
@@ -20,9 +20,6 @@ class EventName:
     name: str
 
 
-LEM = TypeVar("LEM", bound="LogEventMeta")
-
-
 class LogEventMeta(type):
     """Metaclass for LogEvents. This allows EventNames to specified in subclasses of BaseLogEvent
     as empty typed variables e.g.
@@ -36,7 +33,7 @@ class LogEventMeta(type):
 
     def __new__(
         cls: Type, name: str, bases: Tuple[Type, ...], namespace: Dict[str, Any]
-    ) -> Type[LEM]:
+    ) -> Type["LogEventMeta"]:
         for annotation in namespace.get("__annotations__", []):
             namespace[annotation] = EventName(annotation)
         return super(LogEventMeta, cls).__new__(cls, name, bases, namespace)

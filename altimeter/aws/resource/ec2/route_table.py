@@ -1,5 +1,5 @@
 """Resource for Route Tables"""
-from typing import Type, TypeVar
+from typing import Type
 
 from botocore.client import BaseClient
 
@@ -11,8 +11,6 @@ from altimeter.core.graph.field.dict_field import EmbeddedDictField
 from altimeter.core.graph.field.list_field import AnonymousListField, ListField
 from altimeter.core.graph.field.resource_link_field import ResourceLinkField
 from altimeter.core.graph.field.scalar_field import ScalarField
-
-T = TypeVar("T", bound="EC2RouteTableResourceSpec")
 
 
 class EC2RouteTableResourceSpec(EC2ResourceSpec):
@@ -60,7 +58,7 @@ class EC2RouteTableResourceSpec(EC2ResourceSpec):
 
     @classmethod
     def list_from_aws(
-        cls: Type[T], client: BaseClient, account_id: str, region: str
+        cls: Type["EC2RouteTableResourceSpec"], client: BaseClient, account_id: str, region: str
     ) -> ListFromAWSResult:
         paginator = client.get_paginator("describe_route_tables")
         route_tables = {}

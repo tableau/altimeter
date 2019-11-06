@@ -1,5 +1,5 @@
 """Resource for KMSKeys"""
-from typing import Type, TypeVar
+from typing import Type
 
 from botocore.client import BaseClient
 
@@ -7,8 +7,6 @@ from altimeter.aws.resource.resource_spec import ListFromAWSResult
 from altimeter.aws.resource.kms import KMSResourceSpec
 from altimeter.core.graph.field.scalar_field import ScalarField
 from altimeter.core.graph.schema import Schema
-
-T = TypeVar("T", bound="KMSKeyResourceSpec")
 
 
 class KMSKeyResourceSpec(KMSResourceSpec):
@@ -19,7 +17,7 @@ class KMSKeyResourceSpec(KMSResourceSpec):
 
     @classmethod
     def list_from_aws(
-        cls: Type[T], client: BaseClient, account_id: str, region: str
+        cls: Type["KMSKeyResourceSpec"], client: BaseClient, account_id: str, region: str
     ) -> ListFromAWSResult:
         """Return a dict of dicts of the format:
 
