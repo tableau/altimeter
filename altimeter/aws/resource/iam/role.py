@@ -1,5 +1,6 @@
 """Resource for IAM Roles"""
 import copy
+import json
 from typing import Any, Dict, List, Type
 
 from botocore.client import BaseClient
@@ -7,6 +8,7 @@ from botocore.client import BaseClient
 from altimeter.aws.resource.resource_spec import ListFromAWSResult
 from altimeter.aws.resource.iam import IAMResourceSpec
 from altimeter.aws.resource.iam.policy import IAMPolicyResourceSpec
+from altimeter.aws.resource.util import policy_doc_dict_to_sorted_str
 from altimeter.core.graph.field.dict_field import (
     EmbeddedDictField,
     AnonymousEmbeddedDictField,
@@ -55,6 +57,7 @@ class IAMRoleResourceSpec(IAMResourceSpec):
                 ),
             ),
         ),
+        ScalarField("AssumeRolePolicyDocumentText"),
     )
 
     @classmethod
@@ -75,6 +78,10 @@ class IAMRoleResourceSpec(IAMResourceSpec):
             for role in resp.get("Roles", []):
                 role_name = role["RoleName"]
                 assume_role_policy_document = copy.deepcopy(role["AssumeRolePolicyDocument"])
+                assume_role_policy_document_text = policy_doc_dict_to_sorted_str(
+                    assume_role_policy_document
+                )
+                role["AssumeRolePolicyDocumentText"] = assume_role_policy_document_text
                 for statement in assume_role_policy_document.get("Statement", []):
                     for obj in statement.get("Condition", {}).values():
                         for obj_key in obj.keys():
