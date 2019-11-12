@@ -1,7 +1,7 @@
 # Altimeter
 
 [![Community Supported](https://img.shields.io/badge/Support%20Level-Community%20Supported-457387.svg)](https://www.tableau.com/support-levels-it-and-developer-tools)
-[![Build Status](https://img.shields.io/travis/com/tableau/altimeter.svg?branch=master)](https://travis-ci.com/tableau/altimeter)
+[![Build Status](https://api.travis-ci.com/tableau/altimeter.svg?branch=master)](https://travis-ci.com/tableau/altimeter)
 [![GitHub](https://img.shields.io/badge/license-MIT-brightgreen.svg)](https://raw.githubusercontent.com/Tableau/altimeter/master/LICENSE)
 
 [![Python 3.7](https://img.shields.io/badge/python-3.7-blue.svg)](https://www.python.org/downloads/release/python-370/)
