@@ -1,5 +1,9 @@
 # Altimeter
 
+[![Community Supported](https://img.shields.io/badge/Support%20Level-Community%20Supported-457387.svg)](https://www.tableau.com/support-levels-it-and-developer-tools)
+[![Build Status](https://img.shields.io/travis/com/tableau/altimeter.svg?branch=master)](https://travis-ci.com/tableau/altimeter)
+[![GitHub](https://img.shields.io/badge/license-MIT-brightgreen.svg)](https://raw.githubusercontent.com/Tableau/altimeter/master/LICENSE)
+
 Altimeter is a system to graph and scan AWS resources across multiple
 AWS Organizations and Accounts.
 
