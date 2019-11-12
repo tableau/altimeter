@@ -4,7 +4,8 @@ python: 3.7
 install:
     - pip install -r requirements.txt 
     - pip install -r ci/requirements.txt
+    - pip install -r tests/unit/requirements.txt
 script:
     - export PYTHONPATH=.
     - ci/static_checks.sh altimeter
-
+    - ci/test.sh altimeter tests/unit
