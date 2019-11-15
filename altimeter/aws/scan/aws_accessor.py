@@ -17,6 +17,7 @@ def on_request_created(
     account_id: str,
     region_name: str,
     service_name: str,
+    readonly: bool,
     **kwargs: Any,
 ) -> None:
     """Called when a boto3 request is created. This handles api call statistics tracking.
@@ -26,13 +27,15 @@ def on_request_created(
         account_id: request account id
         region_name: request region
         service_name: request service
+        readonly: if True only allow readonly calls
         kwargs: kwargs which are passed through by the boto event callback.
     """
     _, _, operation_name = kwargs["event_name"].split(".")
-    if not _PERMITTED_OPERATION_NAMES_RE.search(kwargs["operation_name"]):
-        raise Exception(
-            f"Operation name {operation_name} did not match {_PERMITTED_OPERATION_NAMES_STR}"
-        )
+    if readonly:
+        if not _PERMITTED_OPERATION_NAMES_RE.search(kwargs["operation_name"]):
+            raise Exception(
+                f"Operation name {operation_name} did not match {_PERMITTED_OPERATION_NAMES_STR}"
+            )
     api_call_stats.increment(account_id, region_name, service_name, operation_name)
 
 
@@ -46,12 +49,15 @@ class AWSAccessor:
         region_name: aws region
     """
 
-    def __init__(self, session: boto3.Session, account_id: str, region_name: str):
+    def __init__(
+        self, session: boto3.Session, account_id: str, region_name: str, readonly: bool = True
+    ):
         self.session = session
         self.account_id = account_id
         self.region = region_name
         self.api_call_stats = MultilevelCounter()
         self.client_cache: Dict[str, Any] = {}
+        self.readonly = readonly
 
     def client(self, service_name: str) -> BaseClient:
         """Return a boto3 client for a given AWS service_name.
@@ -71,6 +77,7 @@ class AWSAccessor:
             account_id=self.account_id,
             region_name=self.region,
             service_name=service_name,
+            readonly=self.readonly,
             **kwargs,
         )
         client.meta.events.register("request-created.*.*", create_handler)
