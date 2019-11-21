@@ -9,6 +9,7 @@ from altimeter.aws.resource.ec2.image import EC2ImageResourceSpec
 from altimeter.aws.resource.ec2.security_group import SecurityGroupResourceSpec
 from altimeter.aws.resource.ec2.subnet import SubnetResourceSpec
 from altimeter.aws.resource.ec2.vpc import VPCResourceSpec
+from altimeter.aws.resource.iam.instance_profile import InstanceProfileResourceSpec
 from altimeter.core.graph.field.dict_field import AnonymousDictField, AnonymousEmbeddedDictField
 from altimeter.core.graph.field.list_field import AnonymousListField
 from altimeter.core.graph.field.resource_link_field import (
@@ -37,6 +38,13 @@ class EC2InstanceResourceSpec(EC2ResourceSpec):
         AnonymousListField(
             "SecurityGroups",
             AnonymousEmbeddedDictField(ResourceLinkField("GroupId", SecurityGroupResourceSpec)),
+        ),
+        AnonymousDictField(
+            "IamInstanceProfile",
+            ResourceLinkField(
+                "Arn", InstanceProfileResourceSpec, alti_key="instance_profile", value_is_id=True
+            ),
+            optional=True,
         ),
         TagsField(),
     )
