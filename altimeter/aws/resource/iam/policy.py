@@ -37,7 +37,7 @@ class IAMPolicyResourceSpec(IAMResourceSpec):
 
         # Scope parameter can be modified to return AWS managed policies
         # Currently scoped to user defined policies only
-        for resp in paginator.paginate(Scope="Local"):
+        for resp in paginator.paginate():
             for policy in resp.get("Policies", []):
                 resource_arn = policy["Arn"]
                 default_policy_version = policy["DefaultVersionId"]
