@@ -24,7 +24,7 @@ from altimeter.aws.resource.elasticloadbalancing.target_group import TargetGroup
 from altimeter.aws.resource.events.cloudwatchevents_rule import EventsRuleResourceSpec
 from altimeter.aws.resource.iam.iam_saml_provider import IAMSAMLProviderResourceSpec
 from altimeter.aws.resource.iam.instance_profile import InstanceProfileResourceSpec
-from altimeter.aws.resource.iam.policy import IAMPolicyResourceSpec
+from altimeter.aws.resource.iam.policy import IAMPolicyResourceSpec, IAMAWSManagedPolicyResourceSpec
 from altimeter.aws.resource.iam.role import IAMRoleResourceSpec
 from altimeter.aws.resource.iam.user import IAMUserResourceSpec
 from altimeter.aws.resource.kms.key import KMSKeyResourceSpec
@@ -45,6 +45,7 @@ RESOURCE_SPEC_CLASSES: Tuple[Type[AWSResourceSpec], ...] = (
     EC2NetworkInterfaceResourceSpec,
     EC2RouteTableResourceSpec,
     EventsRuleResourceSpec,
+    IAMAWSManagedPolicyResourceSpec,
     IAMPolicyResourceSpec,
     IAMRoleResourceSpec,
     IAMSAMLProviderResourceSpec,

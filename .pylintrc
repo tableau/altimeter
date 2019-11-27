@@ -63,6 +63,7 @@ confidence=
 disable=abstract-method,  # doesn't understand ABC
         bad-continuation, # incompatible with black
         invalid-name, # we're ok with things like 'lb' and TypeVars T
+        too-few-public-methods,
 
 #disable=print-statement,
 #        parameter-unpacking,

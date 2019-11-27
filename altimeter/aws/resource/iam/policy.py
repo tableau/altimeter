@@ -11,7 +11,7 @@ from altimeter.core.graph.schema import Schema
 
 
 class IAMPolicyResourceSpec(IAMResourceSpec):
-    """Resource for IAM Policies"""
+    """Resource for user-managed IAM Policies"""
 
     type_name = "policy"
     schema = Schema(
@@ -35,8 +35,6 @@ class IAMPolicyResourceSpec(IAMResourceSpec):
         policies = {}
         paginator = client.get_paginator("list_policies")
 
-        # Scope parameter can be modified to return AWS managed policies
-        # Currently scoped to user defined policies only
         for resp in paginator.paginate(Scope="Local"):
             for policy in resp.get("Policies", []):
                 resource_arn = policy["Arn"]
@@ -50,5 +48,36 @@ class IAMPolicyResourceSpec(IAMResourceSpec):
                 policy["DefaultVersionPolicyDocumentText"] = policy_doc_dict_to_sorted_str(
                     default_policy_version_document_text
                 )
+                policies[resource_arn] = policy
+        return ListFromAWSResult(resources=policies)
+
+
+class IAMAWSManagedPolicyResourceSpec(IAMResourceSpec):
+    """Resource for AWS-managed IAM Policies"""
+
+    type_name = "policy"
+    schema = Schema(ScalarField("PolicyName", "name"), ScalarField("PolicyId"))
+
+    @classmethod
+    def list_from_aws(
+        cls: Type["IAMAWSManagedPolicyResourceSpec"],
+        client: BaseClient,
+        account_id: str,
+        region: str,
+    ) -> ListFromAWSResult:
+        """Return a dict of dicts of the format:
+
+            {'role_1_arn': {role_1_dict},
+             'role_2_arn': {role_2_dict},
+             ...}
+
+        Where the dicts represent results from list_policies and additional info per role from
+        list_targets_by_role."""
+        policies = {}
+        paginator = client.get_paginator("list_policies")
+
+        for resp in paginator.paginate(Scope="AWS", OnlyAttached=True):
+            for policy in resp.get("Policies", []):
+                resource_arn = policy["Arn"]
                 policies[resource_arn] = policy
         return ListFromAWSResult(resources=policies)
