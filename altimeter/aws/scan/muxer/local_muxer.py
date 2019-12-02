@@ -25,7 +25,9 @@ def local_account_scan(
     artifact_writer = FileArtifactWriter(output_dir=output_dir)
     account_scan_plan = AccountScanPlan.from_dict(account_scan_plan_dict=account_scan_plan_dict)
     account_scanner = AccountScanner(
-        account_scan_plan=account_scan_plan,
+        account_id=account_scan_plan.account_id,
+        regions=account_scan_plan.regions,
+        get_session=account_scan_plan.get_session,
         artifact_writer=artifact_writer,
         scan_sub_accounts=scan_sub_accounts,
         max_svc_threads=DEFAULT_MAX_SVC_THREADS,

@@ -213,17 +213,18 @@ class AWSResourceSpec(ResourceSpec):
                 )
             resource_account_id = arn.split(":")[4]
             if resource_account_id:
-                account_link = ResourceLinkLink(
-                    pred="account", obj=f"arn:aws::::account/{resource_account_id}"
-                )
-                links.append(account_link)
-                resource_region_name = arn.split(":")[3]
-                if resource_region_name:
-                    region_link = ResourceLinkLink(
-                        pred="region",
-                        obj=f"arn:aws:::{resource_account_id}:region/{resource_region_name}",
+                if resource_account_id != "aws":
+                    account_link = ResourceLinkLink(
+                        pred="account", obj=f"arn:aws::::account/{resource_account_id}"
                     )
-                    links.append(region_link)
+                    links.append(account_link)
+                    resource_region_name = arn.split(":")[3]
+                    if resource_region_name:
+                        region_link = ResourceLinkLink(
+                            pred="region",
+                            obj=f"arn:aws:::{resource_account_id}:region/{resource_region_name}",
+                        )
+                        links.append(region_link)
             resource = Resource(resource_id=arn, type_name=cls.get_full_type_name(), links=links)
             resources.append(resource)
         return resources

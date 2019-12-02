@@ -19,7 +19,9 @@ def lambda_handler(event, context):
 
     artifact_writer = S3ArtifactWriter(bucket=json_bucket, key_prefix=key_prefix)
     account_scanner = AccountScanner(
-        account_scan_plan=account_scan_plan,
+        account_id=account_scan_plan.account_id,
+        regions=account_scan_plan.regions,
+        get_session=account_scan_plan.get_session,
         artifact_writer=artifact_writer,
         scan_sub_accounts=scan_sub_accounts,
         max_svc_threads=DEFAULT_MAX_SVC_THREADS,

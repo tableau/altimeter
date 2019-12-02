@@ -101,6 +101,5 @@ def get_attached_role_policies(client: BaseClient, role_name: str) -> List[Dict[
     paginator = client.get_paginator("list_attached_role_policies")
     for resp in paginator.paginate(RoleName=role_name):
         for policy in resp.get("AttachedPolicies", []):
-            if policy["PolicyArn"].split(":")[4] != "aws":  # Include only user-defined Policies
-                policies.append(policy)
+            policies.append(policy)
     return policies
