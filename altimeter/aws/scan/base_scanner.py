@@ -104,16 +104,16 @@ class BaseScanner(abc.ABC):
             stats = MultilevelCounter()
             errors: List[str] = []
             now = int(time.time())
-            account_graph_set = GraphSet(
-                name=self.graph_name,
-                version=self.graph_version,
-                start_time=now,
-                end_time=now,
-                resources=[],
-                errors=[],
-                stats=stats,
-            )
             try:
+                account_graph_set = GraphSet(
+                    name=self.graph_name,
+                    version=self.graph_version,
+                    start_time=now,
+                    end_time=now,
+                    resources=[],
+                    errors=[],
+                    stats=stats,
+                )
                 # sanity check
                 session = self.get_session()
                 sts_client = session.client("sts")
@@ -178,11 +178,6 @@ class BaseScanner(abc.ABC):
                         graph_set = GraphSet.from_dict(graph_set_dict)
                         errors += graph_set.errors
                         account_graph_set.merge(graph_set)
-                account_graph_set.validate()
-                output_artifact = self.artifact_writer.write_artifact(
-                    name=self.account_id, data=account_graph_set.to_dict()
-                )
-                logger.info(event=AWSLogEvents.ScanAWSAccountEnd)
             except Exception as ex:
                 error_str = str(ex)
                 trace_back = traceback.format_exc()
@@ -193,7 +188,7 @@ class BaseScanner(abc.ABC):
                 unscanned_account_resource = UnscannedAccountResourceSpec.create_resource(
                     account_id=self.account_id, errors=errors
                 )
-                failed_account_graph_set = GraphSet(
+                account_graph_set = GraphSet(
                     name=self.graph_name,
                     version=self.graph_version,
                     start_time=now,
@@ -202,7 +197,11 @@ class BaseScanner(abc.ABC):
                     errors=errors,
                     stats=stats,
                 )
-                account_graph_set.merge(failed_account_graph_set)
+        account_graph_set.validate()
+        output_artifact = self.artifact_writer.write_artifact(
+            name=self.account_id, data=account_graph_set.to_dict()
+        )
+        logger.info(event=AWSLogEvents.ScanAWSAccountEnd)
         api_call_stats = account_graph_set.stats.to_dict()
         return {
             "account_id": self.account_id,
