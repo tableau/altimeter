@@ -178,6 +178,7 @@ class BaseScanner(abc.ABC):
                         graph_set = GraphSet.from_dict(graph_set_dict)
                         errors += graph_set.errors
                         account_graph_set.merge(graph_set)
+                    account_graph_set.validate()
             except Exception as ex:
                 error_str = str(ex)
                 trace_back = traceback.format_exc()
@@ -197,7 +198,7 @@ class BaseScanner(abc.ABC):
                     errors=errors,
                     stats=stats,
                 )
-        account_graph_set.validate()
+                account_graph_set.validate()
         output_artifact = self.artifact_writer.write_artifact(
             name=self.account_id, data=account_graph_set.to_dict()
         )
