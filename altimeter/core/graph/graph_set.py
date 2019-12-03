@@ -107,10 +107,7 @@ class GraphSet:
         orphan_refs = resource_ref_ids - present_resource_ids
         if orphan_refs:
             raise GraphSetOrphanedReferencesException(
-                (
-                    "References to resources were found which were not scanned: "
-                    f"{orphan_refs}.\n\nDetails: {json.dumps(resource_ref_ids_used_by_ids)}"
-                )
+                ("References to resources were found which were not scanned: " f"{orphan_refs}.")
             )
 
     def _resolve_duplicates(self) -> None:

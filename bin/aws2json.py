@@ -249,11 +249,13 @@ def scan(
         account_id = account_scan_manifest.account_id
         if account_scan_manifest.artifacts:
             artifacts += account_scan_manifest.artifacts
-            scanned_accounts.append(account_id)
+            if account_scan_manifest.errors:
+                errors[account_id] = account_scan_manifest.errors
+                unscanned_accounts.append(account_id)
+            else:
+                scanned_accounts.append(account_id)
         else:
             unscanned_accounts.append(account_id)
-        if account_scan_manifest.errors:
-            errors[account_id] = account_scan_manifest.errors
         account_stats = MultilevelCounter.from_dict(account_scan_manifest.api_call_stats)
         stats.merge(account_stats)
     graph_set = None
