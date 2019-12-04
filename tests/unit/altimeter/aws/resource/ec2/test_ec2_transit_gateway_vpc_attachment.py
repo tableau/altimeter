@@ -52,15 +52,13 @@ class TestTransitGatewayVpcAttachmentSchema(unittest.TestCase):
                     "obj": datetime.datetime(2019, 8, 23, 15, 59, 46, tzinfo=tzutc()),
                     "type": "simple",
                 },
-                {
-                    "pred": "subnet",
-                    "obj": "arn:aws:ec2:us-west-2:111122223333:subnet/subnet-07697f82fe4c6a8d6",
-                    "type": "resource_link",
+                {"obj": "subnet-07697f82fe4c6a8d6",
+                    "pred": "subnet_id",
+                    "type": "simple"
                 },
-                {
-                    "pred": "subnet",
-                    "obj": "arn:aws:ec2:us-west-2:111122223333:subnet/subnet-0396137c18d6c30ef",
-                    "type": "resource_link",
+                {"obj": "subnet-0396137c18d6c30ef",
+                    "pred": "subnet_id",
+                    "type": "simple"
                 },
                 {"pred": "dns_support", "obj": "enable", "type": "simple"},
                 {"pred": "ipv6_support", "obj": "disable", "type": "simple"},

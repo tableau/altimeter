@@ -5,12 +5,10 @@ from botocore.client import BaseClient
 
 from altimeter.aws.resource.resource_spec import ListFromAWSResult
 from altimeter.aws.resource.ec2 import EC2ResourceSpec
-from altimeter.aws.resource.ec2.subnet import SubnetResourceSpec
 from altimeter.core.graph.schema import Schema
 from altimeter.core.graph.field.dict_field import AnonymousDictField
-from altimeter.core.graph.field.list_field import AnonymousListField
-from altimeter.core.graph.field.resource_link_field import EmbeddedResourceLinkField
-from altimeter.core.graph.field.scalar_field import ScalarField
+from altimeter.core.graph.field.list_field import ListField
+from altimeter.core.graph.field.scalar_field import EmbeddedScalarField, ScalarField
 
 
 class TransitGatewayVpcAttachmentResourceSpec(EC2ResourceSpec):
@@ -24,7 +22,7 @@ class TransitGatewayVpcAttachmentResourceSpec(EC2ResourceSpec):
         ScalarField("VpcOwnerId"),
         ScalarField("State"),
         ScalarField("CreationTime"),
-        AnonymousListField("SubnetIds", EmbeddedResourceLinkField(SubnetResourceSpec)),
+        ListField("SubnetIds", EmbeddedScalarField(), alti_key="subnet_id"),
         AnonymousDictField("Options", ScalarField("DnsSupport"), ScalarField("Ipv6Support")),
     )
 
