@@ -41,7 +41,7 @@ class EC2InstanceResourceSpec(EC2ResourceSpec):
         ),
         AnonymousDictField(
             "IamInstanceProfile",
-            ResourceLinkField(
+            TransientResourceLinkField(
                 "Arn", InstanceProfileResourceSpec, alti_key="instance_profile", value_is_id=True
             ),
             optional=True,
