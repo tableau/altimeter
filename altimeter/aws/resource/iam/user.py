@@ -3,10 +3,11 @@ import copy
 from typing import Any, List, Dict, Type
 
 from botocore.client import BaseClient
+from botocore.exceptions import ClientError
 
 from altimeter.aws.resource.resource_spec import ListFromAWSResult
 from altimeter.aws.resource.iam import IAMResourceSpec
-from altimeter.core.graph.field.dict_field import AnonymousDictField, EmbeddedDictField
+from altimeter.core.graph.field.dict_field import AnonymousDictField, DictField, EmbeddedDictField
 from altimeter.core.graph.field.list_field import ListField
 from altimeter.core.graph.field.scalar_field import ScalarField
 from altimeter.core.graph.schema import Schema
@@ -30,6 +31,12 @@ class IAMUserResourceSpec(IAMResourceSpec):
             ),
             optional=True,
             alti_key="access_key",
+        ),
+        DictField(
+            "LoginProfile",
+            ScalarField("CreateDate"),
+            ScalarField("PasswordResetRequired"),
+            optional=True,
         ),
         ListField(
             "MfaDevices",
@@ -71,5 +78,11 @@ class IAMUserResourceSpec(IAMResourceSpec):
                 for mfa_devices_resp in mfa_devices_paginator.paginate(UserName=user_name):
                     mfa_devices += mfa_devices_resp["MFADevices"]
                     user["MfaDevices"] = mfa_devices
+                try:
+                    login_profile_resp = client.get_login_profile(UserName=user_name)
+                    user["LoginProfile"] = login_profile_resp["LoginProfile"]
+                except ClientError as c_e:
+                    if "NoSuchEntity" not in str(c_e):
+                        raise c_e
                 users[resource_arn] = user
         return ListFromAWSResult(resources=users)
