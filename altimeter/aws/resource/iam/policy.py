@@ -17,6 +17,7 @@ class IAMPolicyResourceSpec(IAMResourceSpec):
     schema = Schema(
         ScalarField("PolicyName", "name"),
         ScalarField("PolicyId"),
+        ScalarField("DefaultVersionId"),
         ScalarField("DefaultVersionPolicyDocumentText"),
     )
 
