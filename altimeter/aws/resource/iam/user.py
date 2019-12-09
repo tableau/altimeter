@@ -21,6 +21,7 @@ class IAMUserResourceSpec(IAMResourceSpec):
         ScalarField("UserName", "name"),
         ScalarField("UserId"),
         ScalarField("CreateDate"),
+        ScalarField("PasswordLastUsed", optional=True),
         ListField(
             "AccessKeys",
             EmbeddedDictField(
