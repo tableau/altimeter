@@ -19,6 +19,7 @@ from altimeter.aws.resource.ec2.subnet import SubnetResourceSpec
 from altimeter.aws.resource.ec2.transit_gateway import TransitGatewayResourceSpec
 from altimeter.aws.resource.ec2.volume import EBSVolumeResourceSpec
 from altimeter.aws.resource.ec2.vpc import VPCResourceSpec
+from altimeter.aws.resource.ec2.vpc_endpoint import VpcEndpointResourceSpec
 from altimeter.aws.resource.elasticloadbalancing.load_balancer import LoadBalancerResourceSpec
 from altimeter.aws.resource.elasticloadbalancing.target_group import TargetGroupResourceSpec
 from altimeter.aws.resource.events.cloudwatchevents_rule import EventsRuleResourceSpec
@@ -63,6 +64,7 @@ RESOURCE_SPEC_CLASSES: Tuple[Type[AWSResourceSpec], ...] = (
     TransitGatewayResourceSpec,
     TransitGatewayVpcAttachmentResourceSpec,
     VPCResourceSpec,
+    VpcEndpointResourceSpec,
 )
 
 INFRA_RESOURCE_SPEC_CLASSES: Tuple[Type[AWSResourceSpec], ...] = (
