@@ -58,7 +58,7 @@ class RDSInstanceResourceSpec(RDSResourceSpec):
                 ResourceLinkField("VpcSecurityGroupId", SecurityGroupResourceSpec, optional=True)
             ),
         ),
-        ScalarField("AvailabilityZone"),
+        ScalarField("AvailabilityZone", optional=True),
         AnonymousDictField(
             "DBSubnetGroup", ResourceLinkField("VpcId", VPCResourceSpec), optional=True
         ),
