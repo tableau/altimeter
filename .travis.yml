@@ -22,11 +22,3 @@ deploy:
     on:
         branch: master
         tags: true
-deploy:
-    provider: pages
-    skip_cleanup: true
-    github_token: $GITHUB_TOKEN
-    local_dir: doc/html
-    on:
-        branch: master
-    #    tags: true
