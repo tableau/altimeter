@@ -13,6 +13,7 @@ script:
     - export PYTHONPATH=.
     - sphinx-apidoc -f -o doc/source altimeter
     - sphinx-build doc/source doc/html -E -W
+    - touch doc/html/.nojekyll
 deploy:
     provider: pypi
     user: "__token__"
