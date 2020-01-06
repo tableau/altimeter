@@ -27,3 +27,6 @@ deploy:
     github_token:
         secure: "Oe+IDJIuFDlAyf+4O5LhfgIGmbdhGt18pgjhlGzrLeRq8SHJ+Ao93wZbLLMR36NuDiJp4AMI5Oto0tBwTc6dXrc1RXzl0RhC3x1H+oAtbdsRB7LAY4ARw5qrWtz87Z1zfm/RgM1DrSmKGN7UVSx2gvFnKRLryLku695VG/0VLZuDqwLGvgvRMCkyiQgluJFB7jHHyje5eN2b0TkjOVMIY7nWqbugfcyUlHJ7hzljSEd9RP+3zQRlJqn1C/uIMu1gPXohOvYWKBYGg4XDLgPzjL8JXz5BaykwtGegF656wu1ZtYqNf0pIN6t4B5665GBcZqL7ZbHEBQeqC2eCfpF8aDkuZm9kZ0RyykGxhnDdZvBZ9j/+POcw54k6Ms/SAFadH18uQpizSdsSznfe5KJ+E/i/3RokKDDrNmthfCdbdTZwdI6pmpJRoaDI74VWKitrRceJxh0gOXEXHd0Gzv3Kb5ZK3dpfORsU1DgYJ5fryZk8QMxvHCtBRdDUc6KaLWplUrCSeqOApdpkGG3/GV170tckW1aN4bi2uZsBJ6wpCGn+pDiArbV0e1ESNVM83GvQE57me2tq5NfOWEaeXkNF6cE0pOB4sEJW3wtIJcv1EXscKvO9CgCfZeM3sqdul1bwMs1PYVnqvqZ+Z/X0kC32p/28mvSFL6TQDcxZjQJoiMI="
     local_dir: doc/html
+    on:
+        tags: true
+        branch: master
