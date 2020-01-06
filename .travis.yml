@@ -9,3 +9,12 @@ script:
     - pip install -e .
     - ci/static_checks.sh altimeter
     - ci/test.sh altimeter tests/unit
+deploy:
+    provider: pypi
+    user: "__token__"
+    password:
+        secure: "oXWWn+yLy0sZhZrE/Pv3pd4GaoufgLbKZ3HoAWMdudZwK6YI/xikw3wn1yfnuyhcUFGemoE99oE7Xz3+jUmINVElzqnlkpG6/j6FYuPZU4Ca90hyLX9E0Ojw5RYx3PqCOGAtt6qyjRrS7doVyUwAd5hcryKupQrz8fWpfECP11kVxxhk4Bxq08UfZrLGzxsMd0rGL8FiHlV7d4EDW6X8v0t+I6YulqrkW2nyeXQrRie5+01DMxBBwXAF477UvHuDwfjZ/2JH2pk7p3cF0VI0FLfdPe3+k/tuodbGYJr9t3qtl1pqzc4PzC4qfnZIOelnEcWBFIGMzVWjKNdChBu5iqgQGSiY0/R43qNQk66Ioj9++wQKWWlKS+eaqI4A1k182ioSscC17GwyY6OJ0VzU5gengfkk36oBBr0w8JjIsu8piq9/Ea+QRZJMnjYy/tExyAGheVB0QjIhIaJBCb/04igq8s9VOdgWtLBbWdhe/B6XI/3Hl0F1ztJz5078fYYVQr/RuXsQOdiYy4TpIoPSdla3BgW7kwPKetfYd1VGE1tdbLiBtCsJZVjcRLn9yOowze85OmD2eYunKQuCW6SCgSUspoSCuVWoNUrYLlJgXpjuXkPGOXK7Vd2hiw2vRKfSp8YVANpPzUpP8C1Sn29XMnOw5u6hKnOlpCgsen0bemM="
+    skip_existing: true
+    on:
+        tags: true
+        branch: master
