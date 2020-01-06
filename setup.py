@@ -20,6 +20,7 @@ setup(
         "rdflib==4.2.2",
         "structlog==18.2.0",
         "boto3>=1.9.130",
+        "typing_extensions>=3.7.4.1,<3.8",
     ],
     scripts=[
         "bin/account_scan.py",
