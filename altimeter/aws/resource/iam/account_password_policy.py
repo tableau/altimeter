@@ -30,7 +30,10 @@ class AccountPasswordPolicyResourceSpec(IAMResourceSpec):
 
     @classmethod
     def list_from_aws(
-            cls: Type["AccountPasswordPolicyResourceSpec"], client: BaseClient, account_id: str, region: str
+        cls: Type["AccountPasswordPolicyResourceSpec"],
+        client: BaseClient,
+        account_id: str,
+        region: str,
     ) -> ListFromAWSResult:
         """Return a dict of dicts of the format:
 
