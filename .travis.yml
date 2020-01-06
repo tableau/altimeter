@@ -29,4 +29,4 @@ deploy:
     local_dir: doc/html
     on:
         branch: master
-    #    tags: true
+        tags: true
