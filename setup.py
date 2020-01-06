@@ -7,7 +7,7 @@ with open("README.md", "r") as fh:
 
 setup(
     name="altimeter",
-    version=os.environ.get("PKG_VERSION", "0.0.1dev0+local"),
+    version=os.environ.get("TRAVIS_TAG", "0.0.1dev0+local"),
     packages=find_packages(exclude=["tests"]),
     author="Tableau",
     description="Graph AWS resources in Neptune",
