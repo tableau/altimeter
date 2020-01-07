@@ -65,6 +65,8 @@ class EC2InstanceResourceSpec(EC2ResourceSpec):
         for resp in paginator.paginate():
             for reservation in resp.get("Reservations", []):
                 for instance in reservation.get("Instances", []):
-                    resource_arn = cls.generate_arn(account_id, region, instance["InstanceId"])
+                    resource_arn = cls.generate_arn(
+                        account_id=account_id, region=region, resource_id=instance["InstanceId"]
+                    )
                     instances[resource_arn] = instance
         return ListFromAWSResult(resources=instances)

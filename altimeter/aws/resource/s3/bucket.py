@@ -78,7 +78,9 @@ class S3BucketResourceSpec(S3ResourceSpec):
                     msg=f"Unable to determine region for {bucket_name}: {s3ade}",
                 )
                 continue
-            resource_arn = cls.generate_arn(account_id, bucket_region, bucket_name)
+            resource_arn = cls.generate_arn(
+                account_id=account_id, region=bucket_region, resource_id=bucket_name
+            )
             try:
                 bucket["Tags"] = get_s3_bucket_tags(client, bucket_name)
             except S3BucketAccessDeniedException as s3ade:

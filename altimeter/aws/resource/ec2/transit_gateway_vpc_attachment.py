@@ -38,7 +38,9 @@ class TransitGatewayVpcAttachmentResourceSpec(EC2ResourceSpec):
         for resp in paginator.paginate():
             for attachment in resp.get("TransitGatewayVpcAttachments", []):
                 resource_arn = cls.generate_arn(
-                    account_id, region, attachment["TransitGatewayAttachmentId"]
+                    account_id=account_id,
+                    region=region,
+                    resource_id=attachment["TransitGatewayAttachmentId"],
                 )
                 attachments[resource_arn] = attachment
         return ListFromAWSResult(resources=attachments)

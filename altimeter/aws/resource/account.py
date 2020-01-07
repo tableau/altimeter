@@ -37,7 +37,7 @@ class AccountResourceSpec(AWSResourceSpec):
 
     @classmethod
     def generate_arn(
-        cls: Type["AccountResourceSpec"], account_id: str, region: str, resource_id: str
+        cls: Type["AccountResourceSpec"], resource_id: str, account_id: str = "", region: str = "",
     ) -> str:
         """Generate an ARN for this resource"""
         return f"arn:aws::::account/{resource_id}"

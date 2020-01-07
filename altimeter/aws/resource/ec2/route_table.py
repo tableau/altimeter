@@ -64,6 +64,8 @@ class EC2RouteTableResourceSpec(EC2ResourceSpec):
         route_tables = {}
         for resp in paginator.paginate():
             for attachment in resp.get("RouteTables", []):
-                resource_arn = cls.generate_arn(account_id, region, attachment["RouteTableId"])
+                resource_arn = cls.generate_arn(
+                    account_id=account_id, region=region, resource_id=attachment["RouteTableId"]
+                )
                 route_tables[resource_arn] = attachment
         return ListFromAWSResult(resources=route_tables)

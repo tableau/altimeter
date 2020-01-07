@@ -23,6 +23,7 @@ from altimeter.aws.resource.ec2.vpc_endpoint import VpcEndpointResourceSpec
 from altimeter.aws.resource.elasticloadbalancing.load_balancer import LoadBalancerResourceSpec
 from altimeter.aws.resource.elasticloadbalancing.target_group import TargetGroupResourceSpec
 from altimeter.aws.resource.events.cloudwatchevents_rule import EventsRuleResourceSpec
+from altimeter.aws.resource.iam.account_password_policy import IAMAccountPasswordPolicyResourceSpec
 from altimeter.aws.resource.iam.iam_saml_provider import IAMSAMLProviderResourceSpec
 from altimeter.aws.resource.iam.instance_profile import InstanceProfileResourceSpec
 from altimeter.aws.resource.iam.policy import IAMPolicyResourceSpec, IAMAWSManagedPolicyResourceSpec
@@ -46,6 +47,7 @@ RESOURCE_SPEC_CLASSES: Tuple[Type[AWSResourceSpec], ...] = (
     EC2NetworkInterfaceResourceSpec,
     EC2RouteTableResourceSpec,
     EventsRuleResourceSpec,
+    IAMAccountPasswordPolicyResourceSpec,
     IAMAWSManagedPolicyResourceSpec,
     IAMPolicyResourceSpec,
     IAMRoleResourceSpec,

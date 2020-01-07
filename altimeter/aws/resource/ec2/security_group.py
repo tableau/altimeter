@@ -116,7 +116,9 @@ class SecurityGroupResourceSpec(EC2ResourceSpec):
         paginator = client.get_paginator("describe_security_groups")
         for resp in paginator.paginate():
             for security_group in resp.get("SecurityGroups", []):
-                resource_arn = cls.generate_arn(account_id, region, security_group["GroupId"])
+                resource_arn = cls.generate_arn(
+                    account_id=account_id, region=region, resource_id=security_group["GroupId"]
+                )
                 for ingress_rule in security_group.get("IpPermissions", []):
                     for ip_range in ingress_rule.get("IpRanges", []):
                         cidr = ip_range["CidrIp"]

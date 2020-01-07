@@ -52,6 +52,8 @@ class EC2ImageResourceSpec(EC2ResourceSpec):
             )
             launch_permissions = perms_resp["LaunchPermissions"]
             image["LaunchPermissions"] = launch_permissions
-            resource_arn = cls.generate_arn(account_id, region, image_id)
+            resource_arn = cls.generate_arn(
+                account_id=account_id, region=region, resource_id=image_id
+            )
             images[resource_arn] = image
         return ListFromAWSResult(resources=images)

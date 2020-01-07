@@ -1,7 +1,7 @@
 import unittest
 
 from altimeter.core.resource.resource import Resource
-from altimeter.aws.resource.iam.account_password_policy import AccountPasswordPolicyResourceSpec
+from altimeter.aws.resource.iam.account_password_policy import IAMAccountPasswordPolicyResourceSpec
 
 
 class TestAccountPasswordPolicyResourceSpec(unittest.TestCase):
@@ -13,11 +13,11 @@ class TestAccountPasswordPolicyResourceSpec(unittest.TestCase):
             'ExpirePasswords': True, 'MaxPasswordAge': 90, 'PasswordReusePrevention': 5, 'HardExpiry': True
         }
 
-        links = AccountPasswordPolicyResourceSpec.schema.parse(
+        links = IAMAccountPasswordPolicyResourceSpec.schema.parse(
             data=aws_resource_dict, context={"account_id": "111122223333", "region": "us-west-2"}
         )
         resource = Resource(
-            resource_id=resource_arn, type_name=AccountPasswordPolicyResourceSpec.type_name, links=links
+            resource_id=resource_arn, type_name=IAMAccountPasswordPolicyResourceSpec.type_name, links=links
         )
         alti_resource_dict = resource.to_dict()
 

@@ -9,7 +9,7 @@ from altimeter.core.graph.field.scalar_field import ScalarField
 from altimeter.core.graph.schema import Schema
 
 
-class AccountPasswordPolicyResourceSpec(IAMResourceSpec):
+class IAMAccountPasswordPolicyResourceSpec(IAMResourceSpec):
     """Resource for Account Password Policy"""
 
     DEFAULT_PASSWORD_POLICY_NAME = "default"
@@ -30,7 +30,7 @@ class AccountPasswordPolicyResourceSpec(IAMResourceSpec):
 
     @classmethod
     def list_from_aws(
-        cls: Type["AccountPasswordPolicyResourceSpec"],
+        cls: Type["IAMAccountPasswordPolicyResourceSpec"],
         client: BaseClient,
         account_id: str,
         region: str,
@@ -49,6 +49,8 @@ class AccountPasswordPolicyResourceSpec(IAMResourceSpec):
         policy = resp.get("PasswordPolicy", {})
 
         if policy:
-            resource_arn = cls.generate_arn(account_id, region, cls.DEFAULT_PASSWORD_POLICY_NAME)
+            resource_arn = cls.generate_arn(
+                account_id=account_id, resource_id=cls.DEFAULT_PASSWORD_POLICY_NAME
+            )
             password_policies[resource_arn] = policy
         return ListFromAWSResult(resources=password_policies)
