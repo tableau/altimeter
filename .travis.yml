@@ -27,6 +27,7 @@ jobs:
               - sed -i "s/LOCALVERSION/${TRAVIS_TAG}/g" setup.py
           deploy:
               provider: pypi
+              all_branches: true
               skip_cleanup: true
               user: "__token__"
               password:
