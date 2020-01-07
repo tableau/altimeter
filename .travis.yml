@@ -19,7 +19,7 @@ jobs:
               - export PYTHONPATH=.
               - sphinx-apidoc -f -o doc/source altimeter
               - sphinx-build doc/source doc/html -E -W
-        # publish a release candidate package for non-master, tagged like n.n.n-rc.n
+        # publish a release candidate package for non-master, tagged like n.n.n-rcn
         - stage: deploy-pypi-release-candidate
           if: branch != master
           script:
@@ -34,7 +34,7 @@ jobs:
               on:
                   all_branches: true
                   tags: true
-                  condition: $TRAVIS_TAG =~ ^[0-9]+\.[0-9]+\.[0-9]+-rc\.[0-9]+$
+                  condition: $TRAVIS_TAG =~ ^[0-9]+\.[0-9]+\.[0-9]+-rc[0-9]+$
 
         - stage: deploy-pypi-release
         # publish a release package for master, tagged like n.n.n
