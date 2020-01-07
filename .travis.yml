@@ -26,6 +26,7 @@ deploy:
       #     1) master commit with a tag matching a release version (n.n.n)
       #     2) non-master commit with a tag matching a release-candidate version (n.n.n-rc.n)
       on:
+          all_branches: true
           condition: branch = master  AND tag IS present AND tag =~ /^\d+\.\d+\.\d+$/ OR \
                      branch != master AND tag IS present AND tag =~ /^\d+\.\d+\.\d+-rc\.\d+$/
     - provider: pages
@@ -34,4 +35,6 @@ deploy:
       local_dir: doc/html
       # only publish to pages for master with a tag matching a 'real' release.
       on:
-          condition: branch = master  AND tag IS present AND tag =~ /^\d+\.\d+\.\d+$/
+          branch: master
+          tags: true
+          condition: tag =~ /^\d+\.\d+\.\d+$/
