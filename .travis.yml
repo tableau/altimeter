@@ -34,7 +34,7 @@ jobs:
               on:
                   all_branches: true
                   tags: true
-                  condition: $TRAVIS_TAG =~ ^\d+\.\d+\.\d+-rc\.\d+$
+                  condition: $TRAVIS_TAG =~ ^[0-9]+\.[0-9]+\.[0-9]+-rc\.[0-9]+$
 
         - stage: deploy-pypi-release
         # publish a release package for master, tagged like n.n.n
@@ -51,7 +51,7 @@ jobs:
               on:
                   branch: master
                   tags: true
-                  condition: $TRAVIS_TAG =~ ^\d+\.\d+\.\d+$
+                  condition: $TRAVIS_TAG =~ ^[0-9]+\.[0-9]+\.[0-9]+$
 
         - stage: deploy-github-pages
           if: branch = master
@@ -66,4 +66,4 @@ jobs:
               on:
                   branch: master
                   tags: true
-                  condition: $TRAVIS_TAG =~ ^\d+\.\d+\.\d+$
+                  condition: $TRAVIS_TAG =~ ^[0-9]+\.[0-9]+\.[0-9]+$
