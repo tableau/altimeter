@@ -33,6 +33,8 @@ class VPCResourceSpec(EC2ResourceSpec):
         paginator = client.get_paginator("describe_vpcs")
         for resp in paginator.paginate():
             for vpc in resp.get("Vpcs", []):
-                resource_arn = cls.generate_arn(account_id, region, vpc["VpcId"])
+                resource_arn = cls.generate_arn(
+                    account_id=account_id, region=region, resource_id=vpc["VpcId"]
+                )
                 vpcs[resource_arn] = vpc
         return ListFromAWSResult(resources=vpcs)

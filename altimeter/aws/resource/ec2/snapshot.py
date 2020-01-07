@@ -43,6 +43,8 @@ class EBSSnapshotResourceSpec(EC2ResourceSpec):
         paginator = client.get_paginator("describe_snapshots")
         for resp in paginator.paginate(OwnerIds=["self"]):
             for snapshot in resp.get("Snapshots", []):
-                resource_arn = cls.generate_arn(account_id, region, snapshot["SnapshotId"])
+                resource_arn = cls.generate_arn(
+                    account_id=account_id, region=region, resource_id=snapshot["SnapshotId"]
+                )
                 snapshots[resource_arn] = snapshot
         return ListFromAWSResult(resources=snapshots)

@@ -50,6 +50,10 @@ class EC2NetworkInterfaceResourceSpec(EC2ResourceSpec):
         interfaces = {}
         for resp in paginator.paginate():
             for interface in resp.get("NetworkInterfaces", []):
-                resource_arn = cls.generate_arn(account_id, region, interface["NetworkInterfaceId"])
+                resource_arn = cls.generate_arn(
+                    account_id=account_id,
+                    region=region,
+                    resource_id=interface["NetworkInterfaceId"],
+                )
                 interfaces[resource_arn] = interface
         return ListFromAWSResult(resources=interfaces)

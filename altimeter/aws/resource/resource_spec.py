@@ -100,7 +100,7 @@ class AWSResourceSpec(ResourceSpec):
 
     @classmethod
     def generate_arn(
-        cls: Type["AWSResourceSpec"], account_id: str, region: str, resource_id: str
+        cls: Type["AWSResourceSpec"], resource_id: str, account_id: str = "", region: str = "",
     ) -> str:
         """Generate an ARN for this resource
 
