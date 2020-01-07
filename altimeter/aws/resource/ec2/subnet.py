@@ -33,7 +33,9 @@ class SubnetResourceSpec(EC2ResourceSpec):
         subnets = {}
         resp = client.describe_subnets()
         for subnet in resp.get("Subnets", []):
-            resource_arn = cls.generate_arn(account_id, region, subnet["SubnetId"])
+            resource_arn = cls.generate_arn(
+                account_id=account_id, region=region, resource_id=subnet["SubnetId"]
+            )
             cidr = subnet["CidrBlock"]
             ipv4_network = ipaddress.IPv4Network(cidr, strict=False)
             first_ip, last_ip = int(ipv4_network[0]), int(ipv4_network[-1])

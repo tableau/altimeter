@@ -56,6 +56,8 @@ class EBSVolumeResourceSpec(EC2ResourceSpec):
         paginator = client.get_paginator("describe_volumes")
         for resp in paginator.paginate():
             for volume in resp.get("Volumes", []):
-                resource_arn = cls.generate_arn(account_id, region, volume["VolumeId"])
+                resource_arn = cls.generate_arn(
+                    account_id=account_id, region=region, resource_id=volume["VolumeId"]
+                )
                 volumes[resource_arn] = volume
         return ListFromAWSResult(resources=volumes)
