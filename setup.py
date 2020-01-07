@@ -1,5 +1,4 @@
 """setup.py"""
-import os
 from setuptools import setup, find_packages
 
 with open("README.md", "r") as fh:
@@ -7,7 +6,7 @@ with open("README.md", "r") as fh:
 
 setup(
     name="altimeter",
-    version=os.environ.get("TRAVIS_TAG", "0.0.1dev0+local"),
+    version="LOCALVERSION",
     packages=find_packages(exclude=["tests"]),
     author="Tableau",
     description="Graph AWS resources in Neptune",
