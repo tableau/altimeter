@@ -19,9 +19,10 @@ jobs:
               - export PYTHONPATH=.
               - sphinx-apidoc -f -o doc/source altimeter
               - sphinx-build doc/source doc/html -E -W
-        # publish a release candidate package for non-master, tagged like n.n.n-rcn
+
+        # rc packages can be published from any branch. tag must be like n.n.n-rcn
         - stage: deploy-pypi-release-candidate
-          if: branch != master
+          if: tag =~ ^[0-9]+\.[0-9]+\.[0-9]+-rc[0-9]+$ AND type = push AND fork = false
           script:
               - sed -i "s/LOCALVERSION/${TRAVIS_TAG}/g" setup.py
           deploy:
@@ -33,12 +34,10 @@ jobs:
               skip_existing: true
               on:
                   all_branches: true
-                  tags: true
-                  condition: $TRAVIS_TAG =~ ^[0-9]+\.[0-9]+\.[0-9]+-rc[0-9]+$
 
+        # release packages can be published from master only. tag must be like n.n.n
         - stage: deploy-pypi-release
-        # publish a release package for master, tagged like n.n.n
-          if: branch = master AND type = push AND fork = false
+          if: branch = master AND tag =~ ^[0-9]+\.[0-9]+\.[0-9]+$ AND type = push AND fork = false
           script:
               - sed -i "s/LOCALVERSION/${TRAVIS_TAG}/g" setup.py
           deploy:
@@ -48,13 +47,10 @@ jobs:
               password:
                   secure: "oXWWn+yLy0sZhZrE/Pv3pd4GaoufgLbKZ3HoAWMdudZwK6YI/xikw3wn1yfnuyhcUFGemoE99oE7Xz3+jUmINVElzqnlkpG6/j6FYuPZU4Ca90hyLX9E0Ojw5RYx3PqCOGAtt6qyjRrS7doVyUwAd5hcryKupQrz8fWpfECP11kVxxhk4Bxq08UfZrLGzxsMd0rGL8FiHlV7d4EDW6X8v0t+I6YulqrkW2nyeXQrRie5+01DMxBBwXAF477UvHuDwfjZ/2JH2pk7p3cF0VI0FLfdPe3+k/tuodbGYJr9t3qtl1pqzc4PzC4qfnZIOelnEcWBFIGMzVWjKNdChBu5iqgQGSiY0/R43qNQk66Ioj9++wQKWWlKS+eaqI4A1k182ioSscC17GwyY6OJ0VzU5gengfkk36oBBr0w8JjIsu8piq9/Ea+QRZJMnjYy/tExyAGheVB0QjIhIaJBCb/04igq8s9VOdgWtLBbWdhe/B6XI/3Hl0F1ztJz5078fYYVQr/RuXsQOdiYy4TpIoPSdla3BgW7kwPKetfYd1VGE1tdbLiBtCsJZVjcRLn9yOowze85OmD2eYunKQuCW6SCgSUspoSCuVWoNUrYLlJgXpjuXkPGOXK7Vd2hiw2vRKfSp8YVANpPzUpP8C1Sn29XMnOw5u6hKnOlpCgsen0bemM="
               skip_existing: true
-              on:
-                  branch: master
-                  tags: true
-                  condition: $TRAVIS_TAG =~ ^[0-9]+\.[0-9]+\.[0-9]+$
 
+        # only publish to pages for master with a tag matching a 'real' release.
         - stage: deploy-github-pages
-          if: branch = master AND type = push AND fork = false
+          if: branch = master AND tag =~ ^[0-9]+\.[0-9]+\.[0-9]+$ AND type = push AND fork = false 
           script:
               - touch doc/html/.nojekyll
           deploy:
@@ -62,8 +58,3 @@ jobs:
               skip_cleanup: true
               github_token: $GITHUB_TOKEN
               local_dir: doc/html
-              # only publish to pages for master with a tag matching a 'real' release.
-              on:
-                  branch: master
-                  tags: true
-                  condition: $TRAVIS_TAG =~ ^[0-9]+\.[0-9]+\.[0-9]+$
