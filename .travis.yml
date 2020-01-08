@@ -34,6 +34,7 @@ jobs:
               skip_existing: true
               on:
                   all_branches: true
+                  tags: true
 
         # release packages can be published from master only. tag must be like n.n.n
         - stage: deploy-pypi-release
@@ -62,3 +63,4 @@ jobs:
               local_dir: doc/html
               on:
                   branch: master
+                  tags: true
