@@ -22,7 +22,7 @@ jobs:
 
         # rc packages can be published from any branch. tag must be like n.n.n-rcn
         - stage: deploy-pypi-release-candidate
-          if: tag =~ ^[0-9]+\.[0-9]+\.[0-9]+-rc[0-9]+$ AND type = push AND fork = false
+          if: tag =~ ^[0-9]+\.[0-9]+\.[0-9]+-rc[0-9]+$ AND type IN (push, pull_request) AND fork = false
           script:
               - sed -i "s/LOCALVERSION/${TRAVIS_TAG}/g" setup.py
           deploy:
@@ -37,7 +37,7 @@ jobs:
 
         # release packages can be published from master only. tag must be like n.n.n
         - stage: deploy-pypi-release
-          if: branch = master AND tag =~ ^[0-9]+\.[0-9]+\.[0-9]+$ AND type = push AND fork = false
+          if: branch = master AND tag =~ ^[0-9]+\.[0-9]+\.[0-9]+$ AND type IN (push, pull_request) AND fork = false
           script:
               - sed -i "s/LOCALVERSION/${TRAVIS_TAG}/g" setup.py
           deploy:
@@ -50,7 +50,7 @@ jobs:
 
         # only publish to pages for master with a tag matching a 'real' release.
         - stage: deploy-github-pages
-          if: branch = master AND tag =~ ^[0-9]+\.[0-9]+\.[0-9]+$ AND type = push AND fork = false 
+          if: branch = master AND tag =~ ^[0-9]+\.[0-9]+\.[0-9]+$ AND type IN (push, pull_request) AND fork = false
           script:
               - touch doc/html/.nojekyll
           deploy:
