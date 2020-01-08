@@ -6,9 +6,9 @@ This quickstart guide demonstrates how to generate a graph for a single account.
 Installation
 ------------
 
+::
 
-* AWS credentials for CLI access to the account you wish to scan.
-  See https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html
+    pip install altimeter
 
 Generating the Graph
 --------------------
