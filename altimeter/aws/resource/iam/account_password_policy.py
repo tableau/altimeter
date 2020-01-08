@@ -25,7 +25,7 @@ class IAMAccountPasswordPolicyResourceSpec(IAMResourceSpec):
         ScalarField("ExpirePasswords"),
         ScalarField("MaxPasswordAge", optional=True),
         ScalarField("PasswordReusePrevention", optional=True),
-        ScalarField("HardExpiry"),
+        ScalarField("HardExpiry", optional=True),
     )
 
     @classmethod
