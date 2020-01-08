@@ -30,7 +30,7 @@ class UnscannedAccountResourceSpec(AWSResourceSpec):
             link = SimpleLink(pred="error", obj=error)
             links.append(link)
         return Resource(
-            resource_id=cls.generate_arn("", "", account_id),
+            resource_id=cls.generate_arn(resource_id=account_id),
             type_name=cls.get_full_type_name(),
             links=links,
         )

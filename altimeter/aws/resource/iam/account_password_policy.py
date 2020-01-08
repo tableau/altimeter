@@ -23,9 +23,9 @@ class IAMAccountPasswordPolicyResourceSpec(IAMResourceSpec):
         ScalarField("RequireLowercaseCharacters"),
         ScalarField("AllowUsersToChangePassword"),
         ScalarField("ExpirePasswords"),
-        ScalarField("MaxPasswordAge"),
-        ScalarField("PasswordReusePrevention"),
-        ScalarField("HardExpiry"),
+        ScalarField("MaxPasswordAge", optional=True),
+        ScalarField("PasswordReusePrevention", optional=True),
+        ScalarField("HardExpiry", optional=True),
     )
 
     @classmethod

@@ -79,7 +79,7 @@ class RDSInstanceResourceSpec(RDSResourceSpec):
             EmbeddedDictField(
                 AnonymousDictField(
                     "RestoreWindow",
-                    ScalarField("EarliestTime", alti_key="earliest_restore_time"),
+                    ScalarField("EarliestTime", alti_key="earliest_restore_time", optional=True),
                     optional=True,
                 ),
                 AnonymousDictField(
