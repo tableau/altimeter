@@ -53,6 +53,9 @@ jobs:
         - stage: deploy-github-pages
           if: tag =~ ^[0-9]+\.[0-9]+\.[0-9]+$ AND type = push AND fork = false
           script:
+              - export PYTHONPATH=.
+              - sphinx-apidoc -f -o doc/source altimeter
+              - sphinx-build doc/source doc/html -E -W
               - touch doc/html/.nojekyll
           deploy:
               provider: pages
