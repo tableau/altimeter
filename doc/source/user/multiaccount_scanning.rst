@@ -44,24 +44,23 @@ The 'external_id_env_var' key refers to the name of an environment variable
 (ALTIMETER_EXT_ID) which should contain the external id for the IAM trust.
 If you do not wish to use an external id this can be omitted.
 
-Running aws2json.py
--------------------
+Running Altimeter in Multi-Account Mode
+---------------------------------------
 
-Given an access config as described above in 'access_config.json', aws2json.py
+Given an access config as described above in 'access_config.json', altimeter
 can now be run as the following command assuming you currently have AWS API
 credentials configured for the master account:
 
 ::
 
-    bin/altimeter_local.sh  --access_config access_config.json \
-                            --base_dir /tmp \
-                            --regions us-east-1 \
-                            --accounts 1234 4567 7890
+    altimeter --access_config access_config.json \
+              --base_dir /tmp \
+              --regions us-east-1 \
+              --accounts 1234 4567 7890
 
 where 1234 4567 7890 are account ids which can be accessed using the trust above.
 
-This will generate a JSON file which can be converted to RDF as described
-in :doc:`Quickstart <quickstart>` and loaded into a local Blazegraph instance
+This will generate an RDF file which can be loaded into a local Blazegraph instance
 and queried as described in :doc:`Local Querying with Blazegraph <local_blazegraph>`
 
 Organizations
@@ -74,8 +73,8 @@ flag, e.g.:
 
 ::
 
-    bin/altimeter_local.sh  --access_config access_config.json \
-                            --base_dir /tmp \
-                            --regions us-east-1 \
-                            --accounts master-account-id \
-                            --scan_sub_accounts
+    altimeter  --access_config access_config.json \
+               --base_dir /tmp \
+               --regions us-east-1 \
+               --accounts master-account-id \
+               --scan_sub_accounts

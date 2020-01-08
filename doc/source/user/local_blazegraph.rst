@@ -7,7 +7,7 @@ can load these results into a local Blazegraph instance for querying:
 
 ::
 
-    bin/rdf2blaze.sh <path-to-rdf>
+    rdf2blaze <path-to-rdf>
 
 This command will start a Blazegraph docker container, load the rdf and print
 details on accessing it:
