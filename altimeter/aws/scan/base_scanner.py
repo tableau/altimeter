@@ -136,14 +136,28 @@ class BaseScanner(abc.ABC):
                     client_name = resource_spec_class.get_client_name()
                     resource_class_scan_granularity = resource_spec_class.scan_granularity
                     if resource_class_scan_granularity == ScanGranularity.ACCOUNT:
-                        regions_services_resource_spec_classes[scan_regions[0]][client_name].append(
-                            resource_spec_class
-                        )
-                    elif resource_class_scan_granularity == ScanGranularity.REGION:
-                        for region in scan_regions:
-                            regions_services_resource_spec_classes[region][client_name].append(
+                        if resource_spec_class.region_whitelist:
+                            for whitelisted_region in resource_spec_class.region_whitelist:
+                                if whitelisted_region in scan_regions:
+                                    regions_services_resource_spec_classes[whitelisted_region][client_name].append(
+                                        resource_spec_class
+                                    )
+                                    break
+                        else:
+                            regions_services_resource_spec_classes[scan_regions[0]][client_name].append(
                                 resource_spec_class
                             )
+                    elif resource_class_scan_granularity == ScanGranularity.REGION:
+                        for region in scan_regions:
+                            if resource_spec_class.region_whitelist:
+                                if region in resource_spec_class.region_whitelist:
+                                    regions_services_resource_spec_classes[region][client_name].append(
+                                        resource_spec_class
+                                    )
+                            else:
+                                regions_services_resource_spec_classes[region][client_name].append(
+                                    resource_spec_class
+                                )
                     else:
                         raise NotImplementedError(
                             f"ScanGranularity {resource_class_scan_granularity} not implemented"

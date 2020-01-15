@@ -48,6 +48,7 @@ class AWSResourceSpec(ResourceSpec):
     provider_name: str = "aws"
     service_name: str = ""
     scan_granularity: ScanGranularity = ScanGranularity.REGION
+    region_whitelist: List[str] = []
 
     def __init_subclass__(cls: Type["AWSResourceSpec"], **kwargs: Any) -> None:
         if not inspect.isabstract(cls):
