@@ -134,33 +134,26 @@ class BaseScanner(abc.ABC):
                 resource_spec_class: Type[AWSResourceSpec]
                 for resource_spec_class in self.resource_spec_classes:
                     client_name = resource_spec_class.get_client_name()
-                    resource_class_scan_granularity = resource_spec_class.scan_granularity
-                    if resource_class_scan_granularity == ScanGranularity.ACCOUNT:
-                        if resource_spec_class.region_whitelist:
-                            for whitelisted_region in resource_spec_class.region_whitelist:
-                                if whitelisted_region in scan_regions:
-                                    regions_services_resource_spec_classes[whitelisted_region][
-                                        client_name
-                                    ].append(resource_spec_class)
-                                    break
-                        else:
-                            regions_services_resource_spec_classes[scan_regions[0]][
-                                client_name
-                            ].append(resource_spec_class)
-                    elif resource_class_scan_granularity == ScanGranularity.REGION:
-                        for region in scan_regions:
-                            if resource_spec_class.region_whitelist:
-                                if region in resource_spec_class.region_whitelist:
-                                    regions_services_resource_spec_classes[region][
-                                        client_name
-                                    ].append(resource_spec_class)
-                            else:
-                                regions_services_resource_spec_classes[region][client_name].append(
-                                    resource_spec_class
-                                )
+                    if resource_spec_class.region_whitelist:
+                        resource_scan_regions = tuple(
+                            region
+                            for region in scan_regions
+                            if region in resource_spec_class.region_whitelist
+                        )
+                    else:
+                        resource_scan_regions = scan_regions
+                    if resource_spec_class.scan_granularity == ScanGranularity.ACCOUNT:
+                        regions_services_resource_spec_classes[resource_scan_regions[0]][
+                            client_name
+                        ].append(resource_spec_class)
+                    elif resource_spec_class.scan_granularity == ScanGranularity.REGION:
+                        for region in resource_scan_regions:
+                            regions_services_resource_spec_classes[region][client_name].append(
+                                resource_spec_class
+                            )
                     else:
                         raise NotImplementedError(
-                            f"ScanGranularity {resource_class_scan_granularity} not implemented"
+                            f"ScanGranularity {resource_spec_class.scan_granularity} unimplemented"
                         )
                 with ThreadPoolExecutor(max_workers=self.max_svc_threads) as executor:
                     futures = []
