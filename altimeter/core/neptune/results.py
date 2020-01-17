@@ -74,8 +74,8 @@ class QueryResultSet:
             for result in self.values:
                 record = {key: value["value"] for key, value in result.items()}
                 ndjson_buf.write(json.dumps(record) + "\n")
-        ndjson_buf.seek(0)
-        return ndjson_buf.read()
+            ndjson_buf.seek(0)
+            return ndjson_buf.read()
 
     def get_stats(self, field_keys: List[str]) -> Counter:
         """Return a Counter representing statistics about this result set keyed by a user
