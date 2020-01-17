@@ -16,10 +16,6 @@ class SeverityLevelResourceSpec(SupportResourceSpec):
     schema = Schema(ScalarField("code"))
 
     @classmethod
-    def get_full_type_name(cls: Type["SeverityLevelResourceSpec"]) -> str:
-        return f"{cls.provider_name}:{cls.type_name}"
-
-    @classmethod
     def list_from_aws(
         cls: Type["SeverityLevelResourceSpec"], client: BaseClient, account_id: str, region: str
     ) -> ListFromAWSResult:
