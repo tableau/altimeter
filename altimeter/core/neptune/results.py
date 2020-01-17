@@ -77,7 +77,6 @@ class QueryResultSet:
         ndjson_buf.seek(0)
         return ndjson_buf.read()
 
-
     def get_stats(self, field_keys: List[str]) -> Counter:
         """Return a Counter representing statistics about this result set keyed by a user
         specified list of field keys (e.g. account_id and account_name)
