@@ -4,7 +4,7 @@ import abc
 import inspect
 from dataclasses import dataclass, field
 from enum import Enum, auto
-from typing import Dict, Any, List, Type
+from typing import Dict, Any, List, Tuple, Type
 
 from botocore.client import BaseClient
 from botocore.exceptions import ClientError
@@ -48,6 +48,7 @@ class AWSResourceSpec(ResourceSpec):
     provider_name: str = "aws"
     service_name: str = ""
     scan_granularity: ScanGranularity = ScanGranularity.REGION
+    region_whitelist: Tuple[str, ...] = ()
 
     def __init_subclass__(cls: Type["AWSResourceSpec"], **kwargs: Any) -> None:
         if not inspect.isabstract(cls):

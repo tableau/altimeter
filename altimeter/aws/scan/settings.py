@@ -36,6 +36,7 @@ from altimeter.aws.resource.organizations.account import OrgsAccountResourceSpec
 from altimeter.aws.resource.rds.instance import RDSInstanceResourceSpec
 from altimeter.aws.resource.rds.snapshot import RDSSnapshotResourceSpec
 from altimeter.aws.resource.s3.bucket import S3BucketResourceSpec
+from altimeter.aws.resource.support.severity_level import SeverityLevelResourceSpec
 
 # To enable a resource to be scanned, add it here.
 RESOURCE_SPEC_CLASSES: Tuple[Type[AWSResourceSpec], ...] = (
@@ -61,6 +62,7 @@ RESOURCE_SPEC_CLASSES: Tuple[Type[AWSResourceSpec], ...] = (
     RDSSnapshotResourceSpec,
     S3BucketResourceSpec,
     SecurityGroupResourceSpec,
+    SeverityLevelResourceSpec,
     SubnetResourceSpec,
     TargetGroupResourceSpec,
     TransitGatewayResourceSpec,
