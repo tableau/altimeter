@@ -2,6 +2,7 @@
 from collections import Counter
 import csv
 import io
+import json
 from typing import Any, Dict, List, Type, Union
 
 
@@ -62,6 +63,20 @@ class QueryResultSet:
                 writer.writerow(row)
             csv_buf.seek(0)
             return csv_buf.read()
+
+    def to_ndjson(self) -> str:
+        """Create an NDJSON representation of this QueryResult.
+
+        Returns:
+            NDJSON as a str
+        """
+        with io.StringIO() as ndjson_buf:
+            for result in self.values:
+                record = {key: value["value"] for key, value in result.items()}
+                ndjson_buf.write(json.dumps(record) + "\n")
+        ndjson_buf.seek(0)
+        return ndjson_buf.read()
+
 
     def get_stats(self, field_keys: List[str]) -> Counter:
         """Return a Counter representing statistics about this result set keyed by a user
@@ -142,6 +157,14 @@ class QueryResult:
             csv as a str
         """
         return self.query_result_set.to_csv()
+
+    def to_ndjson(self) -> str:
+        """Create an NDJSON representation of this QueryResult.
+
+        Returns:
+            NDJSON as a str
+        """
+        return self.query_result_set.to_ndjson()
 
     def get_stats(self, field_keys: List[str]) -> Counter:
         """Return a Counter representing statistics about this result set keyed by a user
