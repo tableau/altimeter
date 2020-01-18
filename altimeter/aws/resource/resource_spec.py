@@ -167,11 +167,7 @@ class AWSResourceSpec(ResourceSpec):
         resources = cls._list_from_aws_result_to_resources(
             list_from_aws_result=list_from_aws_result, context=context
         )
-        return ResourceScanResult(
-            resources=resources,
-            stats=scan_accessor.api_call_stats,
-            errors=list_from_aws_result.errors,
-        )
+        return ResourceScanResult(resources=resources, errors=list_from_aws_result.errors,)
 
     @classmethod
     def _list_from_aws(
