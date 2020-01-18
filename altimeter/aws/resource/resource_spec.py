@@ -169,6 +169,7 @@ class AWSResourceSpec(ResourceSpec):
         )
         return ResourceScanResult(
             resources=resources,
+            stats=scan_accessor.api_call_stats,
             errors=list_from_aws_result.errors,
         )
 

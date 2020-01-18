@@ -49,6 +49,7 @@ class GraphSpec:
 
         resources: List[Resource] = []
         errors: List[str] = []
+        stats = MultilevelCounter()
         start_time = int(time.time())
         logger = Logger()
         for resource_spec_class in self.resource_spec_classes:
@@ -57,6 +58,7 @@ class GraphSpec:
                 resource_scan_result = resource_spec_class.scan(scan_accessor=self.scan_accessor)
                 resources += resource_scan_result.resources
                 errors += resource_scan_result.errors
+                stats.merge(resource_scan_result.stats)
                 logger.debug(event=LogEvent.ScanResourceTypeEnd)
         end_time = int(time.time())
         return GraphSet(
@@ -66,5 +68,5 @@ class GraphSpec:
             end_time=end_time,
             resources=resources,
             errors=errors,
-            stats=self.scan_accessor.api_call_stats,
+            stats=stats,
         )

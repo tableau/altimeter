@@ -14,6 +14,7 @@ from altimeter.core.resource.exceptions import (
 from altimeter.core.graph.exceptions import UnmergableDuplicateResourceIdsFoundException
 from altimeter.core.graph.link.base import Link
 from altimeter.core.graph.schema import Schema
+from altimeter.core.multilevel_counter import MultilevelCounter
 from altimeter.core.resource.resource import Resource
 
 
@@ -22,12 +23,14 @@ class ResourceScanResult:
     """Contains the result of a ResourceSpec.scan run."""
 
     resources: List[Resource]
+    stats: MultilevelCounter
     errors: List[str]
 
     def to_dict(self) -> Dict[str, Any]:
         """Return a dict representation of self."""
         return {
             "resources": [resource.to_dict() for resource in self.resources],
+            "stats": self.stats.to_dict(),
             "errors": self.errors,
         }
 
