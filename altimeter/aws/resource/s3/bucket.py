@@ -71,33 +71,39 @@ class S3BucketResourceSpec(S3ResourceSpec):
         for bucket in buckets_resp.get("Buckets", []):
             bucket_name = bucket["Name"]
             try:
-                bucket_region = get_s3_bucket_region(client, bucket_name)
-            except S3BucketAccessDeniedException as s3ade:
+                try:
+                    bucket_region = get_s3_bucket_region(client, bucket_name)
+                except S3BucketAccessDeniedException as s3ade:
+                    logger.warn(
+                        event=AWSLogEvents.ScanAWSResourcesNonFatalError,
+                        msg=f"Unable to determine region for {bucket_name}: {s3ade}",
+                    )
+                    continue
+                try:
+                    bucket["Tags"] = get_s3_bucket_tags(client, bucket_name)
+                except S3BucketAccessDeniedException as s3ade:
+                    bucket["Tags"] = []
+                    logger.warn(
+                        event=AWSLogEvents.ScanAWSResourcesNonFatalError,
+                        msg=f"Unable to determine tags for {bucket_name}: {s3ade}",
+                    )
+                try:
+                    bucket["ServerSideEncryption"] = get_s3_bucket_encryption(client, bucket_name)
+                except S3BucketAccessDeniedException as s3ade:
+                    bucket["ServerSideEncryption"] = {"Rules": []}
+                    logger.warn(
+                        event=AWSLogEvents.ScanAWSResourcesNonFatalError,
+                        msg=f"Unable to determine encryption status for {bucket_name}: {s3ade}",
+                    )
+                resource_arn = cls.generate_arn(
+                    account_id=account_id, region=bucket_region, resource_id=bucket_name
+                )
+                buckets[resource_arn] = bucket
+            except S3BucketDoesNotExistException as s3bdnee:
                 logger.warn(
                     event=AWSLogEvents.ScanAWSResourcesNonFatalError,
-                    msg=f"Unable to determine region for {bucket_name}: {s3ade}",
+                    msg=f"{bucket_name}: No longer exists: {s3bdnee}",
                 )
-                continue
-            resource_arn = cls.generate_arn(
-                account_id=account_id, region=bucket_region, resource_id=bucket_name
-            )
-            try:
-                bucket["Tags"] = get_s3_bucket_tags(client, bucket_name)
-            except S3BucketAccessDeniedException as s3ade:
-                bucket["Tags"] = []
-                logger.warn(
-                    event=AWSLogEvents.ScanAWSResourcesNonFatalError,
-                    msg=f"Unable to determine tags for {bucket_name}: {s3ade}",
-                )
-            try:
-                bucket["ServerSideEncryption"] = get_s3_bucket_encryption(client, bucket_name)
-            except S3BucketAccessDeniedException as s3ade:
-                bucket["ServerSideEncryption"] = {"Rules": []}
-                logger.warn(
-                    event=AWSLogEvents.ScanAWSResourcesNonFatalError,
-                    msg=f"Unable to determine encryption status for {bucket_name}: {s3ade}",
-                )
-            buckets[resource_arn] = bucket
         return ListFromAWSResult(resources=buckets)
 
 
