@@ -3,6 +3,7 @@ import time
 from typing import Type
 
 from botocore.client import BaseClient
+from botocore.exceptions import ClientError
 
 from altimeter.aws.resource.resource_spec import ListFromAWSResult
 from altimeter.aws.resource.account import AccountResourceSpec
@@ -47,13 +48,20 @@ class EC2ImageResourceSpec(EC2ResourceSpec):
         for image in resp["Images"]:
             image_id = image["ImageId"]
             time.sleep(0.25)  # seems necessary to avoid frequent RequestLimitExceeded
-            perms_resp = client.describe_image_attribute(
-                Attribute="launchPermission", ImageId=image_id
-            )
-            launch_permissions = perms_resp["LaunchPermissions"]
-            image["LaunchPermissions"] = launch_permissions
-            resource_arn = cls.generate_arn(
-                account_id=account_id, region=region, resource_id=image_id
-            )
-            images[resource_arn] = image
+            try:
+                perms_resp = client.describe_image_attribute(
+                    Attribute="launchPermission", ImageId=image_id
+                )
+                launch_permissions = perms_resp["LaunchPermissions"]
+                image["LaunchPermissions"] = launch_permissions
+                resource_arn = cls.generate_arn(
+                    account_id=account_id, region=region, resource_id=image_id
+                )
+                images[resource_arn] = image
+            except ClientError as c_e:
+                response_error = getattr(c_e, "response", {}).get("Error", {})
+                error_code = response_error.get("Code", "")
+                if error_code == "InvalidAMIID.Unavailable":
+                    continue
+                raise c_e
         return ListFromAWSResult(resources=images)
