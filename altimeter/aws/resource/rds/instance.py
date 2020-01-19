@@ -55,12 +55,12 @@ class RDSInstanceResourceSpec(RDSResourceSpec):
         AnonymousListField(
             "VpcSecurityGroups",
             AnonymousEmbeddedDictField(
-                ResourceLinkField("VpcSecurityGroupId", SecurityGroupResourceSpec, optional=True)
+                TransientResourceLinkField("VpcSecurityGroupId", SecurityGroupResourceSpec, optional=True)
             ),
         ),
         ScalarField("AvailabilityZone", optional=True),
         AnonymousDictField(
-            "DBSubnetGroup", ResourceLinkField("VpcId", VPCResourceSpec), optional=True
+            "DBSubnetGroup", TransientResourceLinkField("VpcId", VPCResourceSpec), optional=True
         ),
         ScalarField("MultiAZ"),
         ScalarField("PubliclyAccessible"),
