@@ -20,7 +20,7 @@ class TestResourceSpecA(ResourceSpec):
             Resource(resource_id="123", type_name=cls.type_name, links=[]),
             Resource(resource_id="456", type_name=cls.type_name, links=[]),
         ]
-        return ResourceScanResult(resources=resources, stats=MultilevelCounter(), errors=[])
+        return ResourceScanResult(resources=resources, errors=[])
 
 
 
@@ -37,11 +37,11 @@ class TestResourceSpecB(ResourceSpec):
             Resource(resource_id="abc", type_name=cls.type_name, links=[]),
             Resource(resource_id="def", type_name=cls.type_name, links=[]),
         ]
-        return ResourceScanResult(resources=resources, stats=MultilevelCounter(), errors=[])
+        return ResourceScanResult(resources=resources, errors=[])
 
 
 class TestScanAccessor:
-    pass
+    api_call_stats: MultilevelCounter = MultilevelCounter()
 
 
 class TestGraphSpec(TestCase):

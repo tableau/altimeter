@@ -65,14 +65,14 @@ class TestVPCResourceSpec(TestCase):
                     ],
                 },
             ],
-            "stats": {
-                "count": 1,
-                "123456789012": {
-                    "count": 1,
-                    "us-east-1": {"count": 1, "ec2": {"count": 1, "DescribeVpcs": {"count": 1}}},
-                },
-            },
             "errors": [],
         }
-
+        expected_api_call_stats = {
+            "count": 1,
+            "123456789012": {
+                "count": 1,
+                "us-east-1": {"count": 1, "ec2": {"count": 1, "DescribeVpcs": {"count": 1}}},
+            },
+        }
         self.assertDictEqual(scan_result_dict, expected_scan_result_dict)
+        self.assertDictEqual(scan_accessor.api_call_stats.to_dict(), expected_api_call_stats)
