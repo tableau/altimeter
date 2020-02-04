@@ -25,7 +25,7 @@ class FlowLogResourceSpec(EC2ResourceSpec):
         TransientResourceLinkField("ResourceId", VPCResourceSpec, optional=True),
         ScalarField("TrafficType"),
         ScalarField("LogDestinationType"),
-        ScalarField("LogDestination"),
+        ScalarField("LogDestination", optional=True),
         ScalarField("LogFormat"),
     )
 
