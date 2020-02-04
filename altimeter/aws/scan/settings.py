@@ -5,6 +5,7 @@ from altimeter.aws.resource.resource_spec import AWSResourceSpec
 from altimeter.aws.resource.account import AccountResourceSpec
 from altimeter.aws.resource.awslambda.function import LambdaFunctionResourceSpec
 from altimeter.aws.resource.dynamodb.dynamodb_table import DynamoDbTableResourceSpec
+from altimeter.aws.resource.ec2.flow_log import FlowLogResourceSpec
 from altimeter.aws.resource.ec2.image import EC2ImageResourceSpec
 from altimeter.aws.resource.ec2.instance import EC2InstanceResourceSpec
 from altimeter.aws.resource.ec2.network_interface import EC2NetworkInterfaceResourceSpec
@@ -48,6 +49,7 @@ RESOURCE_SPEC_CLASSES: Tuple[Type[AWSResourceSpec], ...] = (
     EC2NetworkInterfaceResourceSpec,
     EC2RouteTableResourceSpec,
     EventsRuleResourceSpec,
+    FlowLogResourceSpec,
     IAMAccountPasswordPolicyResourceSpec,
     IAMAWSManagedPolicyResourceSpec,
     IAMPolicyResourceSpec,
