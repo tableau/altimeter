@@ -6,8 +6,8 @@ from botocore.exceptions import ClientError
 
 from altimeter.aws.resource.resource_spec import ListFromAWSResult
 from altimeter.aws.resource.ec2.vpc import VPCResourceSpec
-from altimeter.aws.resource.elasticloadbalancing import ElasticLoadBalancingResourceSpec
-from altimeter.aws.resource.elasticloadbalancing.load_balancer import LoadBalancerResourceSpec
+from altimeter.aws.resource.elbv2 import ELBV2ResourceSpec
+from altimeter.aws.resource.elbv2.load_balancer import LoadBalancerResourceSpec
 from altimeter.core.exceptions import AltimeterException
 from altimeter.core.graph.field.dict_field import AnonymousDictField, EmbeddedDictField
 from altimeter.core.graph.field.list_field import ListField
@@ -23,7 +23,7 @@ class TargetGroupAccessDeniedException(AltimeterException):
     pass
 
 
-class TargetGroupResourceSpec(ElasticLoadBalancingResourceSpec):
+class TargetGroupResourceSpec(ELBV2ResourceSpec):
     """Resource for target group"""
 
     type_name = "targetgroup"
