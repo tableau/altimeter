@@ -1,5 +1,5 @@
 """Resource for load balancers"""
-from typing import Type
+from typing import Dict, Type
 
 from botocore.client import BaseClient
 
@@ -8,11 +8,13 @@ from altimeter.aws.resource.elasticloadbalancing import ElasticLoadBalancingReso
 from altimeter.aws.resource.ec2.security_group import SecurityGroupResourceSpec
 from altimeter.aws.resource.ec2.vpc import VPCResourceSpec
 from altimeter.aws.resource.ec2.subnet import SubnetResourceSpec
+from altimeter.aws.resource.s3.bucket import S3BucketResourceSpec
 from altimeter.core.graph.field.dict_field import AnonymousDictField, EmbeddedDictField
 from altimeter.core.graph.field.list_field import ListField
 from altimeter.core.graph.field.resource_link_field import (
     EmbeddedResourceLinkField,
     ResourceLinkField,
+    TransientResourceLinkField,
 )
 from altimeter.core.graph.field.scalar_field import ScalarField
 from altimeter.core.graph.schema import Schema
@@ -49,6 +51,14 @@ class LoadBalancerResourceSpec(ElasticLoadBalancingResourceSpec):
             "SecurityGroups", EmbeddedResourceLinkField(SecurityGroupResourceSpec), optional=True
         ),
         ScalarField("IpAddressType"),
+        ScalarField("AccessLogsEnabled"),
+        TransientResourceLinkField(
+            "AccessLogsS3Bucket",
+            S3BucketResourceSpec,
+            alti_key="access_logs_s3_bucket",
+            optional=True,
+        ),
+        ScalarField("AccessLogsS3Prefix", optional=True),
     )
 
     @classmethod
@@ -67,5 +77,25 @@ class LoadBalancerResourceSpec(ElasticLoadBalancingResourceSpec):
         for resp in paginator.paginate():
             for lb in resp.get("LoadBalancers", []):
                 resource_arn = lb["LoadBalancerArn"]
+                lb_attrs = cls.get_lb_attrs(client, resource_arn)
+                lb.update(lb_attrs)
                 load_balancers[resource_arn] = lb
         return ListFromAWSResult(resources=load_balancers)
+
+    @classmethod
+    def get_lb_attrs(
+        cls: Type["LoadBalancerResourceSpec"], client: BaseClient, lb_arn: str,
+    ) -> Dict[str, str]:
+        """Get lb attributes that Altimeter graphs."""
+        lb_attrs = {}
+        resp = client.describe_load_balancer_attributes(LoadBalancerArn=lb_arn)
+        for attr in resp["Attributes"]:
+            if attr["Key"] == "access_logs.s3.enabled":
+                lb_attrs["AccessLogsEnabled"] = attr["Value"]
+            elif attr["Key"] == "access_logs.s3.bucket":
+                if attr["Value"]:
+                    lb_attrs["AccessLogsS3Bucket"] = attr["Value"]
+            elif attr["Key"] == "access_logs.s3.prefix":
+                if attr["Value"]:
+                    lb_attrs["AccessLogsS3Prefix"] = attr["Value"]
+        return lb_attrs
