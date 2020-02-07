@@ -4,7 +4,7 @@ from typing import Dict, Type
 from botocore.client import BaseClient
 
 from altimeter.aws.resource.resource_spec import ListFromAWSResult
-from altimeter.aws.resource.elasticloadbalancing import ElasticLoadBalancingResourceSpec
+from altimeter.aws.resource.elbv2 import ELBV2ResourceSpec
 from altimeter.aws.resource.ec2.security_group import SecurityGroupResourceSpec
 from altimeter.aws.resource.ec2.vpc import VPCResourceSpec
 from altimeter.aws.resource.ec2.subnet import SubnetResourceSpec
@@ -20,7 +20,7 @@ from altimeter.core.graph.field.scalar_field import ScalarField
 from altimeter.core.graph.schema import Schema
 
 
-class LoadBalancerResourceSpec(ElasticLoadBalancingResourceSpec):
+class LoadBalancerResourceSpec(ELBV2ResourceSpec):
     """Resource for load balancer"""
 
     type_name = "loadbalancer"
