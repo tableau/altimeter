@@ -21,7 +21,9 @@ class DynamoDbTableResourceSpec(DynamoDBResourceSpec):
         ScalarField("TableSizeBytes"),
         ScalarField("ItemCount"),
         ScalarField("TableId"),
-        AnonymousDictField("ProvisionedThroughput", ScalarField("NumberOfDecreasesToday")),
+        AnonymousDictField(
+            "ProvisionedThroughput", ScalarField("NumberOfDecreasesToday", optional=True)
+        ),
         AnonymousDictField("ProvisionedThroughput", ScalarField("ReadCapacityUnits")),
         AnonymousDictField("ProvisionedThroughput", ScalarField("WriteCapacityUnits")),
         AnonymousDictField("BillingModeSummary", ScalarField("BillingMode"), optional=True),
