@@ -86,7 +86,7 @@ class RDSInstanceResourceSpec(RDSResourceSpec):
                 ),
                 AnonymousDictField(
                     "RestoreWindow",
-                    ScalarField("LatestTime", alti_key="latest_restore_time"),
+                    ScalarField("LatestTime", alti_key="latest_restore_time", optional=True),
                     optional=True,
                 ),
                 ScalarField("AllocatedStorage"),
