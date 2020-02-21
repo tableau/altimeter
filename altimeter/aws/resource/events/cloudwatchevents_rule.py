@@ -22,7 +22,9 @@ class EventsRuleResourceSpec(EventsResourceSpec):
         ScalarField("ScheduleExpression", optional=True),
         ListField(
             "Targets",
-            EmbeddedDictField(ScalarField("Id", "name"), ScalarField("Arn", "arn")),
+            EmbeddedDictField(ScalarField("Id", "name"),
+                              ScalarField("Arn"),
+                              ScalarField("RoleArn", optional=True)),
             alti_key="target",
         ),
     )
