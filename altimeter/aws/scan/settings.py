@@ -25,6 +25,7 @@ from altimeter.aws.resource.elbv1.load_balancer import ClassicLoadBalancerResour
 from altimeter.aws.resource.elbv2.load_balancer import LoadBalancerResourceSpec
 from altimeter.aws.resource.elbv2.target_group import TargetGroupResourceSpec
 from altimeter.aws.resource.events.cloudwatchevents_rule import EventsRuleResourceSpec
+from altimeter.aws.resource.events.event_bus import EventBusResourceSpec
 from altimeter.aws.resource.iam.account_password_policy import IAMAccountPasswordPolicyResourceSpec
 from altimeter.aws.resource.iam.iam_saml_provider import IAMSAMLProviderResourceSpec
 from altimeter.aws.resource.iam.instance_profile import InstanceProfileResourceSpec
@@ -50,6 +51,7 @@ RESOURCE_SPEC_CLASSES: Tuple[Type[AWSResourceSpec], ...] = (
     EC2InstanceResourceSpec,
     EC2NetworkInterfaceResourceSpec,
     EC2RouteTableResourceSpec,
+    EventBusResourceSpec,
     EventsRuleResourceSpec,
     FlowLogResourceSpec,
     IAMAccountPasswordPolicyResourceSpec,
