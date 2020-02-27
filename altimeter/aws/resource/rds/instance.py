@@ -91,7 +91,7 @@ class RDSInstanceResourceSpec(RDSResourceSpec):
                 ),
                 ScalarField("AllocatedStorage"),
                 ScalarField("Status"),
-                ScalarField("AvailabilityZone"),
+                ScalarField("AvailabilityZone", optional=True),
                 ScalarField("Engine"),
                 ScalarField("EngineVersion"),
                 ScalarField("Encrypted"),
