@@ -28,7 +28,9 @@ class DynamoDbTableResourceSpec(DynamoDBResourceSpec):
         AnonymousDictField("ProvisionedThroughput", ScalarField("WriteCapacityUnits")),
         AnonymousDictField("BillingModeSummary", ScalarField("BillingMode"), optional=True),
         AnonymousDictField(
-            "BillingModeSummary", ScalarField("LastUpdateToPayPerRequestDateTime"), optional=True
+            "BillingModeSummary",
+            ScalarField("LastUpdateToPayPerRequestDateTime", optional=True),
+            optional=True,
         ),
         AnonymousDictField("ContinuousBackupsDescription", ScalarField("ContinuousBackupsStatus")),
         AnonymousDictField(
