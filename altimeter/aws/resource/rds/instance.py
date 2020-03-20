@@ -38,7 +38,7 @@ class RDSInstanceResourceSpec(RDSResourceSpec):
         ScalarField("DBName", optional=True),
         AnonymousDictField(
             "Endpoint",
-            ScalarField("Address", alti_key="endpoint_address"),
+            ScalarField("Address", alti_key="endpoint_address", optional=True),
             ScalarField("Port", alti_key="endpoint_port"),
             ScalarField("HostedZoneId", alti_key="endpoint_hosted_zone", optional=True),
             optional=True,
