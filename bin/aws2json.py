@@ -95,7 +95,7 @@ def lambda_handler(event, context):
         account_scan_lambda_timeout=account_scan_lambda_timeout,
     )
 
-    accessor = Accessor.from_file(Path("./config/access_config_v2.json"))
+    accessor = Accessor.from_file(Path("./config/access_config.json"))
 
     now = datetime.now()
     scan_date = now.strftime("%Y%m%d")
