@@ -41,7 +41,7 @@ from pathlib import Path
 import sys
 from typing import Dict, List, Set
 
-from altimeter.aws.access.accessor import Accessor
+from altimeter.aws.access.v2.accessor import Accessor
 from altimeter.core.awslambda import get_required_lambda_env_var
 from altimeter.core.graph.graph_set import GraphSet
 from altimeter.core.log import Logger
@@ -95,7 +95,7 @@ def lambda_handler(event, context):
         account_scan_lambda_timeout=account_scan_lambda_timeout,
     )
 
-    accessor = Accessor.from_file(Path("./config/access_config.json"))
+    accessor = Accessor.from_file(Path("./config/access_config_v2.json"))
 
     now = datetime.now()
     scan_date = now.strftime("%Y%m%d")

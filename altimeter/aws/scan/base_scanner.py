@@ -140,6 +140,8 @@ class BaseScanner(abc.ABC):
                             for region in scan_regions
                             if region in resource_spec_class.region_whitelist
                         )
+                        if not resource_scan_regions:
+                            resource_scan_regions = resource_spec_class.region_whitelist
                     else:
                         resource_scan_regions = scan_regions
                     if resource_spec_class.scan_granularity == ScanGranularity.ACCOUNT:

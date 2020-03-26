@@ -4,7 +4,7 @@ from typing import Any, Dict, List, Optional, Type
 
 import boto3
 
-from altimeter.aws.access.accessor import Accessor
+from altimeter.aws.access.v2.accessor import Accessor
 
 
 @dataclass(frozen=True)
@@ -28,7 +28,7 @@ class AccountScanPlan:
         Returns:
             session object
         """
-        return self.accessor.get_session(account_id=self.account_id, region=region)
+        return self.accessor.get_session(account_id=self.account_id, region_name=region)
 
     def to_dict(self) -> Dict[str, Any]:
         """Generate a dict representation of this AccountScanPlan.
