@@ -1,7 +1,7 @@
 import time
 from unittest import TestCase
 
-from altimeter.aws.access.v2.cache import (
+from altimeter.aws.auth.cache import (
     AWSCredentials,
     AWSCredentialsCacheKey,
     AWSCredentialsCache,

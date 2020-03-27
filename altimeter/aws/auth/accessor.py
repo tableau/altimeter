@@ -10,9 +10,9 @@ from typing import Any, Dict, List, Optional, Type
 import boto3
 import jinja2
 
-from altimeter.aws.access.v2.cache import AWSCredentialsCache
-from altimeter.aws.access.v2.exceptions import AccountAuthException
-from altimeter.aws.access.v2.multi_hop_accessor import MultiHopAccessor
+from altimeter.aws.auth.cache import AWSCredentialsCache
+from altimeter.aws.auth.exceptions import AccountAuthException
+from altimeter.aws.auth.multi_hop_accessor import MultiHopAccessor
 from altimeter.core.log import LogEvent, Logger
 
 

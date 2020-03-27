@@ -6,8 +6,8 @@ import tempfile
 import time
 from unittest import TestCase
 
-from altimeter.aws.access.v2.accessor import Accessor
-from altimeter.aws.access.v2.exceptions import AccountAuthException
+from altimeter.aws.auth.accessor import Accessor
+from altimeter.aws.auth.exceptions import AccountAuthException
 
 import jinja2
 from moto import mock_sts
@@ -102,7 +102,7 @@ class TestAccessor(TestCase):
                 fp.write(json.dumps(TEST_ACCESSOR_FILE_CONTENT))
             accessor = Accessor.from_file(filepath=access_config_path)
             with mock.patch(
-                "altimeter.aws.access.v2.multi_hop_accessor.MultiHopAccessor.get_session"
+                "altimeter.aws.auth.multi_hop_accessor.MultiHopAccessor.get_session"
             ) as mock_get_session:
                 mock_get_session.side_effect = Exception("MockAuthFailure")
                 with self.assertRaises(AccountAuthException):

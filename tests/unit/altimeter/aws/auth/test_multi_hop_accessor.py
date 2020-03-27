@@ -1,7 +1,7 @@
 from unittest import TestCase
 
-from altimeter.aws.access.v2.cache import AWSCredentialsCache
-from altimeter.aws.access.v2.multi_hop_accessor import AccessStep, MultiHopAccessor
+from altimeter.aws.auth.multi_hop_accessor import AccessStep, MultiHopAccessor
+from altimeter.aws.auth.cache import AWSCredentialsCache
 
 from moto import mock_sts
 

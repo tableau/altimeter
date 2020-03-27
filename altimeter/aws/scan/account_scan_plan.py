@@ -4,7 +4,7 @@ from typing import Any, Dict, List, Optional, Type
 
 import boto3
 
-from altimeter.aws.access.v2.accessor import Accessor
+from altimeter.aws.auth.accessor import Accessor
 
 
 @dataclass(frozen=True)

@@ -5,7 +5,7 @@ from typing import Any, Dict, List, Optional, Type
 
 import boto3
 
-from altimeter.aws.access.v2.cache import AWSCredentials, AWSCredentialsCache
+from altimeter.aws.auth.cache import AWSCredentials, AWSCredentialsCache
 from altimeter.core.log import LogEvent, Logger
 
 
