@@ -76,6 +76,11 @@ class TestMultiHopAccessor(TestCase):
         )
         session = mha.get_session("123456789012")
         sts_client = session.client("sts")
+        caller_id = sts_client.get_caller_identity()
+        self.assertEqual(
+            caller_id["Arn"],
+            "arn:aws:sts::123456789012:assumed-role/test_role_name3/test_role_session_name",
+        )
         self.assertIsNone(session.region_name)
 
     @mock_sts
@@ -90,6 +95,12 @@ class TestMultiHopAccessor(TestCase):
             role_session_name="test_role_session_name", access_steps=access_steps
         )
         session = mha.get_session("123456789012", credentials_cache=cache)
+        sts_client = session.client("sts")
+        caller_id = sts_client.get_caller_identity()
+        self.assertEqual(
+            caller_id["Arn"],
+            "arn:aws:sts::123456789012:assumed-role/test_role_name3/test_role_session_name",
+        )
         self.assertIsNone(session.region_name)
         self.assertEqual(
             sorted(cache.to_dict()["cache"].keys()),
