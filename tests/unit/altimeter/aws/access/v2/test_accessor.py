@@ -17,10 +17,10 @@ TEST_EXT_ID = "foo"
 TEST_ACCESSOR_FILE_CONTENT = {
     "multi_hop_accessors": [
         {
-            "role_session_name": "altimeter-mb-oaar",
+            "role_session_name": "altimeter-mb-a",
             "access_steps": [
                 {
-                    "account_id": "361055995553",
+                    "account_id": "123456789012",
                     "external_id": "{{ env['TEST_EXT_ID'] }}",
                     "role_name": "OrganizationAccountAccessRole",
                 },
@@ -28,15 +28,15 @@ TEST_ACCESSOR_FILE_CONTENT = {
             ],
         },
         {
-            "role_session_name": "altimeter-sales-oaar",
+            "role_session_name": "altimeter-mb-b",
             "access_steps": [
                 {
-                    "account_id": "361055995553",
+                    "account_id": "123456789012",
                     "external_id": "{{ env['TEST_EXT_ID'] }}",
                     "role_name": "OrganizationAccountAccessRole",
                 },
                 {
-                    "account_id": "233564261086",
+                    "account_id": "123456789012",
                     "external_id": "{{ env['TEST_EXT_ID'] }}",
                     "role_name": "OrganizationAccountAccessRole",
                 },
@@ -49,10 +49,10 @@ TEST_ACCESSOR_FILE_CONTENT = {
 TEST_ACCESSOR_DICT = {
     "multi_hop_accessors": [
         {
-            "role_session_name": "altimeter-mb-oaar",
+            "role_session_name": "altimeter-mb-a",
             "access_steps": [
                 {
-                    "account_id": "361055995553",
+                    "account_id": "123456789012",
                     "external_id": TEST_EXT_ID,
                     "role_name": "OrganizationAccountAccessRole",
                 },
@@ -60,15 +60,15 @@ TEST_ACCESSOR_DICT = {
             ],
         },
         {
-            "role_session_name": "altimeter-sales-oaar",
+            "role_session_name": "altimeter-mb-b",
             "access_steps": [
                 {
-                    "account_id": "361055995553",
+                    "account_id": "123456789012",
                     "external_id": TEST_EXT_ID,
                     "role_name": "OrganizationAccountAccessRole",
                 },
                 {
-                    "account_id": "233564261086",
+                    "account_id": "123456789012",
                     "external_id": TEST_EXT_ID,
                     "role_name": "OrganizationAccountAccessRole",
                 },
@@ -115,11 +115,11 @@ class TestAccessor(TestCase):
             {
                 "multi_hop_accessors": [
                     {
-                        "role_session_name": "altimeter-mb-oaar",
+                        "role_session_name": "altimeter-mb-a",
                         "access_steps": [
                             {
                                 "role_name": "OrganizationAccountAccessRole",
-                                "account_id": "361055995553",
+                                "account_id": "123456789012",
                                 "external_id": "foo",
                             },
                             {
@@ -130,16 +130,16 @@ class TestAccessor(TestCase):
                         ],
                     },
                     {
-                        "role_session_name": "altimeter-sales-oaar",
+                        "role_session_name": "altimeter-mb-b",
                         "access_steps": [
                             {
                                 "role_name": "OrganizationAccountAccessRole",
-                                "account_id": "361055995553",
+                                "account_id": "123456789012",
                                 "external_id": "foo",
                             },
                             {
                                 "role_name": "OrganizationAccountAccessRole",
-                                "account_id": "233564261086",
+                                "account_id": "123456789012",
                                 "external_id": "foo",
                             },
                             {
@@ -178,11 +178,11 @@ class TestAccessor(TestCase):
             {
                 "multi_hop_accessors": [
                     {
-                        "role_session_name": "altimeter-mb-oaar",
+                        "role_session_name": "altimeter-mb-a",
                         "access_steps": [
                             {
                                 "role_name": "OrganizationAccountAccessRole",
-                                "account_id": "361055995553",
+                                "account_id": "123456789012",
                                 "external_id": "foo",
                             },
                             {
@@ -193,16 +193,16 @@ class TestAccessor(TestCase):
                         ],
                     },
                     {
-                        "role_session_name": "altimeter-sales-oaar",
+                        "role_session_name": "altimeter-mb-b",
                         "access_steps": [
                             {
                                 "role_name": "OrganizationAccountAccessRole",
-                                "account_id": "361055995553",
+                                "account_id": "123456789012",
                                 "external_id": "foo",
                             },
                             {
                                 "role_name": "OrganizationAccountAccessRole",
-                                "account_id": "233564261086",
+                                "account_id": "123456789012",
                                 "external_id": "foo",
                             },
                             {
@@ -229,11 +229,11 @@ class TestAccessor(TestCase):
             {
                 "multi_hop_accessors": [
                     {
-                        "role_session_name": "altimeter-mb-oaar",
+                        "role_session_name": "altimeter-mb-a",
                         "access_steps": [
                             {
                                 "role_name": "OrganizationAccountAccessRole",
-                                "account_id": "361055995553",
+                                "account_id": "123456789012",
                                 "external_id": "foo",
                             },
                             {
@@ -244,16 +244,16 @@ class TestAccessor(TestCase):
                         ],
                     },
                     {
-                        "role_session_name": "altimeter-sales-oaar",
+                        "role_session_name": "altimeter-mb-b",
                         "access_steps": [
                             {
                                 "role_name": "OrganizationAccountAccessRole",
-                                "account_id": "361055995553",
+                                "account_id": "123456789012",
                                 "external_id": "foo",
                             },
                             {
                                 "role_name": "OrganizationAccountAccessRole",
-                                "account_id": "233564261086",
+                                "account_id": "123456789012",
                                 "external_id": "foo",
                             },
                             {
@@ -272,11 +272,11 @@ class TestAccessor(TestCase):
         data = {
             "multi_hop_accessors": [
                 {
-                    "role_session_name": "altimeter-mb-oaar",
+                    "role_session_name": "altimeter-mb-a",
                     "access_steps": [
                         {
                             "role_name": "OrganizationAccountAccessRole",
-                            "account_id": "361055995553",
+                            "account_id": "123456789012",
                             "external_id": "foo",
                         },
                         {
@@ -287,16 +287,16 @@ class TestAccessor(TestCase):
                     ],
                 },
                 {
-                    "role_session_name": "altimeter-sales-oaar",
+                    "role_session_name": "altimeter-mb-b",
                     "access_steps": [
                         {
                             "role_name": "OrganizationAccountAccessRole",
-                            "account_id": "361055995553",
+                            "account_id": "123456789012",
                             "external_id": "foo",
                         },
                         {
                             "role_name": "OrganizationAccountAccessRole",
-                            "account_id": "233564261086",
+                            "account_id": "123456789012",
                             "external_id": "foo",
                         },
                         {
@@ -317,11 +317,11 @@ class TestAccessor(TestCase):
         data = {
             "multi_hop_accessors": [
                 {
-                    "role_session_name": "altimeter-mb-oaar",
+                    "role_session_name": "altimeter-mb-a",
                     "access_steps": [
                         {
                             "role_name": "OrganizationAccountAccessRole",
-                            "account_id": "361055995553",
+                            "account_id": "123456789012",
                             "external_id": "foo",
                         },
                         {
@@ -332,16 +332,16 @@ class TestAccessor(TestCase):
                     ],
                 },
                 {
-                    "role_session_name": "altimeter-sales-oaar",
+                    "role_session_name": "altimeter-mb-b",
                     "access_steps": [
                         {
                             "role_name": "OrganizationAccountAccessRole",
-                            "account_id": "361055995553",
+                            "account_id": "123456789012",
                             "external_id": "foo",
                         },
                         {
                             "role_name": "OrganizationAccountAccessRole",
-                            "account_id": "233564261086",
+                            "account_id": "12345678901",
                             "external_id": "foo",
                         },
                         {
@@ -376,10 +376,10 @@ class TestAccessor(TestCase):
         self.assertEqual(
             str(accessor),
             (
-                "accessor:altimeter-mb-oaar:OrganizationAccountAccessRole@361055995553,"
+                "accessor:altimeter-mb-a:OrganizationAccountAccessRole@123456789012,"
                 "OrganizationAccountAccessRole@target,"
-                "accessor:altimeter-sales-oaar:OrganizationAccountAccessRole@361055995553,"
-                "OrganizationAccountAccessRole@233564261086,"
+                "accessor:altimeter-mb-b:OrganizationAccountAccessRole@123456789012,"
+                "OrganizationAccountAccessRole@123456789012,"
                 "OrganizationAccountAccessRole@target"
             ),
         )

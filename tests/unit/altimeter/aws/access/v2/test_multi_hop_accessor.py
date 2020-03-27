@@ -67,8 +67,8 @@ class TestMultiHopAccessor(TestCase):
     @mock_sts
     def test_get_session_without_cache(self):
         access_steps = [
-            AccessStep(role_name="test_role_name1", account_id="1234", external_id="abcd"),
-            AccessStep(role_name="test_role_name2", account_id="5678"),
+            AccessStep(role_name="test_role_name1", account_id="123456789012", external_id="abcd"),
+            AccessStep(role_name="test_role_name2", account_id="123456789012"),
             AccessStep(role_name="test_role_name3"),
         ]
         mha = MultiHopAccessor(
@@ -87,8 +87,8 @@ class TestMultiHopAccessor(TestCase):
     def test_get_session_with_cache(self):
         cache = AWSCredentialsCache()
         access_steps = [
-            AccessStep(role_name="test_role_name1", account_id="1234", external_id="abcd"),
-            AccessStep(role_name="test_role_name2", account_id="5678"),
+            AccessStep(role_name="test_role_name1", account_id="123456789012", external_id="abcd"),
+            AccessStep(role_name="test_role_name2", account_id="123456789012"),
             AccessStep(role_name="test_role_name3"),
         ]
         mha = MultiHopAccessor(
@@ -115,8 +115,8 @@ class TestMultiHopAccessor(TestCase):
     def test_get_session_with_primed_cache(self):
         cache = AWSCredentialsCache()
         access_steps = [
-            AccessStep(role_name="test_role_name1", account_id="1234", external_id="abcd"),
-            AccessStep(role_name="test_role_name2", account_id="5678"),
+            AccessStep(role_name="test_role_name1", account_id="123456789012", external_id="abcd"),
+            AccessStep(role_name="test_role_name2", account_id="123456789012"),
             AccessStep(role_name="test_role_name3"),
         ]
         mha = MultiHopAccessor(

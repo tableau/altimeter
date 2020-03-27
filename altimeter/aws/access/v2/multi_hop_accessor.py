@@ -116,7 +116,7 @@ class MultiHopAccessor:
                 if credentials_cache is not None:
                     credentials_cache.put(
                         credentials=credentials,
-                        account_id=account_id,
+                        account_id=access_account_id,
                         role_name=role_name,
                         role_session_name=self.role_session_name,
                     )
