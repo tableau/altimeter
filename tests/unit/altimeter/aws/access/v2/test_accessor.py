@@ -154,10 +154,6 @@ class TestAccessor(TestCase):
             },
         )
 
-    def test_from_dict_missing_mhas(self):
-        with self.assertRaises(ValueError):
-            Accessor.from_dict({"multi_hop_accessors": [], "credentials_cache": None})
-
     def test_from_file_missing_env_args(self):
         with tempfile.TemporaryDirectory() as tmp_dir:
             access_config_path = Path(tmp_dir, "access_config.json")

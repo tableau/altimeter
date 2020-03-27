@@ -121,6 +121,7 @@ class MultiHopAccessor:
                         role_session_name=self.role_session_name,
                     )
                 logger.debug(event=LogEvent.AuthToAccountEnd)
+            cws = session
         return session
 
     def __str__(self) -> str:
