@@ -21,7 +21,8 @@ class LambdaAWSScanMuxer(AWSScanMuxer):
         json_bucket: bucket to dump json output into
         key_prefix: prefix for json output objects
         scan_sub_accounts: if True, scan subaccounts of any org master accounts
-        max_lambdas: max number of AccountScan lambdas to run concurrently
+        max_threads: maximum number of AccountScans to run concurrently
+        max_accounts_per_thread: max number of accounts to scan concurrently inside each AccountScan
     """
 
     def __init__(
@@ -31,9 +32,10 @@ class LambdaAWSScanMuxer(AWSScanMuxer):
         json_bucket: str,
         key_prefix: str,
         scan_sub_accounts: bool,
-        max_lambdas: int,
+        max_threads: int = 32,  # TODO setting
+        max_accounts_per_thread: int = 8,  # TODO setting
     ):
-        super().__init__(max_threads=max_lambdas)
+        super().__init__(max_threads=max_threads, max_accounts_per_thread=max_accounts_per_thread)
         self.account_scan_lambda_name = account_scan_lambda_name
         self.account_scan_lambda_timeout = account_scan_lambda_timeout
         self.json_bucket = json_bucket
@@ -47,7 +49,6 @@ class LambdaAWSScanMuxer(AWSScanMuxer):
         the proper arguments."""
         lambda_event = {
             "account_scan_plan": account_scan_plan.to_dict(),
-            "regions": account_scan_plan.regions,
             "json_bucket": self.json_bucket,
             "key_prefix": self.key_prefix,
             "scan_sub_accounts": self.scan_sub_accounts,

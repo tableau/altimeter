@@ -1,4 +1,4 @@
-"""An AccountScanPlan defines how to scan an account."""
+"""An AccountScanPlan defines how to scan a set of accounts."""
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional, Type
 
@@ -9,26 +9,17 @@ from altimeter.aws.auth.accessor import Accessor
 
 @dataclass(frozen=True)
 class AccountScanPlan:
-    """An AccountScanPlan defines how to scan an account.
+    """An AccountScanPlan defines how to scan a set of accounts.
 
     Arguments:
-        account_id: account id to scan
+        account_ids: account ids to scan
         regions: regions to scan
-        accessor: Accessor to use to access the account
+        accessor: Accessor to use to access the accounts
     """
 
-    account_id: str
+    account_ids: List[str]
     regions: List[str]
     accessor: Accessor
-
-    def get_session(self, region: Optional[str] = None) -> boto3.Session:
-        """Get a boto3 Session for this AccountScanPlan's account_id
-        Args:
-             region: specific region to acquire the session in
-        Returns:
-            session object
-        """
-        return self.accessor.get_session(account_id=self.account_id, region_name=region)
 
     def to_dict(self) -> Dict[str, Any]:
         """Generate a dict representation of this AccountScanPlan.
@@ -37,7 +28,7 @@ class AccountScanPlan:
             dict representation of this AccountScanPlan
         """
         return {
-            "account_id": self.account_id,
+            "account_ids": self.account_ids,
             "regions": list(self.regions),
             "accessor": self.accessor.to_dict(),
         }
@@ -54,31 +45,22 @@ class AccountScanPlan:
         Returns:
             AccountScanPlan object
         """
-        account_id = account_scan_plan_dict["account_id"]
+        account_ids = account_scan_plan_dict["account_ids"]
         regions = account_scan_plan_dict["regions"]
         accessor_dict = account_scan_plan_dict["accessor"]
         accessor = Accessor.from_dict(accessor_dict)
-        return cls(account_id=account_id, regions=regions, accessor=accessor)
+        return cls(account_ids=account_ids, regions=regions, accessor=accessor)
 
-
-def build_account_scan_plans(
-    accessor: Accessor, account_ids: List[str], regions: List[str]
-) -> List[AccountScanPlan]:
-    """Given a list of account_ids and regions build a list of AccountScanPlans.
-
-    Args:
-        accessor: Accessor to use for each AccountScanPlan
-        account_ids: list of account ids to build plans for
-        regions: regions to scan
-
-    Returns:
-        List of AccountScanPlan objects.
-    """
-    account_scan_plans: List[AccountScanPlan] = []
-    # first any free-floating accounts
-    for account_id in account_ids:
-        account_scan_plan = AccountScanPlan(
-            account_id=account_id, regions=regions, accessor=accessor
-        )
-        account_scan_plans.append(account_scan_plan)
-    return account_scan_plans
+    def to_batches(self, max_accounts: int) -> List["AccountScanPlan"]:
+        """Break this AccountScanPlan into multiple AccountScanPlans with a max of
+        max_accounts account_ids per plan"""
+        account_id_batches = [
+            self.account_ids[n : n + max_accounts]
+            for n in range(0, len(self.account_ids), max_accounts)
+        ]
+        return [
+            AccountScanPlan(
+                account_ids=account_id_batch, regions=self.regions, accessor=self.accessor
+            )
+            for account_id_batch in account_id_batches
+        ]

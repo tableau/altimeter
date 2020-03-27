@@ -54,12 +54,10 @@ from altimeter.core.artifact_io.writer import ArtifactWriter, FileArtifactWriter
 from altimeter.aws.scan.muxer import AWSScanMuxer
 from altimeter.aws.scan.muxer.local_muxer import LocalAWSScanMuxer
 from altimeter.aws.scan.muxer.lambda_muxer import LambdaAWSScanMuxer
-from altimeter.aws.scan.account_scan_plan import build_account_scan_plans
+from altimeter.aws.scan.account_scan_plan import AccountScanPlan
 from altimeter.aws.scan.scan_manifest import ScanManifest
 
 import boto3
-
-DEFAULT_MAX_LAMBDAS = 192
 
 
 def lambda_handler(event, context):
@@ -82,7 +80,6 @@ def lambda_handler(event, context):
         scan_sub_accounts = bool(event["scan_sub_accounts"])
     else:
         scan_sub_accounts = bool(os.environ.get("SCAN_SUB_ACCOUNTS", True))
-    max_lambdas = int(os.environ.get("MAX_LAMBDAS", DEFAULT_MAX_LAMBDAS))
 
     logger = Logger()
     logger.info(
@@ -111,7 +108,6 @@ def lambda_handler(event, context):
         json_bucket=json_bucket,
         key_prefix=key_prefix,
         scan_sub_accounts=scan_sub_accounts,
-        max_lambdas=max_lambdas,
     )
 
     scan_manifest = scan(
@@ -171,7 +167,7 @@ def main(argv=None):
         sts_client = boto3.client("sts")
         account_id = sts_client.get_caller_identity()["Account"]
         account_ids = [account_id]
-        accessor = Accessor(multi_hop_accessors=[])
+        accessor = Accessor()
         logger.info(
             AWSLogEvents.ScanConfigured, account_ids=account_ids, regions=regions, base_dir=base_dir
         )
@@ -232,12 +228,13 @@ def scan(
 ) -> ScanManifest:
     if scan_sub_accounts:
         account_ids = get_sub_account_ids(account_ids, accessor)
-    account_scan_plans = build_account_scan_plans(
-        accessor=accessor, account_ids=account_ids, regions=regions
-    )
+    #HERE! looking onto build_account_scan_plan...
+    account_scan_plan = AccountScanPlan(account_ids=account_ids,
+                                        regions=regions,
+                                        accessor=accessor)
     logger = Logger()
     logger.info(event=AWSLogEvents.ScanAWSAccountsStart)
-    account_scan_manifests = muxer.scan(account_scan_plans=account_scan_plans)
+    account_scan_manifests = muxer.scan(account_scan_plan=account_scan_plan)
     # now combine account_scan_results and org_details to build a ScanManifest
     scanned_accounts: List[Dict[str, str]] = []
     artifacts: List[str] = []
