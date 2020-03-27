@@ -92,8 +92,8 @@ class BaseScanner(abc.ABC):
             for account_id in self.account_scan_plan.account_ids:
                 with logger.bind(account_id=account_id):
                     # need to figure out how to multithread self.scan_account calls...
-                    print(account_id)
-            #        scan_results.append(self.scan_account(account_id=account_id))
+                    raise NotImplementedError("WIP")
+                    #scan_results.append(self.scan_account(account_id=account_id))
         return scan_results
 
     def scan_account(self, account_id: str) -> Dict[str, Any]:

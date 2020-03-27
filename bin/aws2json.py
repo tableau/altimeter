@@ -228,7 +228,6 @@ def scan(
 ) -> ScanManifest:
     if scan_sub_accounts:
         account_ids = get_sub_account_ids(account_ids, accessor)
-    #HERE! looking onto build_account_scan_plan...
     account_scan_plan = AccountScanPlan(account_ids=account_ids,
                                         regions=regions,
                                         accessor=accessor)

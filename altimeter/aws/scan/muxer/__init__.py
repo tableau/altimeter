@@ -35,10 +35,6 @@ class AWSScanMuxer(abc.ABC):
         account_scan_results: List[AccountScanManifest] = []
         num_total_accounts = len(account_scan_plan.account_ids)
         account_scan_plans = account_scan_plan.to_batches(max_accounts=self.max_accounts_per_thread)
-        # TEMP FIXME
-        account_scan_plans = account_scan_plans[:2]
-        # TEMP FIXME
-        account_scan_plans
         num_account_batches = len(account_scan_plans)
         num_threads = min(num_account_batches, self.max_threads)
         logger = Logger()
@@ -60,9 +56,6 @@ class AWSScanMuxer(abc.ABC):
                     )
                 for future in as_completed(futures):
                     scan_results_dicts = future.result()
-                    print("*" * 80)
-                    print(scan_results_dicts)
-                    print("*" * 80)
                     for scan_results_dict in scan_results_dicts:
                         account_id = scan_results_dict["account_id"]
                         output_artifact = scan_results_dict["output_artifact"]
@@ -92,3 +85,4 @@ class AWSScanMuxer(abc.ABC):
         In a local environment this means creating an AccountScanner directly and
         calling executor.submit(AccountScanner.scan)
         """
+        raise NotImplementedError("WIP")
