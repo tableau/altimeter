@@ -41,7 +41,7 @@ from pathlib import Path
 import sys
 from typing import Dict, List, Set
 
-from altimeter.aws.access.accessor import Accessor
+from altimeter.aws.auth.accessor import Accessor
 from altimeter.core.awslambda import get_required_lambda_env_var
 from altimeter.core.graph.graph_set import GraphSet
 from altimeter.core.log import Logger
@@ -171,7 +171,7 @@ def main(argv=None):
         sts_client = boto3.client("sts")
         account_id = sts_client.get_caller_identity()["Account"]
         account_ids = [account_id]
-        accessor = Accessor()
+        accessor = Accessor(multi_hop_accessors=[])
         logger.info(
             AWSLogEvents.ScanConfigured, account_ids=account_ids, regions=regions, base_dir=base_dir
         )
