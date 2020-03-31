@@ -9,6 +9,7 @@ from typing import Any, DefaultDict, Dict, List, Tuple, Type
 import boto3
 
 from altimeter.core.artifact_io.writer import ArtifactWriter
+from altimeter.aws.auth.accessor import Accessor
 from altimeter.aws.log import AWSLogEvents
 from altimeter.aws.resource.resource_spec import ScanGranularity, AWSResourceSpec
 from altimeter.aws.resource.unscanned_account import UnscannedAccountResourceSpec
@@ -91,130 +92,177 @@ class BaseScanner(abc.ABC):
             futures = []
             for account_id in self.account_scan_plan.account_ids:
                 with logger.bind(account_id=account_id):
-                    # need to figure out how to multithread self.scan_account calls...
-                    raise NotImplementedError("WIP")
-                    #scan_results.append(self.scan_account(account_id=account_id))
+                    scan_future = scan_account(account_id=account_id,
+                                               regions=self.account_scan_plan.regions,
+                                               resource_spec_classes=self.resource_spec_classes,
+                                               graph_name=self.graph_name,
+                                               graph_version=self.graph_version,
+                                               max_svc_threads=self.max_svc_threads,
+                                               artifact_writer=self.artifact_writer,
+                                               accessor_dict=self.account_scan_plan.accessor.to_dict())
+                    futures.append(scan_future)
+            for future in as_completed(futures):
+                account_scan_result = future.result()
+                print("*"*80)
+                print(account_scan_result)
+                print("*"*80)
+        raise NotImplementedError
         return scan_results
 
-    def scan_account(self, account_id: str) -> Dict[str, Any]:
-        """ FIXME TODO DOCUMENT ME """
-        logger = Logger()
-        logger.info(event=AWSLogEvents.ScanAWSAccountStart)
-        stats = MultilevelCounter()
-        errors: List[str] = []
-        now = int(time.time())
-        try:
-            account_graph_set = GraphSet(
-                name=self.graph_name,
-                version=self.graph_version,
-                start_time=now,
-                end_time=now,
-                resources=[],
-                errors=[],
-                stats=stats,
-            )
-            # sanity check
-            session = self.account_scan_plan.accessor.get_session(account_id=account_id)
-            sts_client = session.client("sts")
-            sts_account_id = sts_client.get_caller_identity()["Account"]
-            if sts_account_id != account_id:
-                raise ValueError(f"BUG: sts detected account_id {sts_account_id} != {account_id}")
-            if self.account_scan_plan.regions:
-                scan_regions = tuple(self.account_scan_plan.regions)
-            else:
-                scan_regions = get_all_enabled_regions(session=session)
-            # build graph specs.
-            # build a dict of regions -> services -> List[AWSResourceSpec]
-            regions_services_resource_spec_classes: DefaultDict[
-                str, DefaultDict[str, List[Type[AWSResourceSpec]]]
-            ] = defaultdict(lambda: defaultdict(list))
-            resource_spec_class: Type[AWSResourceSpec]
-            for resource_spec_class in self.resource_spec_classes:
-                client_name = resource_spec_class.get_client_name()
-                if resource_spec_class.region_whitelist:
-                    resource_scan_regions = tuple(
-                        region
-                        for region in scan_regions
-                        if region in resource_spec_class.region_whitelist
-                    )
-                    if not resource_scan_regions:
-                        resource_scan_regions = resource_spec_class.region_whitelist
-                else:
-                    resource_scan_regions = scan_regions
-                if resource_spec_class.scan_granularity == ScanGranularity.ACCOUNT:
-                    regions_services_resource_spec_classes[resource_scan_regions[0]][
-                        client_name
-                    ].append(resource_spec_class)
-                elif resource_spec_class.scan_granularity == ScanGranularity.REGION:
-                    for region in resource_scan_regions:
-                        regions_services_resource_spec_classes[region][client_name].append(
-                            resource_spec_class
-                        )
-                else:
-                    raise NotImplementedError(
-                        f"ScanGranularity {resource_spec_class.scan_granularity} unimplemented"
-                    )
-            with ThreadPoolExecutor(max_workers=self.max_svc_threads) as executor:
-                futures = []
-                for (
-                    region,
-                    services_resource_spec_classes,
-                ) in regions_services_resource_spec_classes.items():
-                    for (service, resource_spec_classes,) in services_resource_spec_classes.items():
-                        region_session = self.account_scan_plan.accessor.get_session(
-                            account_id=account_id, region=region
-                        )
-                        region_creds = region_session.get_credentials()
-                        scan_future = schedule_scan_service(
-                            executor=executor,
-                            graph_name=self.graph_name,
-                            graph_version=self.graph_version,
-                            account_id=account_id,
-                            region=region,
-                            service=service,
-                            access_key=region_creds.access_key,
-                            secret_key=region_creds.secret_key,
-                            token=region_creds.token,
-                            resource_spec_classes=tuple(resource_spec_classes),
-                        )
-                        futures.append(scan_future)
-                for future in as_completed(futures):
-                    graph_set_dict = future.result()
-                    graph_set = GraphSet.from_dict(graph_set_dict)
-                    errors += graph_set.errors
-                    account_graph_set.merge(graph_set)
-                account_graph_set.validate()
-        except Exception as ex:
-            error_str = str(ex)
-            trace_back = traceback.format_exc()
-            logger.error(
-                event=AWSLogEvents.ScanAWSAccountError, error=error_str, trace_back=trace_back,
-            )
-            errors.append(" : ".join((error_str, trace_back)))
-            unscanned_account_resource = UnscannedAccountResourceSpec.create_resource(
-                account_id=account_id, errors=errors
-            )
-            account_graph_set = GraphSet(
-                name=self.graph_name,
-                version=self.graph_version,
-                start_time=now,
-                end_time=now,
-                resources=[unscanned_account_resource],
-                errors=errors,
-                stats=stats,
-            )
-            account_graph_set.validate()
-        output_artifact = self.artifact_writer.write_artifact(
-            name=account_id, data=account_graph_set.to_dict()
+
+def schedule_scan_account(
+    executor: ThreadPoolExecutor,
+    account_id: str,
+    regions: List[str],
+    resource_spec_classes: Tuple[Type[AWSResourceSpec], ...],
+    graph_name: str,
+    graph_version: str,
+    max_svc_threads: int,
+    artifact_writer: ArtifactWriter,
+    accessor_dict: Dict[str, Any],
+) -> Future:
+    scan_lambda = lambda: scan_account(
+        account_id=account_id,
+        regions=regions,
+        resource_spec_classes=resource_spec_classes,
+        graph_name=graph_name,
+        graph_version=graph_version,
+        max_svc_threads=max_svc_threads,
+        artifact_writer=artifact_writer,
+        accessor_dict=accessor_dict,
+    )
+    return executor.submit(scan_lambda)
+
+
+def scan_account(
+    account_id: str,
+    regions: List[str],
+    resource_spec_classes: Tuple[Type[AWSResourceSpec], ...],
+    graph_name: str,
+    graph_version: str,
+    max_svc_threads: int,
+    artifact_writer: ArtifactWriter,
+    accessor_dict: Dict[str, Any],
+) -> Dict[str, Any]:
+    """ FIXME TODO DOCUMENT ME """
+    logger = Logger()
+    logger.info(event=AWSLogEvents.ScanAWSAccountStart)
+    stats = MultilevelCounter()
+    errors: List[str] = []
+    now = int(time.time())
+    try:
+        account_graph_set = GraphSet(
+            name=graph_name,
+            version=graph_version,
+            start_time=now,
+            end_time=now,
+            resources=[],
+            errors=[],
+            stats=stats,
         )
-        logger.info(event=AWSLogEvents.ScanAWSAccountEnd)
-        api_call_stats = account_graph_set.stats.to_dict()
-        return {
-            "account_id": account_id,
-            "output_artifact": output_artifact,
-            "errors": errors,
-            "api_call_stats": api_call_stats,
-        }
+        # sanity check
+        accessor = Accessor.from_dict(data=accessor_dict)
+        session = accessor.get_session(account_id=account_id)
+        sts_client = session.client("sts")
+        sts_account_id = sts_client.get_caller_identity()["Account"]
+        if sts_account_id != account_id:
+            raise ValueError(f"BUG: sts detected account_id {sts_account_id} != {account_id}")
+        if regions:
+            scan_regions = tuple(regions)
+        else:
+            scan_regions = get_all_enabled_regions(session=session)
+        # build graph specs.
+        # build a dict of regions -> services -> List[AWSResourceSpec]
+        regions_services_resource_spec_classes: DefaultDict[
+            str, DefaultDict[str, List[Type[AWSResourceSpec]]]
+        ] = defaultdict(lambda: defaultdict(list))
+        resource_spec_class: Type[AWSResourceSpec]
+        for resource_spec_class in resource_spec_classes:
+            client_name = resource_spec_class.get_client_name()
+            if resource_spec_class.region_whitelist:
+                resource_scan_regions = tuple(
+                    region
+                    for region in scan_regions
+                    if region in resource_spec_class.region_whitelist
+                )
+                if not resource_scan_regions:
+                    resource_scan_regions = resource_spec_class.region_whitelist
+            else:
+                resource_scan_regions = scan_regions
+            if resource_spec_class.scan_granularity == ScanGranularity.ACCOUNT:
+                regions_services_resource_spec_classes[resource_scan_regions[0]][
+                    client_name
+                ].append(resource_spec_class)
+            elif resource_spec_class.scan_granularity == ScanGranularity.REGION:
+                for region in resource_scan_regions:
+                    regions_services_resource_spec_classes[region][client_name].append(
+                        resource_spec_class
+                    )
+            else:
+                raise NotImplementedError(
+                    f"ScanGranularity {resource_spec_class.scan_granularity} unimplemented"
+                )
+        with ThreadPoolExecutor(max_workers=max_svc_threads) as executor:
+            futures = []
+            for (
+                region,
+                services_resource_spec_classes,
+            ) in regions_services_resource_spec_classes.items():
+                for (service, resource_spec_classes,) in services_resource_spec_classes.items():
+                    region_session = accessor.get_session(
+                        account_id=account_id, region_name=region
+                    )
+                    region_creds = region_session.get_credentials()
+                    scan_future = schedule_scan_service(
+                        executor=executor,
+                        graph_name=graph_name,
+                        graph_version=graph_version,
+                        account_id=account_id,
+                        region=region,
+                        service=service,
+                        access_key=region_creds.access_key,
+                        secret_key=region_creds.secret_key,
+                        token=region_creds.token,
+                        resource_spec_classes=tuple(resource_spec_classes),
+                    )
+                    futures.append(scan_future)
+            for future in as_completed(futures):
+                graph_set_dict = future.result()
+                graph_set = GraphSet.from_dict(graph_set_dict)
+                errors += graph_set.errors
+                account_graph_set.merge(graph_set)
+            account_graph_set.validate()
+    except Exception as ex:
+        error_str = str(ex)
+        trace_back = traceback.format_exc()
+        logger.error(
+            event=AWSLogEvents.ScanAWSAccountError, error=error_str, trace_back=trace_back,
+        )
+        errors.append(" : ".join((error_str, trace_back)))
+        unscanned_account_resource = UnscannedAccountResourceSpec.create_resource(
+            account_id=account_id, errors=errors
+        )
+        account_graph_set = GraphSet(
+            name=graph_name,
+            version=graph_version,
+            start_time=now,
+            end_time=now,
+            resources=[unscanned_account_resource],
+            errors=errors,
+            stats=stats,
+        )
+        account_graph_set.validate()
+    output_artifact = artifact_writer.write_artifact(
+        name=account_id, data=account_graph_set.to_dict()
+    )
+    logger.info(event=AWSLogEvents.ScanAWSAccountEnd)
+    api_call_stats = account_graph_set.stats.to_dict()
+    return {
+        "account_id": account_id,
+        "output_artifact": output_artifact,
+        "errors": errors,
+        "api_call_stats": api_call_stats,
+    }
 
 
 def schedule_scan_service(
