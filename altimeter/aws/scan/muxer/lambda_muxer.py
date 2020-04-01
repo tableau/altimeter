@@ -33,7 +33,7 @@ class LambdaAWSScanMuxer(AWSScanMuxer):
         key_prefix: str,
         scan_sub_accounts: bool,
         max_threads: int = 32,  # TODO setting
-        max_accounts_per_thread: int = 8,  # TODO setting
+        max_accounts_per_thread: int = 16,  # TODO setting
     ):
         super().__init__(max_threads=max_threads, max_accounts_per_thread=max_accounts_per_thread)
         self.account_scan_lambda_name = account_scan_lambda_name
@@ -77,7 +77,7 @@ def invoke_lambda(lambda_name: str, lambda_timeout: int, event: Dict[str, Any]) 
         Exception if there was an error invoking the lambda.
     """
     logger = Logger()
-    with logger.bind(lambda_name=lambda_name, lambda_timeout=lambda_timeout, event=event):
+    with logger.bind(lambda_name=lambda_name, lambda_timeout=lambda_timeout):
         logger.info(event=AWSLogEvents.RunAccountScanLambdaStart)
         boto_config = botocore.config.Config(
             read_timeout=lambda_timeout + 10, retries={"max_attempts": 0}
