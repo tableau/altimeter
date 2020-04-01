@@ -32,7 +32,7 @@ class RDSSnapshotResourceSpec(RDSResourceSpec):
         ScalarField("PercentProgress"),
         ScalarField("Region", optional=True),
         ScalarField("Encrypted"),
-        ResourceLinkField("KmsKeyID", KMSKeyResourceSpec, optional=True),
+        TransientResourceLinkField("KmsKeyID", KMSKeyResourceSpec, optional=True),
         ScalarField("Timezone", optional=True),
         ScalarField("IAMDatabaseAuthenticationEnabled"),
         TransientResourceLinkField("DBInstanceArn", RDSInstanceResourceSpec, value_is_id=True),
