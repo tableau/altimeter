@@ -52,7 +52,8 @@ class AWSScanMuxer(abc.ABC):
                     account_scan_future = self._schedule_account_scan(executor, account_scan_plan)
                     futures.append(account_scan_future)
                     logger.info(
-                        event=AWSLogEvents.MuxerQueueScan, account_ids=account_scan_plan.account_ids
+                        event=AWSLogEvents.MuxerQueueScan,
+                        account_ids=",".join(account_scan_plan.account_ids),
                     )
                 for future in as_completed(futures):
                     scan_results_dicts = future.result()
