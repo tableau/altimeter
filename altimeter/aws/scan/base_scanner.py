@@ -88,25 +88,31 @@ class BaseScanner(abc.ABC):
         """
         logger = Logger()
         scan_results = []
-        with ThreadPoolExecutor(max_workers=self.max_account_threads) as executor:
-            futures = []
-            for account_id in self.account_scan_plan.account_ids:
-                with logger.bind(account_id=account_id):
-                    scan_future = schedule_scan_account(
-                        executor=executor,
-                        account_id=account_id,
-                        regions=self.account_scan_plan.regions,
-                        resource_spec_classes=self.resource_spec_classes,
-                        graph_name=self.graph_name,
-                        graph_version=self.graph_version,
-                        max_svc_threads=self.max_svc_threads,
-                        artifact_writer=self.artifact_writer,
-                        accessor_dict=self.account_scan_plan.accessor.to_dict(),
-                    )
-                    futures.append(scan_future)
-            for future in as_completed(futures):
-                scan_result = future.result()
-                scan_results.append(scan_result)
+        with logger.bind(
+            account_ids=",".join(self.account_scan_plan.account_ids),
+            regions=",".join(self.account_scan_plan.regions),
+        ):
+            with ThreadPoolExecutor(max_workers=self.max_account_threads) as executor:
+                logger.info(event=AWSLogEvents.ScanAWSAccountBatchStart)
+                futures = []
+                for account_id in self.account_scan_plan.account_ids:
+                    with logger.bind(account_id=account_id):
+                        scan_future = schedule_scan_account(
+                            executor=executor,
+                            account_id=account_id,
+                            regions=self.account_scan_plan.regions,
+                            resource_spec_classes=self.resource_spec_classes,
+                            graph_name=self.graph_name,
+                            graph_version=self.graph_version,
+                            max_svc_threads=self.max_svc_threads,
+                            artifact_writer=self.artifact_writer,
+                            accessor_dict=self.account_scan_plan.accessor.to_dict(),
+                        )
+                        futures.append(scan_future)
+                for future in as_completed(futures):
+                    scan_result = future.result()
+                    scan_results.append(scan_result)
+                logger.info(event=AWSLogEvents.ScanAWSAccountBatchEnd)
         return scan_results
 
 

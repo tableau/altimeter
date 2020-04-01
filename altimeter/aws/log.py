@@ -26,6 +26,9 @@ class AWSLogEvents(BaseLogEvent):
     ScanAWSAccountsStart: EventName
     ScanAWSAccountsEnd: EventName
 
+    ScanAWSAccountBatchStart: EventName
+    ScanAWSAccountBatchEnd: EventName
+
     ScanAWSAccountStart: EventName
     ScanAWSAccountEnd: EventName
     ScanAWSAccountError: EventName

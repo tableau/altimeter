@@ -57,9 +57,7 @@ class Accessor:
                     except Exception as ex:
                         errors.append(ex)
                         logger.debug(event=LogEvent.AuthToAccountFailure, exception=str(ex))
-            raise AccountAuthException(
-                f"Unable to access {account_id} using {str(self)}: {errors}"
-            )
+            raise AccountAuthException(f"Unable to access {account_id} using {str(self)}: {errors}")
         else:
             # local run mode
             session = boto3.Session(region_name=region_name)
