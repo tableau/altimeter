@@ -1,8 +1,6 @@
 """An AccountScanPlan defines how to scan a set of accounts."""
 from dataclasses import dataclass
-from typing import Any, Dict, List, Optional, Type
-
-import boto3
+from typing import Any, Dict, List, Type
 
 from altimeter.aws.auth.accessor import Accessor
 

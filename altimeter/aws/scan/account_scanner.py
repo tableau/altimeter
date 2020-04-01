@@ -1,7 +1,5 @@
 """An AccountScanner scans a set of accounts using an AccountScanPlan to define scan
 parameters"""
-from typing import List
-
 from altimeter.core.artifact_io.writer import ArtifactWriter
 from altimeter.aws.scan.settings import (
     RESOURCE_SPEC_CLASSES,
@@ -33,8 +31,8 @@ class AccountScanner(BaseScanner):  # pylint: disable=too-few-public-methods
         account_scan_plan: AccountScanPlan,
         artifact_writer: ArtifactWriter,
         scan_sub_accounts: bool,
-        max_account_threads: int = 16, # TODO SETTING
-        max_svc_threads: int = 4,  # TODO SETTING
+        max_account_threads: int = 16,
+        max_svc_threads: int = 4,
         graph_name: str = GRAPH_NAME,
         graph_version: str = GRAPH_VERSION,
     ) -> None:

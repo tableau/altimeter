@@ -92,15 +92,17 @@ class BaseScanner(abc.ABC):
             futures = []
             for account_id in self.account_scan_plan.account_ids:
                 with logger.bind(account_id=account_id):
-                    scan_future = schedule_scan_account(executor=executor,
-                                                        account_id=account_id,
-                                                        regions=self.account_scan_plan.regions,
-                                                        resource_spec_classes=self.resource_spec_classes,
-                                                        graph_name=self.graph_name,
-                                                        graph_version=self.graph_version,
-                                                        max_svc_threads=self.max_svc_threads,
-                                                        artifact_writer=self.artifact_writer,
-                                                        accessor_dict=self.account_scan_plan.accessor.to_dict())
+                    scan_future = schedule_scan_account(
+                        executor=executor,
+                        account_id=account_id,
+                        regions=self.account_scan_plan.regions,
+                        resource_spec_classes=self.resource_spec_classes,
+                        graph_name=self.graph_name,
+                        graph_version=self.graph_version,
+                        max_svc_threads=self.max_svc_threads,
+                        artifact_writer=self.artifact_writer,
+                        accessor_dict=self.account_scan_plan.accessor.to_dict(),
+                    )
                     futures.append(scan_future)
             for future in as_completed(futures):
                 scan_result = future.result()
@@ -206,10 +208,8 @@ def scan_account(
                 region,
                 services_resource_spec_classes,
             ) in regions_services_resource_spec_classes.items():
-                for (service, resource_spec_classes,) in services_resource_spec_classes.items():
-                    region_session = accessor.get_session(
-                        account_id=account_id, region_name=region
-                    )
+                for (service, svc_resource_spec_classes,) in services_resource_spec_classes.items():
+                    region_session = accessor.get_session(account_id=account_id, region_name=region)
                     region_creds = region_session.get_credentials()
                     scan_future = schedule_scan_service(
                         executor=executor,
@@ -221,7 +221,7 @@ def scan_account(
                         access_key=region_creds.access_key,
                         secret_key=region_creds.secret_key,
                         token=region_creds.token,
-                        resource_spec_classes=tuple(resource_spec_classes),
+                        resource_spec_classes=tuple(svc_resource_spec_classes),
                     )
                     futures.append(scan_future)
             for future in as_completed(futures):
