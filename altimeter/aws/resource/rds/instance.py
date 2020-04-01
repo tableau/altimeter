@@ -69,7 +69,7 @@ class RDSInstanceResourceSpec(RDSResourceSpec):
         ListField("StatusInfos", EmbeddedDictField(ScalarField("Status")), optional=True),
         ScalarField("StorageType"),
         ScalarField("StorageEncrypted"),
-        ResourceLinkField("KmsKeyId", KMSKeyResourceSpec, optional=True, value_is_id=True),
+        TransientResourceLinkField("KmsKeyId", KMSKeyResourceSpec, optional=True, value_is_id=True),
         ScalarField("DbiResourceId"),
         ScalarField("Timezone", optional=True),
         ScalarField("IAMDatabaseAuthenticationEnabled"),

@@ -7,10 +7,7 @@ from altimeter.aws.resource.resource_spec import ListFromAWSResult
 from altimeter.aws.resource.ec2 import EC2ResourceSpec
 from altimeter.aws.resource.ec2.volume import EBSVolumeResourceSpec
 from altimeter.aws.resource.kms.key import KMSKeyResourceSpec
-from altimeter.core.graph.field.resource_link_field import (
-    ResourceLinkField,
-    TransientResourceLinkField,
-)
+from altimeter.core.graph.field.resource_link_field import TransientResourceLinkField
 from altimeter.core.graph.field.scalar_field import ScalarField
 from altimeter.core.graph.field.tags_field import TagsField
 from altimeter.core.graph.schema import Schema
@@ -23,7 +20,7 @@ class EBSSnapshotResourceSpec(EC2ResourceSpec):
     schema = Schema(
         ScalarField("VolumeSize"),
         ScalarField("Encrypted"),
-        ResourceLinkField("KmsKeyId", KMSKeyResourceSpec, optional=True, value_is_id=True),
+        TransientResourceLinkField("KmsKeyId", KMSKeyResourceSpec, optional=True, value_is_id=True),
         TransientResourceLinkField("VolumeId", EBSVolumeResourceSpec),
         TagsField(),
     )
