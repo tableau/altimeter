@@ -92,21 +92,19 @@ class BaseScanner(abc.ABC):
             futures = []
             for account_id in self.account_scan_plan.account_ids:
                 with logger.bind(account_id=account_id):
-                    scan_future = scan_account(account_id=account_id,
-                                               regions=self.account_scan_plan.regions,
-                                               resource_spec_classes=self.resource_spec_classes,
-                                               graph_name=self.graph_name,
-                                               graph_version=self.graph_version,
-                                               max_svc_threads=self.max_svc_threads,
-                                               artifact_writer=self.artifact_writer,
-                                               accessor_dict=self.account_scan_plan.accessor.to_dict())
+                    scan_future = schedule_scan_account(executor=executor,
+                                                        account_id=account_id,
+                                                        regions=self.account_scan_plan.regions,
+                                                        resource_spec_classes=self.resource_spec_classes,
+                                                        graph_name=self.graph_name,
+                                                        graph_version=self.graph_version,
+                                                        max_svc_threads=self.max_svc_threads,
+                                                        artifact_writer=self.artifact_writer,
+                                                        accessor_dict=self.account_scan_plan.accessor.to_dict())
                     futures.append(scan_future)
             for future in as_completed(futures):
-                account_scan_result = future.result()
-                print("*"*80)
-                print(account_scan_result)
-                print("*"*80)
-        raise NotImplementedError
+                scan_result = future.result()
+                scan_results.append(scan_result)
         return scan_results
 
 

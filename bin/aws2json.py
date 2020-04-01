@@ -167,7 +167,7 @@ def main(argv=None):
         sts_client = boto3.client("sts")
         account_id = sts_client.get_caller_identity()["Account"]
         account_ids = [account_id]
-        accessor = Accessor()
+        accessor = Accessor([])
         logger.info(
             AWSLogEvents.ScanConfigured, account_ids=account_ids, regions=regions, base_dir=base_dir
         )

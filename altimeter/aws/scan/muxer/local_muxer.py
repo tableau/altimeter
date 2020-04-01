@@ -44,8 +44,8 @@ class LocalAWSScanMuxer(AWSScanMuxer):
         self,
         output_dir: Path,
         scan_sub_accounts: bool,
-        max_threads: int = 8,  # TODO SETTING,
-        max_accounts_per_thread: int = 8,  # TODO SETTING
+        max_threads: int = 16,  # TODO SETTING,
+        max_accounts_per_thread: int = 16,  # TODO SETTING
     ):
         super().__init__(max_threads=max_threads, max_accounts_per_thread=max_accounts_per_thread)
         self.output_dir = output_dir

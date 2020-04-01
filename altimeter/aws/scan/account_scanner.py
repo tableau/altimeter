@@ -33,7 +33,7 @@ class AccountScanner(BaseScanner):  # pylint: disable=too-few-public-methods
         account_scan_plan: AccountScanPlan,
         artifact_writer: ArtifactWriter,
         scan_sub_accounts: bool,
-        max_account_threads: int = 4,  # TODO SETTING
+        max_account_threads: int = 16, # TODO SETTING
         max_svc_threads: int = 4,  # TODO SETTING
         graph_name: str = GRAPH_NAME,
         graph_version: str = GRAPH_VERSION,
