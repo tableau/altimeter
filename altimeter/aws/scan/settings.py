@@ -26,6 +26,7 @@ from altimeter.aws.resource.elbv2.load_balancer import LoadBalancerResourceSpec
 from altimeter.aws.resource.elbv2.target_group import TargetGroupResourceSpec
 from altimeter.aws.resource.events.cloudwatchevents_rule import EventsRuleResourceSpec
 from altimeter.aws.resource.events.event_bus import EventBusResourceSpec
+from altimeter.aws.resource.guardduty.detector import DetectorResourceSpec
 from altimeter.aws.resource.iam.account_password_policy import IAMAccountPasswordPolicyResourceSpec
 from altimeter.aws.resource.iam.iam_saml_provider import IAMSAMLProviderResourceSpec
 from altimeter.aws.resource.iam.instance_profile import InstanceProfileResourceSpec
@@ -44,6 +45,7 @@ from altimeter.aws.resource.support.severity_level import SeverityLevelResourceS
 # To enable a resource to be scanned, add it here.
 RESOURCE_SPEC_CLASSES: Tuple[Type[AWSResourceSpec], ...] = (
     ClassicLoadBalancerResourceSpec,
+    DetectorResourceSpec,
     DynamoDbTableResourceSpec,
     EBSSnapshotResourceSpec,
     EBSVolumeResourceSpec,
