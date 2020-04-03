@@ -24,6 +24,7 @@ from altimeter.aws.resource.ec2.vpc_endpoint import VpcEndpointResourceSpec
 from altimeter.aws.resource.elbv1.load_balancer import ClassicLoadBalancerResourceSpec
 from altimeter.aws.resource.elbv2.load_balancer import LoadBalancerResourceSpec
 from altimeter.aws.resource.elbv2.target_group import TargetGroupResourceSpec
+from altimeter.aws.resource.eks.cluster import EKSClusterResourceSpec
 from altimeter.aws.resource.events.cloudwatchevents_rule import EventsRuleResourceSpec
 from altimeter.aws.resource.events.event_bus import EventBusResourceSpec
 from altimeter.aws.resource.guardduty.detector import DetectorResourceSpec
@@ -53,6 +54,7 @@ RESOURCE_SPEC_CLASSES: Tuple[Type[AWSResourceSpec], ...] = (
     EC2InstanceResourceSpec,
     EC2NetworkInterfaceResourceSpec,
     EC2RouteTableResourceSpec,
+    EKSClusterResourceSpec,
     EventBusResourceSpec,
     EventsRuleResourceSpec,
     FlowLogResourceSpec,
