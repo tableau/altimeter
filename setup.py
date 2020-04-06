@@ -13,13 +13,12 @@ setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/tableau/altimeter",
-    python_requires=">=3.7,<4",
+    python_requires=">=3.8,<4",
     install_requires=[
         "aws-requests-auth==0.4.2",
         "rdflib==4.2.2",
         "structlog>=18.2.0,<20",
         "boto3>=1.9.130",
-        "typing_extensions>=3.7.4.1,<3.8",
         "jinja2>=2.11.1,<3",
     ],
     scripts=[
