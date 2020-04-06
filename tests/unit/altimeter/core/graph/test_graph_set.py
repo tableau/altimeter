@@ -1,4 +1,4 @@
-from typing import Any, Type
+from typing import Any, List, Type
 from unittest import TestCase
 
 from altimeter.core.graph.exceptions import (
@@ -10,7 +10,7 @@ from altimeter.core.graph.graph_set import GraphSet
 from altimeter.core.graph.link.links import ResourceLinkLink, SimpleLink
 from altimeter.core.multilevel_counter import MultilevelCounter
 from altimeter.core.resource.resource import Resource
-from altimeter.core.resource.resource_spec import ResourceScanResult, ResourceSpec
+from altimeter.core.resource.resource_spec import ResourceSpec
 from altimeter.core.resource.exceptions import ResourceSpecClassNotFoundException
 
 
@@ -23,7 +23,7 @@ class TestResourceSpecA(ResourceSpec):
         return "test:a"
 
     @classmethod
-    def scan(cls: Type["TestResourceSpecA"], scan_accessor: Any) -> ResourceScanResult:
+    def scan(cls: Type["TestResourceSpecA"], scan_accessor: Any) -> List[Resource]:
         raise NotImplementedError()
 
 
@@ -36,7 +36,7 @@ class TestResourceSpecB(ResourceSpec):
         return "test:b"
 
     @classmethod
-    def scan(cls: Type["TestResourceSpecB"], scan_accessor: Any) -> ResourceScanResult:
+    def scan(cls: Type["TestResourceSpecB"], scan_accessor: Any) -> List[Resource]:
         raise NotImplementedError()
 
 

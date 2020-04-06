@@ -2,7 +2,7 @@
 ResourceSpecs for AWS resources"""
 import abc
 import inspect
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from enum import Enum, auto
 from typing import Dict, Any, List, Tuple, Type
 
@@ -13,7 +13,7 @@ from altimeter.aws.scan.aws_accessor import AWSAccessor
 from altimeter.core.graph.exceptions import SchemaParseException
 from altimeter.core.graph.link import ResourceLinkLink
 from altimeter.core.resource.resource import Resource
-from altimeter.core.resource.resource_spec import ResourceSpec, ResourceScanResult
+from altimeter.core.resource.resource_spec import ResourceSpec
 
 AWS_API_IGNORE_ERRORS = frozenset(
     ("NotSignedUp", "OptInRequired", "SubscriptionRequiredException", "InvalidAction")
@@ -30,15 +30,13 @@ class ScanGranularity(Enum):
 @dataclass(frozen=True)
 class ListFromAWSResult:
     """Result of a list_from_aws call. Contains a list of resources represented as a dict
-    of arns to resource details and a list of any error strings.
+    of arns to resource details
 
     Args:
         resources: Dict of resource ids to resource dicts
-        errors: list of errors which occurred during the list operation
     """
 
     resources: Dict[str, Dict[str, Any]]
-    errors: List[str] = field(default_factory=list)
 
 
 class AWSResourceSpec(ResourceSpec):
@@ -153,21 +151,21 @@ class AWSResourceSpec(ResourceSpec):
         """
 
     @classmethod
-    def scan(cls: Type["AWSResourceSpec"], scan_accessor: AWSAccessor) -> ResourceScanResult:
+    def scan(cls: Type["AWSResourceSpec"], scan_accessor: AWSAccessor) -> List[Resource]:
         """Scan this ResourceSpec
 
        Args:
            scan_accessor: AWSAccessor object to use for api access
 
         Returns:
-            ResourceScanResult object
+            List of Resource objects
         """
         context = {"account_id": scan_accessor.account_id, "region": scan_accessor.region}
         list_from_aws_result = cls._list_from_aws(scan_accessor)
         resources = cls._list_from_aws_result_to_resources(
             list_from_aws_result=list_from_aws_result, context=context
         )
-        return ResourceScanResult(resources=resources, errors=list_from_aws_result.errors,)
+        return resources
 
     @classmethod
     def _list_from_aws(

@@ -48,12 +48,14 @@ class AWSScanMuxer(abc.ABC):
             with ThreadPoolExecutor(max_workers=num_threads) as executor:
                 processed_accounts = 0
                 futures = []
-                for account_scan_plan in account_scan_plans:
-                    account_scan_future = self._schedule_account_scan(executor, account_scan_plan)
+                for sub_account_scan_plan in account_scan_plans:
+                    account_scan_future = self._schedule_account_scan(
+                        executor, sub_account_scan_plan
+                    )
                     futures.append(account_scan_future)
                     logger.info(
                         event=AWSLogEvents.MuxerQueueScan,
-                        account_ids=",".join(account_scan_plan.account_ids),
+                        account_ids=",".join(sub_account_scan_plan.account_ids),
                     )
                 for future in as_completed(futures):
                     scan_results_dicts = future.result()

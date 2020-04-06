@@ -37,41 +37,37 @@ class TestLambdaFunctionResourceSpec(TestCase):
         )
 
         scan_accessor = AWSAccessor(session=session, account_id=account_id, region_name=region_name)
-        scan_result = LambdaFunctionResourceSpec.scan(scan_accessor=scan_accessor)
-        scan_result_dict = scan_result.to_dict()
+        resources = LambdaFunctionResourceSpec.scan(scan_accessor=scan_accessor)
 
         self.maxDiff=None
-        expected_scan_result_dict = {
-            "resources": [
-                {
-                    "type": "aws:lambda:function",
-                    "links": [
-                        {"pred": "function_name", "obj": "func_name", "type": "simple"},
-                        {
-                            "pred": "runtime",
-                            "obj": "python3.7",
-                            "type": "simple",
-                        },
-                        {
-                            "pred": "vpc",
-                            "obj": f"arn:aws:ec2:{region_name}:{account_id}:vpc/vpc-123abc",
-                            "type": "transient_resource_link",
-                        },
-                        {
-                            "pred": "account",
-                            "obj": f"arn:aws::::account/{account_id}",
-                            "type": "resource_link",
-                        },
-                        {
-                            "pred": "region",
-                            "obj": f"arn:aws:::{account_id}:region/{region_name}",
-                            "type": "resource_link",
-                        },
-                    ],
-                }
-            ],
-            "errors": [],
-        }
+        expected_resources = [
+            {
+                "type": "aws:lambda:function",
+                "links": [
+                    {"pred": "function_name", "obj": "func_name", "type": "simple"},
+                    {
+                        "pred": "runtime",
+                        "obj": "python3.7",
+                        "type": "simple",
+                    },
+                    {
+                        "pred": "vpc",
+                        "obj": f"arn:aws:ec2:{region_name}:{account_id}:vpc/vpc-123abc",
+                        "type": "transient_resource_link",
+                    },
+                    {
+                        "pred": "account",
+                        "obj": f"arn:aws::::account/{account_id}",
+                        "type": "resource_link",
+                    },
+                    {
+                        "pred": "region",
+                        "obj": f"arn:aws:::{account_id}:region/{region_name}",
+                        "type": "resource_link",
+                    },
+                ],
+            }
+        ]
 
         expected_api_call_stats = {
             "count": 1,
@@ -83,5 +79,5 @@ class TestLambdaFunctionResourceSpec(TestCase):
                 },
             },
         }
-        self.assertDictEqual(scan_result_dict, expected_scan_result_dict)
+        self.assertListEqual([resource.to_dict() for resource in resources], expected_resources)
         self.assertDictEqual(scan_accessor.api_call_stats.to_dict(), expected_api_call_stats)

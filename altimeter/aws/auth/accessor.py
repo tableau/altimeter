@@ -58,14 +58,13 @@ class Accessor:
                         errors.append(ex)
                         logger.debug(event=LogEvent.AuthToAccountFailure, exception=str(ex))
             raise AccountAuthException(f"Unable to access {account_id} using {str(self)}: {errors}")
-        else:
-            # local run mode
-            session = boto3.Session(region_name=region_name)
-            sts_client = session.client("sts")
-            sts_account_id = sts_client.get_caller_identity()["Account"]
-            if sts_account_id != account_id:
-                raise ValueError(f"BUG: sts_account_id {sts_account_id} != {account_id}")
-            return session
+        # local run mode
+        session = boto3.Session(region_name=region_name)
+        sts_client = session.client("sts")
+        sts_account_id = sts_client.get_caller_identity()["Account"]
+        if sts_account_id != account_id:
+            raise ValueError(f"BUG: sts_account_id {sts_account_id} != {account_id}")
+        return session
 
     def __str__(self) -> str:
         return ",".join(

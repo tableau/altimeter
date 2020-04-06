@@ -3,7 +3,6 @@ is converted into graph data.  It contains a Schema which contains a set of
 Fields defining the transformation."""
 import abc
 from collections import defaultdict
-from dataclasses import dataclass
 import inspect
 from typing import Any, DefaultDict, Dict, List, Set, Type
 
@@ -15,21 +14,6 @@ from altimeter.core.graph.exceptions import UnmergableDuplicateResourceIdsFoundE
 from altimeter.core.graph.link.base import Link
 from altimeter.core.graph.schema import Schema
 from altimeter.core.resource.resource import Resource
-
-
-@dataclass(frozen=True)
-class ResourceScanResult:
-    """Contains the result of a ResourceSpec.scan run."""
-
-    resources: List[Resource]
-    errors: List[str]
-
-    def to_dict(self) -> Dict[str, Any]:
-        """Return a dict representation of self."""
-        return {
-            "resources": [resource.to_dict() for resource in self.resources],
-            "errors": self.errors,
-        }
 
 
 class ResourceSpec(abc.ABC):
@@ -55,14 +39,14 @@ class ResourceSpec(abc.ABC):
 
     @classmethod
     @abc.abstractmethod
-    def scan(cls: Type["ResourceSpec"], scan_accessor: Any) -> ResourceScanResult:
-        """Scan for this ResourceSpec using scan_accessor and return a ResourceScanResult.
+    def scan(cls: Type["ResourceSpec"], scan_accessor: Any) -> List[Resource]:
+        """Scan for this ResourceSpec using scan_accessor and return a list of Resource objects
 
         Args:
             scan_accessor: scan accessor object for accessing required APIs
 
         Returns:
-            ResourceScanResult object
+            List of Resource objects
         """
 
     @classmethod

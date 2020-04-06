@@ -1,11 +1,8 @@
 """A GraphSpec contains a specification to scan and create a graph."""
-import time
 from typing import Any, Dict, List, Tuple, Type
 
 from altimeter.core.log import LogEvent, Logger
 
-from altimeter.core.graph.graph_set import GraphSet
-from altimeter.core.multilevel_counter import MultilevelCounter
 from altimeter.core.resource.resource import Resource
 from altimeter.core.resource.resource_spec import ResourceSpec
 
@@ -39,32 +36,19 @@ class GraphSpec:
             for resource_spec_class in self.resource_spec_classes
         }
 
-    def scan(self) -> GraphSet:
+    def scan(self) -> List[Resource]:
         """Perform a scan on all of the resource classes in this GraphSpec and return
-        a GraphSet containing the scanned data.
+        a list of Resource objects.
 
         Returns:
-            GraphSet representing results of scanning this GraphSpec's resource_spec_classes.
+            List of Resource objects
         """
-
         resources: List[Resource] = []
-        errors: List[str] = []
-        start_time = int(time.time())
         logger = Logger()
         for resource_spec_class in self.resource_spec_classes:
             with logger.bind(resource_type=str(resource_spec_class.type_name)):
                 logger.debug(event=LogEvent.ScanResourceTypeStart)
-                resource_scan_result = resource_spec_class.scan(scan_accessor=self.scan_accessor)
-                resources += resource_scan_result.resources
-                errors += resource_scan_result.errors
+                scanned_resources = resource_spec_class.scan(scan_accessor=self.scan_accessor)
+                resources += scanned_resources
                 logger.debug(event=LogEvent.ScanResourceTypeEnd)
-        end_time = int(time.time())
-        return GraphSet(
-            name=self.name,
-            version=self.version,
-            start_time=start_time,
-            end_time=end_time,
-            resources=resources,
-            errors=errors,
-            stats=self.scan_accessor.api_call_stats,
-        )
+        return resources
