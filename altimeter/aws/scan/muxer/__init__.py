@@ -1,6 +1,7 @@
 """Abstract base class for AWSScanMuxers."""
 import abc
 from concurrent.futures import as_completed, Future, ThreadPoolExecutor
+import os
 from typing import List
 
 from altimeter.core.log import Logger
@@ -20,8 +21,10 @@ class AWSScanMuxer(abc.ABC):
     """
 
     def __init__(self, max_threads: int, max_accounts_per_thread: int):
-        self.max_threads = max_threads
-        self.max_accounts_per_thread = max_accounts_per_thread
+        self.max_threads = int(os.environ.get("MAX_MUXER_THREADS", max_threads))
+        self.max_accounts_per_thread = int(
+            os.environ.get("MAX_ACCOUNTS_PER_THREAD", max_accounts_per_thread)
+        )
 
     def scan(self, account_scan_plan: AccountScanPlan) -> List[AccountScanManifest]:
         """Scan accounts. Return a list of AccountScanManifest objects.

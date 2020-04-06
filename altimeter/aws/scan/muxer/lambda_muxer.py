@@ -32,8 +32,8 @@ class LambdaAWSScanMuxer(AWSScanMuxer):
         json_bucket: str,
         key_prefix: str,
         scan_sub_accounts: bool,
-        max_threads: int = 32,  # TODO setting
-        max_accounts_per_thread: int = 16,  # TODO setting
+        max_threads: int = 32,
+        max_accounts_per_thread: int = 16,
     ):
         super().__init__(max_threads=max_threads, max_accounts_per_thread=max_accounts_per_thread)
         self.account_scan_lambda_name = account_scan_lambda_name
