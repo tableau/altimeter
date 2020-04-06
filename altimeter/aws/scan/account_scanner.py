@@ -3,6 +3,7 @@ parameters"""
 from collections import defaultdict
 from concurrent.futures import Future, ThreadPoolExecutor, as_completed
 from dataclasses import dataclass
+import os
 import time
 import traceback
 from typing import Any, DefaultDict, Dict, List, Tuple, Type
@@ -88,7 +89,7 @@ class AccountScanner:
         self.resource_spec_classes = RESOURCE_SPEC_CLASSES + INFRA_RESOURCE_SPEC_CLASSES
         if scan_sub_accounts:
             self.resource_spec_classes += ORG_RESOURCE_SPEC_CLASSES
-        self.max_threads = max_threads
+        self.max_threads = int(os.environ.get("MAX_ACCOUNT_SCANNER_THREADS", max_threads))
 
     def scan(self) -> List[Dict[str, Any]]:
         logger = Logger()
