@@ -5,7 +5,7 @@ import logging
 import os
 import sys
 import threading
-from typing import Any, Dict, List, Tuple, Type, Union
+from typing import cast, Any, Dict, List, Tuple, Type, Union
 
 import structlog
 
@@ -33,11 +33,11 @@ class LogEventMeta(type):
     """
 
     def __new__(
-        cls: Type, name: str, bases: Tuple[Type, ...], namespace: Dict[str, Any]
-    ) -> Type["LogEventMeta"]:
+        mcs, name: str, bases: Tuple[Type, ...], namespace: Dict[str, Any]
+    ) -> "LogEventMeta":
         for annotation in namespace.get("__annotations__", []):
             namespace[annotation] = EventName(annotation)
-        return super(LogEventMeta, cls).__new__(cls, name, bases, namespace)
+        return cast(LogEventMeta, super().__new__(mcs, name, bases, namespace))
 
 
 @dataclass(frozen=True)

@@ -90,7 +90,7 @@ def invoke_lambda(lambda_name: str, lambda_timeout: int, event: Dict[str, Any]) 
         )
         payload: bytes = resp["Payload"].read()
         if resp.get("FunctionError", None):
-            raise Exception(f"Error invoking {lambda_name} with event {event}: {payload}")
+            raise Exception(f"Error invoking {lambda_name} with event {event}: {payload.decode()}")
         payload_dict = json.loads(payload)
         logger.info(event=AWSLogEvents.RunAccountScanLambdaEnd)
         return payload_dict
