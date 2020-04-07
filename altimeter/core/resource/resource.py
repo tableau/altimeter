@@ -2,7 +2,7 @@ from typing import Optional, List, Dict, Any, Type
 
 from rdflib import Namespace, Graph, BNode, RDF, Literal
 
-from altimeter.core.graph.link import Link
+from altimeter.core.graph.link.base import Link
 from altimeter.core.graph.link.links import link_from_dict
 from altimeter.core.graph.node_cache import NodeCache
 

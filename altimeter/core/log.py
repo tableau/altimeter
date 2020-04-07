@@ -56,14 +56,6 @@ class LogEvent(BaseLogEvent):
     GraphLoadedSNSNotificationStart: EventName
     GraphLoadedSNSNotificationEnd: EventName
 
-    GraphResourcesStart: EventName
-    GraphResourcesEnd: EventName
-
-    GraphResourceStart: EventName
-    GraphResourceEnd: EventName
-
-    InitializedLogger: EventName
-
     MetadataGraphUpdateStart: EventName
     MetadataGraphUpdateEnd: EventName
 
@@ -83,16 +75,12 @@ class LogEvent(BaseLogEvent):
 
     PruneNeptuneMetadataGraphStart: EventName
     PruneNeptuneMetadataGraphEnd: EventName
-    PruneNeptuneMetadataGraphError: EventName
 
     ReadFromFSStart: EventName
     ReadFromFSEnd: EventName
 
     ReadFromS3Start: EventName
     ReadFromS3End: EventName
-
-    ScanResourcesStart: EventName
-    ScanResourcesEnd: EventName
 
     ScanResourceTypeStart: EventName
     ScanResourceTypeEnd: EventName

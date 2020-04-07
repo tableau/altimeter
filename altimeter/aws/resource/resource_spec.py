@@ -11,7 +11,7 @@ from botocore.exceptions import ClientError
 
 from altimeter.aws.scan.aws_accessor import AWSAccessor
 from altimeter.core.graph.exceptions import SchemaParseException
-from altimeter.core.graph.link import ResourceLinkLink
+from altimeter.core.graph.link.links import ResourceLinkLink
 from altimeter.core.resource.resource import Resource
 from altimeter.core.resource.resource_spec import ResourceSpec
 

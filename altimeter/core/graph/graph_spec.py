@@ -1,5 +1,5 @@
 """A GraphSpec contains a specification to scan and create a graph."""
-from typing import Any, Dict, List, Tuple, Type
+from typing import Any, List, Tuple, Type
 
 from altimeter.core.log import LogEvent, Logger
 
@@ -31,10 +31,6 @@ class GraphSpec:
         self.version = version
         self.resource_spec_classes = resource_spec_classes
         self.scan_accessor = scan_accessor
-        self._resource_spec_types_classes: Dict[str, Type[ResourceSpec]] = {
-            resource_spec_class.type_name: resource_spec_class
-            for resource_spec_class in self.resource_spec_classes
-        }
 
     def scan(self) -> List[Resource]:
         """Perform a scan on all of the resource classes in this GraphSpec and return

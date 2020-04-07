@@ -3,10 +3,11 @@ from concurrent.futures import Future, ThreadPoolExecutor
 from pathlib import Path
 from typing import Any, Dict, List
 
-from altimeter.core.artifact_io.writer import FileArtifactWriter
 from altimeter.aws.scan.muxer import AWSScanMuxer
 from altimeter.aws.scan.account_scan_plan import AccountScanPlan
 from altimeter.aws.scan.account_scanner import AccountScanner
+from altimeter.aws.settings import MAX_LOCAL_ACCOUNT_SCAN_THREADS, MAX_LOCAL_ACCOUNTS_PER_THREAD
+from altimeter.core.artifact_io.writer import FileArtifactWriter
 
 
 def local_account_scan(
@@ -44,8 +45,8 @@ class LocalAWSScanMuxer(AWSScanMuxer):
         self,
         output_dir: Path,
         scan_sub_accounts: bool,
-        max_threads: int = 16,
-        max_accounts_per_thread: int = 16,
+        max_threads: int = MAX_LOCAL_ACCOUNT_SCAN_THREADS,
+        max_accounts_per_thread: int = MAX_LOCAL_ACCOUNTS_PER_THREAD,
     ):
         super().__init__(max_threads=max_threads, max_accounts_per_thread=max_accounts_per_thread)
         self.output_dir = output_dir

@@ -3,7 +3,6 @@ parameters"""
 from collections import defaultdict
 from concurrent.futures import Future, ThreadPoolExecutor, as_completed
 from dataclasses import dataclass
-import os
 import time
 import traceback
 from typing import Any, DefaultDict, Dict, List, Tuple, Type
@@ -20,7 +19,7 @@ from altimeter.aws.scan.settings import (
     INFRA_RESOURCE_SPEC_CLASSES,
     ORG_RESOURCE_SPEC_CLASSES,
 )
-from altimeter.aws.settings import GRAPH_NAME, GRAPH_VERSION
+from altimeter.aws.settings import GRAPH_NAME, GRAPH_VERSION, MAX_ACCOUNT_SCANNER_THREADS
 from altimeter.core.artifact_io.writer import ArtifactWriter
 from altimeter.core.graph.graph_set import GraphSet
 from altimeter.core.graph.graph_spec import GraphSpec
@@ -78,7 +77,7 @@ class AccountScanner:
         account_scan_plan: AccountScanPlan,
         artifact_writer: ArtifactWriter,
         scan_sub_accounts: bool,
-        max_threads: int = 64,
+        max_threads: int = MAX_ACCOUNT_SCANNER_THREADS,
         graph_name: str = GRAPH_NAME,
         graph_version: str = GRAPH_VERSION,
     ) -> None:
@@ -86,10 +85,10 @@ class AccountScanner:
         self.artifact_writer = artifact_writer
         self.graph_name = graph_name
         self.graph_version = graph_version
+        self.max_threads = max_threads
         self.resource_spec_classes = RESOURCE_SPEC_CLASSES + INFRA_RESOURCE_SPEC_CLASSES
         if scan_sub_accounts:
             self.resource_spec_classes += ORG_RESOURCE_SPEC_CLASSES
-        self.max_threads = int(os.environ.get("MAX_ACCOUNT_SCANNER_THREADS", max_threads))
 
     def scan(self) -> List[Dict[str, Any]]:
         logger = Logger()

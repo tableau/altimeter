@@ -5,7 +5,7 @@ from datetime import datetime
 
 from altimeter.core.log import LogEvent, Logger
 from altimeter.core.awslambda import get_required_lambda_env_var
-from altimeter.core.neptune.client import AltimeterNeptuneClient, NeptuneEndpoint, META_GRAPH_NAME
+from altimeter.core.neptune.client import AltimeterNeptuneClient, NeptuneEndpoint
 
 
 def lambda_handler(event, context):
