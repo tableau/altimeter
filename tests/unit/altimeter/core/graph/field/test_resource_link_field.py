@@ -1,5 +1,5 @@
 import json
-from typing import Any
+from typing import Any, List
 from unittest import TestCase
 
 from altimeter.core.graph.field.exceptions import (
@@ -7,7 +7,8 @@ from altimeter.core.graph.field.exceptions import (
     ResourceLinkFieldValueNotAStringException,
 )
 from altimeter.core.multilevel_counter import MultilevelCounter
-from altimeter.core.resource.resource_spec import ResourceScanResult, ResourceSpec
+from altimeter.core.resource.resource import Resource
+from altimeter.core.resource.resource_spec import ResourceSpec
 from altimeter.core.graph.schema import Schema
 
 from altimeter.core.graph.field.resource_link_field import (
@@ -21,8 +22,8 @@ class TestResourceSpec(ResourceSpec):
     schema = Schema()
 
     @classmethod
-    def scan(cls, scan_accessor: Any) -> ResourceScanResult:
-        return ResourceScanResult(resources=[], stats=MultilevelCounter(), errors=[])
+    def scan(cls, scan_accessor: Any) -> List[Resource]:
+        return []
 
     @classmethod
     def get_full_type_name(cls) -> str:

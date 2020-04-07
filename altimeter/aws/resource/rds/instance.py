@@ -15,10 +15,7 @@ from altimeter.core.graph.field.dict_field import (
     EmbeddedDictField,
 )
 from altimeter.core.graph.field.list_field import AnonymousListField, ListField
-from altimeter.core.graph.field.resource_link_field import (
-    ResourceLinkField,
-    TransientResourceLinkField,
-)
+from altimeter.core.graph.field.resource_link_field import TransientResourceLinkField
 from altimeter.core.graph.field.scalar_field import ScalarField
 from altimeter.core.graph.field.tags_field import TagsField
 from altimeter.core.graph.schema import Schema

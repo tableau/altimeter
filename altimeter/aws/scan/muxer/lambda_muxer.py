@@ -6,10 +6,11 @@ from typing import Any, Dict
 import boto3
 import botocore
 
-from altimeter.core.log import Logger
 from altimeter.aws.log import AWSLogEvents
 from altimeter.aws.scan.muxer import AWSScanMuxer
 from altimeter.aws.scan.account_scan_plan import AccountScanPlan
+from altimeter.aws.settings import MAX_LAMBDA_ACCOUNT_SCAN_THREADS, MAX_LAMBDA_ACCOUNTS_PER_THREAD
+from altimeter.core.log import Logger
 
 
 class LambdaAWSScanMuxer(AWSScanMuxer):
@@ -21,7 +22,8 @@ class LambdaAWSScanMuxer(AWSScanMuxer):
         json_bucket: bucket to dump json output into
         key_prefix: prefix for json output objects
         scan_sub_accounts: if True, scan subaccounts of any org master accounts
-        max_lambdas: max number of AccountScan lambdas to run concurrently
+        max_threads: maximum number of AccountScans to run concurrently
+        max_accounts_per_thread: max number of accounts to scan concurrently inside each AccountScan
     """
 
     def __init__(
@@ -31,9 +33,10 @@ class LambdaAWSScanMuxer(AWSScanMuxer):
         json_bucket: str,
         key_prefix: str,
         scan_sub_accounts: bool,
-        max_lambdas: int,
+        max_threads: int = MAX_LAMBDA_ACCOUNT_SCAN_THREADS,
+        max_accounts_per_thread: int = MAX_LAMBDA_ACCOUNTS_PER_THREAD,
     ):
-        super().__init__(max_threads=max_lambdas)
+        super().__init__(max_threads=max_threads, max_accounts_per_thread=max_accounts_per_thread)
         self.account_scan_lambda_name = account_scan_lambda_name
         self.account_scan_lambda_timeout = account_scan_lambda_timeout
         self.json_bucket = json_bucket
@@ -47,7 +50,6 @@ class LambdaAWSScanMuxer(AWSScanMuxer):
         the proper arguments."""
         lambda_event = {
             "account_scan_plan": account_scan_plan.to_dict(),
-            "regions": account_scan_plan.regions,
             "json_bucket": self.json_bucket,
             "key_prefix": self.key_prefix,
             "scan_sub_accounts": self.scan_sub_accounts,
@@ -76,7 +78,7 @@ def invoke_lambda(lambda_name: str, lambda_timeout: int, event: Dict[str, Any]) 
         Exception if there was an error invoking the lambda.
     """
     logger = Logger()
-    with logger.bind(lambda_name=lambda_name, lambda_timeout=lambda_timeout, event=event):
+    with logger.bind(lambda_name=lambda_name, lambda_timeout=lambda_timeout):
         logger.info(event=AWSLogEvents.RunAccountScanLambdaStart)
         boto_config = botocore.config.Config(
             read_timeout=lambda_timeout + 10, retries={"max_attempts": 0}
@@ -88,7 +90,7 @@ def invoke_lambda(lambda_name: str, lambda_timeout: int, event: Dict[str, Any]) 
         )
         payload: bytes = resp["Payload"].read()
         if resp.get("FunctionError", None):
-            raise Exception(f"Error invoking {lambda_name} with event {event}: {payload}")
+            raise Exception(f"Error invoking {lambda_name} with event {event}: {payload.decode()}")
         payload_dict = json.loads(payload)
         logger.info(event=AWSLogEvents.RunAccountScanLambdaEnd)
         return payload_dict

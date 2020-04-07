@@ -1,6 +1,5 @@
 """A GraphSet represents the contents of a Graph."""
 from collections import defaultdict
-import json
 from typing import Any, DefaultDict, Dict, List, Type
 
 from rdflib import BNode, Graph, Literal, Namespace, RDF

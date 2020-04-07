@@ -10,26 +10,6 @@ class SchemaParseException(AltimeterException):
     """Schema.parse error"""
 
 
-class EmbeddedFieldSourceKeyNotFoundException(AltimeterException):
-    """The source_key of an EmbeddedField was not found"""
-
-
-class EmbeddedFieldSourceKeyValueIsNoneException(AltimeterException):
-    """A required source_key had a value but it was None."""
-
-
-class MultiFieldSourceKeyNotFoundException(AltimeterException):
-    """The source_key of a MultiField was not found"""
-
-
-class MultiFieldValueNotAListException(AltimeterException):
-    """A MultiField does not contain a List"""
-
-
-class ResourceLinkFieldSourceKeyValueNotFoundException(AltimeterException):
-    """The source_key of a ResourceLinkField was not found or had a None/0 value"""
-
-
 class UnmergableDuplicateResourceIdsFoundException(AltimeterException):
     """Duplicate resource ids were found in a GraphSet and are not mergable"""
 

@@ -1,36 +1,31 @@
 """AWSScanMuxer that runs account scans one-per-thread"""
 from concurrent.futures import Future, ThreadPoolExecutor
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any, Dict, List
 
-from altimeter.core.artifact_io.writer import FileArtifactWriter
 from altimeter.aws.scan.muxer import AWSScanMuxer
 from altimeter.aws.scan.account_scan_plan import AccountScanPlan
 from altimeter.aws.scan.account_scanner import AccountScanner
-
-DEFAULT_MAX_ACCOUNT_THREADS = 32
-DEFAULT_MAX_SVC_THREADS = 2
+from altimeter.aws.settings import MAX_LOCAL_ACCOUNT_SCAN_THREADS, MAX_LOCAL_ACCOUNTS_PER_THREAD
+from altimeter.core.artifact_io.writer import FileArtifactWriter
 
 
 def local_account_scan(
     account_scan_plan_dict: Dict[str, Any], scan_sub_accounts: bool, output_dir: Path
-) -> Dict[str, Any]:
-    """Scan an account.
+) -> List[Dict[str, Any]]:
+    """Scan a set of accounts.
 
     Args:
-        account_scan_plan_dict: AccountScanPlan data defining the scan
+        account_scan_plan_dict: AccountScanPlan defining the scan
         scan_sub_accounts: if True, scan subaccounts of any org master accounts
         output_dir: output artifats to this Path
     """
     artifact_writer = FileArtifactWriter(output_dir=output_dir)
     account_scan_plan = AccountScanPlan.from_dict(account_scan_plan_dict=account_scan_plan_dict)
     account_scanner = AccountScanner(
-        account_id=account_scan_plan.account_id,
-        regions=account_scan_plan.regions,
-        get_session=account_scan_plan.get_session,
+        account_scan_plan=account_scan_plan,
         artifact_writer=artifact_writer,
         scan_sub_accounts=scan_sub_accounts,
-        max_svc_threads=DEFAULT_MAX_SVC_THREADS,
     )
     return account_scanner.scan()
 
@@ -42,16 +37,18 @@ class LocalAWSScanMuxer(AWSScanMuxer):
     Args:
         output_dir: output artifacts to this dir
         scan_sub_accounts: if True, scan subaccounts of any org master accounts
-        max_threads: max number of scan threads to run concurrently
+        max_threads: maximum number of AccountScans to run concurrently
+        max_accounts_per_thread: max number of accounts to scan concurrently inside each AccountScan
     """
 
     def __init__(
         self,
         output_dir: Path,
         scan_sub_accounts: bool,
-        max_threads: int = DEFAULT_MAX_ACCOUNT_THREADS,
+        max_threads: int = MAX_LOCAL_ACCOUNT_SCAN_THREADS,
+        max_accounts_per_thread: int = MAX_LOCAL_ACCOUNTS_PER_THREAD,
     ):
-        super().__init__(max_threads=max_threads)
+        super().__init__(max_threads=max_threads, max_accounts_per_thread=max_accounts_per_thread)
         self.output_dir = output_dir
         self.scan_sub_accounts = scan_sub_accounts
 
@@ -63,7 +60,7 @@ class LocalAWSScanMuxer(AWSScanMuxer):
 
         Args:
             executor: ThreadPoolExecutor to submit scan to
-            account_scan_plan: AccountScanPlan defining this scan
+            account_scan_plan: AccountScanPlans defining this scan
         """
         scan_lambda = lambda: local_account_scan(
             account_scan_plan_dict=account_scan_plan.to_dict(),

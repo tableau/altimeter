@@ -87,7 +87,7 @@ class S3ArtifactWriter(ArtifactWriter):
         logger = Logger()
         with logger.bind(bucket=self.bucket, key=output_key):
             logger.info(event=LogEvent.WriteToS3Start)
-            s3_client = boto3.client("s3")
+            s3_client = boto3.Session().client("s3")
             results_str = json.dumps(data, default=json_encoder)
             results_bytes = results_str.encode("utf-8")
             with io.BytesIO(results_bytes) as results_bytes_stream:

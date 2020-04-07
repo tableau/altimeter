@@ -43,32 +43,28 @@ class Accessor:
             boto3.Session object
         """
         logger = Logger()
-        with logger.bind(auth_account_id=account_id):
-            errors = []
-            if self.multi_hop_accessors:
-                for mha in self.multi_hop_accessors:  # pylint: disable=not-an-iterable
-                    with logger.bind(auth_accessor=str(mha)):
-                        try:
-                            session = mha.get_session(
-                                account_id=account_id,
-                                region_name=region_name,
-                                credentials_cache=self.credentials_cache,
-                            )
-                            return session
-                        except Exception as ex:
-                            errors.append(ex)
-                            logger.debug(event=LogEvent.AuthToAccountFailure, exception=str(ex))
-                raise AccountAuthException(
-                    f"Unable to access {account_id} using {str(self)}: {errors}"
-                )
-            else:
-                # local run mode
-                session = boto3.Session(region_name=region_name)
-                sts_client = session.client("sts")
-                sts_account_id = sts_client.get_caller_identity()["Account"]
-                if sts_account_id != account_id:
-                    raise ValueError(f"BUG: sts_account_id {sts_account_id} != {account_id}")
-                return session
+        errors = []
+        if self.multi_hop_accessors:
+            for mha in self.multi_hop_accessors:  # pylint: disable=not-an-iterable
+                with logger.bind(auth_accessor=str(mha)):
+                    try:
+                        session = mha.get_session(
+                            account_id=account_id,
+                            region_name=region_name,
+                            credentials_cache=self.credentials_cache,
+                        )
+                        return session
+                    except Exception as ex:
+                        errors.append(ex)
+                        logger.debug(event=LogEvent.AuthToAccountFailure, exception=str(ex))
+            raise AccountAuthException(f"Unable to access {account_id} using {str(self)}: {errors}")
+        # local run mode
+        session = boto3.Session(region_name=region_name)
+        sts_client = session.client("sts")
+        sts_account_id = sts_client.get_caller_identity()["Account"]
+        if sts_account_id != account_id:
+            raise ValueError(f"BUG: sts_account_id {sts_account_id} != {account_id}")
+        return session
 
     def __str__(self) -> str:
         return ",".join(

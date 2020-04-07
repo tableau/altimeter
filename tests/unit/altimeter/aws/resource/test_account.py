@@ -15,18 +15,14 @@ class TestEBSVolumeResourceSpec(TestCase):
 
         session = boto3.Session()
         scan_accessor = AWSAccessor(session=session, account_id=account_id, region_name=region_name)
-        scan_result = AccountResourceSpec.scan(scan_accessor=scan_accessor)
-        scan_result_dict = scan_result.to_dict()
+        resources = AccountResourceSpec.scan(scan_accessor=scan_accessor)
 
-        expected_scan_result_dict = {
-            "resources": [
-                {
-                    "type": "aws:account",
-                    "links": [{"pred": "account_id", "obj": "123456789012", "type": "simple"}],
-                }
-            ],
-            "errors": [],
-        }
+        expected_resources = [
+            {
+                "type": "aws:account",
+                "links": [{"pred": "account_id", "obj": "123456789012", "type": "simple"}],
+            }
+        ]
         expected_api_call_stats = {
             "count": 1,
             "123456789012": {
@@ -37,7 +33,7 @@ class TestEBSVolumeResourceSpec(TestCase):
                 },
             },
         }
-        self.assertDictEqual(scan_result_dict, expected_scan_result_dict)
+        self.assertListEqual([resource.to_dict() for resource in resources], expected_resources)
         self.assertDictEqual(scan_accessor.api_call_stats.to_dict(), expected_api_call_stats)
 
     @mock_sts

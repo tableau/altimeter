@@ -4,7 +4,8 @@ from dataclasses import dataclass
 import logging
 import os
 import sys
-from typing import Any, Dict, List, Tuple, Type, Union
+import threading
+from typing import cast, Any, Dict, List, Tuple, Type, Union
 
 import structlog
 
@@ -32,11 +33,11 @@ class LogEventMeta(type):
     """
 
     def __new__(
-        cls: Type, name: str, bases: Tuple[Type, ...], namespace: Dict[str, Any]
-    ) -> Type["LogEventMeta"]:
+        mcs, name: str, bases: Tuple[Type, ...], namespace: Dict[str, Any]
+    ) -> "LogEventMeta":
         for annotation in namespace.get("__annotations__", []):
             namespace[annotation] = EventName(annotation)
-        return super(LogEventMeta, cls).__new__(cls, name, bases, namespace)
+        return cast(LogEventMeta, super().__new__(mcs, name, bases, namespace))
 
 
 @dataclass(frozen=True)
@@ -54,14 +55,6 @@ class LogEvent(BaseLogEvent):
 
     GraphLoadedSNSNotificationStart: EventName
     GraphLoadedSNSNotificationEnd: EventName
-
-    GraphResourcesStart: EventName
-    GraphResourcesEnd: EventName
-
-    GraphResourceStart: EventName
-    GraphResourceEnd: EventName
-
-    InitializedLogger: EventName
 
     MetadataGraphUpdateStart: EventName
     MetadataGraphUpdateEnd: EventName
@@ -82,16 +75,12 @@ class LogEvent(BaseLogEvent):
 
     PruneNeptuneMetadataGraphStart: EventName
     PruneNeptuneMetadataGraphEnd: EventName
-    PruneNeptuneMetadataGraphError: EventName
 
     ReadFromFSStart: EventName
     ReadFromFSEnd: EventName
 
     ReadFromS3Start: EventName
     ReadFromS3End: EventName
-
-    ScanResourcesStart: EventName
-    ScanResourcesEnd: EventName
 
     ScanResourceTypeStart: EventName
     ScanResourceTypeEnd: EventName
@@ -116,14 +105,22 @@ class Singleton(type):
 
 LoggableTypes = Union[int, str, Dict]
 
+LOGGER_STACK = threading.local()
+
+
+def _get_loggers() -> List[structlog.BoundLogger]:
+    if not hasattr(LOGGER_STACK, "LOGGERS"):
+        LOGGER_STACK.LOGGERS = []
+    return LOGGER_STACK.LOGGERS
+
 
 class Logger(metaclass=Singleton):
     """Logger singleton.  Provides contextmanager 'bind' which can be use to bind
     keys to the logger using 'with' syntax, they will be removed from the logger
     in subsequent calls."""
 
-    def __init__(self) -> None:
-        self._logger_stack: List[structlog.BoundLogger] = []
+    def __init__(self, log_tid: bool = True) -> None:
+        self._log_tid = log_tid
         log_processors = [
             structlog.stdlib.add_log_level,
             structlog.stdlib.add_logger_name,
@@ -151,11 +148,15 @@ class Logger(metaclass=Singleton):
             level=os.environ.get("LOG_LEVEL", "INFO"), stream=sys.stdout, format="%(message)s"
         )
         logging.getLogger("botocore").setLevel(logging.ERROR)
-        logger = structlog.get_logger()
-        self._logger_stack.append(logger)
 
     def _get_current_logger(self) -> structlog.BoundLogger:
-        return self._logger_stack[-1]
+        loggers = _get_loggers()
+        if not loggers:
+            logger = structlog.get_logger()
+            if self._log_tid:
+                logger = logger.bind(tid=threading.get_ident())
+            loggers.append(logger)
+        return loggers[-1]
 
     def debug(self, event: EventName, **kwargs: LoggableTypes) -> None:
         """Create DEBUG level log entry.
@@ -216,8 +217,9 @@ class Logger(metaclass=Singleton):
         """Context manager to bind a set of k/vs to the logger.  The k/vs will be removed
         when the with block exits."""
         new_logger = self._get_current_logger().bind(**bindings)
-        self._logger_stack.append(new_logger)
+        loggers = _get_loggers()
+        loggers.append(new_logger)
         try:
             yield
         finally:
-            self._logger_stack.pop()
+            loggers.pop()

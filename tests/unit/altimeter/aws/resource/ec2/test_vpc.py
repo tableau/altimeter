@@ -19,54 +19,50 @@ class TestVPCResourceSpec(TestCase):
         ec2_client.create_vpc(CidrBlock="10.0.0.0/16")
 
         scan_accessor = AWSAccessor(session=session, account_id=account_id, region_name=region_name)
-        scan_result = VPCResourceSpec.scan(scan_accessor=scan_accessor)
-        scan_result_dict = scan_result.to_dict()
+        resources = VPCResourceSpec.scan(scan_accessor=scan_accessor)
 
-        expected_scan_result_dict = {
-            "resources": [
-                {
-                    "type": "aws:ec2:vpc",
-                    "links": [
-                        {"pred": "is_default", "obj": True, "type": "simple"},
-                        {
-                            "pred": "cidr_block",
-                            "obj": "172.31.0.0/16",
-                            "type": "simple",
-                        },  # from moto
-                        {"pred": "state", "obj": "available", "type": "simple"},
-                        {
-                            "pred": "account",
-                            "obj": "arn:aws::::account/123456789012",
-                            "type": "resource_link",
-                        },
-                        {
-                            "pred": "region",
-                            "obj": "arn:aws:::123456789012:region/us-east-1",
-                            "type": "resource_link",
-                        },
-                    ],
-                },
-                {
-                    "type": "aws:ec2:vpc",
-                    "links": [
-                        {"pred": "is_default", "obj": False, "type": "simple"},
-                        {"pred": "cidr_block", "obj": "10.0.0.0/16", "type": "simple"},
-                        {"pred": "state", "obj": "available", "type": "simple"},
-                        {
-                            "pred": "account",
-                            "obj": "arn:aws::::account/123456789012",
-                            "type": "resource_link",
-                        },
-                        {
-                            "pred": "region",
-                            "obj": "arn:aws:::123456789012:region/us-east-1",
-                            "type": "resource_link",
-                        },
-                    ],
-                },
-            ],
-            "errors": [],
-        }
+        expected_resources = [
+            {
+                "type": "aws:ec2:vpc",
+                "links": [
+                    {"pred": "is_default", "obj": True, "type": "simple"},
+                    {
+                        "pred": "cidr_block",
+                        "obj": "172.31.0.0/16",
+                        "type": "simple",
+                    },  # from moto
+                    {"pred": "state", "obj": "available", "type": "simple"},
+                    {
+                        "pred": "account",
+                        "obj": "arn:aws::::account/123456789012",
+                        "type": "resource_link",
+                    },
+                    {
+                        "pred": "region",
+                        "obj": "arn:aws:::123456789012:region/us-east-1",
+                        "type": "resource_link",
+                    },
+                ],
+            },
+            {
+                "type": "aws:ec2:vpc",
+                "links": [
+                    {"pred": "is_default", "obj": False, "type": "simple"},
+                    {"pred": "cidr_block", "obj": "10.0.0.0/16", "type": "simple"},
+                    {"pred": "state", "obj": "available", "type": "simple"},
+                    {
+                        "pred": "account",
+                        "obj": "arn:aws::::account/123456789012",
+                        "type": "resource_link",
+                    },
+                    {
+                        "pred": "region",
+                        "obj": "arn:aws:::123456789012:region/us-east-1",
+                        "type": "resource_link",
+                    },
+                ],
+            },
+        ]
         expected_api_call_stats = {
             "count": 1,
             "123456789012": {
@@ -74,5 +70,5 @@ class TestVPCResourceSpec(TestCase):
                 "us-east-1": {"count": 1, "ec2": {"count": 1, "DescribeVpcs": {"count": 1}}},
             },
         }
-        self.assertDictEqual(scan_result_dict, expected_scan_result_dict)
+        self.assertListEqual([resource.to_dict() for resource in resources], expected_resources)
         self.assertDictEqual(scan_accessor.api_call_stats.to_dict(), expected_api_call_stats)

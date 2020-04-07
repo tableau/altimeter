@@ -30,14 +30,9 @@ class AWSLogEvents(BaseLogEvent):
     ScanAWSAccountEnd: EventName
     ScanAWSAccountError: EventName
 
-    ScanAWSAccountRegionStart: EventName
-    ScanAWSAccountRegionEnd: EventName
-
     ScanAWSAccountServiceStart: EventName
     ScanAWSAccountServiceEnd: EventName
 
-    ScanAWSResourcesStart: EventName
-    ScanAWSResourcesEnd: EventName
     ScanAWSResourcesNonFatalError: EventName
 
     ScanConfigured: EventName

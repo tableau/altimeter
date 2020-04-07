@@ -1,6 +1,5 @@
 """Resource for IAM Roles"""
 import copy
-import json
 from typing import Any, Dict, List, Type
 
 from botocore.client import BaseClient

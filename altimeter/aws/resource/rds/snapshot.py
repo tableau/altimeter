@@ -8,10 +8,7 @@ from altimeter.aws.resource.ec2.vpc import VPCResourceSpec
 from altimeter.aws.resource.rds import RDSResourceSpec
 from altimeter.aws.resource.rds.instance import RDSInstanceResourceSpec
 from altimeter.aws.resource.kms.key import KMSKeyResourceSpec
-from altimeter.core.graph.field.resource_link_field import (
-    ResourceLinkField,
-    TransientResourceLinkField,
-)
+from altimeter.core.graph.field.resource_link_field import TransientResourceLinkField
 from altimeter.core.graph.field.scalar_field import ScalarField
 from altimeter.core.graph.schema import Schema
 
