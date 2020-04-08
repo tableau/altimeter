@@ -1,6 +1,32 @@
 #!/usr/bin/env python3
 """Pull data from AWS and convert it to JSON for consumption by json2rdf.py.
 Run with -h for documentation."""
+
+from datetime import datetime
+import argparse
+from concurrent.futures import Future, ThreadPoolExecutor, as_completed
+import os
+from pathlib import Path
+import sys
+from typing import Dict, List, Set
+
+import boto3
+
+from altimeter.aws.auth.accessor import Accessor
+from altimeter.aws.log import AWSLogEvents
+from altimeter.aws.scan.muxer import AWSScanMuxer
+from altimeter.aws.scan.muxer.local_muxer import LocalAWSScanMuxer
+from altimeter.aws.scan.muxer.lambda_muxer import LambdaAWSScanMuxer
+from altimeter.aws.scan.account_scan_plan import AccountScanPlan
+from altimeter.aws.scan.scan_manifest import ScanManifest
+from altimeter.aws.settings import MAX_S3_READ_THREADS
+from altimeter.core.artifact_io.reader import ArtifactReader, FileArtifactReader, S3ArtifactReader
+from altimeter.core.artifact_io.writer import ArtifactWriter, FileArtifactWriter, S3ArtifactWriter
+from altimeter.core.awslambda import get_required_lambda_env_var
+from altimeter.core.graph.graph_set import GraphSet
+from altimeter.core.log import Logger
+from altimeter.core.multilevel_counter import MultilevelCounter
+
 LOCAL_USAGE = """
 
 This tool can be run locally in two modes:
@@ -34,30 +60,6 @@ For example:
 The access_config.json file specifies a set of steps which can be used to access an account
 via STS assume role operations. See the Altimeter user documentation for more information.
 """
-from datetime import datetime
-import argparse
-import os
-from pathlib import Path
-import sys
-from typing import Dict, List, Set
-
-from altimeter.aws.auth.accessor import Accessor
-from altimeter.core.awslambda import get_required_lambda_env_var
-from altimeter.core.graph.graph_set import GraphSet
-from altimeter.core.log import Logger
-from altimeter.aws.log import AWSLogEvents
-from altimeter.core.multilevel_counter import MultilevelCounter
-
-from altimeter.core.artifact_io.reader import ArtifactReader, FileArtifactReader, S3ArtifactReader
-from altimeter.core.artifact_io.writer import ArtifactWriter, FileArtifactWriter, S3ArtifactWriter
-
-from altimeter.aws.scan.muxer import AWSScanMuxer
-from altimeter.aws.scan.muxer.local_muxer import LocalAWSScanMuxer
-from altimeter.aws.scan.muxer.lambda_muxer import LambdaAWSScanMuxer
-from altimeter.aws.scan.account_scan_plan import AccountScanPlan
-from altimeter.aws.scan.scan_manifest import ScanManifest
-
-import boto3
 
 
 def lambda_handler(event, context):
@@ -228,9 +230,7 @@ def scan(
 ) -> ScanManifest:
     if scan_sub_accounts:
         account_ids = get_sub_account_ids(account_ids, accessor)
-    account_scan_plan = AccountScanPlan(account_ids=account_ids,
-                                        regions=regions,
-                                        accessor=accessor)
+    account_scan_plan = AccountScanPlan(account_ids=account_ids, regions=regions, accessor=accessor)
     logger = Logger()
     logger.info(event=AWSLogEvents.ScanAWSAccountsStart)
     account_scan_manifests = muxer.scan(account_scan_plan=account_scan_plan)
@@ -255,8 +255,16 @@ def scan(
         account_stats = MultilevelCounter.from_dict(account_scan_manifest.api_call_stats)
         stats.merge(account_stats)
     graph_set = None
-    for artifact_path in artifacts:
-        artifact_dict = artifact_reader.read_artifact(artifact_path)
+    futures = []
+    with ThreadPoolExecutor(max_workers=MAX_S3_READ_THREADS) as executor:
+        for artifact_path in artifacts:
+            futures.append(
+                schedule_artifact_read(
+                    executor=executor, artifact_reader=artifact_reader, artifact_path=artifact_path
+                )
+            )
+    for future in as_completed(futures):
+        artifact_dict = future.result()
         artifact_graph_set = GraphSet.from_dict(artifact_dict)
         if graph_set is None:
             graph_set = artifact_graph_set
@@ -283,6 +291,12 @@ def scan(
         start_time=start_time,
         end_time=end_time,
     )
+
+
+def schedule_artifact_read(
+    executor: ThreadPoolExecutor, artifact_reader: ArtifactReader, artifact_path: str
+) -> Future:
+    return executor.submit(lambda: artifact_reader.read_artifact(artifact_path))
 
 
 if __name__ == "__main__":

@@ -9,6 +9,9 @@ import os
 GRAPH_NAME: str = "alti"
 GRAPH_VERSION: str = "1"
 
+# number of threads to use for S3 reads
+MAX_S3_READ_THREADS = int(os.environ.get("MAX_S3_READ_THREADS", 16))
+
 # The following variables control scan concurrency.
 #
 # The execution model of aws2json is as such:
