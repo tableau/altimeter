@@ -1,7 +1,7 @@
 """Abstract base class for AWSScanMuxers."""
 import abc
 from concurrent.futures import as_completed, Future, ThreadPoolExecutor
-from typing import List
+from typing import Generator
 
 from altimeter.core.log import Logger
 from altimeter.aws.log import AWSLogEvents
@@ -23,16 +23,17 @@ class AWSScanMuxer(abc.ABC):
         self.max_threads = max_threads
         self.max_accounts_per_thread = max_accounts_per_thread
 
-    def scan(self, account_scan_plan: AccountScanPlan) -> List[AccountScanManifest]:
+    def scan(
+        self, account_scan_plan: AccountScanPlan
+    ) -> Generator[AccountScanManifest, None, None]:
         """Scan accounts. Return a list of AccountScanManifest objects.
 
         Args:
             account_scan_plan: AccountScanPlan defining this scan op
 
-        Returns:
-            list of AccountScanManifest objects describing the output of the scan.
+        Yields:
+            AccountScanManifest objects
         """
-        account_scan_results: List[AccountScanManifest] = []
         num_total_accounts = len(account_scan_plan.account_ids)
         account_scan_plans = account_scan_plan.to_batches(max_accounts=self.max_accounts_per_thread)
         num_account_batches = len(account_scan_plans)
@@ -71,11 +72,10 @@ class AWSScanMuxer(abc.ABC):
                             errors=account_errors,
                             api_call_stats=api_call_stats,
                         )
-                        account_scan_results.append(account_scan_result)
+                        yield account_scan_result
                         processed_accounts += 1
                     logger.info(event=AWSLogEvents.MuxerStat, num_scanned=processed_accounts)
             logger.info(event=AWSLogEvents.MuxerEnd)
-        return account_scan_results
 
     @abc.abstractmethod
     def _schedule_account_scan(

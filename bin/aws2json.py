@@ -233,18 +233,25 @@ def scan(
                                         accessor=accessor)
     logger = Logger()
     logger.info(event=AWSLogEvents.ScanAWSAccountsStart)
-    account_scan_manifests = muxer.scan(account_scan_plan=account_scan_plan)
     # now combine account_scan_results and org_details to build a ScanManifest
     scanned_accounts: List[Dict[str, str]] = []
     artifacts: List[str] = []
     errors: Dict[str, List[str]] = {}
     unscanned_accounts: List[Dict[str, str]] = []
     stats = MultilevelCounter()
+    graph_set = None
 
-    for account_scan_manifest in account_scan_manifests:
+    for account_scan_manifest in muxer.scan(account_scan_plan=account_scan_plan):
         account_id = account_scan_manifest.account_id
         if account_scan_manifest.artifacts:
-            artifacts += account_scan_manifest.artifacts
+            for account_scan_artifact in account_scan_manifest.artifacts:
+                artifacts += account_scan_artifact
+                artifact_graph_set_dict = artifact_reader.read_artifact(account_scan_artifact)
+                artifact_graph_set = GraphSet.from_dict(artifact_graph_set_dict)
+                if graph_set is None:
+                    graph_set = artifact_graph_set
+                else:
+                    graph_set.merge(artifact_graph_set)
             if account_scan_manifest.errors:
                 errors[account_id] = account_scan_manifest.errors
                 unscanned_accounts.append(account_id)
@@ -254,14 +261,6 @@ def scan(
             unscanned_accounts.append(account_id)
         account_stats = MultilevelCounter.from_dict(account_scan_manifest.api_call_stats)
         stats.merge(account_stats)
-    graph_set = None
-    for artifact_path in artifacts:
-        artifact_dict = artifact_reader.read_artifact(artifact_path)
-        artifact_graph_set = GraphSet.from_dict(artifact_dict)
-        if graph_set is None:
-            graph_set = artifact_graph_set
-        else:
-            graph_set.merge(artifact_graph_set)
     master_artifact_path = None
     if graph_set:
         master_artifact_path = artifact_writer.write_artifact(
@@ -283,7 +282,6 @@ def scan(
         start_time=start_time,
         end_time=end_time,
     )
-
 
 if __name__ == "__main__":
     sys.exit(main())
