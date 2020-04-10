@@ -24,7 +24,7 @@ GRAPH_VERSION: str = "1"
 # Note that each of these variables is overridable via env vars, see os.environ.get calls below.
 
 # in lambda, number of AccountScan lambdas to run concurrently
-MAX_LAMBDA_ACCOUNT_SCAN_THREADS = int(os.environ.get("MAX_MUXER_THREADS", 64))
+MAX_LAMBDA_ACCOUNT_SCAN_THREADS = int(os.environ.get("MAX_MUXER_THREADS", 32))
 # in lambda, the number of accounts to scan in each AccountScan lambda
 MAX_LAMBDA_ACCOUNTS_PER_THREAD = int(os.environ.get("MAX_ACCOUNTS_PER_THREAD", 1))
 
