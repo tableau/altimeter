@@ -37,10 +37,11 @@ class EBSSnapshotResourceSpec(EC2ResourceSpec):
 
         Where the dicts represent results from describe_snapshots."""
         snapshots = {}
-        resp = client.describe_snapshots(OwnerIds=["self"])
-        for snapshot in resp.get("Snapshots", []):
-            resource_arn = cls.generate_arn(
-                account_id=account_id, region=region, resource_id=snapshot["SnapshotId"]
-            )
-            snapshots[resource_arn] = snapshot
+        paginator = client.get_paginator("describe_snapshots")
+        for resp in paginator.paginate(OwnerIds=["self"]):
+            for snapshot in resp.get("Snapshots", []):
+                resource_arn = cls.generate_arn(
+                    account_id=account_id, region=region, resource_id=snapshot["SnapshotId"]
+                )
+                snapshots[resource_arn] = snapshot
         return ListFromAWSResult(resources=snapshots)
