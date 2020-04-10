@@ -29,9 +29,9 @@ MAX_LAMBDA_ACCOUNT_SCAN_THREADS = int(os.environ.get("MAX_MUXER_THREADS", 64))
 MAX_LAMBDA_ACCOUNTS_PER_THREAD = int(os.environ.get("MAX_ACCOUNTS_PER_THREAD", 1))
 
 # in local usage, number of AccountScans to run concurrently
-MAX_LOCAL_ACCOUNT_SCAN_THREADS = int(os.environ.get("MAX_MUXER_THREADS", 1))
+MAX_LOCAL_ACCOUNT_SCAN_THREADS = int(os.environ.get("MAX_MUXER_THREADS", 4))
 # in lcoal usage, the number of accounts to scan in each AccountScan
-MAX_LOCAL_ACCOUNTS_PER_THREAD = int(os.environ.get("MAX_ACCOUNTS_PER_THREAD", 2))
+MAX_LOCAL_ACCOUNTS_PER_THREAD = int(os.environ.get("MAX_ACCOUNTS_PER_THREAD", 1))
 
 # the number of scan threads to spawn in each account scan
 MAX_ACCOUNT_SCANNER_THREADS = int(os.environ.get("MAX_ACCOUNT_SCANNER_THREADS", 64))
