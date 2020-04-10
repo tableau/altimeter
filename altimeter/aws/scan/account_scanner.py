@@ -117,6 +117,7 @@ class AccountScanner:
                             scan_regions = tuple(self.account_scan_plan.regions)
                         else:
                             scan_regions = get_all_enabled_regions(session=session)
+                        random_scan_region = random.choice(scan_regions)
                         # build a dict of regions -> services -> List[AWSResourceSpec]
                         regions_services_resource_spec_classes: DefaultDict[
                             str, DefaultDict[str, List[Type[AWSResourceSpec]]]
@@ -124,21 +125,21 @@ class AccountScanner:
                         resource_spec_class: Type[AWSResourceSpec]
                         for resource_spec_class in self.resource_spec_classes:
                             client_name = resource_spec_class.get_client_name()
-                            if resource_spec_class.region_whitelist:
-                                resource_scan_regions = tuple(
-                                    region
-                                    for region in scan_regions
-                                    if region in resource_spec_class.region_whitelist
-                                )
-                                if not resource_scan_regions:
-                                    resource_scan_regions = resource_spec_class.region_whitelist
-                            else:
-                                resource_scan_regions = scan_regions
                             if resource_spec_class.scan_granularity == ScanGranularity.ACCOUNT:
                                 regions_services_resource_spec_classes[
-                                    random.choice(resource_scan_regions)
+                                    random_scan_region
                                 ][client_name].append(resource_spec_class)
                             elif resource_spec_class.scan_granularity == ScanGranularity.REGION:
+                                if resource_spec_class.region_whitelist:
+                                    resource_scan_regions = tuple(
+                                        region
+                                        for region in scan_regions
+                                        if region in resource_spec_class.region_whitelist
+                                    )
+                                    if not resource_scan_regions:
+                                        resource_scan_regions = resource_spec_class.region_whitelist
+                                else:
+                                    resource_scan_regions = scan_regions
                                 for region in resource_scan_regions:
                                     regions_services_resource_spec_classes[region][
                                         client_name
