@@ -3,6 +3,7 @@ parameters"""
 from collections import defaultdict
 from concurrent.futures import Future, ThreadPoolExecutor, as_completed
 from dataclasses import dataclass
+import random
 import time
 import traceback
 from typing import Any, DefaultDict, Dict, List, Tuple, Type
@@ -19,7 +20,12 @@ from altimeter.aws.scan.settings import (
     INFRA_RESOURCE_SPEC_CLASSES,
     ORG_RESOURCE_SPEC_CLASSES,
 )
-from altimeter.aws.settings import GRAPH_NAME, GRAPH_VERSION, MAX_ACCOUNT_SCANNER_THREADS
+from altimeter.aws.settings import (
+    GRAPH_NAME,
+    GRAPH_VERSION,
+    MAX_ACCOUNT_SCANNER_THREADS,
+    PREFERRED_ACCOUNT_SCAN_REGIONS,
+)
 from altimeter.core.artifact_io.writer import ArtifactWriter
 from altimeter.core.graph.graph_set import GraphSet
 from altimeter.core.graph.graph_spec import GraphSpec
@@ -97,7 +103,10 @@ class AccountScanner:
         prescan_account_ids_errors: DefaultDict[str, List[str]] = defaultdict(list)
         futures = []
         with ThreadPoolExecutor(max_workers=self.max_threads) as executor:
-            for account_id in self.account_scan_plan.account_ids:
+            shuffled_account_ids = random.sample(
+                self.account_scan_plan.account_ids, k=len(self.account_scan_plan.account_ids)
+            )
+            for account_id in shuffled_account_ids:
                 with logger.bind(account_id=account_id):
                     logger.info(event=AWSLogEvents.ScanAWSAccountStart)
                     try:
@@ -113,6 +122,7 @@ class AccountScanner:
                             scan_regions = tuple(self.account_scan_plan.regions)
                         else:
                             scan_regions = get_all_enabled_regions(session=session)
+                        account_gran_scan_region = random.choice(PREFERRED_ACCOUNT_SCAN_REGIONS)
                         # build a dict of regions -> services -> List[AWSResourceSpec]
                         regions_services_resource_spec_classes: DefaultDict[
                             str, DefaultDict[str, List[Type[AWSResourceSpec]]]
@@ -120,21 +130,27 @@ class AccountScanner:
                         resource_spec_class: Type[AWSResourceSpec]
                         for resource_spec_class in self.resource_spec_classes:
                             client_name = resource_spec_class.get_client_name()
-                            if resource_spec_class.region_whitelist:
-                                resource_scan_regions = tuple(
-                                    region
-                                    for region in scan_regions
-                                    if region in resource_spec_class.region_whitelist
-                                )
-                                if not resource_scan_regions:
-                                    resource_scan_regions = resource_spec_class.region_whitelist
-                            else:
-                                resource_scan_regions = scan_regions
                             if resource_spec_class.scan_granularity == ScanGranularity.ACCOUNT:
-                                regions_services_resource_spec_classes[resource_scan_regions[0]][
-                                    client_name
-                                ].append(resource_spec_class)
+                                if resource_spec_class.region_whitelist:
+                                    account_resource_scan_region = resource_spec_class.region_whitelist[
+                                        0
+                                    ]
+                                else:
+                                    account_resource_scan_region = account_gran_scan_region
+                                regions_services_resource_spec_classes[
+                                    account_resource_scan_region
+                                ][client_name].append(resource_spec_class)
                             elif resource_spec_class.scan_granularity == ScanGranularity.REGION:
+                                if resource_spec_class.region_whitelist:
+                                    resource_scan_regions = tuple(
+                                        region
+                                        for region in scan_regions
+                                        if region in resource_spec_class.region_whitelist
+                                    )
+                                    if not resource_scan_regions:
+                                        resource_scan_regions = resource_spec_class.region_whitelist
+                                else:
+                                    resource_scan_regions = scan_regions
                                 for region in resource_scan_regions:
                                     regions_services_resource_spec_classes[region][
                                         client_name
@@ -144,18 +160,26 @@ class AccountScanner:
                                     f"ScanGranularity {resource_spec_class.scan_granularity} unimplemented"
                                 )
                         # Build and submit ScanUnits
+                        shuffed_regions_services_resource_spec_classes = random.sample(
+                            regions_services_resource_spec_classes.items(),
+                            len(regions_services_resource_spec_classes),
+                        )
                         for (
                             region,
                             services_resource_spec_classes,
-                        ) in regions_services_resource_spec_classes.items():
+                        ) in shuffed_regions_services_resource_spec_classes:
                             region_session = self.account_scan_plan.accessor.get_session(
                                 account_id=account_id, region_name=region
                             )
                             region_creds = region_session.get_credentials()
+                            shuffled_services_resource_spec_classes = random.sample(
+                                services_resource_spec_classes.items(),
+                                len(services_resource_spec_classes),
+                            )
                             for (
                                 service,
                                 svc_resource_spec_classes,
-                            ) in services_resource_spec_classes.items():
+                            ) in shuffled_services_resource_spec_classes:
                                 future = schedule_scan(
                                     executor=executor,
                                     graph_name=self.graph_name,
