@@ -3,6 +3,7 @@ parameters"""
 from collections import defaultdict
 from concurrent.futures import Future, ThreadPoolExecutor, as_completed
 from dataclasses import dataclass
+import random
 import time
 import traceback
 from typing import Any, DefaultDict, Dict, List, Tuple, Type
@@ -97,7 +98,10 @@ class AccountScanner:
         prescan_account_ids_errors: DefaultDict[str, List[str]] = defaultdict(list)
         futures = []
         with ThreadPoolExecutor(max_workers=self.max_threads) as executor:
-            for account_id in self.account_scan_plan.account_ids:
+            shuffled_account_ids = random.sample(
+                self.account_scan_plan.account_ids, k=len(self.account_scan_plan.account_ids)
+            )
+            for account_id in shuffled_account_ids:
                 with logger.bind(account_id=account_id):
                     logger.info(event=AWSLogEvents.ScanAWSAccountStart)
                     try:
@@ -131,9 +135,9 @@ class AccountScanner:
                             else:
                                 resource_scan_regions = scan_regions
                             if resource_spec_class.scan_granularity == ScanGranularity.ACCOUNT:
-                                regions_services_resource_spec_classes[resource_scan_regions[0]][
-                                    client_name
-                                ].append(resource_spec_class)
+                                regions_services_resource_spec_classes[
+                                    random.choice(resource_scan_regions)
+                                ][client_name].append(resource_spec_class)
                             elif resource_spec_class.scan_granularity == ScanGranularity.REGION:
                                 for region in resource_scan_regions:
                                     regions_services_resource_spec_classes[region][
@@ -144,18 +148,26 @@ class AccountScanner:
                                     f"ScanGranularity {resource_spec_class.scan_granularity} unimplemented"
                                 )
                         # Build and submit ScanUnits
+                        shuffed_regions_services_resource_spec_classes = random.sample(
+                            regions_services_resource_spec_classes.items(),
+                            len(regions_services_resource_spec_classes),
+                        )
                         for (
                             region,
                             services_resource_spec_classes,
-                        ) in regions_services_resource_spec_classes.items():
+                        ) in shuffed_regions_services_resource_spec_classes:
                             region_session = self.account_scan_plan.accessor.get_session(
                                 account_id=account_id, region_name=region
                             )
                             region_creds = region_session.get_credentials()
+                            shuffled_services_resource_spec_classes = random.sample(
+                                services_resource_spec_classes.items(),
+                                len(services_resource_spec_classes),
+                            )
                             for (
                                 service,
                                 svc_resource_spec_classes,
-                            ) in services_resource_spec_classes.items():
+                            ) in shuffled_services_resource_spec_classes:
                                 future = schedule_scan(
                                     executor=executor,
                                     graph_name=self.graph_name,
