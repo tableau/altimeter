@@ -46,7 +46,6 @@ from altimeter.core.awslambda import get_required_lambda_env_var
 from altimeter.core.graph.graph_set import GraphSet
 from altimeter.core.log import Logger
 from altimeter.aws.log import AWSLogEvents
-from altimeter.core.multilevel_counter import MultilevelCounter
 
 from altimeter.core.artifact_io.reader import ArtifactReader, FileArtifactReader, S3ArtifactReader
 from altimeter.core.artifact_io.writer import ArtifactWriter, FileArtifactWriter, S3ArtifactWriter
@@ -238,7 +237,6 @@ def scan(
     artifacts: List[str] = []
     errors: Dict[str, List[str]] = {}
     unscanned_accounts: List[Dict[str, str]] = []
-    stats = MultilevelCounter()
     graph_set = None
 
     for account_scan_manifest in muxer.scan(account_scan_plan=account_scan_plan):
@@ -259,8 +257,6 @@ def scan(
                 scanned_accounts.append(account_id)
         else:
             unscanned_accounts.append(account_id)
-        account_stats = MultilevelCounter.from_dict(account_scan_manifest.api_call_stats)
-        stats.merge(account_stats)
     master_artifact_path = None
     if graph_set:
         master_artifact_path = artifact_writer.write_artifact(
@@ -278,7 +274,7 @@ def scan(
         artifacts=artifacts,
         errors=errors,
         unscanned_accounts=unscanned_accounts,
-        api_call_stats=stats.to_dict(),
+        api_call_stats=graph_set.to_dict(),
         start_time=start_time,
         end_time=end_time,
     )
