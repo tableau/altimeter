@@ -20,7 +20,12 @@ from altimeter.aws.scan.settings import (
     INFRA_RESOURCE_SPEC_CLASSES,
     ORG_RESOURCE_SPEC_CLASSES,
 )
-from altimeter.aws.settings import GRAPH_NAME, GRAPH_VERSION, MAX_ACCOUNT_SCANNER_THREADS
+from altimeter.aws.settings import (
+    GRAPH_NAME,
+    GRAPH_VERSION,
+    MAX_ACCOUNT_SCANNER_THREADS,
+    PREFERRED_ACCOUNT_SCAN_REGIONS,
+)
 from altimeter.core.artifact_io.writer import ArtifactWriter
 from altimeter.core.graph.graph_set import GraphSet
 from altimeter.core.graph.graph_spec import GraphSpec
@@ -117,7 +122,7 @@ class AccountScanner:
                             scan_regions = tuple(self.account_scan_plan.regions)
                         else:
                             scan_regions = get_all_enabled_regions(session=session)
-                        random_scan_region = random.choice(scan_regions)
+                        account_gran_scan_region = random.choice(PREFERRED_ACCOUNT_SCAN_REGIONS)
                         # build a dict of regions -> services -> List[AWSResourceSpec]
                         regions_services_resource_spec_classes: DefaultDict[
                             str, DefaultDict[str, List[Type[AWSResourceSpec]]]
@@ -131,7 +136,7 @@ class AccountScanner:
                                         0
                                     ]
                                 else:
-                                    account_resource_scan_region = random_scan_region
+                                    account_resource_scan_region = account_gran_scan_region
                                 regions_services_resource_spec_classes[
                                     account_resource_scan_region
                                 ][client_name].append(resource_spec_class)

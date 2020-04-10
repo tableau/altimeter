@@ -35,3 +35,6 @@ MAX_LOCAL_ACCOUNTS_PER_THREAD = int(os.environ.get("MAX_ACCOUNTS_PER_THREAD", 2)
 
 # the number of scan threads to spawn in each account scan
 MAX_ACCOUNT_SCANNER_THREADS = int(os.environ.get("MAX_ACCOUNT_SCANNER_THREADS", 64))
+
+# for ACCOUNT granularity resources, this is the list of preferred scan regions
+PREFERRED_ACCOUNT_SCAN_REGIONS = ("us-west-1", "us-west-2", "us-east-1", "us-east-2")
