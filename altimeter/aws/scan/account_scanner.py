@@ -126,9 +126,9 @@ class AccountScanner:
                         for resource_spec_class in self.resource_spec_classes:
                             client_name = resource_spec_class.get_client_name()
                             if resource_spec_class.scan_granularity == ScanGranularity.ACCOUNT:
-                                regions_services_resource_spec_classes[
-                                    random_scan_region
-                                ][client_name].append(resource_spec_class)
+                                regions_services_resource_spec_classes[random_scan_region][
+                                    client_name
+                                ].append(resource_spec_class)
                             elif resource_spec_class.scan_granularity == ScanGranularity.REGION:
                                 if resource_spec_class.region_whitelist:
                                     resource_scan_regions = tuple(
