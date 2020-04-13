@@ -1,0 +1,27 @@
+# This configuration will cause altimeter to scan the currently logged in account.
+[access]
+    cache_creds = true
+
+[scan]
+    # accounts to scan
+    accounts = []
+    # regions to scan. If empty, scan all available regions
+    regions = []
+    # if true, discover and scan subaccounts of the above accounts
+    scan_sub_accounts = false
+    # preferred regions to use when scanning non-regional resources (e.g. IAM policies)
+    preferred_account_scan_regions = [
+        "us-west-1",
+        "us-west-2",
+        "us-east-1",
+        "us-east-2",
+    ]
+
+[concurrency]
+    # The following settings control scan concurrency.
+    #
+    # In general, the maximum number of concurrent scan operations is
+    #   max_account_scan_threads * max_svc_scan_threads
+    max_account_scan_threads = 1            # number of account scan threads to spawn
+    max_accounts_per_thread = 1             # number of accounts to scan in each account scan thread
+    max_svc_scan_threads = 64               # the number of scan threads to spawn in each account scan thread

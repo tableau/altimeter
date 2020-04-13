@@ -21,6 +21,7 @@ setup(
         "boto3>=1.9.130",
         "typing_extensions>=3.7.4.1,<3.8",
         "jinja2>=2.11.1,<3",
+        "toml>=0.10.0,<1",
     ],
     scripts=[
         "bin/account_scan.py",
