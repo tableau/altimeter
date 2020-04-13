@@ -1,5 +1,4 @@
 """Configuration classes"""
-from __future__ import annotations
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, Type, Tuple
@@ -65,7 +64,7 @@ class AccessConfig:
     accessor: Accessor
 
     @classmethod
-    def from_dict(cls: Type[AccessConfig], config_dict: Dict[str, Any]) -> AccessConfig:
+    def from_dict(cls: Type["AccessConfig"], config_dict: Dict[str, Any]) -> "AccessConfig":
         """Build an AccessConfig from a dict"""
         cache_creds = get_required_bool_param("cache_creds", config_dict)
         accessor = Accessor.from_dict(config_dict, cache_creds=cache_creds)
@@ -83,7 +82,7 @@ class ScanConfig:
     single_account_mode: bool
 
     @classmethod
-    def from_dict(cls: Type[ScanConfig], config_dict: Dict[str, Any]) -> ScanConfig:
+    def from_dict(cls: Type["ScanConfig"], config_dict: Dict[str, Any]) -> "ScanConfig":
         """Build a ScanConfig from a dict"""
         preferred_account_scan_regions = get_required_list_param(
             "preferred_account_scan_regions", config_dict
@@ -118,7 +117,9 @@ class ConcurrencyConfig:
     max_svc_scan_threads: int
 
     @classmethod
-    def from_dict(cls: Type[ConcurrencyConfig], config_dict: Dict[str, Any]) -> ConcurrencyConfig:
+    def from_dict(
+        cls: Type["ConcurrencyConfig"], config_dict: Dict[str, Any]
+    ) -> "ConcurrencyConfig":
         """Build a ConcurrencyConfig from a dict"""
         max_account_scan_threads = get_required_int_param("max_account_scan_threads", config_dict)
         max_accounts_per_thread = get_required_int_param("max_accounts_per_thread", config_dict)
@@ -147,7 +148,7 @@ class Config:
             raise InvalidConfigException("Accessor config not supported for single account mode")
 
     @classmethod
-    def from_dict(cls: Type[Config], config_dict: Dict[str, Any]) -> Config:
+    def from_dict(cls: Type["Config"], config_dict: Dict[str, Any]) -> "Config":
         """Build a Config from a dict"""
         scan_dict = get_required_section("scan", config_dict)
         try:
@@ -169,7 +170,7 @@ class Config:
         return Config(access=access, concurrency=concurrency, scan=scan,)
 
     @classmethod
-    def from_file(cls: Type[Config], filepath: Path) -> Config:
+    def from_file(cls: Type["Config"], filepath: Path) -> "Config":
         """Load a Config from a file"""
         config_dict = dict(toml.load(filepath))
         try:
