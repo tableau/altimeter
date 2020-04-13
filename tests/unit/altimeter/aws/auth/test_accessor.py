@@ -110,6 +110,7 @@ class TestAccessor(TestCase):
 
     def test_from_dict(self):
         accessor = Accessor.from_dict(data=TEST_ACCESSOR_DICT)
+        self.maxDiff = None
         self.assertDictEqual(
             accessor.to_dict(),
             {
@@ -150,7 +151,7 @@ class TestAccessor(TestCase):
                         ],
                     },
                 ],
-                "credentials_cache": None,
+                "credentials_cache": {"cache": {}},
             },
         )
 
@@ -260,7 +261,7 @@ class TestAccessor(TestCase):
                         ],
                     },
                 ],
-                "credentials_cache": None,
+                "credentials_cache": {"cache": {}},
             },
         )
 

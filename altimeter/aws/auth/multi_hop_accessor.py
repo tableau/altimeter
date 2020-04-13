@@ -38,7 +38,9 @@ class AccessStep:
         account_id = data.get("account_id")
         external_id = data.get("external_id")
         if external_id is not None:
-            template = jinja2.Environment(loader=jinja2.BaseLoader()).from_string(external_id)
+            template = jinja2.Environment(
+                loader=jinja2.BaseLoader(), undefined=jinja2.StrictUndefined
+            ).from_string(external_id)
             external_id = template.render(env=os.environ)
         return cls(role_name=role_name, account_id=account_id, external_id=external_id)
 
