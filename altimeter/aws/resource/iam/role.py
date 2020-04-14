@@ -1,5 +1,5 @@
 """Resource for IAM Roles"""
-import copy
+import hashlib
 from typing import Any, Dict, List, Type
 
 from botocore.client import BaseClient
@@ -47,6 +47,20 @@ class IAMRoleResourceSpec(IAMResourceSpec):
                     ScalarField("Effect"),
                     ScalarField("Action"),
                     DictField(
+                        "Condition",
+                        DictField(
+                            "StringEquals",
+                            ScalarField(
+                                "aws:PrincipalOrgID", alti_key="aws_principal_org_id", optional=True
+                            ),
+                            ScalarField(
+                                "sts:ExternalId", alti_key="sts_external_id", optional=True
+                            ),
+                            optional=True,
+                        ),
+                        optional=True,
+                    ),
+                    DictField(
                         "Principal",
                         ListField("AWS", EmbeddedScalarField(), optional=True, allow_scalar=True),
                         ListField(
@@ -76,16 +90,17 @@ class IAMRoleResourceSpec(IAMResourceSpec):
         for resp in paginator.paginate():
             for role in resp.get("Roles", []):
                 role_name = role["RoleName"]
-                assume_role_policy_document = copy.deepcopy(role["AssumeRolePolicyDocument"])
-                assume_role_policy_document_text = policy_doc_dict_to_sorted_str(
-                    assume_role_policy_document
-                )
-                role["AssumeRolePolicyDocumentText"] = assume_role_policy_document_text
+                assume_role_policy_document = role["AssumeRolePolicyDocument"]
                 for statement in assume_role_policy_document.get("Statement", []):
                     for obj in statement.get("Condition", {}).values():
                         for obj_key in obj.keys():
                             if obj_key.lower() == "sts:externalid":
-                                obj[obj_key] = "REMOVED"
+                                hash_object = hashlib.sha256(obj[obj_key].encode())
+                                obj[obj_key] = f"md5.{hash_object.hexdigest()}"
+                assume_role_policy_document_text = policy_doc_dict_to_sorted_str(
+                    assume_role_policy_document
+                )
+                role["AssumeRolePolicyDocumentText"] = assume_role_policy_document_text
                 policies_result = get_attached_role_policies(client, role_name)
                 policies = policies_result
                 role["PolicyAttachments"] = policies
