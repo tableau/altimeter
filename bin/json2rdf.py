@@ -1,17 +1,19 @@
 #!/usr/bin/env python3
 """Convert intermediate JSON to RDF."""
+import argparse
 from dataclasses import dataclass
 import io
 import gzip
 import json
 import sys
-import urllib
+from typing import Any, Dict, List, Optional
+import urllib.parse
 
 import boto3
 from botocore.client import BaseClient
 from rdflib import Graph
 
-from altimeter.core.awslambda import get_required_lambda_env_var
+from altimeter.core.parameters import get_required_str_env_var
 from altimeter.core.graph.graph_set import GraphSet
 from altimeter.core.log import Logger, LogEvent
 
@@ -54,10 +56,10 @@ def graph_pkg_from_s3(s3_client: BaseClient, json_bucket: str, json_key: str) ->
     )
 
 
-def lambda_handler(event, context):
+def lambda_handler(event: Dict[str, Any], context: Any) -> None:
     json_bucket = event["Records"][0]["s3"]["bucket"]["name"]
     json_key = urllib.parse.unquote(event["Records"][0]["s3"]["object"]["key"])
-    rdf_bucket = get_required_lambda_env_var("RDF_BUCKET")
+    rdf_bucket = get_required_str_env_var("RDF_BUCKET")
     rdf_key = ".".join(json_key.split(".")[:-1]) + ".rdf.gz"
     session = boto3.Session()
     s3_client = session.client("s3")
@@ -102,9 +104,7 @@ def graph_from_filepath(filepath: str) -> Graph:
     return graph_set.to_rdf()
 
 
-def main(argv=None):
-    import argparse
-
+def main(argv: Optional[List[str]] = None) -> int:
     if argv is None:
         argv = sys.argv[1:]
     parser = argparse.ArgumentParser()
@@ -113,6 +113,7 @@ def main(argv=None):
     args_ns = parser.parse_args(argv)
     graph = graph_from_filepath(args_ns.infile)
     graph.serialize(args_ns.outfile)
+    return 0
 
 
 if __name__ == "__main__":

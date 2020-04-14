@@ -1,6 +1,6 @@
 """An AccountScanPlan defines how to scan a set of accounts."""
 from dataclasses import dataclass
-from typing import Any, Dict, List, Type
+from typing import Any, Dict, List, Tuple, Type
 
 from altimeter.aws.auth.accessor import Accessor
 
@@ -15,8 +15,8 @@ class AccountScanPlan:
         accessor: Accessor to use to access the accounts
     """
 
-    account_ids: List[str]
-    regions: List[str]
+    account_ids: Tuple[str, ...]
+    regions: Tuple[str, ...]
     accessor: Accessor
 
     def to_dict(self) -> Dict[str, Any]:

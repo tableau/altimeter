@@ -1,24 +1,25 @@
 #!/usr/bin/env python3
 """Load RDF from S3 into Neptune"""
 import json
-import urllib
+from typing import Any, Dict
+import urllib.parse
 
 import boto3
 
-from altimeter.core.awslambda import get_required_lambda_env_var
+from altimeter.core.parameters import get_required_str_env_var, get_required_int_env_var
 from altimeter.core.log import Logger, LogEvent
 from altimeter.core.neptune.client import AltimeterNeptuneClient, NeptuneEndpoint
 
 
-def lambda_handler(event, context):
+def lambda_handler(event: Dict[str, Any], context: Any) -> None:
     rdf_bucket = event["Records"][0]["s3"]["bucket"]["name"]
     rdf_key = urllib.parse.unquote(event["Records"][0]["s3"]["object"]["key"])
 
-    neptune_host = get_required_lambda_env_var("NEPTUNE_HOST")
-    neptune_port = get_required_lambda_env_var("NEPTUNE_PORT")
-    neptune_region = get_required_lambda_env_var("NEPTUNE_REGION")
-    neptune_load_iam_role_arn = get_required_lambda_env_var("NEPTUNE_LOAD_IAM_ROLE_ARN")
-    on_success_sns_topic_arn = get_required_lambda_env_var("ON_SUCCESS_SNS_TOPIC_ARN")
+    neptune_host = get_required_str_env_var("NEPTUNE_HOST")
+    neptune_port = get_required_int_env_var("NEPTUNE_PORT")
+    neptune_region = get_required_str_env_var("NEPTUNE_REGION")
+    neptune_load_iam_role_arn = get_required_str_env_var("NEPTUNE_LOAD_IAM_ROLE_ARN")
+    on_success_sns_topic_arn = get_required_str_env_var("ON_SUCCESS_SNS_TOPIC_ARN")
 
     endpoint = NeptuneEndpoint(host=neptune_host, port=neptune_port, region=neptune_region)
     neptune_client = AltimeterNeptuneClient(max_age_min=1440, neptune_endpoint=endpoint)

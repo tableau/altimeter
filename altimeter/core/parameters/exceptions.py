@@ -2,9 +2,13 @@
 from altimeter.core.exceptions import AltimeterException
 
 
+class RequiredVariableNotPresentException(AltimeterException):
+    """A required variable is not present"""
+
+
 class RequiredEnvironmentVariableNotPresentException(AltimeterException):
-    """An environment variable required by a lambda is not present."""
+    """A required environment variable is not present."""
 
 
 class RequiredEventVariableNotPresentException(AltimeterException):
-    """An event variable required by a lambda is not present."""
+    """An required lambda event variable is not present."""

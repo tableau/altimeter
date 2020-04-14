@@ -1,9 +1,11 @@
 """A MultiHopAccessor contains a list of AccessSteps defining how to gain access to an account via
 role assumption(s)."""
 from dataclasses import asdict, dataclass, field
+import os
 from typing import Any, Dict, List, Optional, Type
 
 import boto3
+import jinja2
 
 from altimeter.aws.auth.cache import AWSCredentials, AWSCredentialsCache
 from altimeter.core.log import LogEvent, Logger
@@ -30,7 +32,17 @@ class AccessStep:
 
     @classmethod
     def from_dict(cls: Type["AccessStep"], data: Dict[str, Any]) -> "AccessStep":
-        return cls(**data)
+        role_name = data.get("role_name")
+        if role_name is None:
+            raise ValueError(f"AccessStep '{data}' missing key 'role_name'")
+        account_id = data.get("account_id")
+        external_id = data.get("external_id")
+        if external_id is not None:
+            template = jinja2.Environment(
+                loader=jinja2.BaseLoader(), undefined=jinja2.StrictUndefined
+            ).from_string(external_id)
+            external_id = template.render(env=os.environ)
+        return cls(role_name=role_name, account_id=account_id, external_id=external_id)
 
 
 @dataclass(frozen=True)

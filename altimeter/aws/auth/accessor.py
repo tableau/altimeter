@@ -3,12 +3,10 @@ which will iterate through the MultiHopAccessors until a session can be obtained
 a target account."""
 from dataclasses import dataclass
 import json
-import os
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Type
 
 import boto3
-import jinja2
 
 from altimeter.aws.auth.cache import AWSCredentialsCache
 from altimeter.aws.auth.exceptions import AccountAuthException
@@ -72,11 +70,16 @@ class Accessor:
         )
 
     @classmethod
-    def from_dict(cls: Type["Accessor"], data: Dict[str, Any],) -> "Accessor":
+    def from_dict(
+        cls: Type["Accessor"], data: Dict[str, Any], cache_creds: bool = True
+    ) -> "Accessor":
         mhas = data.get("multi_hop_accessors", [])
         credentials_cache = None
         credentials_cache_dict = data.get("credentials_cache")
-        if credentials_cache_dict is not None:
+        if credentials_cache_dict is None:
+            if cache_creds:
+                credentials_cache = AWSCredentialsCache()
+        else:
             credentials_cache = AWSCredentialsCache.from_dict(credentials_cache_dict)
         return cls(
             multi_hop_accessors=[MultiHopAccessor.from_dict(mha) for mha in mhas],
@@ -93,14 +96,8 @@ class Accessor:
         Returns:
             Accessor
         """
-        template_dir = str(filepath.parent.absolute())
-        jinja2_env = jinja2.Environment(
-            loader=jinja2.FileSystemLoader(searchpath=template_dir),
-            undefined=jinja2.StrictUndefined,
-        )
-        template = jinja2_env.get_template(str(filepath.name))
-        config = template.render(env=os.environ)
-        config_dict = json.loads(config)
+        with filepath.open("r") as fp:
+            config_dict = json.load(fp)
         if cache_creds:
             credentials_cache = AWSCredentialsCache()
             config_dict["credentials_cache"] = credentials_cache.to_dict()

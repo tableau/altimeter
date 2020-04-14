@@ -1,48 +1,14 @@
 #!/usr/bin/env python3
-"""Pull data from AWS and convert it to JSON for consumption by json2rdf.py.
-Run with -h for documentation."""
-LOCAL_USAGE = """
-
-This tool can be run locally in two modes:
-
-Single Account Scan Mode
-========================
-
-The currently configured AWS credentials will be used to scan a single account.
-Assuming your local environment has AWS credentials configured (via ~/.aws/credentials
-and/or various AWS_* env vars) the following will run a scan of the current account in
-all regions and save results under /tmp:
-
-    bin/aws2json.py --base_dir=/tmp
-
-Specific regions can be specified using the --regions arg:
-
-    bin/aws2json.py --base_dir /tmp --regions us-east-1 us-west-2
-
-Multiple Account Scan Mode
-==========================
-
-To scan multiple accounts two additional parameters must be specified:
-
-    --accounts - a list of accounts to scan
-    --access_config - filepath of an access config json file
-
-For example:
-
-    bin/aws2json.py --accounts 012345678901 234567789012 --access_config ~/access_config.json --base_dir ~/test
-
-The access_config.json file specifies a set of steps which can be used to access an account
-via STS assume role operations. See the Altimeter user documentation for more information.
-"""
+"""Pull data from AWS and convert it to JSON for consumption by json2rdf.py"""
 from datetime import datetime
 import argparse
-import os
 from pathlib import Path
 import sys
-from typing import Dict, List, Set
+from typing import Any, Dict, List, Optional, Set, Tuple
 
 from altimeter.aws.auth.accessor import Accessor
-from altimeter.core.awslambda import get_required_lambda_env_var
+from altimeter.core.parameters import get_required_str_env_var, get_required_int_env_var
+from altimeter.core.config import Config
 from altimeter.core.graph.graph_set import GraphSet
 from altimeter.core.log import Logger
 from altimeter.aws.log import AWSLogEvents
@@ -57,42 +23,22 @@ from altimeter.aws.scan.muxer.lambda_muxer import LambdaAWSScanMuxer
 from altimeter.aws.scan.account_scan_plan import AccountScanPlan
 from altimeter.aws.scan.scan_manifest import ScanManifest
 
-import boto3
 
+def lambda_handler(event: Dict[str, Any], context: Any) -> None:
+    account_scan_lambda_name = get_required_str_env_var("ACCOUNT_SCAN_LAMBDA_NAME")
+    account_scan_lambda_timeout = get_required_int_env_var("ACCOUNT_SCAN_LAMBDA_TIMEOUT")
+    json_bucket = get_required_str_env_var("JSON_BUCKET")
 
-def lambda_handler(event, context):
-    account_scan_lambda_name = get_required_lambda_env_var("ACCOUNT_SCAN_LAMBDA_NAME")
-    account_scan_lambda_timeout_str = get_required_lambda_env_var("ACCOUNT_SCAN_LAMBDA_TIMEOUT")
-    try:
-        account_scan_lambda_timeout = int(account_scan_lambda_timeout_str)
-    except ValueError as ve:
-        raise Exception(f'Parameter "ACCOUNT_SCAN_LAMBDA_TIMEOUT" must be an int: {ve}')
-    json_bucket = get_required_lambda_env_var("JSON_BUCKET")
-    if "accounts" in event:
-        account_ids = event["accounts"]
-    else:
-        account_ids = get_required_lambda_env_var("ACCOUNTS").split(",")
-    if "regions" in event:
-        regions = event["regions"]
-    else:
-        regions = os.environ.get("regions", [])
-    if "scan_sub_accounts" in event:
-        scan_sub_accounts = bool(event["scan_sub_accounts"])
-    else:
-        scan_sub_accounts = bool(os.environ.get("SCAN_SUB_ACCOUNTS", True))
+    config = Config.from_file(Path("./conf/lambda.toml"))
 
     logger = Logger()
     logger.info(
         AWSLogEvents.ScanConfigured,
-        account_ids=account_ids,
-        regions=regions,
-        scan_sub_accounts=scan_sub_accounts,
+        config=str(config),
         json_bucket=json_bucket,
         account_scan_lambda_name=account_scan_lambda_name,
         account_scan_lambda_timeout=account_scan_lambda_timeout,
     )
-
-    accessor = Accessor.from_file(Path("./config/access_config.json"))
 
     now = datetime.now()
     scan_date = now.strftime("%Y%m%d")
@@ -107,97 +53,58 @@ def lambda_handler(event, context):
         account_scan_lambda_timeout=account_scan_lambda_timeout,
         json_bucket=json_bucket,
         key_prefix=key_prefix,
-        scan_sub_accounts=scan_sub_accounts,
+        config=config,
     )
 
     scan_manifest = scan(
         muxer=muxer,
-        account_ids=account_ids,
-        regions=regions,
-        accessor=accessor,
+        config=config,
         artifact_writer=artifact_writer,
         artifact_reader=artifact_reader,
-        scan_sub_accounts=scan_sub_accounts,
     )
 
     artifact_writer.write_artifact("manifest", scan_manifest.to_dict())
 
 
-def main(argv=None):
+def main(argv: Optional[List[str]] = None) -> int:
     if argv is None:
         argv = sys.argv[1:]
-    parser = argparse.ArgumentParser(
-        description=LOCAL_USAGE, formatter_class=argparse.RawTextHelpFormatter
-    )
-    parser.add_argument("--access_config", required=False, type=Path)
-    parser.add_argument("--accounts", required=False, type=str, nargs="*")
-    parser.add_argument("--regions", required=False, type=str, nargs="*")
-    parser.add_argument("--base_dir", required=True, type=str)
-    parser.add_argument("--scan_sub_accounts", required=False, action="store_true")
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--config", required=True, type=Path)
+    parser.add_argument("output_dir", type=Path)
     args_ns = parser.parse_args(argv)
 
-    regions = args_ns.regions if args_ns.regions else []
-    base_dir = args_ns.base_dir
-    scan_sub_accounts = args_ns.scan_sub_accounts
-
-    logger = Logger()
-
-    # there are two run modes - if access_config and accounts are specified,
-    # it is a multi-account scan.  Otherwise it is assumed that the creds which are
-    # currently set in env vars will be the target scan account for a single-account scan.
-    if any((args_ns.access_config, args_ns.accounts)):
-        # multi-account run mode
-        if all((args_ns.access_config, args_ns.accounts)):
-            accessor = Accessor.from_file(args_ns.access_config)
-            account_ids = args_ns.accounts
-            logger.info(
-                AWSLogEvents.ScanConfigured,
-                account_ids=account_ids,
-                regions=regions,
-                scan_sub_accounts=scan_sub_accounts,
-                base_dir=base_dir,
-                access_config_path=args_ns.access_config,
-            )
-        else:
-            parser.error("Must either specify both access_config and account_ids or neither.")
-    else:
-        # single-account run mode
-        if scan_sub_accounts:
-            raise ValueError("scan_sub_accounts not supported in single-account scan mode.")
-        sts_client = boto3.client("sts")
-        account_id = sts_client.get_caller_identity()["Account"]
-        account_ids = [account_id]
-        accessor = Accessor([])
-        logger.info(
-            AWSLogEvents.ScanConfigured, account_ids=account_ids, regions=regions, base_dir=base_dir
-        )
+    config = Config.from_file(filepath=args_ns.config)
 
     now = datetime.now()
     scan_date = now.strftime("%Y%m%d")
     scan_time = str(int(now.timestamp()))
 
-    full_dir = Path(base_dir, scan_date, scan_time)
+    output_dir = Path(args_ns.output_dir, scan_date, scan_time)
 
-    muxer = LocalAWSScanMuxer(output_dir=full_dir, scan_sub_accounts=scan_sub_accounts)
+    logger = Logger()
+    logger.info(
+        AWSLogEvents.ScanConfigured, config=str(config), output_dir=str(output_dir),
+    )
 
-    artifact_writer = FileArtifactWriter(output_dir=full_dir)
+    muxer = LocalAWSScanMuxer(output_dir=output_dir, config=config,)
+
+    artifact_writer = FileArtifactWriter(output_dir=output_dir)
     artifact_reader = FileArtifactReader()
 
     scan_manifest = scan(
         muxer=muxer,
-        account_ids=account_ids,
-        regions=regions,
-        accessor=accessor,
+        config=config,
         artifact_writer=artifact_writer,
         artifact_reader=artifact_reader,
-        scan_sub_accounts=scan_sub_accounts,
     )
 
     artifact_writer.write_artifact("manifest", scan_manifest.to_dict())
     print(scan_manifest.master_artifact)
+    return 0
 
 
-def get_sub_account_ids(account_ids: List[str], accessor: Accessor) -> List[str]:
+def get_sub_account_ids(account_ids: Tuple[str, ...], accessor: Accessor) -> Tuple[str, ...]:
     logger = Logger()
     logger.info(event=AWSLogEvents.GetSubAccountsStart)
     sub_account_ids: Set[str] = set(account_ids)
@@ -214,30 +121,29 @@ def get_sub_account_ids(account_ids: List[str], accessor: Accessor) -> List[str]
                             account_id = account_resp["Id"]
                             sub_account_ids.add(account_id)
     logger.info(event=AWSLogEvents.GetSubAccountsEnd)
-    return list(sub_account_ids)
+    return tuple(sub_account_ids)
 
 
 def scan(
     muxer: AWSScanMuxer,
-    account_ids: List[str],
-    regions: List[str],
-    accessor: Accessor,
+    config: Config,
     artifact_writer: ArtifactWriter,
     artifact_reader: ArtifactReader,
-    scan_sub_accounts: bool = False,
 ) -> ScanManifest:
-    if scan_sub_accounts:
-        account_ids = get_sub_account_ids(account_ids, accessor)
-    account_scan_plan = AccountScanPlan(account_ids=account_ids,
-                                        regions=regions,
-                                        accessor=accessor)
+    if config.scan.scan_sub_accounts:
+        account_ids = get_sub_account_ids(config.scan.accounts, config.access.accessor)
+    else:
+        account_ids = config.scan.accounts
+    account_scan_plan = AccountScanPlan(
+        account_ids=account_ids, regions=config.scan.regions, accessor=config.access.accessor
+    )
     logger = Logger()
     logger.info(event=AWSLogEvents.ScanAWSAccountsStart)
     # now combine account_scan_results and org_details to build a ScanManifest
-    scanned_accounts: List[Dict[str, str]] = []
+    scanned_accounts: List[str] = []
     artifacts: List[str] = []
     errors: Dict[str, List[str]] = {}
-    unscanned_accounts: List[Dict[str, str]] = []
+    unscanned_accounts: List[str] = []
     stats = MultilevelCounter()
     graph_set = None
 
@@ -245,7 +151,7 @@ def scan(
         account_id = account_scan_manifest.account_id
         if account_scan_manifest.artifacts:
             for account_scan_artifact in account_scan_manifest.artifacts:
-                artifacts += account_scan_artifact
+                artifacts.append(account_scan_artifact)
                 artifact_graph_set_dict = artifact_reader.read_artifact(account_scan_artifact)
                 artifact_graph_set = GraphSet.from_dict(artifact_graph_set_dict)
                 if graph_set is None:
@@ -261,17 +167,12 @@ def scan(
             unscanned_accounts.append(account_id)
         account_stats = MultilevelCounter.from_dict(account_scan_manifest.api_call_stats)
         stats.merge(account_stats)
-    master_artifact_path = None
-    if graph_set:
-        master_artifact_path = artifact_writer.write_artifact(
-            name="master", data=graph_set.to_dict()
-        )
+    if graph_set is None:
+        raise Exception("BUG: No graph_set generated.")
+    master_artifact_path = artifact_writer.write_artifact(name="master", data=graph_set.to_dict())
     logger.info(event=AWSLogEvents.ScanAWSAccountsEnd)
-    if graph_set:
-        start_time = graph_set.start_time
-        end_time = graph_set.end_time
-    else:
-        start_time, end_time = None, None
+    start_time = graph_set.start_time
+    end_time = graph_set.end_time
     return ScanManifest(
         scanned_accounts=scanned_accounts,
         master_artifact=master_artifact_path,
@@ -282,6 +183,7 @@ def scan(
         start_time=start_time,
         end_time=end_time,
     )
+
 
 if __name__ == "__main__":
     sys.exit(main())

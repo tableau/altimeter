@@ -23,10 +23,9 @@ from altimeter.aws.scan.settings import (
 from altimeter.aws.settings import (
     GRAPH_NAME,
     GRAPH_VERSION,
-    MAX_ACCOUNT_SCANNER_THREADS,
-    PREFERRED_ACCOUNT_SCAN_REGIONS,
 )
 from altimeter.core.artifact_io.writer import ArtifactWriter
+from altimeter.core.config import Config
 from altimeter.core.graph.graph_set import GraphSet
 from altimeter.core.graph.graph_spec import GraphSpec
 from altimeter.core.log import Logger
@@ -73,17 +72,16 @@ class AccountScanner:
         artifact_writer: ArtifactWriter for writing out artifacts
         scan_sub_accounts: Whether to auto-scan any org sub accounts of the target accounts
         max_threads: max number of scan worker threads to spawn
+        preferred_account_scan_regions: tuple of region names to select from for non-regional
         graph_name: name of graph
         graph_version: version string for graph
-        resource_spec_classes: tuple of aws resource spec classes to scan.
     """
 
     def __init__(
         self,
         account_scan_plan: AccountScanPlan,
         artifact_writer: ArtifactWriter,
-        scan_sub_accounts: bool,
-        max_threads: int = MAX_ACCOUNT_SCANNER_THREADS,
+        config: Config,
         graph_name: str = GRAPH_NAME,
         graph_version: str = GRAPH_VERSION,
     ) -> None:
@@ -91,9 +89,10 @@ class AccountScanner:
         self.artifact_writer = artifact_writer
         self.graph_name = graph_name
         self.graph_version = graph_version
-        self.max_threads = max_threads
+        self.max_threads = config.concurrency.max_svc_scan_threads
+        self.preferred_account_scan_regions = config.scan.preferred_account_scan_regions
         self.resource_spec_classes = RESOURCE_SPEC_CLASSES + INFRA_RESOURCE_SPEC_CLASSES
-        if scan_sub_accounts:
+        if config.scan.scan_sub_accounts:
             self.resource_spec_classes += ORG_RESOURCE_SPEC_CLASSES
 
     def scan(self) -> List[Dict[str, Any]]:
@@ -122,7 +121,9 @@ class AccountScanner:
                             scan_regions = tuple(self.account_scan_plan.regions)
                         else:
                             scan_regions = get_all_enabled_regions(session=session)
-                        account_gran_scan_region = random.choice(PREFERRED_ACCOUNT_SCAN_REGIONS)
+                        account_gran_scan_region = random.choice(
+                            self.preferred_account_scan_regions
+                        )
                         # build a dict of regions -> services -> List[AWSResourceSpec]
                         regions_services_resource_spec_classes: DefaultDict[
                             str, DefaultDict[str, List[Type[AWSResourceSpec]]]

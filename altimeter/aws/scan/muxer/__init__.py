@@ -3,10 +3,11 @@ import abc
 from concurrent.futures import as_completed, Future, ThreadPoolExecutor
 from typing import Generator
 
-from altimeter.core.log import Logger
 from altimeter.aws.log import AWSLogEvents
 from altimeter.aws.scan.account_scan_plan import AccountScanPlan
 from altimeter.aws.scan.account_scan_manifest import AccountScanManifest
+from altimeter.core.config import Config
+from altimeter.core.log import Logger
 
 
 class AWSScanMuxer(abc.ABC):
@@ -15,13 +16,11 @@ class AWSScanMuxer(abc.ABC):
     a local run or invoke a Lambda-per-account in the case of Altimeter running on AWS Lambda.
 
     Args:
-        max_threads: maximum number of threads to allow concurrently.
-        max_accounts_per_thread: max accounts to scan in a single thread
+        config: Config object
     """
 
-    def __init__(self, max_threads: int, max_accounts_per_thread: int):
-        self.max_threads = max_threads
-        self.max_accounts_per_thread = max_accounts_per_thread
+    def __init__(self, config: Config):
+        self.config = config
 
     def scan(
         self, account_scan_plan: AccountScanPlan
@@ -35,9 +34,11 @@ class AWSScanMuxer(abc.ABC):
             AccountScanManifest objects
         """
         num_total_accounts = len(account_scan_plan.account_ids)
-        account_scan_plans = account_scan_plan.to_batches(max_accounts=self.max_accounts_per_thread)
+        account_scan_plans = account_scan_plan.to_batches(
+            max_accounts=self.config.concurrency.max_accounts_per_thread
+        )
         num_account_batches = len(account_scan_plans)
-        num_threads = min(num_account_batches, self.max_threads)
+        num_threads = min(num_account_batches, self.config.concurrency.max_account_scan_threads)
         logger = Logger()
         with logger.bind(
             num_total_accounts=num_total_accounts,
@@ -88,4 +89,4 @@ class AWSScanMuxer(abc.ABC):
         In a local environment this means creating an AccountScanner directly and
         calling executor.submit(AccountScanner.scan)
         """
-        raise NotImplementedError("WIP")
+        raise NotImplementedError
