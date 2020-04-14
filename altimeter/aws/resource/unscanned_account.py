@@ -1,5 +1,6 @@
 """Resource representing an unscanned AWS Account"""
 from typing import List, Type
+import uuid
 
 from botocore.client import BaseClient
 
@@ -26,7 +27,7 @@ class UnscannedAccountResourceSpec(AWSResourceSpec):
         links: List[Link] = []
         links.append(SimpleLink(pred="account_id", obj=account_id))
         for error in errors:
-            link = SimpleLink(pred="error", obj=error)
+            link = SimpleLink(pred="error", obj=f"{error} - {uuid.uuid4()}")
             links.append(link)
         return Resource(
             resource_id=cls.generate_arn(resource_id=account_id),
