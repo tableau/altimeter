@@ -1,11 +1,11 @@
-"""Contains various utility functions useful in Lambdas."""
+"""Contains functions for pulling runtime parameters from the environment, lambda events, etc"""
 import os
-from typing import Any, Dict
+from typing import Dict, Any
 
-from altimeter.core.awslambda.exceptions import (
+from altimeter.core.parameters.exceptions import (
+    RequiredVariableNotPresentException,
     RequiredEnvironmentVariableNotPresentException,
     RequiredEventVariableNotPresentException,
-    RequiredVariableNotPresentException,
 )
 
 

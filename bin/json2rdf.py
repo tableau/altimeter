@@ -13,7 +13,7 @@ import boto3
 from botocore.client import BaseClient
 from rdflib import Graph
 
-from altimeter.core.awslambda import get_required_str_env_var
+from altimeter.core.parameters import get_required_str_env_var
 from altimeter.core.graph.graph_set import GraphSet
 from altimeter.core.log import Logger, LogEvent
 

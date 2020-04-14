@@ -4,6 +4,7 @@ Run as a lambda this calls Neptune.
 Run from the command line this finds the runquery lambda, sends a query to it and
 reads the results from S3.
 """
+import argparse
 import hashlib
 import json
 import sys
@@ -12,9 +13,9 @@ from typing import Any, Dict, List, Optional
 
 import boto3
 
-from altimeter.core.awslambda import (
-    get_required_int_env_var,
+from altimeter.core.parameters import (
     get_required_str_env_var,
+    get_required_int_env_var,
     get_required_lambda_event_var,
 )
 from altimeter.core.neptune.client import AltimeterNeptuneClient, NeptuneEndpoint
@@ -73,8 +74,6 @@ def get_runquery_lambda_name() -> str:
 
 
 def main(argv: Optional[List[str]] = None) -> int:
-    import argparse
-
     if argv is None:
         argv = sys.argv[1:]
     parser = argparse.ArgumentParser()

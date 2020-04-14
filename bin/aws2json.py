@@ -7,7 +7,7 @@ import sys
 from typing import Any, Dict, List, Optional, Set, Tuple
 
 from altimeter.aws.auth.accessor import Accessor
-from altimeter.core.awslambda import get_required_int_env_var, get_required_str_env_var
+from altimeter.core.parameters import get_required_str_env_var, get_required_int_env_var
 from altimeter.core.config import Config
 from altimeter.core.graph.graph_set import GraphSet
 from altimeter.core.log import Logger

@@ -8,7 +8,7 @@ from altimeter.core.artifact_io.writer import S3ArtifactWriter
 from altimeter.aws.scan.account_scanner import AccountScanner
 from altimeter.aws.scan.account_scan_plan import AccountScanPlan
 from altimeter.core.json_encoder import json_encoder
-from altimeter.core.awslambda import get_required_lambda_event_var
+from altimeter.core.parameters import get_required_lambda_event_var
 from altimeter.core.config import Config
 
 
