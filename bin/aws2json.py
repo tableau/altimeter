@@ -88,15 +88,10 @@ def main(argv=None):
 
     logger = Logger()
     logger.info(
-        AWSLogEvents.ScanConfigured,
-        config=str(config),
-        output_dir=output_dir,
+        AWSLogEvents.ScanConfigured, config=str(config), output_dir=output_dir,
     )
 
-    muxer = LocalAWSScanMuxer(
-        output_dir=output_dir,
-        config=config,
-    )
+    muxer = LocalAWSScanMuxer(output_dir=output_dir, config=config,)
 
     artifact_writer = FileArtifactWriter(output_dir=output_dir)
     artifact_reader = FileArtifactReader()
@@ -142,9 +137,9 @@ def scan(
         account_ids = get_sub_account_ids(config.scan.accounts, config.access.accessor)
     else:
         account_ids = config.scan.accounts
-    account_scan_plan = AccountScanPlan(account_ids=account_ids,
-                                        regions=config.scan.regions,
-                                        accessor=config.access.accessor)
+    account_scan_plan = AccountScanPlan(
+        account_ids=account_ids, regions=config.scan.regions, accessor=config.access.accessor
+    )
     logger = Logger()
     logger.info(event=AWSLogEvents.ScanAWSAccountsStart)
     # now combine account_scan_results and org_details to build a ScanManifest
@@ -159,7 +154,7 @@ def scan(
         account_id = account_scan_manifest.account_id
         if account_scan_manifest.artifacts:
             for account_scan_artifact in account_scan_manifest.artifacts:
-                artifacts += account_scan_artifact
+                artifacts.append(account_scan_artifact)
                 artifact_graph_set_dict = artifact_reader.read_artifact(account_scan_artifact)
                 artifact_graph_set = GraphSet.from_dict(artifact_graph_set_dict)
                 if graph_set is None:
@@ -196,6 +191,7 @@ def scan(
         start_time=start_time,
         end_time=end_time,
     )
+
 
 if __name__ == "__main__":
     sys.exit(main())

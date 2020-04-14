@@ -20,9 +20,7 @@ def lambda_handler(event, context):
 
     artifact_writer = S3ArtifactWriter(bucket=json_bucket, key_prefix=key_prefix)
     account_scanner = AccountScanner(
-        account_scan_plan=account_scan_plan,
-        artifact_writer=artifact_writer,
-        config=config,
+        account_scan_plan=account_scan_plan, artifact_writer=artifact_writer, config=config,
     )
     scan_results_dict = account_scanner.scan()
     scan_results_str = json.dumps(scan_results_dict, default=json_encoder)
