@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 """Remove graphs matching a given name which are older than n minutes."""
 from datetime import datetime
-
+from typing import Any, Dict
 
 from altimeter.core.log import LogEvent, Logger
 from altimeter.core.awslambda import get_required_lambda_env_var
 from altimeter.core.neptune.client import AltimeterNeptuneClient, NeptuneEndpoint
 
 
-def lambda_handler(event, context):
+def lambda_handler(event: Dict[str, Any], context: Any) -> None:
     host = get_required_lambda_env_var("NEPTUNE_HOST")
     port = get_required_lambda_env_var("NEPTUNE_PORT")
     region = get_required_lambda_env_var("NEPTUNE_REGION")
@@ -18,6 +18,10 @@ def lambda_handler(event, context):
         max_age_min = int(max_age_min)
     except ValueError as ve:
         raise Exception(f"env var MAX_AGE_MIN must be an int: {ve}")
+    try:
+        port = int(port)
+    except ValueError as ve:
+        raise Exception(f"env var NEPTUNE_PORT must be an int: {ve}")
     now = int(datetime.now().timestamp())
     oldest_acceptable_graph_epoch = now - max_age_min * 60
 
@@ -33,7 +37,7 @@ def lambda_handler(event, context):
     client.clear_old_graph_metadata(name=graph_name, max_age_min=max_age_min)
     logger.info(event=LogEvent.PruneNeptuneMetadataGraphEnd)
     # now clear actual graphs
-    with logger.bind(neptune_endpoint=endpoint):
+    with logger.bind(neptune_endpoint=str(endpoint)):
         logger.info(event=LogEvent.PruneNeptuneGraphsStart)
         for graph_metadata in client.get_graph_metadatas(name=graph_name):
             assert graph_metadata.name == graph_name

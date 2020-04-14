@@ -4,7 +4,7 @@ from datetime import datetime
 import argparse
 from pathlib import Path
 import sys
-from typing import Dict, List, Set
+from typing import Any, Dict, List, Optional, Set, Tuple
 
 from altimeter.aws.auth.accessor import Accessor
 from altimeter.core.awslambda import get_required_lambda_env_var
@@ -24,7 +24,7 @@ from altimeter.aws.scan.account_scan_plan import AccountScanPlan
 from altimeter.aws.scan.scan_manifest import ScanManifest
 
 
-def lambda_handler(event, context):
+def lambda_handler(event: Dict[str, Any], context: Any) -> None:
     account_scan_lambda_name = get_required_lambda_env_var("ACCOUNT_SCAN_LAMBDA_NAME")
     account_scan_lambda_timeout_str = get_required_lambda_env_var("ACCOUNT_SCAN_LAMBDA_TIMEOUT")
     try:
@@ -70,7 +70,7 @@ def lambda_handler(event, context):
     artifact_writer.write_artifact("manifest", scan_manifest.to_dict())
 
 
-def main(argv=None):
+def main(argv: Optional[List[str]] = None) -> int:
     if argv is None:
         argv = sys.argv[1:]
     parser = argparse.ArgumentParser()
@@ -88,7 +88,7 @@ def main(argv=None):
 
     logger = Logger()
     logger.info(
-        AWSLogEvents.ScanConfigured, config=str(config), output_dir=output_dir,
+        AWSLogEvents.ScanConfigured, config=str(config), output_dir=str(output_dir),
     )
 
     muxer = LocalAWSScanMuxer(output_dir=output_dir, config=config,)
@@ -105,9 +105,10 @@ def main(argv=None):
 
     artifact_writer.write_artifact("manifest", scan_manifest.to_dict())
     print(scan_manifest.master_artifact)
+    return 0
 
 
-def get_sub_account_ids(account_ids: List[str], accessor: Accessor) -> List[str]:
+def get_sub_account_ids(account_ids: Tuple[str, ...], accessor: Accessor) -> Tuple[str, ...]:
     logger = Logger()
     logger.info(event=AWSLogEvents.GetSubAccountsStart)
     sub_account_ids: Set[str] = set(account_ids)
@@ -124,7 +125,7 @@ def get_sub_account_ids(account_ids: List[str], accessor: Accessor) -> List[str]
                             account_id = account_resp["Id"]
                             sub_account_ids.add(account_id)
     logger.info(event=AWSLogEvents.GetSubAccountsEnd)
-    return list(sub_account_ids)
+    return tuple(sub_account_ids)
 
 
 def scan(
@@ -143,10 +144,10 @@ def scan(
     logger = Logger()
     logger.info(event=AWSLogEvents.ScanAWSAccountsStart)
     # now combine account_scan_results and org_details to build a ScanManifest
-    scanned_accounts: List[Dict[str, str]] = []
+    scanned_accounts: List[str] = []
     artifacts: List[str] = []
     errors: Dict[str, List[str]] = {}
-    unscanned_accounts: List[Dict[str, str]] = []
+    unscanned_accounts: List[str] = []
     stats = MultilevelCounter()
     graph_set = None
 
@@ -170,17 +171,14 @@ def scan(
             unscanned_accounts.append(account_id)
         account_stats = MultilevelCounter.from_dict(account_scan_manifest.api_call_stats)
         stats.merge(account_stats)
-    master_artifact_path = None
-    if graph_set:
-        master_artifact_path = artifact_writer.write_artifact(
-            name="master", data=graph_set.to_dict()
-        )
+    if graph_set is None:
+        raise Exception("BUG: No graph_set generated.")
+    master_artifact_path = artifact_writer.write_artifact(
+        name="master", data=graph_set.to_dict()
+    )
     logger.info(event=AWSLogEvents.ScanAWSAccountsEnd)
-    if graph_set:
-        start_time = graph_set.start_time
-        end_time = graph_set.end_time
-    else:
-        start_time, end_time = None, None
+    start_time = graph_set.start_time
+    end_time = graph_set.end_time
     return ScanManifest(
         scanned_accounts=scanned_accounts,
         master_artifact=master_artifact_path,

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Load RDF from S3 into Neptune"""
 import json
+from typing import Any, Dict
 import urllib
 
 import boto3
@@ -10,7 +11,7 @@ from altimeter.core.log import Logger, LogEvent
 from altimeter.core.neptune.client import AltimeterNeptuneClient, NeptuneEndpoint
 
 
-def lambda_handler(event, context):
+def lambda_handler(event: Dict[str, Any], context: Any) -> None:
     rdf_bucket = event["Records"][0]["s3"]["bucket"]["name"]
     rdf_key = urllib.parse.unquote(event["Records"][0]["s3"]["object"]["key"])
 
@@ -19,6 +20,11 @@ def lambda_handler(event, context):
     neptune_region = get_required_lambda_env_var("NEPTUNE_REGION")
     neptune_load_iam_role_arn = get_required_lambda_env_var("NEPTUNE_LOAD_IAM_ROLE_ARN")
     on_success_sns_topic_arn = get_required_lambda_env_var("ON_SUCCESS_SNS_TOPIC_ARN")
+
+    try:
+        neptune_port = int(neptune_port)
+    except ValueError as ve:
+        raise Exception(f"env var NEPTUNE_PORT must be an int: {ve}")
 
     endpoint = NeptuneEndpoint(host=neptune_host, port=neptune_port, region=neptune_region)
     neptune_client = AltimeterNeptuneClient(max_age_min=1440, neptune_endpoint=endpoint)

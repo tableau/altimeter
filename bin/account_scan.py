@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import json
 from pathlib import Path
+from typing import Any, Dict
 
 from altimeter.core.artifact_io.writer import S3ArtifactWriter
 from altimeter.aws.scan.account_scanner import AccountScanner
@@ -10,7 +11,7 @@ from altimeter.core.awslambda import get_required_lambda_event_var
 from altimeter.core.config import Config
 
 
-def lambda_handler(event, context):
+def lambda_handler(event: Dict[str, Any], context: Any) -> None:
     account_scan_plan_dict = get_required_lambda_event_var(event, "account_scan_plan")
     account_scan_plan = AccountScanPlan.from_dict(account_scan_plan_dict)
     json_bucket = get_required_lambda_event_var(event, "json_bucket")

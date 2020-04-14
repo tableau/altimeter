@@ -11,21 +11,21 @@ class ScanManifest:
     scan datetime and api call statistics.
 
     Args:
-        scanned_accounts: Dict of account_ids to account detail dicts for scanned accounts
+        scanned_accounts: List of account ids which were scanned
         master_artifact: artifact containing complete graph json
         artifacts: list of artifacts, one per account
         errors: Dict of account_ids to list of errors encountered during scan
-        unscanned_accounts: Dict of account_ids to account detail dicts for unscanned accounts
+        unscanned_accounts: List of account ids which were not scanned
         api_call_stats: api call stats for this scan
         start_time: epoch timestamp of scan start time
         end_time: epoch timestamp of scan end time
     """
 
-    scanned_accounts: List[Dict[str, str]]
+    scanned_accounts: List[str]
     master_artifact: str
     artifacts: List[str]
     errors: Dict[str, List[str]]
-    unscanned_accounts: List[Dict[str, str]]
+    unscanned_accounts: List[str]
     api_call_stats: Dict[str, Any]
     start_time: int
     end_time: int
