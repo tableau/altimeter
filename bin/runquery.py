@@ -8,14 +8,19 @@ import hashlib
 import json
 import sys
 import time
+from typing import Any, Dict, List, Optional
 
 import boto3
 
-from altimeter.core.awslambda import get_required_lambda_env_var, get_required_lambda_event_var
+from altimeter.core.awslambda import (
+    get_required_int_env_var,
+    get_required_str_env_var,
+    get_required_lambda_event_var,
+)
 from altimeter.core.neptune.client import AltimeterNeptuneClient, NeptuneEndpoint
 
 
-def lambda_handler(event, context):
+def lambda_handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     graph_names_list = get_required_lambda_event_var(event, "graph_names")
     if not isinstance(graph_names_list, list):
         raise ValueError(f"Value for graph_names should be a list. Is {type(graph_names_list)}")
@@ -27,10 +32,10 @@ def lambda_handler(event, context):
     if not isinstance(max_age_min, int):
         raise ValueError(f"Value for max_age_min should be an int. Is {type(max_age_min)}")
 
-    host = get_required_lambda_env_var("NEPTUNE_HOST")
-    port = get_required_lambda_env_var("NEPTUNE_PORT")
-    region = get_required_lambda_env_var("NEPTUNE_REGION")
-    results_bucket = get_required_lambda_env_var("RESULTS_BUCKET")
+    host = get_required_str_env_var("NEPTUNE_HOST")
+    port = get_required_int_env_var("NEPTUNE_PORT")
+    region = get_required_str_env_var("NEPTUNE_REGION")
+    results_bucket = get_required_str_env_var("RESULTS_BUCKET")
 
     endpoint = NeptuneEndpoint(host=host, port=port, region=region)
     client = AltimeterNeptuneClient(max_age_min=max_age_min, neptune_endpoint=endpoint)
@@ -51,7 +56,7 @@ def lambda_handler(event, context):
     }
 
 
-def get_runquery_lambda_name():
+def get_runquery_lambda_name() -> str:
     runquery_lambda_name_prefix = "ITCloudGraph-RunQuery-"
     lambda_client = boto3.client("lambda")
     paginator = lambda_client.get_paginator("list_functions")
@@ -67,7 +72,7 @@ def get_runquery_lambda_name():
     )
 
 
-def main(argv=None):
+def main(argv: Optional[List[str]] = None) -> int:
     import argparse
 
     if argv is None:
@@ -107,6 +112,7 @@ def main(argv=None):
     results_bytes = s3_resp["Body"].read()
     results_str = results_bytes.decode("utf-8")
     print(results_str)
+    return 0
 
 
 if __name__ == "__main__":

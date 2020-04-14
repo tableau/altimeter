@@ -5,25 +5,41 @@ from typing import Any, Dict
 from altimeter.core.awslambda.exceptions import (
     RequiredEnvironmentVariableNotPresentException,
     RequiredEventVariableNotPresentException,
+    RequiredVariableNotPresentException,
 )
 
 
-def get_required_lambda_env_var(key: str) -> str:
-    """Get a variable from os.environ.
-
-    Args:
-        key: Key to look up in the os environment.
-
-    Returns:
-        String value for the given key
-
-    Raises:
-        RequiredEnvironmentVariableNotPresentException if key is not present.
-    """
-    value = os.environ.get(key)
+def _get_required_var(key: str, data: Dict[str, Any]) -> str:
+    """Get a value from a dict coerced to str.
+    raise RequiredVariableNotPresentException if it does not exist"""
+    value = data.get(key)
     if value is None:
-        raise RequiredEnvironmentVariableNotPresentException(f"Missing required env var {key}")
-    return value
+        raise RequiredVariableNotPresentException(f"Missing required var {key}")
+    return str(value)
+
+
+def _get_required_env_var(key: str) -> str:
+    """Get a required env var coerced to a string.
+    raise RequiredEnvironmentVariableNotPresentException if it does not exist"""
+    try:
+        return _get_required_var(key, dict(os.environ))
+    except RequiredVariableNotPresentException as rvnpe:
+        raise RequiredEnvironmentVariableNotPresentException(str(rvnpe))
+
+
+def get_required_str_env_var(key: str) -> str:
+    """Get a required string env variable"""
+    return _get_required_env_var(key)
+
+
+def get_required_int_env_var(key: str) -> int:
+    """Get a required integer env variable.
+    Raise ValueError if it is not an integer"""
+    value = _get_required_env_var(key)
+    try:
+        return int(value)
+    except ValueError as ve:
+        raise ValueError(f"env var {key} must contain an integer value, not {value}: {ve}")
 
 
 def get_required_lambda_event_var(event: Dict[str, Any], key: str) -> Any:

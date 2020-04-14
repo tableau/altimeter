@@ -17,9 +17,9 @@ if [ -z "$PYLINT_MIN_SCORE" ]; then
     PYLINT_MIN_SCORE=9
 fi
 dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd -P)
-black_cmd="black -l 100 --check $src_dir $bin"
-lint_cmd="$dir/lint.py $src_dir ${PYLINT_MIN_SCORE}"
-mypy_cmd="mypy --ignore-missing-imports --disallow-untyped-defs $src_dir"
+black_cmd="black -l 100 --check $src_dir bin"
+lint_cmd="$dir/lint.py $src_dir bin --min_score ${PYLINT_MIN_SCORE}"
+mypy_cmd="mypy --ignore-missing-imports --disallow-untyped-defs $src_dir bin"
 vulture_cmd="vulture --ignore-names lambda_handler altimeter bin"
 pyflakes_cmd="pyflakes altimeter bin"
 

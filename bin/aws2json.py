@@ -7,7 +7,7 @@ import sys
 from typing import Any, Dict, List, Optional, Set, Tuple
 
 from altimeter.aws.auth.accessor import Accessor
-from altimeter.core.awslambda import get_required_lambda_env_var
+from altimeter.core.awslambda import get_required_int_env_var, get_required_str_env_var
 from altimeter.core.config import Config
 from altimeter.core.graph.graph_set import GraphSet
 from altimeter.core.log import Logger
@@ -25,13 +25,9 @@ from altimeter.aws.scan.scan_manifest import ScanManifest
 
 
 def lambda_handler(event: Dict[str, Any], context: Any) -> None:
-    account_scan_lambda_name = get_required_lambda_env_var("ACCOUNT_SCAN_LAMBDA_NAME")
-    account_scan_lambda_timeout_str = get_required_lambda_env_var("ACCOUNT_SCAN_LAMBDA_TIMEOUT")
-    try:
-        account_scan_lambda_timeout = int(account_scan_lambda_timeout_str)
-    except ValueError as ve:
-        raise Exception(f'Parameter "ACCOUNT_SCAN_LAMBDA_TIMEOUT" must be an int: {ve}')
-    json_bucket = get_required_lambda_env_var("JSON_BUCKET")
+    account_scan_lambda_name = get_required_str_env_var("ACCOUNT_SCAN_LAMBDA_NAME")
+    account_scan_lambda_timeout = get_required_int_env_var("ACCOUNT_SCAN_LAMBDA_TIMEOUT")
+    json_bucket = get_required_str_env_var("JSON_BUCKET")
 
     config = Config.from_file(Path("./conf/lambda.toml"))
 
@@ -173,9 +169,7 @@ def scan(
         stats.merge(account_stats)
     if graph_set is None:
         raise Exception("BUG: No graph_set generated.")
-    master_artifact_path = artifact_writer.write_artifact(
-        name="master", data=graph_set.to_dict()
-    )
+    master_artifact_path = artifact_writer.write_artifact(name="master", data=graph_set.to_dict())
     logger.info(event=AWSLogEvents.ScanAWSAccountsEnd)
     start_time = graph_set.start_time
     end_time = graph_set.end_time

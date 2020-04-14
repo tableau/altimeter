@@ -4,24 +4,16 @@ from datetime import datetime
 from typing import Any, Dict
 
 from altimeter.core.log import LogEvent, Logger
-from altimeter.core.awslambda import get_required_lambda_env_var
+from altimeter.core.awslambda import get_required_int_env_var, get_required_str_env_var
 from altimeter.core.neptune.client import AltimeterNeptuneClient, NeptuneEndpoint
 
 
 def lambda_handler(event: Dict[str, Any], context: Any) -> None:
-    host = get_required_lambda_env_var("NEPTUNE_HOST")
-    port = get_required_lambda_env_var("NEPTUNE_PORT")
-    region = get_required_lambda_env_var("NEPTUNE_REGION")
-    max_age_min = get_required_lambda_env_var("MAX_AGE_MIN")
-    graph_name = get_required_lambda_env_var("GRAPH_NAME")
-    try:
-        max_age_min = int(max_age_min)
-    except ValueError as ve:
-        raise Exception(f"env var MAX_AGE_MIN must be an int: {ve}")
-    try:
-        port = int(port)
-    except ValueError as ve:
-        raise Exception(f"env var NEPTUNE_PORT must be an int: {ve}")
+    host = get_required_str_env_var("NEPTUNE_HOST")
+    port = get_required_int_env_var("NEPTUNE_PORT")
+    region = get_required_str_env_var("NEPTUNE_REGION")
+    max_age_min = get_required_int_env_var("MAX_AGE_MIN")
+    graph_name = get_required_str_env_var("GRAPH_NAME")
     now = int(datetime.now().timestamp())
     oldest_acceptable_graph_epoch = now - max_age_min * 60
 

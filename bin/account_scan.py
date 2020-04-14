@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+"""Scan a set of accounts as defined by an AccountScanPlan"""
 import json
 from pathlib import Path
 from typing import Any, Dict

@@ -11,12 +11,14 @@ from pylint import lint
 LOGGER = logging.getLogger(__name__)
 
 
-def lint_py(base_dir: str, min_score: int) -> int:
-    LOGGER.info("=" * 78)
-    LOGGER.info("Running pylint against %s with minimum score %d", base_dir, min_score)
-    LOGGER.info("=" * 78)
-    files = glob.glob("{}/**/*.py".format(base_dir), recursive=True)
-    errors = lint_files(files, min_score)
+def lint_py(src_dirs: List[str], min_score: int) -> int:
+    errors = []
+    for src_dir in src_dirs:
+        LOGGER.info("=" * 78)
+        LOGGER.info("Running pylint against %s with minimum score %d", src_dir, min_score)
+        LOGGER.info("=" * 78)
+        files = glob.glob("{}/**/*.py".format(src_dir), recursive=True)
+        errors += lint_files(files, min_score)
     if errors:
         LOGGER.error("=" * 78)
         LOGGER.error("pylint with minimum score %s failed:", min_score)
@@ -25,7 +27,7 @@ def lint_py(base_dir: str, min_score: int) -> int:
         LOGGER.error("=" * 78)
         return 1
     LOGGER.info("=" * 78)
-    LOGGER.info("pylint against %s with minimum score %d completed successfully", files, min_score)
+    LOGGER.info("pylint against %s with minimum score %d completed successfully", src_dirs, min_score)
     LOGGER.info("=" * 78)
     return 0
 
@@ -65,13 +67,13 @@ def main(argv=None):
         argv = sys.argv[1:]
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("base_dir", type=str, help="Base dir to recursively lint")
+    parser.add_argument("src_dirs", type=str, nargs="+", help="Source dirs to recursively lint")
     parser.add_argument(
-        "min_score", type=check_range, help="Minimum integer score, between 0 and 10."
+        "--min_score", type=check_range, help="Minimum integer score, between 0 and 10."
     )
 
     args_ns = parser.parse_args(argv)
-    return lint_py(args_ns.base_dir, args_ns.min_score)
+    return lint_py(args_ns.src_dirs, args_ns.min_score)
 
 
 if __name__ == "__main__":

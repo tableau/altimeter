@@ -7,13 +7,13 @@ import gzip
 import json
 import sys
 from typing import Any, Dict, List, Optional
-import urllib
+import urllib.parse
 
 import boto3
 from botocore.client import BaseClient
 from rdflib import Graph
 
-from altimeter.core.awslambda import get_required_lambda_env_var
+from altimeter.core.awslambda import get_required_str_env_var
 from altimeter.core.graph.graph_set import GraphSet
 from altimeter.core.log import Logger, LogEvent
 
@@ -59,7 +59,7 @@ def graph_pkg_from_s3(s3_client: BaseClient, json_bucket: str, json_key: str) ->
 def lambda_handler(event: Dict[str, Any], context: Any) -> None:
     json_bucket = event["Records"][0]["s3"]["bucket"]["name"]
     json_key = urllib.parse.unquote(event["Records"][0]["s3"]["object"]["key"])
-    rdf_bucket = get_required_lambda_env_var("RDF_BUCKET")
+    rdf_bucket = get_required_str_env_var("RDF_BUCKET")
     rdf_key = ".".join(json_key.split(".")[:-1]) + ".rdf.gz"
     session = boto3.Session()
     s3_client = session.client("s3")
