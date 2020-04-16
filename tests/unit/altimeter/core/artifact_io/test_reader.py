@@ -6,7 +6,8 @@ import boto3
 import moto
 
 from altimeter.core.artifact_io.exceptions import InvalidS3URIException
-from altimeter.core.artifact_io.reader import FileArtifactReader, S3ArtifactReader, parse_s3_uri
+from altimeter.core.artifact_io.reader import FileArtifactReader, S3ArtifactReader
+from altimeter.core.artifact_io import parse_s3_uri
 
 
 class TestFileArtifactReader(unittest.TestCase):
@@ -16,7 +17,7 @@ class TestFileArtifactReader(unittest.TestCase):
         with tempfile.NamedTemporaryFile() as temp:
             temp.write(json.dumps(data).encode("utf-8"))
             temp.flush()
-            read_data = artifact_reader.read_artifact(temp.name)
+            read_data = artifact_reader.read_json(temp.name)
         self.assertDictEqual(data, read_data)
 
     def test_with_invalid_file(self):
@@ -26,7 +27,7 @@ class TestFileArtifactReader(unittest.TestCase):
             temp.write(data.encode("utf-8"))
             temp.flush()
             with self.assertRaises(json.JSONDecodeError):
-                artifact_reader.read_artifact(temp.name)
+                artifact_reader.read_json(temp.name)
 
 
 class TestS3ArtifactReader(unittest.TestCase):
@@ -37,7 +38,7 @@ class TestS3ArtifactReader(unittest.TestCase):
         s3_client.create_bucket(Bucket="test_bucket")
         s3_client.put_object(Bucket="test_bucket", Key="key", Body=json.dumps(data).encode("utf-8"))
         artifact_reader = S3ArtifactReader()
-        read_data = artifact_reader.read_artifact("s3://test_bucket/key")
+        read_data = artifact_reader.read_json("s3://test_bucket/key")
         self.assertDictEqual(data, read_data)
 
 

@@ -13,7 +13,7 @@ class InvalidConfigException(Exception):
     """Indicates an invalid configuration"""
 
 
-def get_required_param(key: str, config_dict: Dict[str, Any]) -> Any:
+def _get_required_param(key: str, config_dict: Dict[str, Any]) -> Any:
     """Get a parameter by key from a config dict. Raise InvalidConfigException if it does
     not exist."""
     value = config_dict.get(key)
@@ -25,7 +25,7 @@ def get_required_param(key: str, config_dict: Dict[str, Any]) -> Any:
 def get_required_list_param(key: str, config_dict: Dict[str, Any]) -> Tuple[Any, ...]:
     """Get a list parameter by key from a config dict. Raise InvalidConfigException if it does
     not exist or its value is not a list. Return as a tuple."""
-    value = get_required_param(key, config_dict)
+    value = _get_required_param(key, config_dict)
     if not isinstance(value, list):
         raise InvalidConfigException(f"Parameter '{key}' should be a list. Is {type(value)}")
     return tuple(value)
@@ -34,7 +34,7 @@ def get_required_list_param(key: str, config_dict: Dict[str, Any]) -> Tuple[Any,
 def get_required_bool_param(key: str, config_dict: Dict[str, Any]) -> bool:
     """Get a bool parameter by key from a config dict. Raise InvalidConfigException if it does
     not exist or its value is not a bool."""
-    value = get_required_param(key, config_dict)
+    value = _get_required_param(key, config_dict)
     if not isinstance(value, bool):
         raise InvalidConfigException(f"Parameter '{key}' should be a bool. Is {type(value)}")
     return value
@@ -43,9 +43,18 @@ def get_required_bool_param(key: str, config_dict: Dict[str, Any]) -> bool:
 def get_required_int_param(key: str, config_dict: Dict[str, Any]) -> int:
     """Get a int parameter by key from a config dict. Raise InvalidConfigException if it does
     not exist or its value is not a int."""
-    value = get_required_param(key, config_dict)
+    value = _get_required_param(key, config_dict)
     if not isinstance(value, int):
         raise InvalidConfigException(f"Parameter '{key}' should be a int. Is {type(value)}")
+    return value
+
+
+def get_required_str_param(key: str, config_dict: Dict[str, Any]) -> str:
+    """Get a str parameter by key from a config dict. Raise InvalidConfigException if it does
+    not exist or its value is not a str."""
+    value = _get_required_param(key, config_dict)
+    if not isinstance(value, str):
+        raise InvalidConfigException(f"Parameter '{key}' should be a str. Is {type(value)}")
     return value
 
 
@@ -138,6 +147,7 @@ class Config:
     access: AccessConfig
     concurrency: ConcurrencyConfig
     scan: ScanConfig
+    artifact_path: str
 
     def __post_init__(self) -> None:
         if (
@@ -167,7 +177,11 @@ class Config:
             access = AccessConfig.from_dict(access_dict)
         except InvalidConfigException as ice:
             raise InvalidConfigException(f"{str(ice)} in section 'access'")
-        return Config(access=access, concurrency=concurrency, scan=scan,)
+        artifact_path = get_required_str_param("artifact_path", config_dict)
+
+        return Config(
+            access=access, concurrency=concurrency, scan=scan, artifact_path=artifact_path,
+        )
 
     @classmethod
     def from_file(cls: Type["Config"], filepath: Path) -> "Config":

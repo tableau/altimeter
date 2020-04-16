@@ -16,10 +16,12 @@ class AWSScanMuxer(abc.ABC):
     a local run or invoke a Lambda-per-account in the case of Altimeter running on AWS Lambda.
 
     Args:
+        scan_id: unique scan identifier
         config: Config object
     """
 
-    def __init__(self, config: Config):
+    def __init__(self, scan_id: str, config: Config):
+        self.scan_id = scan_id
         self.config = config
 
     def scan(

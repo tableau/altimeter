@@ -1,5 +1,8 @@
 # This configuration will cause altimeter to scan the currently logged in account
 # and any of its subaccounts, using the OrganizationAccountAccessRole
+
+artifact_path = "/tmp/altimeter_multi_account"
+
 [access]
     cache_creds = true
     [[access.multi_hop_accessors]]

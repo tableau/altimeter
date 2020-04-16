@@ -1,36 +1,22 @@
 #!/usr/bin/env python3
 """Convert intermediate JSON to RDF."""
-import argparse
-from dataclasses import dataclass
 import io
 import gzip
 import json
-import sys
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict
 import urllib.parse
 
 import boto3
 from botocore.client import BaseClient
-from rdflib import Graph
 
-from altimeter.core.parameters import get_required_str_env_var
 from altimeter.core.graph.graph_set import GraphSet
+from altimeter.core.parameters import get_required_str_env_var
 from altimeter.core.log import Logger, LogEvent
+from altimeter.core.rdf import GraphPackage
 
 
-@dataclass(frozen=True)
-class GraphPackage:
-    """Represents a rdflib.Graph and associated metadata."""
-
-    graph: Graph
-    name: str
-    version: str
-    start_time: int
-    end_time: int
-
-
-def graph_set_from_s3(s3_client: BaseClient, json_bucket: str, json_key: str) -> GraphSet:
-    """Load a GraphSet from json located in an s3 object."""
+def graph_pkg_from_s3(s3_client: BaseClient, json_bucket: str, json_key: str) -> GraphPackage:
+    """Create an GraphPackage object from json content in an s3 object."""
     logger = Logger()
     logger.info(event=LogEvent.ReadFromS3Start)
     with io.BytesIO() as json_bytes_buf:
@@ -41,12 +27,7 @@ def graph_set_from_s3(s3_client: BaseClient, json_bucket: str, json_key: str) ->
         logger.info(event=LogEvent.ReadFromS3End)
     graph_set_str = graph_set_bytes.decode("utf-8")
     graph_set_dict = json.loads(graph_set_str)
-    return GraphSet.from_dict(graph_set_dict)
-
-
-def graph_pkg_from_s3(s3_client: BaseClient, json_bucket: str, json_key: str) -> GraphPackage:
-    """Create an GraphPackage object from json content in an s3 object."""
-    graph_set = graph_set_from_s3(s3_client=s3_client, json_bucket=json_bucket, json_key=json_key)
+    graph_set = GraphSet.from_dict(graph_set_dict)
     return GraphPackage(
         graph=graph_set.to_rdf(),
         name=graph_set.name,
@@ -91,30 +72,3 @@ def lambda_handler(event: Dict[str, Any], context: Any) -> None:
                 },
             )
         logger.info(event=LogEvent.WriteToS3End)
-
-
-def graph_set_from_filepath(filepath: str) -> GraphSet:
-    with open(filepath, "r") as fp:
-        graph_set_dict = json.load(fp)
-    return GraphSet.from_dict(data=graph_set_dict)
-
-
-def graph_from_filepath(filepath: str) -> Graph:
-    graph_set = graph_set_from_filepath(filepath)
-    return graph_set.to_rdf()
-
-
-def main(argv: Optional[List[str]] = None) -> int:
-    if argv is None:
-        argv = sys.argv[1:]
-    parser = argparse.ArgumentParser()
-    parser.add_argument("infile", type=str)
-    parser.add_argument("outfile", type=str)
-    args_ns = parser.parse_args(argv)
-    graph = graph_from_filepath(args_ns.infile)
-    graph.serialize(args_ns.outfile)
-    return 0
-
-
-if __name__ == "__main__":
-    sys.exit(main())

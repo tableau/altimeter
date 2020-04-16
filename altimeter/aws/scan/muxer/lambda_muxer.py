@@ -14,29 +14,25 @@ from altimeter.core.log import Logger
 
 
 class LambdaAWSScanMuxer(AWSScanMuxer):
-    """AWSScanMuxer that runs account scans one-per-lambda
+    """AWSScanMuxer that runs account scans in AccountScan lambdas
 
     Args:
+        scan_id: unique scan identifier
         account_scan_lambda_name: name of the AccountScan lambda
         account_scan_lambda_timeout: timeout for the AccountScan lambda
-        json_bucket: bucket to dump json output into
-        key_prefix: prefix for json output objects
         config: Config object
     """
 
     def __init__(
         self,
+        scan_id: str,
         account_scan_lambda_name: str,
         account_scan_lambda_timeout: int,
-        json_bucket: str,
-        key_prefix: str,
         config: Config,
     ):
-        super().__init__(config=config)
+        super().__init__(scan_id=scan_id, config=config)
         self.account_scan_lambda_name = account_scan_lambda_name
         self.account_scan_lambda_timeout = account_scan_lambda_timeout
-        self.json_bucket = json_bucket
-        self.key_prefix = key_prefix
 
     def _schedule_account_scan(
         self, executor: ThreadPoolExecutor, account_scan_plan: AccountScanPlan
@@ -45,8 +41,7 @@ class LambdaAWSScanMuxer(AWSScanMuxer):
         the proper arguments."""
         lambda_event = {
             "account_scan_plan": account_scan_plan.to_dict(),
-            "json_bucket": self.json_bucket,
-            "key_prefix": self.key_prefix,
+            "scan_id": self.scan_id,
         }
         return executor.submit(
             invoke_lambda,

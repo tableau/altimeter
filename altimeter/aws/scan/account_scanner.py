@@ -70,9 +70,6 @@ class AccountScanner:
     Args:
         account_scan_plan: AccountScanPlan describing scan targets
         artifact_writer: ArtifactWriter for writing out artifacts
-        scan_sub_accounts: Whether to auto-scan any org sub accounts of the target accounts
-        max_threads: max number of scan worker threads to spawn
-        preferred_account_scan_regions: tuple of region names to select from for non-regional
         graph_name: name of graph
         graph_version: version string for graph
     """
@@ -235,7 +232,7 @@ class AccountScanner:
                     stats=MultilevelCounter(),
                 )
                 account_graph_set.validate()
-                output_artifact = self.artifact_writer.write_artifact(
+                output_artifact = self.artifact_writer.write_json(
                     name=account_id, data=account_graph_set.to_dict()
                 )
                 logger.info(event=AWSLogEvents.ScanAWSAccountEnd)
@@ -283,7 +280,7 @@ class AccountScanner:
                     for graph_set_dict in graph_set_dicts:
                         graph_set = GraphSet.from_dict(graph_set_dict)
                         account_graph_set.merge(graph_set)
-                output_artifact = self.artifact_writer.write_artifact(
+                output_artifact = self.artifact_writer.write_json(
                     name=account_id, data=account_graph_set.to_dict()
                 )
                 logger.info(event=AWSLogEvents.ScanAWSAccountEnd)

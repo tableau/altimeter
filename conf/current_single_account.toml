@@ -1,4 +1,7 @@
 # This configuration will cause altimeter to scan the currently logged in account.
+
+artifact_path = "/tmp/altimeter_single_account"
+
 [access]
     cache_creds = true
 
@@ -6,7 +9,7 @@
     # accounts to scan
     accounts = []
     # regions to scan. If empty, scan all available regions
-    regions = []
+    regions = ["us-west-2"]
     # if true, discover and scan subaccounts of the above accounts
     scan_sub_accounts = false
     # preferred regions to use when scanning non-regional resources (e.g. IAM policies)
