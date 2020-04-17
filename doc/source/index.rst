@@ -25,14 +25,10 @@ User Documentation
     :caption: User Documentation
 
     user/quickstart
-    user/multiaccount_scanning
     user/local_blazegraph
     user/sample_queries
 
 :doc:`Quickstart <user/quickstart>` - Introductory guide to graphing a single AWS account.
-
-
-:doc:`MultiAccount Scanning <user/multiaccount_scanning>` - How to graph multiple accounts and organizations.
 
 Developer Documentation
 -----------------------
