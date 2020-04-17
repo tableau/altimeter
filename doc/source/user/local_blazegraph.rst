@@ -1,8 +1,7 @@
 Local Querying with Blazegraph
 ==============================
 
-Once you've generated an RDF for a single account (:doc:`Quickstart <quickstart>`)
-or for multiple accounts (:doc:`MultiAccount Scanning <multiaccount_scanning>`) you
+Once you've generated an RDF (:doc:`Quickstart <quickstart>`) you
 can load these results into a local Blazegraph instance for querying:
 
 ::
