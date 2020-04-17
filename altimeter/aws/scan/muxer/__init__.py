@@ -3,7 +3,7 @@ import abc
 from concurrent.futures import as_completed, Future, ThreadPoolExecutor
 from typing import Generator
 
-from altimeter.aws.log import AWSLogEvents
+from altimeter.aws.log_events import AWSLogEvents
 from altimeter.aws.scan.account_scan_plan import AccountScanPlan
 from altimeter.aws.scan.account_scan_manifest import AccountScanManifest
 from altimeter.core.config import Config

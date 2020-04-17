@@ -3,7 +3,7 @@ from typing import Type
 
 from botocore.client import BaseClient
 
-from altimeter.aws.log import AWSLogEvents
+from altimeter.aws.log_events import AWSLogEvents
 from altimeter.aws.resource.resource_spec import ListFromAWSResult
 from altimeter.aws.resource.ec2.security_group import SecurityGroupResourceSpec
 from altimeter.aws.resource.ec2.vpc import VPCResourceSpec

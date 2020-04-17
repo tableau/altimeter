@@ -10,7 +10,7 @@ from typing import Any, DefaultDict, Dict, List, Tuple, Type
 
 import boto3
 
-from altimeter.aws.log import AWSLogEvents
+from altimeter.aws.log_events import AWSLogEvents
 from altimeter.aws.resource.resource_spec import ScanGranularity, AWSResourceSpec
 from altimeter.aws.resource.unscanned_account import UnscannedAccountResourceSpec
 from altimeter.aws.scan.account_scan_plan import AccountScanPlan

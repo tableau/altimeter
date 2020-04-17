@@ -11,7 +11,8 @@ import boto3
 from altimeter.aws.auth.cache import AWSCredentialsCache
 from altimeter.aws.auth.exceptions import AccountAuthException
 from altimeter.aws.auth.multi_hop_accessor import MultiHopAccessor
-from altimeter.core.log import LogEvent, Logger
+from altimeter.core.log import Logger
+from altimeter.core.log_events import LogEvent
 
 
 @dataclass(frozen=True)

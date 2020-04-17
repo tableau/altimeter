@@ -13,7 +13,8 @@ import boto3
 from altimeter.core.artifact_io import is_s3_uri, parse_s3_uri
 from altimeter.core.config import Config
 from altimeter.core.json_encoder import json_encoder
-from altimeter.core.log import LogEvent, Logger
+from altimeter.core.log import Logger
+from altimeter.core.log_events import LogEvent
 from altimeter.core.rdf import GraphPackage
 
 GZIP = "gz"

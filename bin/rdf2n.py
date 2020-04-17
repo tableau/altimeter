@@ -7,7 +7,8 @@ import urllib.parse
 import boto3
 
 from altimeter.core.parameters import get_required_str_env_var, get_required_int_env_var
-from altimeter.core.log import Logger, LogEvent
+from altimeter.core.log import Logger
+from altimeter.core.log_events import LogEvent
 from altimeter.core.neptune.client import AltimeterNeptuneClient, NeptuneEndpoint
 
 

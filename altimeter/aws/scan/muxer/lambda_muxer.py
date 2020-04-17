@@ -6,7 +6,7 @@ from typing import Any, Dict
 import boto3
 import botocore
 
-from altimeter.aws.log import AWSLogEvents
+from altimeter.aws.log_events import AWSLogEvents
 from altimeter.aws.scan.muxer import AWSScanMuxer
 from altimeter.aws.scan.account_scan_plan import AccountScanPlan
 from altimeter.core.config import Config

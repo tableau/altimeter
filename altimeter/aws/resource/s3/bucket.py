@@ -4,7 +4,7 @@ from typing import Dict, List, Type
 from botocore.client import BaseClient
 from botocore.exceptions import ClientError
 
-from altimeter.aws.log import AWSLogEvents
+from altimeter.aws.log_events import AWSLogEvents
 from altimeter.aws.resource.resource_spec import ScanGranularity, ListFromAWSResult
 from altimeter.aws.resource.s3 import S3ResourceSpec
 from altimeter.aws.resource.kms.key import KMSKeyResourceSpec

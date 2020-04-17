@@ -11,7 +11,8 @@ from botocore.client import BaseClient
 
 from altimeter.core.graph.graph_set import GraphSet
 from altimeter.core.parameters import get_required_str_env_var
-from altimeter.core.log import Logger, LogEvent
+from altimeter.core.log import Logger
+from altimeter.core.log_events import LogEvent
 from altimeter.core.rdf import GraphPackage
 
 

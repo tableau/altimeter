@@ -8,7 +8,8 @@ from aws_requests_auth.aws_auth import AWSRequestsAuth
 import boto3
 import requests
 
-from altimeter.core.log import LogEvent, Logger
+from altimeter.core.log import Logger
+from altimeter.core.log_events import LogEvent
 from altimeter.core.neptune.exceptions import (
     NeptuneClearGraphException,
     NeptuneLoadGraphException,

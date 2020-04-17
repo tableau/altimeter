@@ -3,7 +3,8 @@
 from datetime import datetime
 from typing import Any, Dict
 
-from altimeter.core.log import LogEvent, Logger
+from altimeter.core.log import Logger
+from altimeter.core.log_events import LogEvent
 from altimeter.core.parameters import get_required_str_env_var, get_required_int_env_var
 from altimeter.core.neptune.client import AltimeterNeptuneClient, NeptuneEndpoint
 

@@ -7,7 +7,7 @@ import sys
 from typing import List, Optional
 import uuid
 
-from altimeter.aws.log import AWSLogEvents
+from altimeter.aws.log_events import AWSLogEvents
 from altimeter.aws.scan.muxer.local_muxer import LocalAWSScanMuxer
 from altimeter.aws.scan.scan import run_scan
 from altimeter.core.artifact_io.reader import ArtifactReader

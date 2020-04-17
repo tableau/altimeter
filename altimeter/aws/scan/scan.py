@@ -1,7 +1,7 @@
 from typing import Tuple, Set, List, Dict
 
 from altimeter.aws.auth.accessor import Accessor
-from altimeter.aws.log import AWSLogEvents
+from altimeter.aws.log_events import AWSLogEvents
 from altimeter.aws.scan.account_scan_plan import AccountScanPlan
 from altimeter.aws.scan.muxer import AWSScanMuxer
 from altimeter.aws.scan.scan_manifest import ScanManifest

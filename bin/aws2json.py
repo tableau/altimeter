@@ -9,7 +9,7 @@ from altimeter.aws.scan.scan import run_scan
 from altimeter.core.parameters import get_required_str_env_var, get_required_int_env_var
 from altimeter.core.config import Config
 from altimeter.core.log import Logger
-from altimeter.aws.log import AWSLogEvents
+from altimeter.aws.log_events import AWSLogEvents
 
 from altimeter.core.artifact_io.reader import ArtifactReader
 from altimeter.core.artifact_io.writer import ArtifactWriter

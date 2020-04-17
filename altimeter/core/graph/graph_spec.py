@@ -1,7 +1,8 @@
 """A GraphSpec contains a specification to scan and create a graph."""
 from typing import Any, List, Tuple, Type
 
-from altimeter.core.log import LogEvent, Logger
+from altimeter.core.log import Logger
+from altimeter.core.log_events import LogEvent
 
 from altimeter.core.resource.resource import Resource
 from altimeter.core.resource.resource_spec import ResourceSpec
