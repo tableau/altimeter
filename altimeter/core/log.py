@@ -58,32 +58,25 @@ class Singleton(type):
 
 LoggableTypes = Union[int, str, Dict]
 
-LOGGER_STACK = threading.local()
 
-
-def _get_loggers() -> List[structlog.BoundLogger]:
-    if not hasattr(LOGGER_STACK, "LOGGERS"):
-        LOGGER_STACK.LOGGERS = []
-    return LOGGER_STACK.LOGGERS
-
-
-class Logger(metaclass=Singleton):
-    """Logger singleton.  Provides contextmanager 'bind' which can be use to bind
+class BaseLogger:
+    """Provides contextmanager 'bind' which can be use to bind
     keys to the logger using 'with' syntax, they will be removed from the logger
-    in subsequent calls."""
+    in subsequent calls. In general use Logger, not BaseLogger directly."""
 
-    def __init__(self, log_tid: bool = True) -> None:
+    def __init__(self, log_tid: bool = True, in_test: bool = False) -> None:
         self._log_tid = log_tid
+        self.logger_stack = threading.local()
+
         log_processors = [
             structlog.stdlib.add_log_level,
-            structlog.stdlib.add_logger_name,
             structlog.stdlib.filter_by_level,
             structlog.processors.TimeStamper(fmt="iso"),
             structlog.processors.StackInfoRenderer(),
             structlog.processors.format_exc_info,
         ]
 
-        if os.environ.get("DEV_LOG", None):
+        if os.environ.get("DEV_LOG", "0") == "1":
             log_processors.append(structlog.dev.ConsoleRenderer(colors=True, force_colors=True))
         else:
             log_processors.append(structlog.processors.JSONRenderer(sort_keys=True))
@@ -92,18 +85,24 @@ class Logger(metaclass=Singleton):
             logger_factory=structlog.stdlib.LoggerFactory(), processors=log_processors
         )
 
-        root = logging.getLogger()
-        if root.handlers:
-            for handler in root.handlers:
-                root.removeHandler(handler)
+        if not in_test:
+            root = logging.getLogger()
+            if root.handlers:
+                for handler in root.handlers:
+                    root.removeHandler(handler)
 
         logging.basicConfig(
             level=os.environ.get("LOG_LEVEL", "INFO"), stream=sys.stdout, format="%(message)s"
         )
         logging.getLogger("botocore").setLevel(logging.ERROR)
 
+    def _get_loggers(self) -> List[structlog.BoundLogger]:
+        if not hasattr(self.logger_stack, "loggers"):
+            self.logger_stack.loggers = []
+        return self.logger_stack.loggers
+
     def _get_current_logger(self) -> structlog.BoundLogger:
-        loggers = _get_loggers()
+        loggers = self._get_loggers()
         if not loggers:
             logger = structlog.get_logger()
             if self._log_tid:
@@ -147,15 +146,6 @@ class Logger(metaclass=Singleton):
         """
         self._get_current_logger().warning(event=event.name, **kwargs)
 
-    def err(self, event: EventName, **kwargs: LoggableTypes) -> None:
-        """Create ERROR level log entry.
-
-        Args:
-            event: EventName object for this event
-            kwargs: log event k/vs
-        """
-        self._get_current_logger().err(event=event.name, **kwargs)
-
     def error(self, event: EventName, **kwargs: LoggableTypes) -> None:
         """Create ERROR level log entry.
 
@@ -170,9 +160,15 @@ class Logger(metaclass=Singleton):
         """Context manager to bind a set of k/vs to the logger.  The k/vs will be removed
         when the with block exits."""
         new_logger = self._get_current_logger().bind(**bindings)
-        loggers = _get_loggers()
+        loggers = self._get_loggers()
         loggers.append(new_logger)
         try:
             yield
         finally:
             loggers.pop()
+
+
+class Logger(BaseLogger, metaclass=Singleton):
+    """Singleton logger class"""
+
+    pass
