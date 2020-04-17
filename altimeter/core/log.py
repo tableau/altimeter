@@ -64,7 +64,7 @@ class BaseLogger:
     keys to the logger using 'with' syntax, they will be removed from the logger
     in subsequent calls. In general use Logger, not BaseLogger directly."""
 
-    def __init__(self, log_tid: bool = True, in_test: bool = False) -> None:
+    def __init__(self, log_tid: bool = True) -> None:
         self._log_tid = log_tid
         self.logger_stack = threading.local()
 
@@ -84,12 +84,6 @@ class BaseLogger:
         structlog.configure(
             logger_factory=structlog.stdlib.LoggerFactory(), processors=log_processors
         )
-
-        if not in_test:
-            root = logging.getLogger()
-            if root.handlers:
-                for handler in root.handlers:
-                    root.removeHandler(handler)
 
         logging.basicConfig(
             level=os.environ.get("LOG_LEVEL", "INFO"), stream=sys.stdout, format="%(message)s"

@@ -18,7 +18,7 @@ def test_debug(caplog):
     caplog.set_level(logging.DEBUG)
     tid = threading.get_ident()
     with patch.dict(os.environ, {}):
-        logger = BaseLogger(in_test=True)
+        logger = BaseLogger()
         logger.debug(event=TestLogEvent.TestEventA, a=1, b="hi-debug")
         record_dict = json.loads(caplog.records[0].message)
         expected_record_keys = {"event", "a", "b", "level", "tid", "timestamp"}
@@ -33,7 +33,7 @@ def test_info(caplog):
     caplog.set_level(logging.DEBUG)
     tid = threading.get_ident()
     with patch.dict(os.environ, {}):
-        logger = BaseLogger(in_test=True)
+        logger = BaseLogger()
         logger.info(event=TestLogEvent.TestEventA, a=1, b="hi-info")
         record_dict = json.loads(caplog.records[0].message)
         expected_record_keys = {"event", "a", "b", "level", "tid", "timestamp"}
@@ -48,7 +48,7 @@ def test_warn(caplog):
     caplog.set_level(logging.DEBUG)
     tid = threading.get_ident()
     with patch.dict(os.environ, {}):
-        logger = BaseLogger(in_test=True)
+        logger = BaseLogger()
         logger.warn(event=TestLogEvent.TestEventA, a=1, b="hi-warn")
         record_dict = json.loads(caplog.records[0].message)
         expected_record_keys = {"event", "a", "b", "level", "tid", "timestamp"}
@@ -63,7 +63,7 @@ def test_warning(caplog):
     caplog.set_level(logging.DEBUG)
     tid = threading.get_ident()
     with patch.dict(os.environ, {}):
-        logger = BaseLogger(in_test=True)
+        logger = BaseLogger()
         logger.warning(event=TestLogEvent.TestEventA, a=1, b="hi-warning")
         record_dict = json.loads(caplog.records[0].message)
         expected_record_keys = {"event", "a", "b", "level", "tid", "timestamp"}
@@ -78,7 +78,7 @@ def test_error(caplog):
     caplog.set_level(logging.DEBUG)
     tid = threading.get_ident()
     with patch.dict(os.environ, {}):
-        logger = BaseLogger(in_test=True)
+        logger = BaseLogger()
         logger.error(event=TestLogEvent.TestEventA, a=1, b="hi-error")
         record_dict = json.loads(caplog.records[0].message)
         expected_record_keys = {"event", "a", "b", "level", "tid", "timestamp"}
@@ -92,7 +92,7 @@ def test_error(caplog):
 def test_no_tid(caplog):
     caplog.set_level(logging.DEBUG)
     with patch.dict(os.environ, {}):
-        logger = BaseLogger(log_tid=False, in_test=True)
+        logger = BaseLogger(log_tid=False)
         logger.info(event=TestLogEvent.TestEventA, a=1, b="hi-info")
         record_dict = json.loads(caplog.records[0].message)
         expected_record_keys = {"event", "a", "b", "level", "timestamp"}
@@ -106,7 +106,7 @@ def test_dev_log(caplog):
     caplog.set_level(logging.DEBUG)
     tid = threading.get_ident()
     with patch.dict(os.environ, {"DEV_LOG": "1"}):
-        logger = BaseLogger(in_test=True)
+        logger = BaseLogger()
         logger.info(event=TestLogEvent.TestEventA, a=1, b="hi-info")
         decolorized = escape_ansi(caplog.records[0].message)
         fields = decolorized.split()
