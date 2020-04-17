@@ -9,7 +9,7 @@ artifact_path = "/tmp/altimeter_single_account"
     # accounts to scan
     accounts = []
     # regions to scan. If empty, scan all available regions
-    regions = ["us-west-2"]
+    regions = []
     # if true, discover and scan subaccounts of the above accounts
     scan_sub_accounts = false
     # preferred regions to use when scanning non-regional resources (e.g. IAM policies)
