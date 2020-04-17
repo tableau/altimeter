@@ -5,10 +5,47 @@ import unittest
 import boto3
 import moto
 
+from altimeter.aws.auth.accessor import Accessor
 from altimeter.core.artifact_io.exceptions import InvalidS3URIException
-from altimeter.core.artifact_io.reader import FileArtifactReader, S3ArtifactReader
+from altimeter.core.artifact_io.reader import ArtifactReader, FileArtifactReader, S3ArtifactReader
 from altimeter.core.artifact_io import parse_s3_uri
+from altimeter.core.config import AccessConfig, ConcurrencyConfig, Config, ScanConfig
 
+
+class TestArtifactReader(unittest.TestCase):
+    def test_from_config_s3(self):
+        access = AccessConfig(accessor=Accessor(multi_hop_accessors=[]))
+        concurrency = ConcurrencyConfig(max_account_scan_threads=1,
+                                        max_accounts_per_thread=1,
+                                        max_svc_scan_threads=1)
+        scan = ScanConfig(accounts=[],
+                          regions=[],
+                          scan_sub_accounts=False,
+                          preferred_account_scan_regions=[],
+                          single_account_mode=True)
+        config = Config(access=access,
+                        concurrency=concurrency,
+                        scan=scan,
+                        artifact_path="s3://bucket/key")
+        reader = ArtifactReader.from_config(config=config)
+        self.assertIsInstance(reader, S3ArtifactReader)
+
+    def test_from_config_filepath(self):
+        access = AccessConfig(accessor=Accessor(multi_hop_accessors=[]))
+        concurrency = ConcurrencyConfig(max_account_scan_threads=1,
+                                        max_accounts_per_thread=1,
+                                        max_svc_scan_threads=1)
+        scan = ScanConfig(accounts=[],
+                          regions=[],
+                          scan_sub_accounts=False,
+                          preferred_account_scan_regions=[],
+                          single_account_mode=True)
+        config = Config(access=access,
+                        concurrency=concurrency,
+                        scan=scan,
+                        artifact_path="/file/path")
+        reader = ArtifactReader.from_config(config=config)
+        self.assertIsInstance(reader, FileArtifactReader)
 
 class TestFileArtifactReader(unittest.TestCase):
     def test_with_valid_file(self):
