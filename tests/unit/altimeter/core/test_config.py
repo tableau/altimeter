@@ -1,0 +1,73 @@
+from unittest import TestCase
+
+from altimeter.core.config import (
+    InvalidConfigException,
+    get_required_list_param,
+    get_required_bool_param,
+    get_required_int_param,
+    get_required_str_param,
+)
+
+class TestGetRequiredListParam(TestCase):
+    def test_present(self):
+        config_dict = {"foo": ["ab", "cd"]}
+        value = get_required_list_param("foo", config_dict)
+        self.assertEqual(value, ("ab", "cd"))
+
+    def test_absent(self):
+        config_dict = {"abcd": "foo"}
+        with self.assertRaises(InvalidConfigException):
+            get_required_list_param("foo", config_dict)
+
+    def test_nonlist(self):
+        config_dict = {"foo": "abcd"}
+        with self.assertRaises(InvalidConfigException):
+            get_required_list_param("foo", config_dict)
+
+class TestGetRequiredBoolParam(TestCase):
+    def test_present(self):
+        config_dict = {"foo": True}
+        value = get_required_bool_param("foo", config_dict)
+        self.assertEqual(value, True)
+
+    def test_absent(self):
+        config_dict = {"abcd": True}
+        with self.assertRaises(InvalidConfigException):
+            get_required_bool_param("foo", config_dict)
+
+    def test_nonbool(self):
+        config_dict = {"foo": "abcd"}
+        with self.assertRaises(InvalidConfigException):
+            get_required_bool_param("foo", config_dict)
+
+class TestGetRequiredIntParam(TestCase):
+    def test_present(self):
+        config_dict = {"foo": 1}
+        value = get_required_int_param("foo", config_dict)
+        self.assertEqual(value, 1)
+
+    def test_absent(self):
+        config_dict = {"abcd": 1}
+        with self.assertRaises(InvalidConfigException):
+            get_required_int_param("foo", config_dict)
+
+    def test_nonint(self):
+        config_dict = {"foo": "abcd"}
+        with self.assertRaises(InvalidConfigException):
+            get_required_int_param("foo", config_dict)
+
+class TestGetRequiredStrParam(TestCase):
+    def test_present(self):
+        config_dict = {"foo": "abcd"}
+        value = get_required_str_param("foo", config_dict)
+        self.assertEqual(value, "abcd")
+
+    def test_absent(self):
+        config_dict = {"abcd": "foo"}
+        with self.assertRaises(InvalidConfigException):
+            get_required_str_param("foo", config_dict)
+
+    def test_nonstr(self):
+        config_dict = {"foo": 1}
+        with self.assertRaises(InvalidConfigException):
+            get_required_str_param("foo", config_dict)
