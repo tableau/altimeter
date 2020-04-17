@@ -18,17 +18,31 @@ such as AWS Neptune for querying.
 
     pip install altimeter
 
+## Configuration
+
+Altimeter's behavior is driven by a toml configuration file.  A few sample
+configuration files are included in the `conf/` directory:
+
+* `current_single_account.toml` - scans the current account - this is the account
+  for which the environment's currently configured AWS CLI credentials are.
+* `current_master_multi_account.toml` - scans the current account and attempts to
+  scan all organizational subaccounts - this configuration should be used if you
+  are scanning  all accounts in an organization.  To do this the currently
+  configured AWS CLI credentials should be pointing to an AWS Organizations
+  master account.
+
+To scan a subset of regions, set the region list parameter `regions` in the `scan`
+section to a list of region names.
+
 ## Generating the Graph
 
 Assuming you have configured AWS CLI credentials
 (see <https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html>),
 run:
 
-    altimeter --base_dir /tmp/altimeter --regions us-east-1
+    altimeter --config_dir <path-to-config> /tmp/altimeter
 
-This will scan all resources in the *us-east-1* region. Multiple regions
-can be specified in this argument or it can be omitted entirely in which
-case all regions will be scanned.
+This will scan all resources in regions specified in the config file.
 
 The full path to the generated RDF file will printed, for example:
 
