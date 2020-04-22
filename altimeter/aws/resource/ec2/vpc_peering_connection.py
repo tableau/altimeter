@@ -17,8 +17,12 @@ class VPCPeeringConnectionResourceSpec(EC2ResourceSpec):
 
     type_name = "vpc-peering-connection"
     schema = Schema(
-        TransientResourceLinkField("AccepterVpc", VPCResourceSpec, value_is_id=True),
-        TransientResourceLinkField("RequesterVpc", VPCResourceSpec, value_is_id=True),
+        TransientResourceLinkField(
+            "AccepterVpc", VPCResourceSpec, value_is_id=True, alti_key="accepter_vpc"
+        ),
+        TransientResourceLinkField(
+            "RequesterVpc", VPCResourceSpec, value_is_id=True, alti_key="requester_vpc"
+        ),
         ScalarField("Status"),
         TagsField(),
     )
