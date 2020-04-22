@@ -22,6 +22,7 @@ from altimeter.aws.resource.ec2.transit_gateway import TransitGatewayResourceSpe
 from altimeter.aws.resource.ec2.volume import EBSVolumeResourceSpec
 from altimeter.aws.resource.ec2.vpc import VPCResourceSpec
 from altimeter.aws.resource.ec2.vpc_endpoint import VpcEndpointResourceSpec
+from altimeter.aws.resource.ec2.vpc_peering_connection import VPCPeeringConnectionResourceSpec
 from altimeter.aws.resource.elbv1.load_balancer import ClassicLoadBalancerResourceSpec
 from altimeter.aws.resource.elbv2.load_balancer import LoadBalancerResourceSpec
 from altimeter.aws.resource.elbv2.target_group import TargetGroupResourceSpec
@@ -79,6 +80,7 @@ RESOURCE_SPEC_CLASSES: Tuple[Type[AWSResourceSpec], ...] = (
     TargetGroupResourceSpec,
     TransitGatewayResourceSpec,
     TransitGatewayVpcAttachmentResourceSpec,
+    VPCPeeringConnectionResourceSpec,
     VPCResourceSpec,
     VpcEndpointResourceSpec,
 )
