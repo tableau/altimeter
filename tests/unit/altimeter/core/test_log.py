@@ -1,6 +1,5 @@
 import json
 import logging
-import os
 import re
 import threading
 from unittest.mock import patch
@@ -17,7 +16,7 @@ class TestLogEvent(BaseLogEvent):
 def test_debug(caplog):
     caplog.set_level(logging.DEBUG)
     tid = threading.get_ident()
-    with patch.dict(os.environ, {}):
+    with patch.dict("os.environ", {}, clear=True):
         logger = BaseLogger()
         logger.debug(event=TestLogEvent.TestEventA, a=1, b="hi-debug")
         record_dict = json.loads(caplog.records[0].message)
@@ -32,7 +31,7 @@ def test_debug(caplog):
 def test_info(caplog):
     caplog.set_level(logging.DEBUG)
     tid = threading.get_ident()
-    with patch.dict(os.environ, {}):
+    with patch.dict("os.environ", {}, clear=True):
         logger = BaseLogger()
         logger.info(event=TestLogEvent.TestEventA, a=1, b="hi-info")
         record_dict = json.loads(caplog.records[0].message)
@@ -47,7 +46,7 @@ def test_info(caplog):
 def test_warn(caplog):
     caplog.set_level(logging.DEBUG)
     tid = threading.get_ident()
-    with patch.dict(os.environ, {}):
+    with patch.dict("os.environ", {}, clear=True):
         logger = BaseLogger()
         logger.warn(event=TestLogEvent.TestEventA, a=1, b="hi-warn")
         record_dict = json.loads(caplog.records[0].message)
@@ -62,7 +61,7 @@ def test_warn(caplog):
 def test_warning(caplog):
     caplog.set_level(logging.DEBUG)
     tid = threading.get_ident()
-    with patch.dict(os.environ, {}):
+    with patch.dict("os.environ", {}, clear=True):
         logger = BaseLogger()
         logger.warning(event=TestLogEvent.TestEventA, a=1, b="hi-warning")
         record_dict = json.loads(caplog.records[0].message)
@@ -77,7 +76,7 @@ def test_warning(caplog):
 def test_error(caplog):
     caplog.set_level(logging.DEBUG)
     tid = threading.get_ident()
-    with patch.dict(os.environ, {}):
+    with patch.dict("os.environ", {}, clear=True):
         logger = BaseLogger()
         logger.error(event=TestLogEvent.TestEventA, a=1, b="hi-error")
         record_dict = json.loads(caplog.records[0].message)
@@ -91,7 +90,7 @@ def test_error(caplog):
 
 def test_no_tid(caplog):
     caplog.set_level(logging.DEBUG)
-    with patch.dict(os.environ, {}):
+    with patch.dict("os.environ", {}, clear=True):
         logger = BaseLogger(log_tid=False)
         logger.info(event=TestLogEvent.TestEventA, a=1, b="hi-info")
         record_dict = json.loads(caplog.records[0].message)
@@ -105,7 +104,7 @@ def test_no_tid(caplog):
 def test_dev_log(caplog):
     caplog.set_level(logging.DEBUG)
     tid = threading.get_ident()
-    with patch.dict(os.environ, {"DEV_LOG": "1"}):
+    with patch.dict("os.environ", {"DEV_LOG": "1"}, clear=True):
         logger = BaseLogger()
         logger.info(event=TestLogEvent.TestEventA, a=1, b="hi-info")
         decolorized = escape_ansi(caplog.records[0].message)

@@ -51,7 +51,10 @@ def main(argv: Optional[List[str]] = None) -> int:
     artifact_writer.write_json("manifest", scan_manifest.to_dict())
     with logger.bind(json_filepath=json_filepath):
         graph_pkg = artifact_reader.read_graph_pkg(json_filepath)
-        artifact_writer.write_graph(name="master", graph_pkg=graph_pkg)
+        rdf_path = artifact_writer.write_graph(name="master", graph_pkg=graph_pkg)
+    if config.neptune:
+        print(rdf_path)
+        raise NotImplementedError("Neptune load not implemented")
     return 0
 
 

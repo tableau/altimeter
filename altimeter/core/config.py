@@ -1,7 +1,7 @@
 """Configuration classes"""
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, Type, Tuple
+from typing import Any, Dict, Optional, Type, Tuple
 
 import boto3
 import toml
@@ -64,6 +64,11 @@ def get_required_section(key: str, config_dict: Dict[str, Any]) -> Dict[str, Any
     if value is None:
         raise InvalidConfigException(f"Missing section '{key}'")
     return value
+
+
+def get_optional_section(key: str, config_dict: Dict[str, Any]) -> Dict[str, Any]:
+    """Get a section from a config dict. Return None if it does not exist."""
+    return config_dict.get(key)
 
 
 @dataclass(frozen=True)
@@ -141,6 +146,25 @@ class ConcurrencyConfig:
 
 
 @dataclass(frozen=True)
+class NeptuneConfig:
+    """Neptune configuration class"""
+
+    host: str
+    port: int
+    region: str
+    iam_role: str
+
+    @classmethod
+    def from_dict(cls: Type["NeptuneConfig"], config_dict: Dict[str, Any]) -> "NeptuneConfig":
+        """Build a NeptuneConfig from a dict"""
+        host = get_required_str_param("host", config_dict)
+        port = get_required_int_param("port", config_dict)
+        region = get_required_str_param("region", config_dict)
+        iam_role = get_required_str_param("iam_role", config_dict)
+        return NeptuneConfig(host=host, port=port, region=region, iam_role=iam_role,)
+
+
+@dataclass(frozen=True)
 class Config:
     """Top level configuration class"""
 
@@ -148,6 +172,7 @@ class Config:
     concurrency: ConcurrencyConfig
     scan: ScanConfig
     artifact_path: str
+    neptune: Optional[NeptuneConfig] = None
 
     def __post_init__(self) -> None:
         if (
@@ -179,8 +204,19 @@ class Config:
             raise InvalidConfigException(f"{str(ice)} in section 'access'")
         artifact_path = get_required_str_param("artifact_path", config_dict)
 
+        neptune_dict = get_required_section("neptune", config_dict)
+        neptune = None
+        try:
+            neptune = NeptuneConfig.from_dict(neptune_dict)
+        except InvalidConfigException as ice:
+            raise InvalidConfigException(f"{str(ice)} in section 'neptune'")
+
         return Config(
-            access=access, concurrency=concurrency, scan=scan, artifact_path=artifact_path,
+            access=access,
+            concurrency=concurrency,
+            scan=scan,
+            artifact_path=artifact_path,
+            neptune=neptune,
         )
 
     @classmethod
