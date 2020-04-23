@@ -1,4 +1,4 @@
-from typing import Tuple
+from typing import Optional, Tuple
 
 from altimeter.core.artifact_io.exceptions import InvalidS3URIException
 
@@ -11,7 +11,7 @@ def is_s3_uri(path: str) -> bool:
     return False
 
 
-def parse_s3_uri(uri: str) -> Tuple[str, str]:
+def parse_s3_uri(uri: str) -> Tuple[str, Optional[str]]:
     """Parse an s3 uri (s3://bucket/key/path) into bucket and key parts
 
     Args:
@@ -28,13 +28,15 @@ def parse_s3_uri(uri: str) -> Tuple[str, str]:
         raise InvalidS3URIException(f"S3 URIs should begin with '{S3_URI_PREFIX}'")
     uri = uri.rstrip("/")
     parts = uri[len(S3_URI_PREFIX) :].split("/")
-    if len(parts) < 2:
-        raise InvalidS3URIException(f"{uri} missing key portion")
+    if len(parts) < 1:
+        raise InvalidS3URIException(f"{uri} missing bucket portion")
     bucket = parts[0]
     if not bucket:
         raise InvalidS3URIException(f"Bad bucket portion in uri {uri}")
-    key_parts = [part.rstrip("/ ") for part in parts[1:]]
-    if not all(key_parts):
-        raise InvalidS3URIException(f"Bad key portion in uri {uri}")
-    key = "/".join(key_parts)
+    key = None
+    if len(parts) > 1:
+        key_parts = [part.rstrip("/ ") for part in parts[1:]]
+        if not all(key_parts):
+            raise InvalidS3URIException(f"Bad key portion in uri {uri}")
+        key = "/".join(key_parts)
     return bucket, key

@@ -9,6 +9,7 @@ import jinja2
 import toml
 
 from altimeter.aws.auth.accessor import Accessor
+from altimeter.core.artifact_io import is_s3_uri, parse_s3_uri
 
 
 class InvalidConfigException(Exception):
@@ -191,6 +192,12 @@ class Config:
             and self.access.accessor.multi_hop_accessors
         ):
             raise InvalidConfigException("Accessor config not supported for single account mode")
+        if is_s3_uri(self.artifact_path):
+            bucket, key_prefix = parse_s3_uri(self.artifact_path)
+            if key_prefix is not None:
+                raise InvalidConfigException(
+                    f"S3 artifact path should be s3://<bucket>, no key - got {self.artifact_path}"
+                )
 
     @classmethod
     def from_dict(cls: Type["Config"], config_dict: Dict[str, Any]) -> "Config":

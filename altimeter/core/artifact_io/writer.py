@@ -55,7 +55,11 @@ class ArtifactWriter(abc.ABC):
         or an S3ArtifactWriter depending on the value of Config.artifact_path"""
         if is_s3_uri(config.artifact_path):
             bucket, key_prefix = parse_s3_uri(config.artifact_path)
-            return S3ArtifactWriter(scan_id=scan_id, bucket=bucket, key_prefix=key_prefix)
+            if key_prefix is not None:
+                raise ValueError(
+                    f"S3 artifact path should be s3://<bucket>, no key - got {config.artifact_path}"
+                )
+            return S3ArtifactWriter(bucket=bucket, key_prefix=scan_id)
         return FileArtifactWriter(scan_id=scan_id, output_dir=Path(config.artifact_path))
 
 
@@ -131,9 +135,9 @@ class S3ArtifactWriter(ArtifactWriter):
         key_prefix: s3 key prefix
     """
 
-    def __init__(self, scan_id: str, bucket: str, key_prefix: str):
+    def __init__(self, bucket: str, key_prefix: str):
         self.bucket = bucket
-        self.key_prefix = "/".join((key_prefix, scan_id))
+        self.key_prefix = key_prefix
 
     def write_json(self, name: str, data: Dict[str, Any]) -> str:
         """Write artifact data to s3://self.bucket/self.key_prefix/name.json

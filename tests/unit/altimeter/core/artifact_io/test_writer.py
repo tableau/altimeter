@@ -25,7 +25,7 @@ class TestArtifactWriter(unittest.TestCase):
         config = Config(access=access,
                         concurrency=concurrency,
                         scan=scan,
-                        artifact_path="s3://bucket/key")
+                        artifact_path="s3://bucket")
         writer = ArtifactWriter.from_config(scan_id="test-scan-id", config=config)
         self.assertIsInstance(writer, S3ArtifactWriter)
 
@@ -67,8 +67,8 @@ class TestS3ArtifactWriter(unittest.TestCase):
         scan_id = 'test-scan-id'
         s3_client = boto3.Session().client("s3")
         s3_client.create_bucket(Bucket="test_bucket")
-        artifact_writer = S3ArtifactWriter(scan_id=scan_id, bucket="test_bucket", key_prefix="foo/boo")
+        artifact_writer = S3ArtifactWriter(bucket="test_bucket", key_prefix=scan_id)
         artifact_writer.write_json("test_name", data)
-        resp = s3_client.get_object(Bucket="test_bucket", Key="foo/boo/test-scan-id/test_name.json")
+        resp = s3_client.get_object(Bucket="test_bucket", Key="test-scan-id/test_name.json")
         written_data = json.load(resp["Body"])
         self.assertDictEqual(data, written_data)

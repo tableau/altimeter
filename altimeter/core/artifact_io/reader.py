@@ -43,6 +43,11 @@ class ArtifactReader(abc.ABC):
         """Create an ArtifactReader based on a config. This either returns a FileArtifactReader
         or an S3ArtifactReader depending on the value of Config.artifact_path"""
         if is_s3_uri(config.artifact_path):
+            bucket, key_prefix = parse_s3_uri(config.artifact_path)
+            if key_prefix is not None:
+                raise ValueError(
+                    f"S3 artifact path should be s3://<bucket>, no key - got {config.artifact_path}"
+                )
             return S3ArtifactReader()
         return FileArtifactReader()
 
@@ -101,6 +106,8 @@ class S3ArtifactReader(ArtifactReader):
             artifact content
         """
         bucket, key = parse_s3_uri(path)
+        if key is None:
+            raise ValueError(f"Unable to read from s3 uri missing key: {path}")
         session = boto3.Session()
         s3_client = session.client("s3")
         logger = Logger()
@@ -126,6 +133,8 @@ class S3ArtifactReader(ArtifactReader):
             GraphPackage object
         """
         bucket, key = parse_s3_uri(path)
+        if key is None:
+            raise ValueError(f"Unable to read from s3 uri missing key: {path}")
         session = boto3.Session()
         s3_client = session.client("s3")
         logger = Logger()

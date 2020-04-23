@@ -26,7 +26,7 @@ class TestArtifactReader(unittest.TestCase):
         config = Config(access=access,
                         concurrency=concurrency,
                         scan=scan,
-                        artifact_path="s3://bucket/key")
+                        artifact_path="s3://bucket")
         reader = ArtifactReader.from_config(config=config)
         self.assertIsInstance(reader, S3ArtifactReader)
 
@@ -104,8 +104,9 @@ class TestParseS3URI(unittest.TestCase):
 
     def test_without_key(self):
         uri = "s3://bucket/"
-        with self.assertRaises(InvalidS3URIException):
-            parse_s3_uri(uri)
+        bucket, key = parse_s3_uri(uri)
+        self.assertIsNone(key)
+        self.assertEqual(bucket, "bucket")
 
     def test_bad_key(self):
         uri = "s3://bucket/key//goo"
