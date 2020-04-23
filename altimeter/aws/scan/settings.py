@@ -8,6 +8,7 @@ from altimeter.aws.resource.dynamodb.dynamodb_table import DynamoDbTableResource
 from altimeter.aws.resource.ec2.flow_log import FlowLogResourceSpec
 from altimeter.aws.resource.ec2.image import EC2ImageResourceSpec
 from altimeter.aws.resource.ec2.instance import EC2InstanceResourceSpec
+from altimeter.aws.resource.ec2.internet_gateway import InternetGatewayResourceSpec
 from altimeter.aws.resource.ec2.network_interface import EC2NetworkInterfaceResourceSpec
 from altimeter.aws.resource.ec2.region import RegionResourceSpec
 from altimeter.aws.resource.ec2.route_table import EC2RouteTableResourceSpec
@@ -21,6 +22,7 @@ from altimeter.aws.resource.ec2.transit_gateway import TransitGatewayResourceSpe
 from altimeter.aws.resource.ec2.volume import EBSVolumeResourceSpec
 from altimeter.aws.resource.ec2.vpc import VPCResourceSpec
 from altimeter.aws.resource.ec2.vpc_endpoint import VpcEndpointResourceSpec
+from altimeter.aws.resource.ec2.vpc_peering_connection import VPCPeeringConnectionResourceSpec
 from altimeter.aws.resource.elbv1.load_balancer import ClassicLoadBalancerResourceSpec
 from altimeter.aws.resource.elbv2.load_balancer import LoadBalancerResourceSpec
 from altimeter.aws.resource.elbv2.target_group import TargetGroupResourceSpec
@@ -65,6 +67,7 @@ RESOURCE_SPEC_CLASSES: Tuple[Type[AWSResourceSpec], ...] = (
     IAMSAMLProviderResourceSpec,
     IAMUserResourceSpec,
     InstanceProfileResourceSpec,
+    InternetGatewayResourceSpec,
     KMSKeyResourceSpec,
     LambdaFunctionResourceSpec,
     LoadBalancerResourceSpec,
@@ -77,6 +80,7 @@ RESOURCE_SPEC_CLASSES: Tuple[Type[AWSResourceSpec], ...] = (
     TargetGroupResourceSpec,
     TransitGatewayResourceSpec,
     TransitGatewayVpcAttachmentResourceSpec,
+    VPCPeeringConnectionResourceSpec,
     VPCResourceSpec,
     VpcEndpointResourceSpec,
 )
