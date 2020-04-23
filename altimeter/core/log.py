@@ -85,11 +85,6 @@ class BaseLogger:
             logger_factory=structlog.stdlib.LoggerFactory(), processors=log_processors
         )
 
-        root = logging.getLogger()
-        if root.handlers:
-            for handler in root.handlers:
-                root.removeHandler(handler)
-
         logging.basicConfig(
             level=os.environ.get("LOG_LEVEL", "INFO"), stream=sys.stdout, format="%(message)s"
         )
@@ -169,3 +164,5 @@ class BaseLogger:
 
 class Logger(BaseLogger, metaclass=Singleton):
     """Singleton logger class"""
+
+    pass
