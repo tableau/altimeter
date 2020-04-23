@@ -8,6 +8,7 @@ from altimeter.core.config import (
     get_required_int_param,
     get_required_section,
     get_required_str_param,
+    ScanConfig,
 )
 
 class TestGetRequiredListParam(TestCase):
@@ -121,3 +122,19 @@ class TestGetOptionalSection(TestCase):
         config_dict = {"SectionA": "foo"}
         with self.assertRaises(InvalidConfigException):
             get_optional_section("SectionA", config_dict)
+
+class TestScanConfig(TestCase):
+    def test_from_dict(self):
+        scan_config_dict = {
+            "accounts": ["123", "456"],
+            "regions": ["us-west-2", "us-west-1"],
+            "scan_sub_accounts": False,
+            "preferred_account_scan_regions": ["us-east-1", "us-west-2"],
+            "single_account_mode": False,
+        }
+        scan_config = ScanConfig.from_dict(scan_config_dict)
+        self.assertTupleEqual(scan_config.accounts, ("123", "456"))
+        self.assertTupleEqual(scan_config.regions, ("us-west-2", "us-west-1"))
+        self.assertEqual(scan_config.scan_sub_accounts, False)
+        self.assertTupleEqual(scan_config.preferred_account_scan_regions, ("us-east-1", "us-west-2"))
+        self.assertEqual(scan_config.single_account_mode, False)
