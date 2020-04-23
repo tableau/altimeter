@@ -3,6 +3,7 @@
 from datetime import datetime
 import argparse
 from dataclasses import dataclass
+import logging
 from pathlib import Path
 import sys
 from typing import Any, Dict, List, Optional
@@ -62,6 +63,11 @@ def generate_scan_id() -> str:
 
 def lambda_handler(event: Dict[str, Any], context: Any) -> None:
     """AWS Lambda Handler"""
+    root = logging.getLogger()
+    if root.handlers:
+        for handler in root.handlers:
+            root.removeHandler(handler)
+
     account_scan_lambda_name = get_required_str_env_var("ACCOUNT_SCAN_LAMBDA_NAME")
     account_scan_lambda_timeout = get_required_int_env_var("ACCOUNT_SCAN_LAMBDA_TIMEOUT")
 

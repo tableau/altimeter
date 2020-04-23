@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Remove graphs matching a given name which are older than n minutes."""
 from datetime import datetime
+import logging
 from typing import Any, Dict
 
 from altimeter.core.log import Logger
@@ -10,6 +11,11 @@ from altimeter.core.neptune.client import AltimeterNeptuneClient, NeptuneEndpoin
 
 
 def lambda_handler(event: Dict[str, Any], context: Any) -> None:
+    root = logging.getLogger()
+    if root.handlers:
+        for handler in root.handlers:
+            root.removeHandler(handler)
+
     host = get_required_str_env_var("NEPTUNE_HOST")
     port = get_required_int_env_var("NEPTUNE_PORT")
     region = get_required_str_env_var("NEPTUNE_REGION")
@@ -20,6 +26,7 @@ def lambda_handler(event: Dict[str, Any], context: Any) -> None:
 
     endpoint = NeptuneEndpoint(host=host, port=port, region=region)
     client = AltimeterNeptuneClient(max_age_min=max_age_min, neptune_endpoint=endpoint)
+
     logger = Logger()
 
     uncleared = []

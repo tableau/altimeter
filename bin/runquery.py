@@ -7,6 +7,7 @@ reads the results from S3.
 import argparse
 import hashlib
 import json
+import logging
 import sys
 import time
 from typing import Any, Dict, List, Optional
@@ -22,6 +23,11 @@ from altimeter.core.neptune.client import AltimeterNeptuneClient, NeptuneEndpoin
 
 
 def lambda_handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
+    root = logging.getLogger()
+    if root.handlers:
+        for handler in root.handlers:
+            root.removeHandler(handler)
+
     graph_names_list = get_required_lambda_event_var(event, "graph_names")
     if not isinstance(graph_names_list, list):
         raise ValueError(f"Value for graph_names should be a list. Is {type(graph_names_list)}")

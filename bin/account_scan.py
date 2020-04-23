@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Scan a set of accounts as defined by an AccountScanPlan"""
 import json
+import logging
 from pathlib import Path
 from typing import Any, Dict
 
@@ -13,6 +14,11 @@ from altimeter.core.config import Config
 
 
 def lambda_handler(event: Dict[str, Any], context: Any) -> None:
+    root = logging.getLogger()
+    if root.handlers:
+        for handler in root.handlers:
+            root.removeHandler(handler)
+
     account_scan_plan_dict = get_required_lambda_event_var(event, "account_scan_plan")
     account_scan_plan = AccountScanPlan.from_dict(account_scan_plan_dict)
     scan_id = get_required_lambda_event_var(event, "scan_id")

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Load RDF from S3 into Neptune"""
 import json
+import logging
 from typing import Any, Dict
 import urllib.parse
 
@@ -13,6 +14,11 @@ from altimeter.core.neptune.client import AltimeterNeptuneClient, NeptuneEndpoin
 
 
 def lambda_handler(event: Dict[str, Any], context: Any) -> None:
+    root = logging.getLogger()
+    if root.handlers:
+        for handler in root.handlers:
+            root.removeHandler(handler)
+
     rdf_bucket = event["Records"][0]["s3"]["bucket"]["name"]
     rdf_key = urllib.parse.unquote(event["Records"][0]["s3"]["object"]["key"])
 
