@@ -14,7 +14,7 @@ from altimeter.aws.scan.muxer.lambda_muxer import LambdaAWSScanMuxer
 from altimeter.aws.scan.muxer.local_muxer import LocalAWSScanMuxer
 from altimeter.aws.scan.scan import run_scan
 from altimeter.core.artifact_io.reader import ArtifactReader
-from altimeter.core.artifact_io.writer import ArtifactWriter
+from altimeter.core.artifact_io.writer import ArtifactWriter, GZIP
 from altimeter.core.config import Config
 from altimeter.core.log import Logger
 from altimeter.core.parameters import get_required_str_env_var, get_required_int_env_var
@@ -45,7 +45,7 @@ def aws2n(scan_id: str, config: Config, muxer: AWSScanMuxer) -> AWS2NResult:
         artifact_reader=artifact_reader,
     )
     json_path = scan_manifest.master_artifact
-    rdf_path = artifact_writer.write_graph_set(name="master", graph_set=graph_set)
+    rdf_path = artifact_writer.write_graph_set(name="master", graph_set=graph_set, compression=GZIP)
     if config.neptune:
         raise NotImplementedError(f"Neptune load not implemented ; {rdf_path}")
     return AWS2NResult(json_path=json_path, rdf_path=rdf_path)
