@@ -72,7 +72,13 @@ def get_required_section(key: str, config_dict: Dict[str, Any]) -> Dict[str, Any
 
 def get_optional_section(key: str, config_dict: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     """Get a section from a config dict. Return None if it does not exist."""
-    return config_dict.get(key)
+    value = config_dict.get(key)
+    if value is not None:
+        if not isinstance(value, dict):
+            raise InvalidConfigException(
+                f"'{key}' does not appear to be a section. Is {type(value)}"
+            )
+    return value
 
 
 @dataclass(frozen=True)

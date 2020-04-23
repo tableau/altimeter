@@ -89,3 +89,35 @@ class TestGetRequiredSection(TestCase):
         config_dict = {"SectionA": "foo"}
         with self.assertRaises(InvalidConfigException):
             get_required_section("SectionA", config_dict)
+
+class TestGetRequiredSection(TestCase):
+    def test_present(self):
+        config_dict = {"SectionA": {"foo": "boo"}}
+        section = get_required_section("SectionA", config_dict)
+        self.assertDictEqual(section, {"foo": "boo"})
+
+    def test_absent(self):
+        config_dict = {"SectionA": {"foo": "boo"}}
+        with self.assertRaises(InvalidConfigException):
+            get_required_section("SectionB", config_dict)
+
+    def test_nondict(self):
+        config_dict = {"SectionA": "foo"}
+        with self.assertRaises(InvalidConfigException):
+            get_required_section("SectionA", config_dict)
+
+class TestGetOptionalSection(TestCase):
+    def test_present(self):
+        config_dict = {"SectionA": {"foo": "boo"}}
+        section = get_optional_section("SectionA", config_dict)
+        self.assertDictEqual(section, {"foo": "boo"})
+
+    def test_absent(self):
+        config_dict = {"SectionA": {"foo": "boo"}}
+        section = get_optional_section("SectionB", config_dict)
+        self.assertIsNone(section)
+
+    def test_nondict(self):
+        config_dict = {"SectionA": "foo"}
+        with self.assertRaises(InvalidConfigException):
+            get_optional_section("SectionA", config_dict)
