@@ -63,6 +63,8 @@ def aws2n(scan_id: str, config: Config, muxer: AWSScanMuxer) -> AWS2NResult:
         )
         neptune_client = AltimeterNeptuneClient(max_age_min=1440, neptune_endpoint=endpoint)
         rdf_bucket, rdf_key = parse_s3_uri(rdf_path)
+        if rdf_key is None:
+            raise Exception(f"Invalid rdf s3 path {rdf_path}")
         graph_metadata = neptune_client.load_graph(
             bucket=rdf_bucket, key=rdf_key, load_iam_role_arn=config.neptune.iam_role_arn
         )

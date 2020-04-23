@@ -255,7 +255,7 @@ class Config:
     @classmethod
     def from_file(cls: Type["Config"], filepath: Path) -> "Config":
         """Load a Config from a file"""
-        with open(filepath, 'r') as fp:
+        with open(filepath, "r") as fp:
             config_str = fp.read()
         template = jinja2.Environment(
             loader=jinja2.BaseLoader(), undefined=jinja2.StrictUndefined
