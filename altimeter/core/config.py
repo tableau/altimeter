@@ -66,7 +66,7 @@ def get_required_section(key: str, config_dict: Dict[str, Any]) -> Dict[str, Any
     return value
 
 
-def get_optional_section(key: str, config_dict: Dict[str, Any]) -> Dict[str, Any]:
+def get_optional_section(key: str, config_dict: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     """Get a section from a config dict. Return None if it does not exist."""
     return config_dict.get(key)
 
@@ -204,12 +204,14 @@ class Config:
             raise InvalidConfigException(f"{str(ice)} in section 'access'")
         artifact_path = get_required_str_param("artifact_path", config_dict)
 
-        neptune_dict = get_required_section("neptune", config_dict)
-        neptune = None
-        try:
-            neptune = NeptuneConfig.from_dict(neptune_dict)
-        except InvalidConfigException as ice:
-            raise InvalidConfigException(f"{str(ice)} in section 'neptune'")
+        neptune_dict = get_optional_section("neptune", config_dict)
+        if neptune_dict:
+            try:
+                neptune = NeptuneConfig.from_dict(neptune_dict)
+            except InvalidConfigException as ice:
+                raise InvalidConfigException(f"{str(ice)} in section 'neptune'")
+        else:
+            neptune = None
 
         return Config(
             access=access,

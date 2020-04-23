@@ -40,7 +40,7 @@ Assuming you have configured AWS CLI credentials
 (see <https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html>),
 run:
 
-    altimeter --config_dir <path-to-config> /tmp/altimeter
+    altimeter <path-to-config>
 
 This will scan all resources in regions specified in the config file.
 

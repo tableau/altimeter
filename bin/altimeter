@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+set -ef -o pipefail
+
+# trick to use fd5 and tee to output the full output to console while
+# also saving the last line (which is the json filepaths used by the next
+# process) in a var.
+exec 5>&1
+rdf_path=$("aws2n.py" $@ | tee /dev/fd/5 | tail -n1)
+echo "Created RDF $rdf_path"

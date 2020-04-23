@@ -26,9 +26,8 @@ setup(
     scripts=[
         "bin/account_scan.py",
         "bin/altimeter",
-        "bin/aws2json.py",
+        "bin/aws2n.py",
         "bin/graphpruner.py",
-        "bin/json2rdf.py",
         "bin/rdf2blaze",
         "bin/rdf2n.py",
         "bin/runquery.py",
