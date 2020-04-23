@@ -163,7 +163,8 @@ class NeptuneConfig:
     host: str
     port: int
     region: str
-    iam_role: str
+    iam_role_arn: str
+    graph_load_sns_topic_arn: str
 
     @classmethod
     def from_dict(cls: Type["NeptuneConfig"], config_dict: Dict[str, Any]) -> "NeptuneConfig":
@@ -171,8 +172,15 @@ class NeptuneConfig:
         host = get_required_str_param("host", config_dict)
         port = get_required_int_param("port", config_dict)
         region = get_required_str_param("region", config_dict)
-        iam_role = get_required_str_param("iam_role", config_dict)
-        return NeptuneConfig(host=host, port=port, region=region, iam_role=iam_role,)
+        iam_role_arn = get_required_str_param("iam_role_arn", config_dict)
+        graph_load_sns_topic_arn = get_required_str_param("graph_load_sns_topic_arn", config_dict)
+        return NeptuneConfig(
+            host=host,
+            port=port,
+            region=region,
+            iam_role_arn=iam_role_arn,
+            graph_load_sns_topic_arn=graph_load_sns_topic_arn,
+        )
 
 
 @dataclass(frozen=True)
@@ -196,7 +204,15 @@ class Config:
             bucket, key_prefix = parse_s3_uri(self.artifact_path)
             if key_prefix is not None:
                 raise InvalidConfigException(
-                    f"S3 artifact path should be s3://<bucket>, no key - got {self.artifact_path}"
+                    f"S3 artifact_path should be s3://<bucket>, no key - got {self.artifact_path}"
+                )
+        if self.neptune:
+            if not is_s3_uri(self.artifact_path):
+                raise InvalidConfigException(
+                    (
+                        "Neptune config is only supported if artifact_path is an s3 uri "
+                        f"(s3://bucket).  artifact_path is '{self.artifact_path}'."
+                    )
                 )
 
     @classmethod
@@ -220,10 +236,6 @@ class Config:
         except InvalidConfigException as ice:
             raise InvalidConfigException(f"{str(ice)} in section 'access'")
         artifact_path = get_required_str_param("artifact_path", config_dict)
-        template = jinja2.Environment(
-            loader=jinja2.BaseLoader(), undefined=jinja2.StrictUndefined
-        ).from_string(artifact_path)
-        artifact_path = template.render(env=os.environ)
 
         neptune_dict = get_optional_section("neptune", config_dict)
         neptune: Optional[NeptuneConfig] = None
@@ -243,7 +255,13 @@ class Config:
     @classmethod
     def from_file(cls: Type["Config"], filepath: Path) -> "Config":
         """Load a Config from a file"""
-        config_dict = dict(toml.load(filepath))
+        with open(filepath, 'r') as fp:
+            config_str = fp.read()
+        template = jinja2.Environment(
+            loader=jinja2.BaseLoader(), undefined=jinja2.StrictUndefined
+        ).from_string(config_str)
+        config_str = template.render(env=os.environ)
+        config_dict = dict(toml.loads(config_str))
         try:
             return cls.from_dict(config_dict)
         except InvalidConfigException as ice:
