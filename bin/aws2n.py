@@ -38,17 +38,14 @@ def aws2n(scan_id: str, config: Config, muxer: AWSScanMuxer) -> AWS2NResult:
         writer=str(artifact_writer.__class__),
     )
 
-    scan_manifest = run_scan(
+    scan_manifest, graph_set = run_scan(
         muxer=muxer,
         config=config,
         artifact_writer=artifact_writer,
         artifact_reader=artifact_reader,
     )
     json_path = scan_manifest.master_artifact
-    artifact_writer.write_json("manifest", scan_manifest.to_dict())
-    with logger.bind(json_path=json_path):
-        graph_pkg = artifact_reader.read_graph_pkg(json_path)
-        rdf_path = artifact_writer.write_graph(name="master", graph_pkg=graph_pkg)
+    rdf_path = artifact_writer.write_graph_set(name="master", graph_set=graph_set)
     if config.neptune:
         raise NotImplementedError(f"Neptune load not implemented ; {rdf_path}")
     return AWS2NResult(json_path=json_path, rdf_path=rdf_path)

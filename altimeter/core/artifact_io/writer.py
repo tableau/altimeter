@@ -12,10 +12,10 @@ import boto3
 
 from altimeter.core.artifact_io import is_s3_uri, parse_s3_uri
 from altimeter.core.config import Config
+from altimeter.core.graph.graph_set import GraphSet
 from altimeter.core.json_encoder import json_encoder
 from altimeter.core.log import Logger
 from altimeter.core.log_events import LogEvent
-from altimeter.core.rdf import GraphPackage
 
 GZIP = "gz"
 
@@ -36,14 +36,14 @@ class ArtifactWriter(abc.ABC):
         """
 
     @abc.abstractmethod
-    def write_graph(
-        self, name: str, graph_pkg: GraphPackage, compression: Optional[str] = None
+    def write_graph_set(
+        self, name: str, graph_set: GraphSet, compression: Optional[str] = None
     ) -> str:
         """Write a graph artifact
 
         Args:
             name: name
-            graph_pkg: GraphPackage object to write
+            graph_set: GraphSet object to write
 
         Returns:
             path to written artifact
@@ -93,14 +93,14 @@ class FileArtifactWriter(ArtifactWriter):
             logger.info(event=LogEvent.WriteToFSEnd)
         return artifact_path
 
-    def write_graph(
-        self, name: str, graph_pkg: GraphPackage, compression: Optional[str] = None
+    def write_graph_set(
+        self, name: str, graph_set: GraphSet, compression: Optional[str] = None
     ) -> str:
         """Write a graph artifact
 
         Args:
             name: name
-            graph_pkg: GraphPackage object to write
+            graph_set: GraphSet object to write
 
         Returns:
             path to written artifact
@@ -113,14 +113,15 @@ class FileArtifactWriter(ArtifactWriter):
             artifact_path = os.path.join(self.output_dir, f"{name}.rdf.gz")
         else:
             raise ValueError(f"Unknown compression arg {compression}")
+        graph = graph_set.to_rdf()
         with logger.bind(artifact_path=artifact_path):
             logger.info(event=LogEvent.WriteToFSStart)
             with open(artifact_path, "wb") as fp:
                 if compression is None:
-                    graph_pkg.graph.serialize(fp)
+                    graph.serialize(fp)
                 elif compression == GZIP:
                     with gzip.GzipFile(fileobj=fp, mode="wb") as gz:
-                        graph_pkg.graph.serialize(gz)
+                        graph.serialize(gz)
                 else:
                     raise ValueError(f"Unknown compression arg {compression}")
             logger.info(event=LogEvent.WriteToFSEnd)
@@ -162,14 +163,14 @@ class S3ArtifactWriter(ArtifactWriter):
             logger.info(event=LogEvent.WriteToS3End)
         return f"s3://{self.bucket}/{output_key}"
 
-    def write_graph(
-        self, name: str, graph_pkg: GraphPackage, compression: Optional[str] = None
+    def write_graph_set(
+        self, name: str, graph_set: GraphSet, compression: Optional[str] = None
     ) -> str:
         """Write a graph artifact
 
         Args:
             name: name
-            graph_pkg: GraphPackage to write
+            graph_set: GraphSet to write
 
         Returns:
             path to written artifact
@@ -182,14 +183,15 @@ class S3ArtifactWriter(ArtifactWriter):
         else:
             raise ValueError(f"Unknown compression arg {compression}")
         output_key = "/".join((self.key_prefix, key))
+        graph = graph_set.to_rdf()
         with logger.bind(bucket=self.bucket, key_prefix=self.key_prefix, key=key):
             logger.info(event=LogEvent.WriteToS3Start)
             with io.BytesIO() as rdf_bytes_buf:
                 if compression is None:
-                    graph_pkg.graph.serialize(rdf_bytes_buf)
+                    graph.serialize(rdf_bytes_buf)
                 elif compression == GZIP:
                     with gzip.GzipFile(fileobj=rdf_bytes_buf, mode="wb") as gz:
-                        graph_pkg.graph.serialize(gz)
+                        graph.serialize(gz)
                 else:
                     raise ValueError(f"Unknown compression arg {compression}")
                 rdf_bytes_buf.flush()
@@ -202,10 +204,10 @@ class S3ArtifactWriter(ArtifactWriter):
                 Key=output_key,
                 Tagging={
                     "TagSet": [
-                        {"Key": "name", "Value": graph_pkg.name},
-                        {"Key": "version", "Value": graph_pkg.version},
-                        {"Key": "start_time", "Value": str(graph_pkg.start_time)},
-                        {"Key": "end_time", "Value": str(graph_pkg.end_time)},
+                        {"Key": "name", "Value": graph_set.name},
+                        {"Key": "version", "Value": graph_set.version},
+                        {"Key": "start_time", "Value": str(graph_set.start_time)},
+                        {"Key": "end_time", "Value": str(graph_set.end_time)},
                     ]
                 },
             )

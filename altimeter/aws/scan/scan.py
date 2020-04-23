@@ -38,7 +38,7 @@ def run_scan(
     config: Config,
     artifact_writer: ArtifactWriter,
     artifact_reader: ArtifactReader,
-) -> ScanManifest:
+) -> Tuple[ScanManifest, GraphSet]:
     if config.scan.scan_sub_accounts:
         account_ids = get_sub_account_ids(config.scan.accounts, config.access.accessor)
     else:
@@ -82,7 +82,7 @@ def run_scan(
     logger.info(event=AWSLogEvents.ScanAWSAccountsEnd)
     start_time = graph_set.start_time
     end_time = graph_set.end_time
-    return ScanManifest(
+    scan_manifest = ScanManifest(
         scanned_accounts=scanned_accounts,
         master_artifact=master_artifact_path,
         artifacts=artifacts,
@@ -92,3 +92,5 @@ def run_scan(
         start_time=start_time,
         end_time=end_time,
     )
+    artifact_writer.write_json("manifest", data=scan_manifest.to_dict())
+    return scan_manifest, graph_set
