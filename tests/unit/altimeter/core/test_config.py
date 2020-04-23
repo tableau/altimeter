@@ -2,9 +2,11 @@ from unittest import TestCase
 
 from altimeter.core.config import (
     InvalidConfigException,
+    get_optional_section,
     get_required_list_param,
     get_required_bool_param,
     get_required_int_param,
+    get_required_section,
     get_required_str_param,
 )
 
@@ -71,3 +73,19 @@ class TestGetRequiredStrParam(TestCase):
         config_dict = {"foo": 1}
         with self.assertRaises(InvalidConfigException):
             get_required_str_param("foo", config_dict)
+
+class TestGetRequiredSection(TestCase):
+    def test_present(self):
+        config_dict = {"SectionA": {"foo": "boo"}}
+        section = get_required_section("SectionA", config_dict)
+        self.assertDictEqual(section, {"foo": "boo"})
+
+    def test_absent(self):
+        config_dict = {"SectionA": {"foo": "boo"}}
+        with self.assertRaises(InvalidConfigException):
+            get_required_section("SectionB", config_dict)
+
+    def test_nondict(self):
+        config_dict = {"SectionA": "foo"}
+        with self.assertRaises(InvalidConfigException):
+            get_required_section("SectionA", config_dict)

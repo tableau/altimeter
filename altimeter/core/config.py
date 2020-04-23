@@ -1,9 +1,11 @@
 """Configuration classes"""
 from dataclasses import dataclass
+import os
 from pathlib import Path
 from typing import Any, Dict, Optional, Type, Tuple
 
 import boto3
+import jinja2
 import toml
 
 from altimeter.aws.auth.accessor import Accessor
@@ -63,6 +65,8 @@ def get_required_section(key: str, config_dict: Dict[str, Any]) -> Dict[str, Any
     value = config_dict.get(key)
     if value is None:
         raise InvalidConfigException(f"Missing section '{key}'")
+    if not isinstance(value, dict):
+        raise InvalidConfigException(f"'{key}' does not appear to be a section. Is {type(value)}")
     return value
 
 
@@ -203,16 +207,18 @@ class Config:
         except InvalidConfigException as ice:
             raise InvalidConfigException(f"{str(ice)} in section 'access'")
         artifact_path = get_required_str_param("artifact_path", config_dict)
+        template = jinja2.Environment(
+            loader=jinja2.BaseLoader(), undefined=jinja2.StrictUndefined
+        ).from_string(artifact_path)
+        artifact_path = template.render(env=os.environ)
 
         neptune_dict = get_optional_section("neptune", config_dict)
+        neptune: Optional[NeptuneConfig] = None
         if neptune_dict:
             try:
                 neptune = NeptuneConfig.from_dict(neptune_dict)
             except InvalidConfigException as ice:
                 raise InvalidConfigException(f"{str(ice)} in section 'neptune'")
-        else:
-            neptune = None
-
         return Config(
             access=access,
             concurrency=concurrency,
