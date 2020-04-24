@@ -5,7 +5,7 @@ import argparse
 from dataclasses import dataclass
 import logging
 import json
-from pathlib import Path
+import os
 import sys
 from typing import Any, Dict, List, Optional
 import uuid
@@ -110,9 +110,10 @@ def lambda_handler(event: Dict[str, Any], context: Any) -> None:
 
     account_scan_lambda_name = get_required_str_env_var("ACCOUNT_SCAN_LAMBDA_NAME")
     account_scan_lambda_timeout = get_required_int_env_var("ACCOUNT_SCAN_LAMBDA_TIMEOUT")
-    config_s3_uri = get_required_str_env_var("CONFIG_S3_URI")
 
-    config = Config.from_s3(s3_uri=config_s3_uri)
+    config_path = get_required_str_env_var("CONFIG_PATH")
+    config = Config.from_path(path=config_path)
+
     scan_id = generate_scan_id()
     muxer = LambdaAWSScanMuxer(
         scan_id=scan_id,
@@ -127,10 +128,22 @@ def main(argv: Optional[List[str]] = None) -> int:
     if argv is None:
         argv = sys.argv[1:]
     parser = argparse.ArgumentParser()
-    parser.add_argument("config", type=Path)
+    parser.add_argument("--config", type=str, nargs="?")
     args_ns = parser.parse_args(argv)
 
-    config = Config.from_file(filepath=args_ns.config)
+    if args_ns.config:
+        config_path = args_ns.config
+    else:
+        config_path = os.environ.get("CONFIG_PATH")
+        if not config_path:
+            print(
+                (
+                    "Config path must be specified either with the '--config' option "
+                    "or the CONFIG_PATH environment variable."
+                )
+            )
+            return 1
+    config = Config.from_path(config_path)
     scan_id = generate_scan_id()
     muxer = LocalAWSScanMuxer(scan_id=scan_id, config=config)
     result = aws2n(scan_id=scan_id, config=config, muxer=muxer, load_neptune=False)

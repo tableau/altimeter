@@ -23,8 +23,8 @@ def lambda_handler(event: Dict[str, Any], context: Any) -> None:
     rdf_bucket = event["Records"][0]["s3"]["bucket"]["name"]
     rdf_key = urllib.parse.unquote(event["Records"][0]["s3"]["object"]["key"])
 
-    config_s3_uri = get_required_str_env_var("CONFIG_S3_URI")
-    config = Config.from_s3(s3_uri=config_s3_uri)
+    config_path = get_required_str_env_var("CONFIG_PATH")
+    config = Config.from_path(path=config_path)
 
     if config.neptune is None:
         raise InvalidConfigException("Configuration missing neptune section.")

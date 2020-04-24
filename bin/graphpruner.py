@@ -17,8 +17,8 @@ def lambda_handler(event: Dict[str, Any], context: Any) -> None:
         for handler in root.handlers:
             root.removeHandler(handler)
 
-    config_s3_uri = get_required_str_env_var("CONFIG_S3_URI")
-    config = Config.from_s3(s3_uri=config_s3_uri)
+    config_path = get_required_str_env_var("CONFIG_PATH")
+    config = Config.from_path(path=config_path)
 
     if config.neptune is None:
         raise InvalidConfigException("Configuration missing neptune section.")

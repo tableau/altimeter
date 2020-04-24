@@ -281,6 +281,13 @@ class Config:
         )
 
     @classmethod
+    def from_path(cls: Type["Config"], path: str) -> "Config":
+        """Load a Config from an s3 uri or a  file"""
+        if is_s3_uri(path):
+            return cls.from_s3(s3_uri=path)
+        return cls.from_file(filepath=Path(path))
+
+    @classmethod
     def from_file(cls: Type["Config"], filepath: Path) -> "Config":
         """Load a Config from a file"""
         with open(filepath, "r") as fp:
