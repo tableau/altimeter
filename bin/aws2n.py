@@ -34,7 +34,7 @@ class AWS2NResult:
     graph_metadata: Optional[GraphMetadata]
 
 
-def aws2n(scan_id: str, config: Config, muxer: AWSScanMuxer) -> AWS2NResult:
+def aws2n(scan_id: str, config: Config, muxer: AWSScanMuxer, load_neptune: bool) -> AWS2NResult:
     """Scan AWS resources to json, convert to RDF and load into Neptune
     if config.neptune is defined"""
     artifact_reader = ArtifactReader.from_artifact_path(config.artifact_path)
@@ -59,7 +59,9 @@ def aws2n(scan_id: str, config: Config, muxer: AWSScanMuxer) -> AWS2NResult:
     json_path = scan_manifest.master_artifact
     rdf_path = artifact_writer.write_graph_set(name="master", graph_set=graph_set, compression=GZIP)
     graph_metadata = None
-    if config.neptune:
+    if load_neptune:
+        if config.neptune is None:
+            raise Exception("Can not load to Neptune because config.neptune is empty.")
         endpoint = NeptuneEndpoint(
             host=config.neptune.host, port=config.neptune.port, region=config.neptune.region
         )
@@ -118,7 +120,7 @@ def lambda_handler(event: Dict[str, Any], context: Any) -> None:
         account_scan_lambda_name=account_scan_lambda_name,
         account_scan_lambda_timeout=account_scan_lambda_timeout,
     )
-    aws2n(scan_id=scan_id, config=config, muxer=muxer)
+    aws2n(scan_id=scan_id, config=config, muxer=muxer, load_neptune=False)
 
 
 def main(argv: Optional[List[str]] = None) -> int:
@@ -131,7 +133,7 @@ def main(argv: Optional[List[str]] = None) -> int:
     config = Config.from_file(filepath=args_ns.config)
     scan_id = generate_scan_id()
     muxer = LocalAWSScanMuxer(scan_id=scan_id, config=config)
-    result = aws2n(scan_id=scan_id, config=config, muxer=muxer)
+    result = aws2n(scan_id=scan_id, config=config, muxer=muxer, load_neptune=False)
     print(result.rdf_path)
     return 0
 
