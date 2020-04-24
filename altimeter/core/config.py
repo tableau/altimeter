@@ -1,11 +1,9 @@
 """Configuration classes"""
 from dataclasses import dataclass
-import os
 from pathlib import Path
 from typing import Any, Dict, Optional, Type, Tuple
 
 import boto3
-import jinja2
 import toml
 
 from altimeter.aws.auth.accessor import Accessor
@@ -25,12 +23,21 @@ def _get_required_param(key: str, config_dict: Dict[str, Any]) -> Any:
     return value
 
 
+def _get_optional_param(key: str, config_dict: Dict[str, Any]) -> Any:
+    """Get a parameter by key from a config dict. Return None if it does not exist."""
+    return config_dict.get(key)
+
+
 def get_required_list_param(key: str, config_dict: Dict[str, Any]) -> Tuple[Any, ...]:
     """Get a list parameter by key from a config dict. Raise InvalidConfigException if it does
     not exist or its value is not a list. Return as a tuple."""
     value = _get_required_param(key, config_dict)
+    if isinstance(value, tuple):
+        return value
     if not isinstance(value, list):
-        raise InvalidConfigException(f"Parameter '{key}' should be a list. Is {type(value)}")
+        raise InvalidConfigException(
+            f"Parameter '{key}' should be a list or tuple. Is {type(value)}"
+        )
     return tuple(value)
 
 
@@ -38,6 +45,17 @@ def get_required_bool_param(key: str, config_dict: Dict[str, Any]) -> bool:
     """Get a bool parameter by key from a config dict. Raise InvalidConfigException if it does
     not exist or its value is not a bool."""
     value = _get_required_param(key, config_dict)
+    if not isinstance(value, bool):
+        raise InvalidConfigException(f"Parameter '{key}' should be a bool. Is {type(value)}")
+    return value
+
+
+def get_optional_bool_param(key: str, config_dict: Dict[str, Any]) -> Optional[bool]:
+    """Get a bool parameter by key from a config dict. Return None if it does not exist,
+    raise InvalidConfigException if its value is not a bool."""
+    value = _get_optional_param(key, config_dict)
+    if value is None:
+        return None
     if not isinstance(value, bool):
         raise InvalidConfigException(f"Parameter '{key}' should be a bool. Is {type(value)}")
     return value
@@ -91,8 +109,11 @@ class AccessConfig:
     @classmethod
     def from_dict(cls: Type["AccessConfig"], config_dict: Dict[str, Any]) -> "AccessConfig":
         """Build an AccessConfig from a dict"""
-        cache_creds = get_required_bool_param("cache_creds", config_dict)
-        accessor = Accessor.from_dict(config_dict, cache_creds=cache_creds)
+        cache_creds = get_optional_bool_param("cache_creds", config_dict)
+        if cache_creds is not None:
+            accessor = Accessor.from_dict(config_dict, cache_creds=cache_creds)
+        else:
+            accessor = Accessor.from_dict(config_dict)
         return AccessConfig(accessor=accessor)
 
 
@@ -187,10 +208,12 @@ class NeptuneConfig:
 class Config:
     """Top level configuration class"""
 
+    artifact_path: str
+    pruner_max_age_min: int
+    graph_name: str
     access: AccessConfig
     concurrency: ConcurrencyConfig
     scan: ScanConfig
-    artifact_path: str
     neptune: Optional[NeptuneConfig] = None
 
     def __post_init__(self) -> None:
@@ -218,6 +241,10 @@ class Config:
     @classmethod
     def from_dict(cls: Type["Config"], config_dict: Dict[str, Any]) -> "Config":
         """Build a Config from a dict"""
+        artifact_path = get_required_str_param("artifact_path", config_dict)
+        pruner_max_age_min = get_required_int_param("pruner_max_age_min", config_dict)
+        graph_name = get_required_str_param("graph_name", config_dict)
+
         scan_dict = get_required_section("scan", config_dict)
         try:
             scan = ScanConfig.from_dict(scan_dict)
@@ -235,7 +262,6 @@ class Config:
             access = AccessConfig.from_dict(access_dict)
         except InvalidConfigException as ice:
             raise InvalidConfigException(f"{str(ice)} in section 'access'")
-        artifact_path = get_required_str_param("artifact_path", config_dict)
 
         neptune_dict = get_optional_section("neptune", config_dict)
         neptune: Optional[NeptuneConfig] = None
@@ -245,10 +271,12 @@ class Config:
             except InvalidConfigException as ice:
                 raise InvalidConfigException(f"{str(ice)} in section 'neptune'")
         return Config(
+            artifact_path=artifact_path,
+            pruner_max_age_min=pruner_max_age_min,
+            graph_name=graph_name,
             access=access,
             concurrency=concurrency,
             scan=scan,
-            artifact_path=artifact_path,
             neptune=neptune,
         )
 
@@ -257,12 +285,21 @@ class Config:
         """Load a Config from a file"""
         with open(filepath, "r") as fp:
             config_str = fp.read()
-        template = jinja2.Environment(
-            loader=jinja2.BaseLoader(), undefined=jinja2.StrictUndefined
-        ).from_string(config_str)
-        config_str = template.render(env=os.environ)
         config_dict = dict(toml.loads(config_str))
         try:
             return cls.from_dict(config_dict)
         except InvalidConfigException as ice:
             raise InvalidConfigException(f"Error in conf file {filepath}: {str(ice)}")
+
+    @classmethod
+    def from_s3(cls: Type["Config"], s3_uri: str) -> "Config":
+        """Load a Config from an s3 object"""
+        bucket, key = parse_s3_uri(s3_uri)
+        s3_client = boto3.client("s3")
+        resp = s3_client.get_object(Bucket=bucket, Key=key,)
+        config_str = resp["Body"].read().decode("utf-8")
+        config_dict = dict(toml.loads(config_str))
+        try:
+            return cls.from_dict(config_dict)
+        except InvalidConfigException as ice:
+            raise InvalidConfigException(f"Error in conf file {s3_uri}: {str(ice)}")

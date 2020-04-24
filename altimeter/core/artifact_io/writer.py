@@ -11,7 +11,6 @@ from typing import Any, Dict, Optional, Type
 import boto3
 
 from altimeter.core.artifact_io import is_s3_uri, parse_s3_uri
-from altimeter.core.config import Config
 from altimeter.core.graph.graph_set import GraphSet
 from altimeter.core.json_encoder import json_encoder
 from altimeter.core.log import Logger
@@ -50,17 +49,19 @@ class ArtifactWriter(abc.ABC):
         """
 
     @classmethod
-    def from_config(cls: Type["ArtifactWriter"], config: Config, scan_id: str) -> "ArtifactWriter":
-        """Create an ArtifactWriter based on a config. This either returns a FileArtifactWriter
-        or an S3ArtifactWriter depending on the value of Config.artifact_path"""
-        if is_s3_uri(config.artifact_path):
-            bucket, key_prefix = parse_s3_uri(config.artifact_path)
+    def from_artifact_path(
+        cls: Type["ArtifactWriter"], artifact_path: str, scan_id: str
+    ) -> "ArtifactWriter":
+        """Create an ArtifactWriter based on an artifact path. This either returns a FileArtifactWriter
+        or an S3ArtifactWriter depending on the value of artifact_path"""
+        if is_s3_uri(artifact_path):
+            bucket, key_prefix = parse_s3_uri(artifact_path)
             if key_prefix is not None:
                 raise ValueError(
-                    f"S3 artifact path should be s3://<bucket>, no key - got {config.artifact_path}"
+                    f"S3 artifact path should be s3://<bucket>, no key - got {artifact_path}"
                 )
             return S3ArtifactWriter(bucket=bucket, key_prefix=scan_id)
-        return FileArtifactWriter(scan_id=scan_id, output_dir=Path(config.artifact_path))
+        return FileArtifactWriter(scan_id=scan_id, output_dir=Path(artifact_path))
 
 
 class FileArtifactWriter(ArtifactWriter):

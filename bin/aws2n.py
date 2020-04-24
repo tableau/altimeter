@@ -37,8 +37,10 @@ class AWS2NResult:
 def aws2n(scan_id: str, config: Config, muxer: AWSScanMuxer) -> AWS2NResult:
     """Scan AWS resources to json, convert to RDF and load into Neptune
     if config.neptune is defined"""
-    artifact_reader = ArtifactReader.from_config(config=config)
-    artifact_writer = ArtifactWriter.from_config(config=config, scan_id=scan_id)
+    artifact_reader = ArtifactReader.from_artifact_path(config.artifact_path)
+    artifact_writer = ArtifactWriter.from_artifact_path(
+        artifact_path=config.artifact_path, scan_id=scan_id
+    )
 
     logger = Logger()
     logger.info(
@@ -106,8 +108,9 @@ def lambda_handler(event: Dict[str, Any], context: Any) -> None:
 
     account_scan_lambda_name = get_required_str_env_var("ACCOUNT_SCAN_LAMBDA_NAME")
     account_scan_lambda_timeout = get_required_int_env_var("ACCOUNT_SCAN_LAMBDA_TIMEOUT")
+    config_s3_uri = get_required_str_env_var("CONFIG_S3_URI")
 
-    config = Config.from_file(Path("./conf/lambda.toml"))
+    config = Config.from_s3(s3_uri=config_s3_uri)
     scan_id = generate_scan_id()
     muxer = LambdaAWSScanMuxer(
         scan_id=scan_id,

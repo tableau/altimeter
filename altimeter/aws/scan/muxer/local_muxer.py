@@ -18,10 +18,16 @@ def local_account_scan(
         account_scan_plan_dict: AccountScanPlan defining the scan
         config: Config object
     """
-    artifact_writer = ArtifactWriter.from_config(scan_id=scan_id, config=config)
+    artifact_writer = ArtifactWriter.from_artifact_path(
+        artifact_path=config.artifact_path, scan_id=scan_id
+    )
     account_scan_plan = AccountScanPlan.from_dict(account_scan_plan_dict=account_scan_plan_dict)
     account_scanner = AccountScanner(
-        account_scan_plan=account_scan_plan, artifact_writer=artifact_writer, config=config,
+        account_scan_plan=account_scan_plan,
+        artifact_writer=artifact_writer,
+        max_svc_scan_threads=config.concurrency.max_svc_scan_threads,
+        preferred_account_scan_regions=config.scan.preferred_account_scan_regions,
+        scan_sub_accounts=config.scan.scan_sub_accounts,
     )
     return account_scanner.scan()
 

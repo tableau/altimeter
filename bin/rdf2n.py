@@ -7,10 +7,11 @@ import urllib.parse
 
 import boto3
 
-from altimeter.core.parameters import get_required_str_env_var, get_required_int_env_var
+from altimeter.core.config import Config, InvalidConfigException
 from altimeter.core.log import Logger
 from altimeter.core.log_events import LogEvent
 from altimeter.core.neptune.client import AltimeterNeptuneClient, NeptuneEndpoint
+from altimeter.core.parameters import get_required_str_env_var
 
 
 def lambda_handler(event: Dict[str, Any], context: Any) -> None:
@@ -22,16 +23,18 @@ def lambda_handler(event: Dict[str, Any], context: Any) -> None:
     rdf_bucket = event["Records"][0]["s3"]["bucket"]["name"]
     rdf_key = urllib.parse.unquote(event["Records"][0]["s3"]["object"]["key"])
 
-    neptune_host = get_required_str_env_var("NEPTUNE_HOST")
-    neptune_port = get_required_int_env_var("NEPTUNE_PORT")
-    neptune_region = get_required_str_env_var("NEPTUNE_REGION")
-    neptune_load_iam_role_arn = get_required_str_env_var("NEPTUNE_LOAD_IAM_ROLE_ARN")
-    on_success_sns_topic_arn = get_required_str_env_var("ON_SUCCESS_SNS_TOPIC_ARN")
+    config_s3_uri = get_required_str_env_var("CONFIG_S3_URI")
+    config = Config.from_s3(s3_uri=config_s3_uri)
 
-    endpoint = NeptuneEndpoint(host=neptune_host, port=neptune_port, region=neptune_region)
+    if config.neptune is None:
+        raise InvalidConfigException("Configuration missing neptune section.")
+
+    endpoint = NeptuneEndpoint(
+        host=config.neptune.host, port=config.neptune.port, region=config.neptune.region
+    )
     neptune_client = AltimeterNeptuneClient(max_age_min=1440, neptune_endpoint=endpoint)
     graph_metadata = neptune_client.load_graph(
-        bucket=rdf_bucket, key=rdf_key, load_iam_role_arn=neptune_load_iam_role_arn
+        bucket=rdf_bucket, key=rdf_key, load_iam_role_arn=config.neptune.iam_role_arn,
     )
 
     logger = Logger()
@@ -47,6 +50,8 @@ def lambda_handler(event: Dict[str, Any], context: Any) -> None:
     }
     message_dict["default"] = json.dumps(message_dict)
     sns_client.publish(
-        TopicArn=on_success_sns_topic_arn, MessageStructure="json", Message=json.dumps(message_dict)
+        TopicArn=config.neptune.graph_load_sns_topic_arn,
+        MessageStructure="json",
+        Message=json.dumps(message_dict),
     )
     logger.info(event=LogEvent.GraphLoadedSNSNotificationEnd)

@@ -8,7 +8,6 @@ from typing import Any, Dict, Type
 import boto3
 
 from altimeter.core.artifact_io import is_s3_uri, parse_s3_uri
-from altimeter.core.config import Config
 from altimeter.core.log import Logger
 from altimeter.core.log_events import LogEvent
 
@@ -27,14 +26,14 @@ class ArtifactReader(abc.ABC):
         """
 
     @classmethod
-    def from_config(cls: Type["ArtifactReader"], config: Config) -> "ArtifactReader":
-        """Create an ArtifactReader based on a config. This either returns a FileArtifactReader
-        or an S3ArtifactReader depending on the value of Config.artifact_path"""
-        if is_s3_uri(config.artifact_path):
-            _, key_prefix = parse_s3_uri(config.artifact_path)
+    def from_artifact_path(cls: Type["ArtifactReader"], artifact_path: str) -> "ArtifactReader":
+        """Create an ArtifactReader based on an artifact path. This either returns a
+        FileArtifactReader or an S3ArtifactReader depending on the value of artifact_path"""
+        if is_s3_uri(artifact_path):
+            _, key_prefix = parse_s3_uri(artifact_path)
             if key_prefix is not None:
                 raise ValueError(
-                    f"S3 artifact path should be s3://<bucket>, no key - got {config.artifact_path}"
+                    f"S3 artifact path should be s3://<bucket>, no key - got {artifact_path}"
                 )
             return S3ArtifactReader()
         return FileArtifactReader()

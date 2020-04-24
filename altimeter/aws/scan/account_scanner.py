@@ -25,7 +25,6 @@ from altimeter.aws.settings import (
     GRAPH_VERSION,
 )
 from altimeter.core.artifact_io.writer import ArtifactWriter
-from altimeter.core.config import Config
 from altimeter.core.graph.graph_set import GraphSet
 from altimeter.core.graph.graph_spec import GraphSpec
 from altimeter.core.log import Logger
@@ -78,7 +77,9 @@ class AccountScanner:
         self,
         account_scan_plan: AccountScanPlan,
         artifact_writer: ArtifactWriter,
-        config: Config,
+        max_svc_scan_threads: int,
+        preferred_account_scan_regions: Tuple[str, ...],
+        scan_sub_accounts: bool,
         graph_name: str = GRAPH_NAME,
         graph_version: str = GRAPH_VERSION,
     ) -> None:
@@ -86,10 +87,10 @@ class AccountScanner:
         self.artifact_writer = artifact_writer
         self.graph_name = graph_name
         self.graph_version = graph_version
-        self.max_threads = config.concurrency.max_svc_scan_threads
-        self.preferred_account_scan_regions = config.scan.preferred_account_scan_regions
+        self.max_threads = max_svc_scan_threads
+        self.preferred_account_scan_regions = preferred_account_scan_regions
         self.resource_spec_classes = RESOURCE_SPEC_CLASSES + INFRA_RESOURCE_SPEC_CLASSES
-        if config.scan.scan_sub_accounts:
+        if scan_sub_accounts:
             self.resource_spec_classes += ORG_RESOURCE_SPEC_CLASSES
 
     def scan(self) -> List[Dict[str, Any]]:

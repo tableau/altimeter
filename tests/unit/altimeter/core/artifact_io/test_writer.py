@@ -7,43 +7,17 @@ import unittest
 import boto3
 import moto
 
-from altimeter.aws.auth.accessor import Accessor
 from altimeter.core.artifact_io.writer import ArtifactWriter, FileArtifactWriter, S3ArtifactWriter
-from altimeter.core.config import AccessConfig, ConcurrencyConfig, Config, ScanConfig
 
 class TestArtifactWriter(unittest.TestCase):
-    def test_from_config_s3(self):
-        access = AccessConfig(accessor=Accessor(multi_hop_accessors=[]))
-        concurrency = ConcurrencyConfig(max_account_scan_threads=1,
-                                        max_accounts_per_thread=1,
-                                        max_svc_scan_threads=1)
-        scan = ScanConfig(accounts=[],
-                          regions=[],
-                          scan_sub_accounts=False,
-                          preferred_account_scan_regions=[],
-                          single_account_mode=True)
-        config = Config(access=access,
-                        concurrency=concurrency,
-                        scan=scan,
-                        artifact_path="s3://bucket")
-        writer = ArtifactWriter.from_config(scan_id="test-scan-id", config=config)
+    def test_from_artifact_path_s3(self):
+        writer = ArtifactWriter.from_artifact_path(artifact_path="s3://bucket",
+                                                   scan_id="test-scan-id")
         self.assertIsInstance(writer, S3ArtifactWriter)
 
-    def test_from_config_filepath(self):
-        access = AccessConfig(accessor=Accessor(multi_hop_accessors=[]))
-        concurrency = ConcurrencyConfig(max_account_scan_threads=1,
-                                        max_accounts_per_thread=1,
-                                        max_svc_scan_threads=1)
-        scan = ScanConfig(accounts=[],
-                          regions=[],
-                          scan_sub_accounts=False,
-                          preferred_account_scan_regions=[],
-                          single_account_mode=True)
-        config = Config(access=access,
-                        concurrency=concurrency,
-                        scan=scan,
-                        artifact_path="/file/path")
-        writer = ArtifactWriter.from_config(scan_id="test-scan-id", config=config)
+    def test_from_artifact_path_filepath(self):
+        writer = ArtifactWriter.from_artifact_path(artifact_path="/file/path",
+                                                   scan_id="test-scan-id")
         self.assertIsInstance(writer, FileArtifactWriter)
 
 

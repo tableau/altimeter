@@ -42,6 +42,10 @@ class LambdaAWSScanMuxer(AWSScanMuxer):
         lambda_event = {
             "account_scan_plan": account_scan_plan.to_dict(),
             "scan_id": self.scan_id,
+            "artifact_path": self.config.artifact_path,
+            "max_svc_scan_threads": self.config.concurrency.max_svc_scan_threads,
+            "preferred_account_scan_regions": self.config.scan.preferred_account_scan_regions,
+            "scan_sub_accounts": self.config.scan.scan_sub_accounts,
         }
         return executor.submit(
             invoke_lambda,
