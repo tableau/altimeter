@@ -5,7 +5,6 @@ import argparse
 from dataclasses import dataclass
 import logging
 import json
-import os
 import sys
 from typing import Any, Dict, List, Optional
 import uuid
@@ -121,29 +120,17 @@ def lambda_handler(event: Dict[str, Any], context: Any) -> None:
         account_scan_lambda_name=account_scan_lambda_name,
         account_scan_lambda_timeout=account_scan_lambda_timeout,
     )
-    aws2n(scan_id=scan_id, config=config, muxer=muxer, load_neptune=False)
+    aws2n(scan_id=scan_id, config=config, muxer=muxer, load_neptune=True)
 
 
 def main(argv: Optional[List[str]] = None) -> int:
     if argv is None:
         argv = sys.argv[1:]
     parser = argparse.ArgumentParser()
-    parser.add_argument("--config", type=str, nargs="?")
+    parser.add_argument("config", type=str)
     args_ns = parser.parse_args(argv)
 
-    if args_ns.config:
-        config_path = args_ns.config
-    else:
-        config_path = os.environ.get("CONFIG_PATH")
-        if not config_path:
-            print(
-                (
-                    "Config path must be specified either with the '--config' option "
-                    "or the CONFIG_PATH environment variable."
-                )
-            )
-            return 1
-    config = Config.from_path(config_path)
+    config = Config.from_path(args_ns.config_path)
     scan_id = generate_scan_id()
     muxer = LocalAWSScanMuxer(scan_id=scan_id, config=config)
     result = aws2n(scan_id=scan_id, config=config, muxer=muxer, load_neptune=False)

@@ -29,7 +29,6 @@ setup(
         "bin/aws2n.py",
         "bin/graphpruner.py",
         "bin/rdf2blaze",
-        "bin/rdf2n.py",
         "bin/runquery.py",
         "bin/scan_resource.py",
     ],
