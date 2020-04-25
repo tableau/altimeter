@@ -9,10 +9,10 @@ install:
 jobs:
     include:
         - stage: static-analysis
-          script: ci/static_checks.sh altimeter
+          script: ci/static_checks.sh
 
         - stage: test
-          script: ci/test.sh altimeter tests/unit
+          script: ci/test.sh
 
         - stage: build-doc
           script:

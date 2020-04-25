@@ -6,20 +6,13 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
 ALTI_DIR=$(dirname "$SCRIPT_DIR")
 export PYTHONPATH="$PYTHONPATH:$ALTI_DIR"
 
-if [ $# -ne 1 ]; then
-    echo "Usage: $0 <src_dir>"
-    exit 1
-fi
-
-src_dir=$1
-
 if [ -z "$PYLINT_MIN_SCORE" ]; then
     PYLINT_MIN_SCORE=9
 fi
 dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd -P)
-black_cmd="black -l 100 --check $src_dir bin"
-lint_cmd="$dir/lint.py $src_dir bin --min_score ${PYLINT_MIN_SCORE}"
-mypy_cmd="mypy --ignore-missing-imports --disallow-untyped-defs $src_dir bin"
+black_cmd="black -l 100 --check altimeter bin"
+lint_cmd="$dir/lint.py altimeter bin --min_score ${PYLINT_MIN_SCORE}"
+mypy_cmd="mypy --ignore-missing-imports --disallow-untyped-defs altimeter bin"
 vulture_cmd="vulture --ignore-names lambda_handler altimeter bin"
 pyflakes_cmd="pyflakes altimeter bin"
 

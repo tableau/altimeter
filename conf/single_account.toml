@@ -9,7 +9,7 @@ pruner_max_age_min = 4320 # prune graphs over 3 days old
 
 [scan]
     # accounts to scan
-    accounts = []
+    accounts = ["1234"]
     # regions to scan. If empty, scan all available regions
     regions = []
     # if true, discover and scan subaccounts of the above accounts

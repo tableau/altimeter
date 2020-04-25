@@ -8,7 +8,8 @@ import boto3
 import jinja2
 
 from altimeter.aws.auth.cache import AWSCredentials, AWSCredentialsCache
-from altimeter.core.log import LogEvent, Logger
+from altimeter.core.log import Logger
+from altimeter.core.log_events import LogEvent
 
 
 @dataclass(frozen=True)

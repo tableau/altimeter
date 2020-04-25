@@ -1,5 +1,10 @@
 # This configuration will cause altimeter to scan the currently logged in account
 # and any of its subaccounts, using the OrganizationAccountAccessRole
+
+artifact_path = "/tmp/altimeter_multi_account"
+graph_name = "alti"
+pruner_max_age_min = 4320 # prune graphs over 3 days old
+
 [access]
     cache_creds = true
     [[access.multi_hop_accessors]]

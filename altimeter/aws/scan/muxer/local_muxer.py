@@ -1,47 +1,39 @@
 """AWSScanMuxer that runs account scans one-per-thread"""
 from concurrent.futures import Future, ThreadPoolExecutor
-from pathlib import Path
 from typing import Any, Dict, List
 
 from altimeter.aws.scan.muxer import AWSScanMuxer
 from altimeter.aws.scan.account_scan_plan import AccountScanPlan
 from altimeter.aws.scan.account_scanner import AccountScanner
-from altimeter.core.artifact_io.writer import FileArtifactWriter
+from altimeter.core.artifact_io.writer import ArtifactWriter
 from altimeter.core.config import Config
 
 
 def local_account_scan(
-    account_scan_plan_dict: Dict[str, Any], config: Config, output_dir: Path,
+    scan_id: str, account_scan_plan_dict: Dict[str, Any], config: Config,
 ) -> List[Dict[str, Any]]:
     """Scan a set of accounts.
 
     Args:
         account_scan_plan_dict: AccountScanPlan defining the scan
         config: Config object
-        output_dir: output artifats to this Path
     """
-    artifact_writer = FileArtifactWriter(output_dir=output_dir)
+    artifact_writer = ArtifactWriter.from_artifact_path(
+        artifact_path=config.artifact_path, scan_id=scan_id
+    )
     account_scan_plan = AccountScanPlan.from_dict(account_scan_plan_dict=account_scan_plan_dict)
     account_scanner = AccountScanner(
-        account_scan_plan=account_scan_plan, artifact_writer=artifact_writer, config=config,
+        account_scan_plan=account_scan_plan,
+        artifact_writer=artifact_writer,
+        max_svc_scan_threads=config.concurrency.max_svc_scan_threads,
+        preferred_account_scan_regions=config.scan.preferred_account_scan_regions,
+        scan_sub_accounts=config.scan.scan_sub_accounts,
     )
     return account_scanner.scan()
 
 
 class LocalAWSScanMuxer(AWSScanMuxer):
-    """AWSScanMuxer that runs account scans one account per thread and saves results
-    to a filesystem path.
-
-    Args:
-        output_dir: output artifacts to this dir
-        config: Config object
-    """
-
-    def __init__(
-        self, output_dir: Path, config: Config,
-    ):
-        super().__init__(config=config)
-        self.output_dir = output_dir
+    """AWSScanMuxer that runs account scans batches of accounts using local os threads"""
 
     def _schedule_account_scan(
         self, executor: ThreadPoolExecutor, account_scan_plan: AccountScanPlan
@@ -54,8 +46,8 @@ class LocalAWSScanMuxer(AWSScanMuxer):
             account_scan_plan: AccountScanPlans defining this scan
         """
         scan_lambda = lambda: local_account_scan(
+            scan_id=self.scan_id,
             account_scan_plan_dict=account_scan_plan.to_dict(),
-            output_dir=self.output_dir,
             config=self.config,
         )
         return executor.submit(scan_lambda)

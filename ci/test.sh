@@ -6,13 +6,8 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
 ALTI_DIR=$(dirname "$SCRIPT_DIR")
 export PYTHONPATH="$PYTHONPATH:$ALTI_DIR"
 
-if [ "$#" -ne 2 ]; then
-    echo "Usage: $0 <src_dir> <tests_dir>"
-    exit 1
-fi
-
-src_dir="$1"
-tests_dir="$2"
+src_dir="altimeter"
+tests_dir="tests/unit"
 
 if [ -z "$COVERAGE_MIN_PERCENTAGE" ]; then
     COVERAGE_MIN_PERCENTAGE=65

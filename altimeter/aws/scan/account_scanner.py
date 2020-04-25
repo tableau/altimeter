@@ -10,7 +10,7 @@ from typing import Any, DefaultDict, Dict, List, Tuple, Type
 
 import boto3
 
-from altimeter.aws.log import AWSLogEvents
+from altimeter.aws.log_events import AWSLogEvents
 from altimeter.aws.resource.resource_spec import ScanGranularity, AWSResourceSpec
 from altimeter.aws.resource.unscanned_account import UnscannedAccountResourceSpec
 from altimeter.aws.scan.account_scan_plan import AccountScanPlan
@@ -25,7 +25,6 @@ from altimeter.aws.settings import (
     GRAPH_VERSION,
 )
 from altimeter.core.artifact_io.writer import ArtifactWriter
-from altimeter.core.config import Config
 from altimeter.core.graph.graph_set import GraphSet
 from altimeter.core.graph.graph_spec import GraphSpec
 from altimeter.core.log import Logger
@@ -70,9 +69,6 @@ class AccountScanner:
     Args:
         account_scan_plan: AccountScanPlan describing scan targets
         artifact_writer: ArtifactWriter for writing out artifacts
-        scan_sub_accounts: Whether to auto-scan any org sub accounts of the target accounts
-        max_threads: max number of scan worker threads to spawn
-        preferred_account_scan_regions: tuple of region names to select from for non-regional
         graph_name: name of graph
         graph_version: version string for graph
     """
@@ -81,7 +77,9 @@ class AccountScanner:
         self,
         account_scan_plan: AccountScanPlan,
         artifact_writer: ArtifactWriter,
-        config: Config,
+        max_svc_scan_threads: int,
+        preferred_account_scan_regions: Tuple[str, ...],
+        scan_sub_accounts: bool,
         graph_name: str = GRAPH_NAME,
         graph_version: str = GRAPH_VERSION,
     ) -> None:
@@ -89,10 +87,10 @@ class AccountScanner:
         self.artifact_writer = artifact_writer
         self.graph_name = graph_name
         self.graph_version = graph_version
-        self.max_threads = config.concurrency.max_svc_scan_threads
-        self.preferred_account_scan_regions = config.scan.preferred_account_scan_regions
+        self.max_threads = max_svc_scan_threads
+        self.preferred_account_scan_regions = preferred_account_scan_regions
         self.resource_spec_classes = RESOURCE_SPEC_CLASSES + INFRA_RESOURCE_SPEC_CLASSES
-        if config.scan.scan_sub_accounts:
+        if scan_sub_accounts:
             self.resource_spec_classes += ORG_RESOURCE_SPEC_CLASSES
 
     def scan(self) -> List[Dict[str, Any]]:
@@ -235,7 +233,7 @@ class AccountScanner:
                     stats=MultilevelCounter(),
                 )
                 account_graph_set.validate()
-                output_artifact = self.artifact_writer.write_artifact(
+                output_artifact = self.artifact_writer.write_json(
                     name=account_id, data=account_graph_set.to_dict()
                 )
                 logger.info(event=AWSLogEvents.ScanAWSAccountEnd)
@@ -283,7 +281,7 @@ class AccountScanner:
                     for graph_set_dict in graph_set_dicts:
                         graph_set = GraphSet.from_dict(graph_set_dict)
                         account_graph_set.merge(graph_set)
-                output_artifact = self.artifact_writer.write_artifact(
+                output_artifact = self.artifact_writer.write_json(
                     name=account_id, data=account_graph_set.to_dict()
                 )
                 logger.info(event=AWSLogEvents.ScanAWSAccountEnd)

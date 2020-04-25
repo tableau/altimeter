@@ -10,7 +10,8 @@ from typing import Any, Dict, List, Optional, Type
 import boto3
 
 from altimeter.aws.access.exceptions import AccountAuthException
-from altimeter.core.log import LogEvent, Logger
+from altimeter.core.log import Logger
+from altimeter.core.log_events import LogEvent
 
 
 @dataclass(frozen=True)

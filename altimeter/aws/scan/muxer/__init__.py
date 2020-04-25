@@ -3,7 +3,7 @@ import abc
 from concurrent.futures import as_completed, Future, ThreadPoolExecutor
 from typing import Generator
 
-from altimeter.aws.log import AWSLogEvents
+from altimeter.aws.log_events import AWSLogEvents
 from altimeter.aws.scan.account_scan_plan import AccountScanPlan
 from altimeter.aws.scan.account_scan_manifest import AccountScanManifest
 from altimeter.core.config import Config
@@ -16,10 +16,12 @@ class AWSScanMuxer(abc.ABC):
     a local run or invoke a Lambda-per-account in the case of Altimeter running on AWS Lambda.
 
     Args:
+        scan_id: unique scan identifier
         config: Config object
     """
 
-    def __init__(self, config: Config):
+    def __init__(self, scan_id: str, config: Config):
+        self.scan_id = scan_id
         self.config = config
 
     def scan(
