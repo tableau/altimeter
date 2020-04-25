@@ -130,7 +130,7 @@ def main(argv: Optional[List[str]] = None) -> int:
     parser.add_argument("config", type=str)
     args_ns = parser.parse_args(argv)
 
-    config = Config.from_path(args_ns.config_path)
+    config = Config.from_path(args_ns.config)
     scan_id = generate_scan_id()
     muxer = LocalAWSScanMuxer(scan_id=scan_id, config=config)
     result = aws2n(scan_id=scan_id, config=config, muxer=muxer, load_neptune=False)
