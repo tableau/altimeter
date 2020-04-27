@@ -46,7 +46,7 @@ jobs:
           if: tag =~ ^[0-9]+\.[0-9]+\.[0-9]+-rc[0-9]+$ AND type = push AND fork = false
           script:
               - echo "$DOCKER_PASSWORD" | docker login --username altimeter --password-stdin
-              - docker build -t altimeter:${TRAVIS_TAG} .
+              - docker build -t altimeter/altimeter:${TRAVIS_TAG} .
               - docker push altimeter/altimeter:${TRAVIS_TAG}
 #
 #        # release packages are published if the tag matches n.n.n
@@ -69,8 +69,8 @@ jobs:
 #          if: tag =~ ^[0-9]+\.[0-9]+\.[0-9]+$ AND type = push AND fork = false
 #          script:
 #              - echo "$DOCKER_PASSWORD" | docker login -u altimeter --password-stdin
-#              - docker build -t altimeter:${TRAVIS_TAG} .
-#              - docker tag altimeter:${TRAVIS_TAG} altimeter:latest
+#              - docker build -t altimeter/altimeter:${TRAVIS_TAG} .
+#              - docker tag altimeter/altimeter:${TRAVIS_TAG} altimeter:latest
 #              - docker push altimeter/altimeter:${TRAVIS_TAG}
 #              - docker push altimeter/altimeter:latest
 #
