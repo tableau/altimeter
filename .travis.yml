@@ -5,8 +5,8 @@ services:
   - docker
 env:
   global:
-    secure: "U6gIo1la+B4yyzbzfrWKbSKcxwdZAJkj+Mw9O1z8vDeDJUq41dTbcD/C+QAo/XrWeGENNNPl5v1Q1FRdq0toCroigt4VBuoN9I+qYY7Qkm7ZurDZSNRVLD+AdPettuNav9PIZHIRQzOZ7OCoLh8n1ZHDMLigMyuNDP6o3tpduBfDNx0kyafZI2XJ9qSD9UDt7bRWeTmLWaV2raH+YwtOn/OQKZBKRcrhLfh2aj/sqgr32dpL8tAJ0Vgb3rbjm31bMxYbND9A+hEhjpbA/n+TXCJiXtPHUdEqMlMnBbAaqmq9ASv1RxC4l9E/V6sPkal52er0eT+Jz+l5aLUrz8IglW5y2i75KKcIWGx7wzu0958Sp6KXu7HQwLMqgSLsWH3+ECvZ+2nvm8GquFa9PqXfsUeaA5VmK4zvkcMPzaGp0aHRa680+J78C9EYPgTYZUGyk2Nc/AVEorXij4fPECpcIlJBtM1CIbURdUyuhZXeZleA9oLPcBH2OdeW7y2Ujw713rtaf6DJ8R0OsT2XJ3vANejLZcFiDGIs02hMjXUeiuOP9MqVBqCfCRsA6xwId1EbAmmo8H1V1dyy0TbLC407npJw5RlUmFRzfgMnWEaL1k9Vb6zC+e6VGVWjpWR2W51kxt6Hy2T6le0nAmxrHxBVtrSJIHOaTiSVw9peOxoqHrI="
-    secure: "ejJdhmgtrAvuWAgZBahyru53YPH9g3wFUaLaEObkBbgzTDI8YZhhuAdMTKimCZX68MNdErXdhhc7VPS3Ks/tmbCztqmZChvcu0EP1ma/bEiM/VkfmxEK/54Dno6MgARhvkyylFkJeFN/HDMy6+M7IELbDSVy99MrSg8HhQCAKLlBQ5V5fyDzj/S7IKrvTr+BDxCmJa4Ik5KqTUoskkGCoBJlOtQaZ7MZiO8KLpK+nzaWsBe/rHZrqgufzdN+3+VRcaQs5La6YfNtZ7wLJNGe4O5PEBtHweiH7o19p382twv5qjj7FL16yA7VE+ofA6w+j90Din4yq6L6R/HMxq6Jrg5TWNvCIUxxmQoo/r2HeKFtctKQavuX6yaXeSwFtoE4kKh63XFsToSoogKKqS/yT92hpQYW+HSQClxGTDhSI1Ahu9LgxGAodSA7Ho15x6pENjJ2K3okynud0S6goQPaJudpG2JVIp1zBjBSIXH+8kIjXxZdOBiWMehikzRduZX8sGSKwtfurdZ2tj68kkk/TIWVBhWn7q7EcdPzcQ+ePrw2GNVzQd/iJriD3n5Qb8oWy+ooM+lerm9GaGujPyX3LiYWwBfloVIfryofHKhHk54I6fdfIngCc0rD9o/1khoTXq9I2Q3aQEJ/xSbN3+m0oTMLCoIc6CP5VYY0RYgkwsE="
+    secure: "jhQUq3Srd75RSLMtE+rrOliqw9n1QfVCFf00J+n4qefC/iCJwG6bagX/jUX/dOEq4yFsl8POfmN6v9+OtQvvTmmwtkfNzl6bpqtZOP/nRTQShbhIUpXMN2Up1eAd6i3g9xfeMEJQZspgUgdoc/E3+51OP7+abTqMIp96qUKEDl7CeTJCNaxJCmPWe5B/doudq2f5N0epTkDE380FsTpitU4JeZz9h/3XrZ0GLIWt0Bv7TpxuwKp8toNVU9mxyFv+1LVBz5tJ6yu+ZvNPdp0zeApIpGl+Vh68GCPlR9cYOw7Rr/f1KyuGQZpqX+U5R+QPikwg/7Vf+YaFrmiy6wzro/YWDaAHIKxy/ld+RLi4rmH/U5WDs4yK7WWFU5lBgFIp2xO6Bra8qd2pEOnoeaDcpKW99VcnypiMIesIZyLuLHVU1htUID0D8HJWNjcHl8WkQv/iinR7CGhMXr3J25ihFipNRo5jH4wfZ44jGKyR0a8Kj0T/jRqt0ntCATKBsbjb4sAka5liIh1P81MJZ7zyXi99WBh96JDfeGlT6jfT727SYjrRzwq+G0Pr8pLSHwgznmcUEjtZRrKv4XjPW1FA6a7Qo9tqS2X/iQn0Rk8H0ciiaP/WTBKqyyuWApo75nStN4Cgrz6roIcUje2mwRcmA/+mpLhtfna7S+PyJbfS+T8="
+    secure: "UmN2HxVpIi1PMfHaF9D4NzQaGHmSKhIEi2hzdtGYSRTgN6zE3HCA36hJRiRD74Y7JXPGMfuuKz0kFNJIGBN1YB2g0hYlmRquIUfD4CFsLkpiddC/vu11sBjaBDd0a7T27DYbfeRLXbI5CXSYNL3V7tXgCXfFHgp92TXMe7qLh2/6aRA0I6rwFp7c+g9pblYYAI4mVAj1iMgrq2rmlzXNs0KHkerIt5ZCO933meXaaxoqitjTL4hRMY2Nww4XF3FKVwmISDTxKOO/iGwtUSXvle3OrUCr0U8x2dY27fu65JLVoDJHp17GBQOfRjSAnnWaNkykPRsUGWEPSzjiX9eBcszWpXLM7D+P9R8Bk7KA2vh7aj6jrBhrbFiVMWatSDi3oRhChWl7NIfEQjmu3cUs3IkEIEzeIBmxXIhunXnqvPApBAurldXVga9b7ekBNt/WNP80JpNE11X9paO8J9hFjaqnUopjnwFl+HWt1cahg7gx4sz9YuTlpFbqyeAKY0wJ/FeQ+1RoXfWrP4UlApbLUAEoZn6WfoPnM858FqR7LzuWax1LeatoLwYB2oHUZRxu/ZCzf7/xCbvbVH0K4DO5TEDLsDmE20qrHgZprnPAl9QsoA8N484Nbu1p1tMGqoYCVgTgW+0cOiN2p49bl1oasqEaOo3UE7Ts7WJCAb5bIVc="
 install:
     - pip install -r requirements.txt
     - pip install -r ci/requirements.txt
@@ -46,7 +46,7 @@ jobs:
         - stage: build-push-docker-image-release-candidate
           if: tag =~ ^[0-9]+\.[0-9]+\.[0-9]+-rc[0-9]+$ AND type = push AND fork = false
           script:
-              - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+              - echo "$DOCKER_PASSWORD" | docker login --username "$DOCKER_USERNAME" --password-stdin
               - docker build -t altimeter:${TRAVIS_TAG} .
               - docker push altimeter:${TRAVIS_TAG}
 #
