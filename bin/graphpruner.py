@@ -12,6 +12,7 @@ from altimeter.core.parameters import get_required_str_env_var
 
 
 def lambda_handler(event: Dict[str, Any], context: Any) -> None:
+    """Entrypoint"""
     root = logging.getLogger()
     if root.handlers:
         for handler in root.handlers:
