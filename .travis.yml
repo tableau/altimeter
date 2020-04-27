@@ -36,6 +36,14 @@ jobs:
                   all_branches: true
                   tags: true
 
+        # rc packages are published if the tag matches n.n.n-rcn
+        - stage: build-push-docker-image-release-candidate
+          if: tag =~ ^[0-9]+\.[0-9]+\.[0-9]+-rc[0-9]+$ AND type = push AND fork = false
+          script:
+              - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+              - docker build -t altimeter:${TRAVIS_TAG} .
+              - docker push altimeter:${TRAVIS_TAG}
+
         # release packages are published if the tag matches n.n.n
         - stage: deploy-pypi-release
           if: tag =~ ^[0-9]+\.[0-9]+\.[0-9]+$ AND type = push AND fork = false
@@ -50,6 +58,16 @@ jobs:
               skip_existing: true
               on:
                   all_branches: true
+
+        # release packages are published if the tag matches n.n.n
+        - stage: build-push-docker-image-release
+          if: tag =~ ^[0-9]+\.[0-9]+\.[0-9]+$ AND type = push AND fork = false
+          script:
+              - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+              - docker build -t altimeter:${TRAVIS_TAG} .
+              - docker tag altimeter:${TRAVIS_TAG} altimeter:latest
+              - docker push altimeter:${TRAVIS_TAG}
+              - docker push altimeter:latest
 
         # only publish to pages for master with a tag matching a 'real' release.
         - stage: deploy-github-pages
