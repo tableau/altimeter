@@ -1,6 +1,9 @@
 os: linux
 language: python
 python: 3.7
+env:
+  global:
+    secure: U6gIo1la+B4yyzbzfrWKbSKcxwdZAJkj+Mw9O1z8vDeDJUq41dTbcD/C+QAo/XrWeGENNNPl5v1Q1FRdq0toCroigt4VBuoN9I+qYY7Qkm7ZurDZSNRVLD+AdPettuNav9PIZHIRQzOZ7OCoLh8n1ZHDMLigMyuNDP6o3tpduBfDNx0kyafZI2XJ9qSD9UDt7bRWeTmLWaV2raH+YwtOn/OQKZBKRcrhLfh2aj/sqgr32dpL8tAJ0Vgb3rbjm31bMxYbND9A+hEhjpbA/n+TXCJiXtPHUdEqMlMnBbAaqmq9ASv1RxC4l9E/V6sPkal52er0eT+Jz+l5aLUrz8IglW5y2i75KKcIWGx7wzu0958Sp6KXu7HQwLMqgSLsWH3+ECvZ+2nvm8GquFa9PqXfsUeaA5VmK4zvkcMPzaGp0aHRa680+J78C9EYPgTYZUGyk2Nc/AVEorXij4fPECpcIlJBtM1CIbURdUyuhZXeZleA9oLPcBH2OdeW7y2Ujw713rtaf6DJ8R0OsT2XJ3vANejLZcFiDGIs02hMjXUeiuOP9MqVBqCfCRsA6xwId1EbAmmo8H1V1dyy0TbLC407npJw5RlUmFRzfgMnWEaL1k9Vb6zC+e6VGVWjpWR2W51kxt6Hy2T6le0nAmxrHxBVtrSJIHOaTiSVw9peOxoqHrI=
 install:
     - pip install -r requirements.txt
     - pip install -r ci/requirements.txt
@@ -8,79 +11,79 @@ install:
     - pip install -r tests/unit/requirements.txt
 jobs:
     include:
-#        - stage: static-analysis
-#          script: ci/static_checks.sh
-#
-#        - stage: test
-#          script: ci/test.sh
-#
-#        - stage: build-doc
-#          script:
-#              - export PYTHONPATH=.
-#              - sphinx-apidoc -f -o doc/source altimeter
-#              - sphinx-build doc/source doc/html -E -W
-#
-#        # rc packages are published if the tag matches n.n.n-rcn
-#        - stage: deploy-pypi-release-candidate
-#          if: tag =~ ^[0-9]+\.[0-9]+\.[0-9]+-rc[0-9]+$ AND type = push AND fork = false
-#          script:
-#              - sed -i "s/LOCALVERSION/${TRAVIS_TAG}/g" setup.py
-#          deploy:
-#              provider: pypi
-#              skip_cleanup: true
-#              user: "__token__"
-#              password:
-#                  secure: "oXWWn+yLy0sZhZrE/Pv3pd4GaoufgLbKZ3HoAWMdudZwK6YI/xikw3wn1yfnuyhcUFGemoE99oE7Xz3+jUmINVElzqnlkpG6/j6FYuPZU4Ca90hyLX9E0Ojw5RYx3PqCOGAtt6qyjRrS7doVyUwAd5hcryKupQrz8fWpfECP11kVxxhk4Bxq08UfZrLGzxsMd0rGL8FiHlV7d4EDW6X8v0t+I6YulqrkW2nyeXQrRie5+01DMxBBwXAF477UvHuDwfjZ/2JH2pk7p3cF0VI0FLfdPe3+k/tuodbGYJr9t3qtl1pqzc4PzC4qfnZIOelnEcWBFIGMzVWjKNdChBu5iqgQGSiY0/R43qNQk66Ioj9++wQKWWlKS+eaqI4A1k182ioSscC17GwyY6OJ0VzU5gengfkk36oBBr0w8JjIsu8piq9/Ea+QRZJMnjYy/tExyAGheVB0QjIhIaJBCb/04igq8s9VOdgWtLBbWdhe/B6XI/3Hl0F1ztJz5078fYYVQr/RuXsQOdiYy4TpIoPSdla3BgW7kwPKetfYd1VGE1tdbLiBtCsJZVjcRLn9yOowze85OmD2eYunKQuCW6SCgSUspoSCuVWoNUrYLlJgXpjuXkPGOXK7Vd2hiw2vRKfSp8YVANpPzUpP8C1Sn29XMnOw5u6hKnOlpCgsen0bemM="
-#              skip_existing: true
-#              on:
-#                  all_branches: true
-#                  tags: true
+        - stage: static-analysis
+          script: ci/static_checks.sh
+
+        - stage: test
+          script: ci/test.sh
+
+        - stage: build-doc
+          script:
+              - export PYTHONPATH=.
+              - sphinx-apidoc -f -o doc/source altimeter
+              - sphinx-build doc/source doc/html -E -W
+
+        # rc packages are published if the tag matches n.n.n-rcn
+        - stage: deploy-pypi-release-candidate
+          if: tag =~ ^[0-9]+\.[0-9]+\.[0-9]+-rc[0-9]+$ AND type = push AND fork = false
+          script:
+              - sed -i "s/LOCALVERSION/${TRAVIS_TAG}/g" setup.py
+          deploy:
+              provider: pypi
+              skip_cleanup: true
+              user: "__token__"
+              password:
+                  secure: "oXWWn+yLy0sZhZrE/Pv3pd4GaoufgLbKZ3HoAWMdudZwK6YI/xikw3wn1yfnuyhcUFGemoE99oE7Xz3+jUmINVElzqnlkpG6/j6FYuPZU4Ca90hyLX9E0Ojw5RYx3PqCOGAtt6qyjRrS7doVyUwAd5hcryKupQrz8fWpfECP11kVxxhk4Bxq08UfZrLGzxsMd0rGL8FiHlV7d4EDW6X8v0t+I6YulqrkW2nyeXQrRie5+01DMxBBwXAF477UvHuDwfjZ/2JH2pk7p3cF0VI0FLfdPe3+k/tuodbGYJr9t3qtl1pqzc4PzC4qfnZIOelnEcWBFIGMzVWjKNdChBu5iqgQGSiY0/R43qNQk66Ioj9++wQKWWlKS+eaqI4A1k182ioSscC17GwyY6OJ0VzU5gengfkk36oBBr0w8JjIsu8piq9/Ea+QRZJMnjYy/tExyAGheVB0QjIhIaJBCb/04igq8s9VOdgWtLBbWdhe/B6XI/3Hl0F1ztJz5078fYYVQr/RuXsQOdiYy4TpIoPSdla3BgW7kwPKetfYd1VGE1tdbLiBtCsJZVjcRLn9yOowze85OmD2eYunKQuCW6SCgSUspoSCuVWoNUrYLlJgXpjuXkPGOXK7Vd2hiw2vRKfSp8YVANpPzUpP8C1Sn29XMnOw5u6hKnOlpCgsen0bemM="
+              skip_existing: true
+              on:
+                  all_branches: true
+                  tags: true
 
         # rc packages are published if the tag matches n.n.n-rcn
         - stage: build-push-docker-image-release-candidate
-          #if: tag =~ ^[0-9]+\.[0-9]+\.[0-9]+-rc[0-9]+$ AND type = push AND fork = false
+          if: tag =~ ^[0-9]+\.[0-9]+\.[0-9]+-rc[0-9]+$ AND type = push AND fork = false
           script:
               - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
               - docker build -t altimeter:${TRAVIS_TAG} .
               - docker push altimeter:${TRAVIS_TAG}
 
-#        # release packages are published if the tag matches n.n.n
-#        - stage: deploy-pypi-release
-#          if: tag =~ ^[0-9]+\.[0-9]+\.[0-9]+$ AND type = push AND fork = false
-#          script:
-#              - sed -i "s/LOCALVERSION/${TRAVIS_TAG}/g" setup.py
-#          deploy:
-#              provider: pypi
-#              skip_cleanup: true
-#              user: "__token__"
-#              password:
-#                  secure: "oXWWn+yLy0sZhZrE/Pv3pd4GaoufgLbKZ3HoAWMdudZwK6YI/xikw3wn1yfnuyhcUFGemoE99oE7Xz3+jUmINVElzqnlkpG6/j6FYuPZU4Ca90hyLX9E0Ojw5RYx3PqCOGAtt6qyjRrS7doVyUwAd5hcryKupQrz8fWpfECP11kVxxhk4Bxq08UfZrLGzxsMd0rGL8FiHlV7d4EDW6X8v0t+I6YulqrkW2nyeXQrRie5+01DMxBBwXAF477UvHuDwfjZ/2JH2pk7p3cF0VI0FLfdPe3+k/tuodbGYJr9t3qtl1pqzc4PzC4qfnZIOelnEcWBFIGMzVWjKNdChBu5iqgQGSiY0/R43qNQk66Ioj9++wQKWWlKS+eaqI4A1k182ioSscC17GwyY6OJ0VzU5gengfkk36oBBr0w8JjIsu8piq9/Ea+QRZJMnjYy/tExyAGheVB0QjIhIaJBCb/04igq8s9VOdgWtLBbWdhe/B6XI/3Hl0F1ztJz5078fYYVQr/RuXsQOdiYy4TpIoPSdla3BgW7kwPKetfYd1VGE1tdbLiBtCsJZVjcRLn9yOowze85OmD2eYunKQuCW6SCgSUspoSCuVWoNUrYLlJgXpjuXkPGOXK7Vd2hiw2vRKfSp8YVANpPzUpP8C1Sn29XMnOw5u6hKnOlpCgsen0bemM="
-#              skip_existing: true
-#              on:
-#                  all_branches: true
-#
-#        # release packages are published if the tag matches n.n.n
-#        - stage: build-push-docker-image-release
-#          if: tag =~ ^[0-9]+\.[0-9]+\.[0-9]+$ AND type = push AND fork = false
-#          script:
-#              - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-#              - docker build -t altimeter:${TRAVIS_TAG} .
-#              - docker tag altimeter:${TRAVIS_TAG} altimeter:latest
-#              - docker push altimeter:${TRAVIS_TAG}
-#              - docker push altimeter:latest
-#
-#        # only publish to pages for master with a tag matching a 'real' release.
-#        - stage: deploy-github-pages
-#          if: tag =~ ^[0-9]+\.[0-9]+\.[0-9]+$ AND type = push AND fork = false
-#          script:
-#              - export PYTHONPATH=.
-#              - sphinx-apidoc -f -o doc/source altimeter
-#              - sphinx-build doc/source doc/html -E -W
-#              - touch doc/html/.nojekyll
-#          deploy:
-#              provider: pages
-#              skip_cleanup: true
-#              github_token: $GITHUB_TOKEN
-#              local_dir: doc/html
-#              on:
-#                  all_branches: true
+        # release packages are published if the tag matches n.n.n
+        - stage: deploy-pypi-release
+          if: tag =~ ^[0-9]+\.[0-9]+\.[0-9]+$ AND type = push AND fork = false
+          script:
+              - sed -i "s/LOCALVERSION/${TRAVIS_TAG}/g" setup.py
+          deploy:
+              provider: pypi
+              skip_cleanup: true
+              user: "__token__"
+              password:
+                  secure: "oXWWn+yLy0sZhZrE/Pv3pd4GaoufgLbKZ3HoAWMdudZwK6YI/xikw3wn1yfnuyhcUFGemoE99oE7Xz3+jUmINVElzqnlkpG6/j6FYuPZU4Ca90hyLX9E0Ojw5RYx3PqCOGAtt6qyjRrS7doVyUwAd5hcryKupQrz8fWpfECP11kVxxhk4Bxq08UfZrLGzxsMd0rGL8FiHlV7d4EDW6X8v0t+I6YulqrkW2nyeXQrRie5+01DMxBBwXAF477UvHuDwfjZ/2JH2pk7p3cF0VI0FLfdPe3+k/tuodbGYJr9t3qtl1pqzc4PzC4qfnZIOelnEcWBFIGMzVWjKNdChBu5iqgQGSiY0/R43qNQk66Ioj9++wQKWWlKS+eaqI4A1k182ioSscC17GwyY6OJ0VzU5gengfkk36oBBr0w8JjIsu8piq9/Ea+QRZJMnjYy/tExyAGheVB0QjIhIaJBCb/04igq8s9VOdgWtLBbWdhe/B6XI/3Hl0F1ztJz5078fYYVQr/RuXsQOdiYy4TpIoPSdla3BgW7kwPKetfYd1VGE1tdbLiBtCsJZVjcRLn9yOowze85OmD2eYunKQuCW6SCgSUspoSCuVWoNUrYLlJgXpjuXkPGOXK7Vd2hiw2vRKfSp8YVANpPzUpP8C1Sn29XMnOw5u6hKnOlpCgsen0bemM="
+              skip_existing: true
+              on:
+                  all_branches: true
+
+        # release packages are published if the tag matches n.n.n
+        - stage: build-push-docker-image-release
+          if: tag =~ ^[0-9]+\.[0-9]+\.[0-9]+$ AND type = push AND fork = false
+          script:
+              - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+              - docker build -t altimeter:${TRAVIS_TAG} .
+              - docker tag altimeter:${TRAVIS_TAG} altimeter:latest
+              - docker push altimeter:${TRAVIS_TAG}
+              - docker push altimeter:latest
+
+        # only publish to pages for master with a tag matching a 'real' release.
+        - stage: deploy-github-pages
+          if: tag =~ ^[0-9]+\.[0-9]+\.[0-9]+$ AND type = push AND fork = false
+          script:
+              - export PYTHONPATH=.
+              - sphinx-apidoc -f -o doc/source altimeter
+              - sphinx-build doc/source doc/html -E -W
+              - touch doc/html/.nojekyll
+          deploy:
+              provider: pages
+              skip_cleanup: true
+              github_token: $GITHUB_TOKEN
+              local_dir: doc/html
+              on:
+                  all_branches: true
