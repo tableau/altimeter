@@ -5,6 +5,7 @@ import argparse
 from dataclasses import dataclass
 import logging
 import json
+import os
 import sys
 from typing import Any, Dict, List, Optional
 import uuid
@@ -127,10 +128,17 @@ def main(argv: Optional[List[str]] = None) -> int:
     if argv is None:
         argv = sys.argv[1:]
     parser = argparse.ArgumentParser()
-    parser.add_argument("config", type=str)
+    parser.add_argument("config", type=str, nargs="?")
     args_ns = parser.parse_args(argv)
 
-    config = Config.from_path(args_ns.config)
+    config = args_ns.config
+    if config is None:
+        config = os.environ.get("CONFIG_PATH")
+    if config is None:
+        print("config must be provided as a positional arg or env var 'CONFIG_PATH'")
+        return 1
+
+    config = Config.from_path(config)
     scan_id = generate_scan_id()
     muxer = LocalAWSScanMuxer(scan_id=scan_id, config=config)
     result = aws2n(scan_id=scan_id, config=config, muxer=muxer, load_neptune=False)
