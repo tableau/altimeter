@@ -5,7 +5,6 @@ services:
   - docker
 env:
   global:
-    - secure: "jhQUq3Srd75RSLMtE+rrOliqw9n1QfVCFf00J+n4qefC/iCJwG6bagX/jUX/dOEq4yFsl8POfmN6v9+OtQvvTmmwtkfNzl6bpqtZOP/nRTQShbhIUpXMN2Up1eAd6i3g9xfeMEJQZspgUgdoc/E3+51OP7+abTqMIp96qUKEDl7CeTJCNaxJCmPWe5B/doudq2f5N0epTkDE380FsTpitU4JeZz9h/3XrZ0GLIWt0Bv7TpxuwKp8toNVU9mxyFv+1LVBz5tJ6yu+ZvNPdp0zeApIpGl+Vh68GCPlR9cYOw7Rr/f1KyuGQZpqX+U5R+QPikwg/7Vf+YaFrmiy6wzro/YWDaAHIKxy/ld+RLi4rmH/U5WDs4yK7WWFU5lBgFIp2xO6Bra8qd2pEOnoeaDcpKW99VcnypiMIesIZyLuLHVU1htUID0D8HJWNjcHl8WkQv/iinR7CGhMXr3J25ihFipNRo5jH4wfZ44jGKyR0a8Kj0T/jRqt0ntCATKBsbjb4sAka5liIh1P81MJZ7zyXi99WBh96JDfeGlT6jfT727SYjrRzwq+G0Pr8pLSHwgznmcUEjtZRrKv4XjPW1FA6a7Qo9tqS2X/iQn0Rk8H0ciiaP/WTBKqyyuWApo75nStN4Cgrz6roIcUje2mwRcmA/+mpLhtfna7S+PyJbfS+T8="
     - secure: "UmN2HxVpIi1PMfHaF9D4NzQaGHmSKhIEi2hzdtGYSRTgN6zE3HCA36hJRiRD74Y7JXPGMfuuKz0kFNJIGBN1YB2g0hYlmRquIUfD4CFsLkpiddC/vu11sBjaBDd0a7T27DYbfeRLXbI5CXSYNL3V7tXgCXfFHgp92TXMe7qLh2/6aRA0I6rwFp7c+g9pblYYAI4mVAj1iMgrq2rmlzXNs0KHkerIt5ZCO933meXaaxoqitjTL4hRMY2Nww4XF3FKVwmISDTxKOO/iGwtUSXvle3OrUCr0U8x2dY27fu65JLVoDJHp17GBQOfRjSAnnWaNkykPRsUGWEPSzjiX9eBcszWpXLM7D+P9R8Bk7KA2vh7aj6jrBhrbFiVMWatSDi3oRhChWl7NIfEQjmu3cUs3IkEIEzeIBmxXIhunXnqvPApBAurldXVga9b7ekBNt/WNP80JpNE11X9paO8J9hFjaqnUopjnwFl+HWt1cahg7gx4sz9YuTlpFbqyeAKY0wJ/FeQ+1RoXfWrP4UlApbLUAEoZn6WfoPnM858FqR7LzuWax1LeatoLwYB2oHUZRxu/ZCzf7/xCbvbVH0K4DO5TEDLsDmE20qrHgZprnPAl9QsoA8N484Nbu1p1tMGqoYCVgTgW+0cOiN2p49bl1oasqEaOo3UE7Ts7WJCAb5bIVc="
 install:
     - pip install -r requirements.txt
@@ -46,7 +45,7 @@ jobs:
         - stage: build-push-docker-image-release-candidate
           if: tag =~ ^[0-9]+\.[0-9]+\.[0-9]+-rc[0-9]+$ AND type = push AND fork = false
           script:
-              - echo "$DOCKER_PASSWORD" | docker login --username "$DOCKER_USERNAME" --password-stdin
+              - echo "$DOCKER_PASSWORD" | docker login --username altimeter --password-stdin
               - docker build -t altimeter:${TRAVIS_TAG} .
               - docker push altimeter:${TRAVIS_TAG}
 #
@@ -69,7 +68,7 @@ jobs:
 #        - stage: build-push-docker-image-release
 #          if: tag =~ ^[0-9]+\.[0-9]+\.[0-9]+$ AND type = push AND fork = false
 #          script:
-#              - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+#              - echo "$DOCKER_PASSWORD" | docker login -u altimeter --password-stdin
 #              - docker build -t altimeter:${TRAVIS_TAG} .
 #              - docker tag altimeter:${TRAVIS_TAG} altimeter:latest
 #              - docker push altimeter:${TRAVIS_TAG}
