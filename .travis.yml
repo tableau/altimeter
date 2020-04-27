@@ -47,7 +47,7 @@ jobs:
           script:
               - echo "$DOCKER_PASSWORD" | docker login --username altimeter --password-stdin
               - docker build -t altimeter:${TRAVIS_TAG} .
-              - docker push altimeter:${TRAVIS_TAG}
+              - docker push altimeter/altimeter:${TRAVIS_TAG}
 #
 #        # release packages are published if the tag matches n.n.n
 #        - stage: deploy-pypi-release
@@ -71,8 +71,8 @@ jobs:
 #              - echo "$DOCKER_PASSWORD" | docker login -u altimeter --password-stdin
 #              - docker build -t altimeter:${TRAVIS_TAG} .
 #              - docker tag altimeter:${TRAVIS_TAG} altimeter:latest
-#              - docker push altimeter:${TRAVIS_TAG}
-#              - docker push altimeter:latest
+#              - docker push altimeter/altimeter:${TRAVIS_TAG}
+#              - docker push altimeter/altimeter:latest
 #
 #        # only publish to pages for master with a tag matching a 'real' release.
 #        - stage: deploy-github-pages
