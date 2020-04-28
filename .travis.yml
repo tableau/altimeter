@@ -71,9 +71,7 @@ jobs:
           script:
               - echo "$DOCKER_PASSWORD" | docker login --username "$DOCKER_USERNAME" --password-stdin
               - docker build -t altimeter/altimeter:${TRAVIS_TAG} .
-              - docker tag altimeter/altimeter:${TRAVIS_TAG} altimeter:latest
               - docker push altimeter/altimeter:${TRAVIS_TAG}
-              - docker push altimeter/altimeter:latest
 
         # only publish to pages for master with a tag matching a 'real' release.
         - stage: deploy-github-pages
