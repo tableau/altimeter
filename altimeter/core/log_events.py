@@ -31,9 +31,6 @@ class LogEvent(BaseLogEvent):
     PruneNeptuneGraphsEnd: EventName
     PruneNeptuneGraphsError: EventName
 
-    PruneNeptuneMetadataGraphStart: EventName
-    PruneNeptuneMetadataGraphEnd: EventName
-
     ReadFromFSStart: EventName
     ReadFromFSEnd: EventName
 

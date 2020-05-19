@@ -38,22 +38,17 @@ def lambda_handler(event: Dict[str, Any], context: Any) -> None:
 
     uncleared = []
 
-    # first prune metadata - if clears below are partial we want to make sure no clients
-    # consider this a valid graph still.
-    logger.info(event=LogEvent.PruneNeptuneMetadataGraphStart)
-    client.clear_old_graph_metadata(name=config.graph_name, max_age_min=config.pruner_max_age_min)
-    logger.info(event=LogEvent.PruneNeptuneMetadataGraphEnd)
-    # now clear actual graphs
+    logger.info(event=LogEvent.PruneNeptuneGraphsStart)
+    all_graph_metadatas = client.get_graph_metadatas(name=config.graph_name)
     with logger.bind(neptune_endpoint=str(endpoint)):
-        logger.info(event=LogEvent.PruneNeptuneGraphsStart)
-        for graph_metadata in client.get_graph_metadatas(name=config.graph_name):
+        for graph_metadata in all_graph_metadatas:
             assert graph_metadata.name == config.graph_name
             graph_epoch = graph_metadata.end_time
             with logger.bind(graph_uri=graph_metadata.uri, graph_epoch=graph_epoch):
                 if graph_epoch < oldest_acceptable_graph_epoch:
                     logger.info(event=LogEvent.PruneNeptuneGraphStart)
                     try:
-                        client.clear_graph(graph_uri=graph_metadata.uri)
+                        client.clear_graph(name=config.graph_name, uri=graph_metadata.uri)
                         logger.info(event=LogEvent.PruneNeptuneGraphEnd)
                     except Exception as ex:
                         logger.error(
