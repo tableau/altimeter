@@ -350,24 +350,6 @@ class AltimeterNeptuneClient:
             graph_metadatas.append(graph_metadata)
         return graph_metadatas
 
-    def clear_graph(self, graph_uri: str) -> None:
-        """Clear a graph by name in Neptune
-
-        Args:
-            graph_uri: uri of graph to clear
-
-        Raises:
-            NeptuneClearGraphException if an error occurred during graph clearing.
-        """
-        auth = self._get_auth()
-        neptune_sparql_url = self._neptune_endpoint.get_sparql_endpoint()
-        update_stmt = f"clear graph <{graph_uri}>"
-        resp = requests.post(neptune_sparql_url, data={"update": update_stmt}, auth=auth)
-        if resp.status_code != 200:
-            raise NeptuneClearGraphException(
-                (f"Error clearing graph {graph_uri} " f"with {update_stmt} : {resp.text}")
-            )
-
     def _get_latest_graph_metadata(self, name: str, version: Optional[str] = None) -> GraphMetadata:
         """Return a GraphMetadata object representing the most recently successfully loaded graph
         for a given name / version.
@@ -439,40 +421,47 @@ class AltimeterNeptuneClient:
             end_time=latest_end_time,
         )
 
-    def clear_old_graph_metadata(self, name: str, max_age_min: int) -> None:
-        """Remove all entries in the meta graph older than max_age_min minutes for a given name.
+    def clear_graph(self, name: str, uri: str) -> None:
+        """Remove data and metadata for a graph by uri
 
         Args:
             name: graph name
-            max_age_min: clear graphs older than this number (in min)
+            uri: graph uri
 
         Raises:
-            NeptuneUpdateGraphException if an error occurred during metadata graph update
+            NeptuneUpdateGraphException if an error occurred during clearing
         """
-        now = int(datetime.now().timestamp())
-        oldest_acceptable_graph_scan_time = now - max_age_min * 60
         auth = self._get_auth()
         neptune_sparql_url = self._neptune_endpoint.get_sparql_endpoint()
+
+        # clear metadata first such that clients will not use this graph if
+        # data clear fails
         delete_stmt = (
             f"WITH <{META_GRAPH_NAME}>\n"
             f"DELETE\n"
-            f"  {{ ?graph <alti:uri>         ?uri ;\n"
+            f'  {{ ?graph <alti:uri>         "{uri}" ;\n'
             f'            <alti:name>        "{name}" ;\n'
             f"            <alti:version>     ?version ;\n"
             f"            <alti:start_time>  ?start_time ;\n"
             f"            <alti:end_time>    ?end_time }}\n"
             f"WHERE\n"
-            f"  {{ ?graph <alti:uri>         ?uri ;\n"
+            f'  {{ ?graph <alti:uri>         "{uri}" ;\n'
             f'            <alti:name>        "{name}" ;\n'
             f"            <alti:version>     ?version ;\n"
             f"            <alti:start_time>  ?start_time ;\n"
-            f"            <alti:end_time>    ?end_time .\n"
-            f"    FILTER ( xsd:integer(?end_time) < {oldest_acceptable_graph_scan_time} ) }}"
+            f"            <alti:end_time>    ?end_time }}\n"
         )
         resp = requests.post(neptune_sparql_url, data={"update": delete_stmt}, auth=auth)
         if resp.status_code != 200:
             raise NeptuneUpdateGraphException(
                 (f"Error updating graph {META_GRAPH_NAME} " f"with {delete_stmt} : {resp.text}")
+            )
+        # then clear data
+        update_stmt = f"clear graph <{uri}>"
+        resp = requests.post(neptune_sparql_url, data={"update": update_stmt}, auth=auth)
+        if resp.status_code != 200:
+            raise NeptuneClearGraphException(
+                (f"Error clearing graph {uri} " f"with {update_stmt} : {resp.text}")
             )
 
     def _run_query_helper(self, query: str) -> QueryResultSet:
