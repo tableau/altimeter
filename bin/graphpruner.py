@@ -48,7 +48,9 @@ def lambda_handler(event: Dict[str, Any], context: Any) -> None:
                 if graph_epoch < oldest_acceptable_graph_epoch:
                     logger.info(event=LogEvent.PruneNeptuneGraphStart)
                     try:
-                        client.clear_graph(name=config.graph_name, uri=graph_metadata.uri)
+                        client.clear_registered_graph(
+                            name=config.graph_name, uri=graph_metadata.uri
+                        )
                         logger.info(event=LogEvent.PruneNeptuneGraphEnd)
                     except Exception as ex:
                         logger.error(
@@ -59,6 +61,12 @@ def lambda_handler(event: Dict[str, Any], context: Any) -> None:
                         continue
                 else:
                     logger.info(event=LogEvent.PruneNeptuneGraphSkip)
+        # now find orphaned graphs - these are in neptune but have no metadata
+        registered_graph_uris = [g_m.uri for g_m in all_graph_metadatas]
+        all_graph_uris = client.get_graph_uris(name=config.graph_name)
+        orphaned_graphs = set(all_graph_uris) - set(registered_graph_uris)
+        if orphaned_graphs:
+            logger.info(event=LogEvent.OrphanedGraphsFound, graphs=",".join(orphaned_graphs))
         logger.info(event=LogEvent.PruneNeptuneGraphsEnd)
         if uncleared:
             msg = f"Errors were found pruning {uncleared}."

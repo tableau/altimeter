@@ -300,6 +300,23 @@ class AltimeterNeptuneClient:
                 (f"Error updating graph {META_GRAPH_NAME} " f"with {update_stmt} : {resp.text}")
             )
 
+    def get_graph_uris(self, name: str) -> List[str]:
+        """Return all graph uris regardless of whether they have corresponding metadata entries
+
+        Args:
+            name: graph name
+
+        Returns:
+            list of graph uris
+        """
+        query = "SELECT ?graph_uri WHERE { GRAPH ?graph_uri { } }"
+        results = self.run_raw_query(query=query)
+        results_list = results.to_list()
+        all_graph_uris = [result["graph_uri"] for result in results_list]
+        graph_prefix = f"{GRAPH_BASE_URI}/{name}/"
+        graph_uris = [uri for uri in all_graph_uris if uri.startswith(graph_prefix)]
+        return graph_uris
+
     def get_graph_metadatas(self, name: str, version: Optional[str] = None) -> List[GraphMetadata]:
         """Return all graph metadatas for a given name/version. These represent fully loaded
         graphs in the Neptune database.
@@ -421,7 +438,7 @@ class AltimeterNeptuneClient:
             end_time=latest_end_time,
         )
 
-    def clear_graph(self, name: str, uri: str) -> None:
+    def clear_registered_graph(self, name: str, uri: str) -> None:
         """Remove data and metadata for a graph by uri
 
         Args:
@@ -431,11 +448,15 @@ class AltimeterNeptuneClient:
         Raises:
             NeptuneUpdateGraphException if an error occurred during clearing
         """
-        auth = self._get_auth()
-        neptune_sparql_url = self._neptune_endpoint.get_sparql_endpoint()
-
         # clear metadata first such that clients will not use this graph if
         # data clear fails
+        self.clear_graph_metadata(name=name, uri=uri)
+        # then clear data
+        self.clear_graph_data(uri=uri)
+
+    def clear_graph_metadata(self, name: str, uri: str) -> None:
+        auth = self._get_auth()
+        neptune_sparql_url = self._neptune_endpoint.get_sparql_endpoint()
         delete_stmt = (
             f"WITH <{META_GRAPH_NAME}>\n"
             f"DELETE\n"
@@ -456,7 +477,10 @@ class AltimeterNeptuneClient:
             raise NeptuneUpdateGraphException(
                 (f"Error updating graph {META_GRAPH_NAME} " f"with {delete_stmt} : {resp.text}")
             )
-        # then clear data
+
+    def clear_graph_data(self, uri: str) -> None:
+        auth = self._get_auth()
+        neptune_sparql_url = self._neptune_endpoint.get_sparql_endpoint()
         update_stmt = f"clear graph <{uri}>"
         resp = requests.post(neptune_sparql_url, data={"update": update_stmt}, auth=auth)
         if resp.status_code != 200:
