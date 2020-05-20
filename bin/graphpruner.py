@@ -66,7 +66,19 @@ def lambda_handler(event: Dict[str, Any], context: Any) -> None:
         all_graph_uris = client.get_graph_uris(name=config.graph_name)
         orphaned_graphs = set(all_graph_uris) - set(registered_graph_uris)
         if orphaned_graphs:
-            logger.info(event=LogEvent.OrphanedGraphsFound, graphs=",".join(orphaned_graphs))
+            for orphaned_graph_uri in orphaned_graphs:
+                with logger.bind(graph_uri=orphaned_graph_uri):
+                    logger.info(event=LogEvent.PruneOrphanedNeptuneGraphStart)
+                    try:
+                        client.clear_graph_data(uri=orphaned_graph_uri)
+                        logger.info(event=LogEvent.PruneOrphanedNeptuneGraphEnd)
+                    except Exception as ex:
+                        logger.error(
+                            event=LogEvent.PruneNeptuneGraphError,
+                            msg=f"Error pruning graph {orphaned_graph_uri}: {ex}",
+                        )
+                        uncleared.append(orphaned_graph_uri)
+                        continue
         logger.info(event=LogEvent.PruneNeptuneGraphsEnd)
         if uncleared:
             msg = f"Errors were found pruning {uncleared}."

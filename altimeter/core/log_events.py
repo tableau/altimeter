@@ -22,12 +22,12 @@ class LogEvent(BaseLogEvent):
     NeptuneLoadPolling: EventName
     NeptuneLoadError: EventName
 
-    OrphanedGraphsFound: EventName
-
     PruneNeptuneGraphStart: EventName
     PruneNeptuneGraphEnd: EventName
     PruneNeptuneGraphError: EventName
     PruneNeptuneGraphSkip: EventName
+    PruneOrphanedNeptuneGraphStart: EventName
+    PruneOrphanedNeptuneGraphEnd: EventName
 
     PruneNeptuneGraphsStart: EventName
     PruneNeptuneGraphsEnd: EventName

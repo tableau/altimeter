@@ -455,6 +455,7 @@ class AltimeterNeptuneClient:
         self.clear_graph_data(uri=uri)
 
     def clear_graph_metadata(self, name: str, uri: str) -> None:
+        """Clear a graph metadata entry"""
         auth = self._get_auth()
         neptune_sparql_url = self._neptune_endpoint.get_sparql_endpoint()
         delete_stmt = (
@@ -479,6 +480,7 @@ class AltimeterNeptuneClient:
             )
 
     def clear_graph_data(self, uri: str) -> None:
+        """Clear a graph in Neptune"""
         auth = self._get_auth()
         neptune_sparql_url = self._neptune_endpoint.get_sparql_endpoint()
         update_stmt = f"clear graph <{uri}>"
