@@ -30,6 +30,7 @@ setup(
         "bin/graphpruner.py",
         "bin/rdf2blaze",
         "bin/runquery.py",
+        "bin/runrawquery.py",
         "bin/scan_resource.py",
     ],
     classifiers=[
