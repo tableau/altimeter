@@ -142,7 +142,7 @@ class AltimeterNeptuneClient:
             graph_metadata = self._get_latest_graph_metadata(name=graph_name)
             graph_uris_load_times[graph_metadata.uri] = graph_metadata.end_time
         finalized_query = finalize_query(query, graph_uris=list(graph_uris_load_times.keys()))
-        query_result_set = self._run_query_helper(finalized_query)
+        query_result_set = self.run_raw_query(finalized_query)
         return QueryResult(graph_uris_load_times, query_result_set)
 
     def load_graph(self, bucket: str, key: str, load_iam_role_arn: str) -> GraphMetadata:
@@ -336,7 +336,7 @@ class AltimeterNeptuneClient:
                 f"                         <alti:end_time> ?end_time }}\n"
                 f"ORDER BY DESC(?end_time)\n"
             )
-        results = self._run_query_helper(query=get_graph_metadatas_query)
+        results = self.run_raw_query(query=get_graph_metadatas_query)
         results_list = results.to_list()
         graph_metadatas: List[GraphMetadata] = []
         for result in results_list:
@@ -392,7 +392,7 @@ class AltimeterNeptuneClient:
                 f"ORDER BY DESC(?end_time)\n"
                 f"LIMIT 1"
             )
-        results = self._run_query_helper(query=get_graph_metadatas_query)
+        results = self.run_raw_query(query=get_graph_metadatas_query)
         results_list = results.to_list()
         if not results_list:
             raise NeptuneNoGraphsFoundException(f"No graphs found for graph name '{name}'")
@@ -464,9 +464,9 @@ class AltimeterNeptuneClient:
                 (f"Error clearing graph {uri} " f"with {update_stmt} : {resp.text}")
             )
 
-    def _run_query_helper(self, query: str) -> QueryResultSet:
+    def run_raw_query(self, query: str) -> QueryResultSet:
         """Run a query against a neptune instance, return a dict of results. Generally this
-        should
+        should be called from `run_query`
 
         Args:
             query: complete query to run
