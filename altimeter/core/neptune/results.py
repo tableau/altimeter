@@ -46,7 +46,7 @@ class QueryResultSet:
         """
         result_list = []
         for value in self.values:
-            result_list.append({k: v["value"] for k, v in value.items()})
+            result_list.append({field: value.get(field, {}).get("value") for field in self.fields})
         return result_list
 
     def to_csv(self) -> str:
@@ -56,11 +56,11 @@ class QueryResultSet:
             csv as a str
         """
         with io.StringIO() as csv_buf:
+            result_list = self.to_list()
             writer = csv.DictWriter(csv_buf, fieldnames=self.fields, lineterminator="\n")
             writer.writeheader()
-            for result in self.values:
-                row = {key: value["value"] for key, value in result.items()}
-                writer.writerow(row)
+            for result in result_list:
+                writer.writerow(result)
             csv_buf.seek(0)
             return csv_buf.read()
 
