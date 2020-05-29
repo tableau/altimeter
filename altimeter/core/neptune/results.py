@@ -71,9 +71,9 @@ class QueryResultSet:
             NDJSON as a str
         """
         with io.StringIO() as ndjson_buf:
-            for result in self.values:
-                record = {key: value["value"] for key, value in result.items()}
-                ndjson_buf.write(json.dumps(record) + "\n")
+            result_list = self.to_list()
+            for result in result_list:
+                ndjson_buf.write(json.dumps(result) + "\n")
             ndjson_buf.seek(0)
             return ndjson_buf.read()
 
