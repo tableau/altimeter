@@ -22,7 +22,9 @@ class InstanceProfileResourceSpec(IAMResourceSpec):
         AnonymousListField(
             "Roles",
             AnonymousEmbeddedDictField(
-                ResourceLinkField("Arn", IAMRoleResourceSpec, value_is_id=True)
+                ResourceLinkField(
+                    "Arn", IAMRoleResourceSpec, value_is_id=True, alti_key="attached_role"
+                )
             ),
         ),
     )
