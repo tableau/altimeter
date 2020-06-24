@@ -17,7 +17,7 @@ setup(
     install_requires=[
         "aws-requests-auth==0.4.2",
         "rdflib==4.2.2",
-        "structlog>=18.2.0,<20",
+        "structlog>=20.1.0,<21",
         "boto3>=1.9.130",
         "typing_extensions>=3.7.4.1,<3.8",
         "jinja2>=2.11.1,<3",
