@@ -7,28 +7,7 @@ import argparse
 import sys
 from typing import List, Optional
 
-import boto3
-
-from altimeter.core.exceptions import AltimeterException
-from altimeter.core.neptune.client import AltimeterNeptuneClient, NeptuneEndpoint
-
-
-def get_neptune_endpoint() -> NeptuneEndpoint:
-    """Find a Neptune"""
-    instance_id_prefix = "alti-"
-    neptune_client = boto3.client("neptune")
-    paginator = neptune_client.get_paginator("describe_db_instances")
-    for resp in paginator.paginate():
-        for instance in resp.get("DBInstances", []):
-            instance_id = instance.get("DBInstanceIdentifier")
-            if instance_id:
-                if instance_id.startswith(instance_id_prefix):
-                    endpoint = instance["Endpoint"]
-                    host = endpoint["Address"]
-                    port = endpoint["Port"]
-                    region = boto3.session.Session().region_name
-                    return NeptuneEndpoint(host=host, port=port, region=region)
-    raise AltimeterException(f"No Neptune instance found matching {instance_id_prefix}*")
+from altimeter.core.neptune.client import AltimeterNeptuneClient, discover_neptune_endpoint
 
 
 def main(argv: Optional[List[str]] = None) -> int:
@@ -44,7 +23,7 @@ def main(argv: Optional[List[str]] = None) -> int:
     with open(args_ns.query_file, "r") as query_fp:
         query = query_fp.read()
 
-    endpoint = get_neptune_endpoint()
+    endpoint = discover_neptune_endpoint()
     client = AltimeterNeptuneClient(max_age_min=args_ns.max_age_min, neptune_endpoint=endpoint)
 
     if args_ns.raw:

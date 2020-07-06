@@ -8,6 +8,7 @@ from aws_requests_auth.aws_auth import AWSRequestsAuth
 import boto3
 import requests
 
+from altimeter.core.exceptions import AltimeterException
 from altimeter.core.log import Logger
 from altimeter.core.log_events import LogEvent
 from altimeter.core.neptune.exceptions import (
@@ -83,6 +84,24 @@ class NeptuneEndpoint:
             loader endpoint url
         """
         return f"http://{self.get_endpoint_str()}/loader"
+
+
+def discover_neptune_endpoint() -> NeptuneEndpoint:
+    """Find a Neptune"""
+    instance_id_prefix = "alti-"
+    neptune_client = boto3.client("neptune")
+    paginator = neptune_client.get_paginator("describe_db_instances")
+    for resp in paginator.paginate():
+        for instance in resp.get("DBInstances", []):
+            instance_id = instance.get("DBInstanceIdentifier")
+            if instance_id:
+                if instance_id.startswith(instance_id_prefix):
+                    endpoint = instance["Endpoint"]
+                    host = endpoint["Address"]
+                    port = endpoint["Port"]
+                    region = boto3.session.Session().region_name
+                    return NeptuneEndpoint(host=host, port=port, region=region)
+    raise AltimeterException(f"No Neptune instance found matching {instance_id_prefix}*")
 
 
 @dataclass(frozen=True)
