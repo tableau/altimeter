@@ -4,6 +4,9 @@
 # JetBrains IDE project files (e.g. PyCharm)
 .idea
 
+# VSCode IDE project files (e.g. PyCharm)
+.vscode
+
 # Python binary artifacts we generally never want to check in.
 *.pyc
 __pycache__/

@@ -8,6 +8,8 @@ from aws_requests_auth.aws_auth import AWSRequestsAuth
 import boto3
 import requests
 
+from gremlin_python.driver.driver_remote_connection import DriverRemoteConnection
+from gremlin_python.process.anonymous_traversal import traversal
 from altimeter.core.exceptions import AltimeterException
 from altimeter.core.log import Logger
 from altimeter.core.log_events import LogEvent
@@ -60,6 +62,7 @@ class NeptuneEndpoint:
     host: str
     port: int
     region: str
+    ssl: bool = True
 
     def get_endpoint_str(self) -> str:
         """Get the endpoint as a string in host:port format
@@ -85,6 +88,16 @@ class NeptuneEndpoint:
         """
         return f"http://{self.get_endpoint_str()}/loader"
 
+    def connect_to_neptune_gremlin(self):
+        endpoint = ""
+        if self.ssl:
+            endpoint = f'wss://{self.host}:{self.port}/gremlin'
+        else:
+            endpoint = f'ws://{self.host}:{self.port}/gremlin'
+        connection = DriverRemoteConnection(endpoint, 'g')
+        gts = traversal().withRemote(connection)
+        return (gts, connection)
+
 
 def discover_neptune_endpoint() -> NeptuneEndpoint:
     """Find a Neptune"""
@@ -101,7 +114,8 @@ def discover_neptune_endpoint() -> NeptuneEndpoint:
                     port = endpoint["Port"]
                     region = boto3.session.Session().region_name
                     return NeptuneEndpoint(host=host, port=port, region=region)
-    raise AltimeterException(f"No Neptune instance found matching {instance_id_prefix}*")
+    raise AltimeterException(
+        f"No Neptune instance found matching {instance_id_prefix}*")
 
 
 @dataclass(frozen=True)
@@ -160,7 +174,8 @@ class AltimeterNeptuneClient:
         for graph_name in graph_names:
             graph_metadata = self._get_latest_graph_metadata(name=graph_name)
             graph_uris_load_times[graph_metadata.uri] = graph_metadata.end_time
-        finalized_query = finalize_query(query, graph_uris=list(graph_uris_load_times.keys()))
+        finalized_query = finalize_query(
+            query, graph_uris=list(graph_uris_load_times.keys()))
         query_result_set = self.run_raw_query(finalized_query)
         return QueryResult(graph_uris_load_times, query_result_set)
 
@@ -179,7 +194,8 @@ class AltimeterNeptuneClient:
         """
         session = boto3.Session(region_name=self._neptune_endpoint.region)
         s3_client = session.client("s3")
-        rdf_object_tagging = s3_client.get_object_tagging(Bucket=bucket, Key=key)
+        rdf_object_tagging = s3_client.get_object_tagging(
+            Bucket=bucket, Key=key)
         tag_set = rdf_object_tagging["TagSet"]
         graph_name = get_required_tag_value(tag_set, "name")
         graph_version = get_required_tag_value(tag_set, "version")
@@ -246,12 +262,15 @@ class AltimeterNeptuneClient:
                         )
                     status_resp_json = status_resp.json()
                     status = status_resp_json["payload"]["overallStatus"]["status"]
-                    logger.info(event=LogEvent.NeptuneLoadPolling, status=status)
+                    logger.info(event=LogEvent.NeptuneLoadPolling,
+                                status=status)
                     if status == "LOAD_COMPLETED":
                         break
                     if status not in ("LOAD_NOT_STARTED", "LOAD_IN_PROGRESS"):
-                        logger.error(event=LogEvent.NeptuneLoadError, status=status)
-                        raise NeptuneLoadGraphException(f"Error loading graph: {status_resp_json}")
+                        logger.error(
+                            event=LogEvent.NeptuneLoadError, status=status)
+                        raise NeptuneLoadGraphException(
+                            f"Error loading graph: {status_resp_json}")
                 logger.info(event=LogEvent.NeptuneLoadEnd)
 
                 logger.info(event=LogEvent.MetadataGraphUpdateStart)
@@ -313,7 +332,8 @@ class AltimeterNeptuneClient:
             f"}}\n"
             "}\n"
         )
-        resp = requests.post(neptune_sparql_url, data={"update": update_stmt}, auth=auth)
+        resp = requests.post(neptune_sparql_url, data={
+                             "update": update_stmt}, auth=auth)
         if resp.status_code != 200:
             raise NeptuneUpdateGraphException(
                 (f"Error updating graph {META_GRAPH_NAME} " f"with {update_stmt} : {resp.text}")
@@ -333,7 +353,8 @@ class AltimeterNeptuneClient:
         results_list = results.to_list()
         all_graph_uris = [result["graph_uri"] for result in results_list]
         graph_prefix = f"{GRAPH_BASE_URI}/{name}/"
-        graph_uris = [uri for uri in all_graph_uris if uri.startswith(graph_prefix)]
+        graph_uris = [
+            uri for uri in all_graph_uris if uri.startswith(graph_prefix)]
         return graph_uris
 
     def get_graph_metadatas(self, name: str, version: Optional[str] = None) -> List[GraphMetadata]:
@@ -431,7 +452,8 @@ class AltimeterNeptuneClient:
         results = self.run_raw_query(query=get_graph_metadatas_query)
         results_list = results.to_list()
         if not results_list:
-            raise NeptuneNoGraphsFoundException(f"No graphs found for graph name '{name}'")
+            raise NeptuneNoGraphsFoundException(
+                f"No graphs found for graph name '{name}'")
         if len(results_list) != 1:
             raise RuntimeError("Logic error - more than one graph returned.")
         result = results_list[0]
@@ -492,7 +514,8 @@ class AltimeterNeptuneClient:
             f"            <alti:start_time>  ?start_time ;\n"
             f"            <alti:end_time>    ?end_time }}\n"
         )
-        resp = requests.post(neptune_sparql_url, data={"update": delete_stmt}, auth=auth)
+        resp = requests.post(neptune_sparql_url, data={
+                             "update": delete_stmt}, auth=auth)
         if resp.status_code != 200:
             raise NeptuneUpdateGraphException(
                 (f"Error updating graph {META_GRAPH_NAME} " f"with {delete_stmt} : {resp.text}")
@@ -503,7 +526,8 @@ class AltimeterNeptuneClient:
         auth = self._get_auth()
         neptune_sparql_url = self._neptune_endpoint.get_sparql_endpoint()
         update_stmt = f"clear graph <{uri}>"
-        resp = requests.post(neptune_sparql_url, data={"update": update_stmt}, auth=auth)
+        resp = requests.post(neptune_sparql_url, data={
+                             "update": update_stmt}, auth=auth)
         if resp.status_code != 200:
             raise NeptuneClearGraphException(
                 (f"Error clearing graph {uri} " f"with {update_stmt} : {resp.text}")
@@ -524,7 +548,9 @@ class AltimeterNeptuneClient:
         """
         neptune_sparql_url = self._neptune_endpoint.get_sparql_endpoint()
         auth = self._get_auth()
-        resp = requests.post(neptune_sparql_url, data={"query": query}, auth=auth)
+        resp = requests.post(neptune_sparql_url, data={
+                             "query": query}, auth=auth)
         if resp.status_code != 200:
-            raise NeptuneQueryException(f"Error running query {query}: {resp.text}")
+            raise NeptuneQueryException(
+                f"Error running query {query}: {resp.text}")
         return QueryResultSet.from_sparql_endpoint_json(resp.json())
