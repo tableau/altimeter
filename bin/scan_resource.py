@@ -49,7 +49,10 @@ def main(argv: Optional[List[str]] = None) -> int:
     account_id = sts_client.get_caller_identity()["Account"]
     aws_accessor = AWSAccessor(session=session, account_id=account_id, region_name=region)
     resource_scan_result = resource_spec_class.scan(aws_accessor)
-    resource_scan_result_json = json.dumps(resource_scan_result, indent=2, default=json_encoder)
+    resource_dicts = []
+    for resource in resource_scan_result:
+        resource_dicts.append(resource.to_dict())
+    resource_scan_result_json = json.dumps(resource_dicts, indent=2, default=json_encoder)
     print(resource_scan_result_json)
     return 0
 
