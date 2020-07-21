@@ -7,5 +7,3 @@ Attributes:
 
 GRAPH_NAME: str = "alti"
 GRAPH_VERSION: str = "1"
-
-SSM_COMMAND_INVOCATION_LOOKBACK_MIN = 43200  # 1 month
