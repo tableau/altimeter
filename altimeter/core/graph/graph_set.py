@@ -1,4 +1,5 @@
 """A GraphSet represents the contents of a Graph."""
+import uuid
 from collections import defaultdict
 from typing import Any, DefaultDict, Dict, List, Type
 
@@ -13,7 +14,6 @@ from altimeter.core.graph.node_cache import NodeCache
 from altimeter.core.multilevel_counter import MultilevelCounter
 from altimeter.core.resource.resource import Resource
 from altimeter.core.resource.resource_spec import ResourceSpec
-
 
 class GraphSet:
     """A GraphSet represents the contents of a Graph.  It contains a list of Resource objects, a
@@ -60,15 +60,36 @@ class GraphSet:
         graph = Graph()
         metadata_node = BNode()
         graph.add((metadata_node, RDF.type, getattr(namespace, "metadata")))
-        graph.add((metadata_node, getattr(namespace, "name"), Literal(self.name)))
-        graph.add((metadata_node, getattr(namespace, "version"), Literal(self.version)))
-        graph.add((metadata_node, getattr(namespace, "start_time"), Literal(self.start_time)))
-        graph.add((metadata_node, getattr(namespace, "end_time"), Literal(self.end_time)))
+        graph.add((metadata_node, getattr(
+            namespace, "name"), Literal(self.name)))
+        graph.add((metadata_node, getattr(
+            namespace, "version"), Literal(self.version)))
+        graph.add((metadata_node, getattr(
+            namespace, "start_time"), Literal(self.start_time)))
+        graph.add((metadata_node, getattr(
+            namespace, "end_time"), Literal(self.end_time)))
         for error in self.errors:
-            graph.add((metadata_node, getattr(namespace, "error"), Literal(error)))
+            graph.add((metadata_node, getattr(
+                namespace, "error"), Literal(error)))
         for resource in self.resources:
-            resource.to_rdf(namespace=namespace, graph=graph, node_cache=node_cache)
+            resource.to_rdf(namespace=namespace, graph=graph,
+                            node_cache=node_cache)
         return graph
+
+    def to_neptune_lpg(self):
+        vertices = []
+        edges=[]
+        vertex = {'~id': f'{self.name}:{self.version}', '~label': "metadata", "name": self.name, "version": self.version,
+                "start_time": self.start_time, "end_time": self.end_time}
+        vertices.append(vertex)
+        for error in self.errors:
+            vertex = {'~id': uuid.uuid1(), '~label': "error", "error": error}
+            vertices.append(vertex)
+            edge = {'~id': uuid.uuid1(), '~label': "generated", "~from": f'{self.name}:{self.version}', '~to': vertex['~id']}
+            vertices.append(vertex)
+        for resource in self.resources:
+            resource.to_lpg(vertices, edges)
+        return {'vertices': vertices, 'edges': edges}
 
     def to_dict(self) -> Dict[str, Any]:
         """Generate a dictionary representation of this GraphSet.
@@ -76,7 +97,8 @@ class GraphSet:
         Returns:
             dict representation of this GraphSet
         """
-        resources = {resource.resource_id: resource.to_dict() for resource in self.resources}
+        resources = {resource.resource_id: resource.to_dict()
+                     for resource in self.resources}
         return {
             "name": self.name,
             "version": self.version,
@@ -96,12 +118,15 @@ class GraphSet:
                 references it as a ResourceLinkField if that VPC is not found as a Resource in the
                 graph this exception is raised.
         """
-        present_resource_ids = {resource.resource_id for resource in self.resources}
-        resource_ref_ids_used_by_ids: DefaultDict[str, List[str]] = defaultdict(list)
+        present_resource_ids = {
+            resource.resource_id for resource in self.resources}
+        resource_ref_ids_used_by_ids: DefaultDict[str, List[str]] = defaultdict(
+            list)
         for resource in self.resources:
             for link in resource.links:
                 if isinstance(link, ResourceLinkLink):
-                    resource_ref_ids_used_by_ids[link.obj].append(resource.resource_id)
+                    resource_ref_ids_used_by_ids[link.obj].append(
+                        resource.resource_id)
         resource_ref_ids = set(resource_ref_ids_used_by_ids.keys())
         orphan_refs = resource_ref_ids - present_resource_ids
         if orphan_refs:
@@ -114,7 +139,8 @@ class GraphSet:
         have their Resource objects merged if they are of the same type and all fields
         are identical or additive only across the resources or if one of the Resources
         allows a special merge via its ResourceSpec class' `allow_clobber` attribute."""
-        resource_ids_resources: DefaultDict[str, List[Resource]] = defaultdict(list)
+        resource_ids_resources: DefaultDict[str,
+                                            List[Resource]] = defaultdict(list)
         for resource in self.resources:
             resource_ids_resources[resource.resource_id].append(resource)
         merged_resources: List[Resource] = []

@@ -7,6 +7,16 @@
 # VSCode IDE project files (e.g. PyCharm)
 .vscode
 
+# Environments
+myvenv/
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
 # Python binary artifacts we generally never want to check in.
 *.pyc
 __pycache__/

@@ -67,3 +67,16 @@ class Resource:
         graph.add((node, getattr(namespace, "id"), Literal(self.resource_id)))
         for link in self.links:
             link.to_rdf(subj=node, namespace=namespace, graph=graph, node_cache=node_cache)
+
+    def to_lpg(self, vertices, edges) -> None:
+        """Graph this Resource as a dictionary into the vertices and edges lists.
+
+        Args:
+            vertices: List containing dictionaries representing a vertex
+            edges: List containing dictionaries representing an edge
+        """
+        vertex={'~id': self.resource_id, '~label': self.type_name}
+        for link in self.links:
+            link.to_lpg(vertex, vertices, edges)
+
+        vertices.append(vertex)

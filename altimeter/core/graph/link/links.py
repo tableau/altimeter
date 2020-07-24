@@ -1,4 +1,5 @@
 """A Link represents the predicate-object portion of a triple."""
+import uuid
 from typing import Any, Dict, Type
 
 from rdflib import BNode, Graph, Literal, Namespace, RDF, XSD
@@ -15,7 +16,7 @@ class SimpleLink(Link):
     field_type = "simple"
 
     def to_rdf(
-        self, subj: BNode, namespace: Namespace, graph: Graph, node_cache: NodeCache
+            self, subj: BNode, namespace: Namespace, graph: Graph, node_cache: NodeCache
     ) -> None:
         """Graph this link on a BNode in a Graph using a given Namespace to create the full
         predicate.
@@ -32,6 +33,24 @@ class SimpleLink(Link):
                 datatype = XSD.nonNegativeInteger
         literal = Literal(self.obj, datatype=datatype)
         graph.add((subj, getattr(namespace, self.pred), literal))
+
+    def to_lpg(
+            self, parent: Dict, vertices: [Dict], edges: [Dict], prefix: str = "") -> None:
+        """Convert this link to the appropriate vertices, edges, and properties
+
+        Args:
+             parent: the parent dictionary vertex
+             vertices: the list of all vertex dictionaries
+             edges: the list of all edge dictionaries
+             :type parent: Dict
+        """
+        if isinstance(self.obj, int):
+            # Need to handle numbers that are bigger than a Long in Java, for now we stringify it
+            if self.obj > 9223372036854775807 or self.obj < -9223372036854775807:
+                self.obj = str(self.obj)
+        elif isinstance(self.obj, SimpleLink):
+            print("ERROR ERROR")
+        parent[prefix + self.pred] = self.obj
 
 
 class MultiLink(Link):
@@ -53,7 +72,7 @@ class MultiLink(Link):
         }
 
     def to_rdf(
-        self, subj: BNode, namespace: Namespace, graph: Graph, node_cache: NodeCache
+            self, subj: BNode, namespace: Namespace, graph: Graph, node_cache: NodeCache
     ) -> None:
         """Graph this link on a BNode in a Graph using a given Namespace to create the full
         predicate.
@@ -69,6 +88,20 @@ class MultiLink(Link):
         for field in self.obj:
             field.to_rdf(map_node, namespace, graph, node_cache)
         graph.add((subj, getattr(namespace, self.pred), map_node))
+
+    def to_lpg(
+            self, parent: Dict, vertices: [Dict], edges: [Dict], prefix: str = "") -> None:
+        """Convert this link to the appropriate vertices, edges, and properties
+
+        Args:
+             parent: the parent dictionary vertex
+             vertices: the list of all vertex dictionaries
+             edges: the list of all edge dictionaries
+             prefix: A string to prefix the property name with
+        """
+
+        for field in self.obj:
+            field.to_lpg(parent, vertices, edges, prefix=self.pred + ".")
 
     @classmethod
     def from_dict(cls: Type["MultiLink"], pred: str, obj: Any) -> "MultiLink":
@@ -91,7 +124,7 @@ class ResourceLinkLink(Link):
     field_type = "resource_link"
 
     def to_rdf(
-        self, subj: BNode, namespace: Namespace, graph: Graph, node_cache: NodeCache
+            self, subj: BNode, namespace: Namespace, graph: Graph, node_cache: NodeCache
     ) -> None:
         """Graph this link on a BNode in a Graph using a given Namespace to create the full
         predicate.
@@ -104,6 +137,19 @@ class ResourceLinkLink(Link):
         """
         link_node = node_cache.setdefault(self.obj, BNode())
         graph.add((subj, getattr(namespace, self.pred), link_node))
+
+    def to_lpg(
+            self, parent: Dict, vertices: [Dict], edges: [Dict], prefix: str = "") -> None:
+        """Convert this link to the appropriate vertices, edges, and properties
+
+        Args:
+             parent: the parent dictionary vertex
+             vertices: the list of all vertex dictionaries
+             edges: the list of all edge dictionaries
+             prefix: string to prefix the property name with
+        """
+        edge = {'~id': uuid.uuid1(), '~label': self.field_type, '~from': parent['~id'], '~to': self.obj}
+        edges.append(edge)
 
 
 class TransientResourceLinkLink(Link):
@@ -112,7 +158,7 @@ class TransientResourceLinkLink(Link):
     field_type = "transient_resource_link"
 
     def to_rdf(
-        self, subj: BNode, namespace: Namespace, graph: Graph, node_cache: NodeCache
+            self, subj: BNode, namespace: Namespace, graph: Graph, node_cache: NodeCache
     ) -> None:
         """Graph this link on a BNode in a Graph using a given Namespace to create the full
         predicate.
@@ -126,6 +172,19 @@ class TransientResourceLinkLink(Link):
         link_node = node_cache.setdefault(self.obj, BNode())
         graph.add((subj, getattr(namespace, self.pred), link_node))
 
+    def to_lpg(
+            self, parent: Dict, vertices: [Dict], edges: [Dict], prefix: str = "") -> None:
+        """Convert this link to the appropriate vertices, edges, and properties
+
+        Args:
+             parent: the parent dictionary vertex
+             vertices: the list of all vertex dictionaries
+             edges: the list of all edge dictionaries
+             prefix: string to prefix the property name with
+        """
+        edge = {'~id': uuid.uuid1(), '~label': self.field_type, '~from': parent['~id'], '~to': self.obj}
+        edges.append(edge)
+
 
 class TagLink(Link):
     """Represents a AWS-style Tag attached to a node."""
@@ -133,7 +192,7 @@ class TagLink(Link):
     field_type = "tag"
 
     def to_rdf(
-        self, subj: BNode, namespace: Namespace, graph: Graph, node_cache: NodeCache
+            self, subj: BNode, namespace: Namespace, graph: Graph, node_cache: NodeCache
     ) -> None:
         """Graph this link on a BNode in a Graph using a given Namespace to create the full
         predicate.
@@ -153,6 +212,25 @@ class TagLink(Link):
             graph.add((tag_node, RDF.type, getattr(namespace, "tag")))
             node_cache[tag_id] = tag_node
         graph.add((subj, getattr(namespace, "tag"), tag_node))
+
+    def to_lpg(
+            self, parent: Dict, vertices: [Dict], edges: [Dict], prefix: str = "") -> None:
+        """Convert this link to the appropriate vertices, edges, and properties
+
+        Args:
+             parent: the parent dictionary vertex
+             vertices: the list of all vertex dictionaries
+             edges: the list of all edge dictionaries
+             prefix: string to prefix the property name with
+        """
+        if not any(x['~id'] == f'{self.pred}:{self.obj}' for x in vertices):
+            vertex = {}
+            vertex['~id'] = f'{self.pred}:{self.obj}'
+            vertex['~label'] = self.field_type
+            vertex[self.pred] = self.obj
+            vertices.append(vertex)
+        edge = {'~id': uuid.uuid1(), '~label': 'tagged', '~from': parent['~id'], '~to': f'{self.pred}:{self.obj}'}
+        edges.append(edge)
 
 
 def link_from_dict(data: Dict[str, Any]) -> Link:

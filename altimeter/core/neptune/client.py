@@ -8,8 +8,10 @@ from aws_requests_auth.aws_auth import AWSRequestsAuth
 import boto3
 import requests
 
-from gremlin_python.driver.driver_remote_connection import DriverRemoteConnection
+from gremlin_python.process.graph_traversal import __
 from gremlin_python.process.anonymous_traversal import traversal
+from gremlin_python.driver.driver_remote_connection import DriverRemoteConnection
+from gremlin_python.process.traversal import T
 from altimeter.core.exceptions import AltimeterException
 from altimeter.core.log import Logger
 from altimeter.core.log_events import LogEvent
@@ -554,3 +556,64 @@ class AltimeterNeptuneClient:
             raise NeptuneQueryException(
                 f"Error running query {query}: {resp.text}")
         return QueryResultSet.from_sparql_endpoint_json(resp.json())
+
+class AltimeterNeptuneGremlinClient:
+    @staticmethod
+    def __connect_to_neptune(config):
+        endpoint = ""
+        if not config['ssl']:
+            endpoint = f'ws://{config["server"]}:{config["port"]}/gremlin'
+        else:
+            endpoint = f'wss://{config["server"]}:{config["port"]}/gremlin'
+        connection = DriverRemoteConnection(endpoint, 'g')
+        gts = traversal().withRemote(connection)
+        return gts, connection
+
+    @staticmethod
+    def __write_vertices(g, vertices):
+        for r in vertices:
+            t = g.V(r['~id']).fold().coalesce(
+                __.unfold(), __.addV(r['~label']).property(T.id, str(r['~id'])))
+            for k in r.keys():
+                # Need to handle numbers that are bigger than a Long in Java, for now we stringify it
+                if isinstance(r[k], int) and (r[k] > 9223372036854775807 or r[k] < -9223372036854775807):
+                    r[k]= str(r[k])
+                if not k in ['~id', '~label']:
+                    t = t.property(k, r[k])
+
+            try:
+                t.next()
+            except:
+                print(f'{r["~id"]} - {k}')
+              #  raise NeptuneLoadGraphException(
+              #      (f"Error loading vertex {r} " f"with {str(t.bytecode)}")
+              #  )
+
+    @staticmethod
+    def __write_edges(g, edges):
+        for r in edges:
+            (g.V(str(r['~from'])).fold().
+                coalesce(
+                __.unfold(),
+                __.addV().property(T.id, str(r['~from']))
+            ).store('from').
+                V(str(r['~to'])).fold().
+                coalesce(
+                __.unfold(),
+                __.addV('unspecified').property(T.id, str(r['~to']))
+            ).store('to').
+                inE().hasId(str(r['~id'])).
+                fold().
+                coalesce(
+                __.unfold(),
+                __.addE(r['~label']).property(T.id, str(r['~id'])).
+                    from_(__.select('from').unfold()).to(__.select('to').unfold())
+            )
+            ).next()
+
+    @classmethod
+    def write_to_neptune(self, config, graph):
+        g, conn = self.__connect_to_neptune(config)
+        self.__write_vertices(g, graph['vertices'])
+        self.__write_edges(g, graph['edges'])
+        conn.close()
