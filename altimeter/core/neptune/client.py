@@ -50,7 +50,6 @@ def get_required_tag_value(tag_set: List[Dict[str, str]], key: str) -> str:
             return tag_value
     raise ValueError(f"Required tag key {key} not found in {tag_set}")
 
-
 @dataclass(frozen=True)
 class NeptuneEndpoint:
     """Represents an AWS Neptune endpoint.
@@ -90,17 +89,6 @@ class NeptuneEndpoint:
         """
         return f"http://{self.get_endpoint_str()}/loader"
 
-    def connect_to_neptune_gremlin(self):
-        endpoint = ""
-        if self.ssl:
-            endpoint = f'wss://{self.host}:{self.port}/gremlin'
-        else:
-            endpoint = f'ws://{self.host}:{self.port}/gremlin'
-        connection = DriverRemoteConnection(endpoint, 'g')
-        gts = traversal().withRemote(connection)
-        return (gts, connection)
-
-
 def discover_neptune_endpoint() -> NeptuneEndpoint:
     """Find a Neptune"""
     instance_id_prefix = "alti-"
@@ -118,7 +106,6 @@ def discover_neptune_endpoint() -> NeptuneEndpoint:
                     return NeptuneEndpoint(host=host, port=port, region=region)
     raise AltimeterException(
         f"No Neptune instance found matching {instance_id_prefix}*")
-
 
 @dataclass(frozen=True)
 class GraphMetadata:
@@ -139,7 +126,6 @@ class GraphMetadata:
     version: str
     start_time: int
     end_time: int
-
 
 class AltimeterNeptuneClient:
     """Client to run sparql queries against a neptune instance using graph name conventions to
@@ -557,20 +543,29 @@ class AltimeterNeptuneClient:
                 f"Error running query {query}: {resp.text}")
         return QueryResultSet.from_sparql_endpoint_json(resp.json())
 
-class AltimeterNeptuneGremlinClient:
     @staticmethod
-    def __connect_to_neptune(config):
+    def connect_to_gremlin(neptune: NeptuneEndpoint):
+        """
+        Get the Gremlin traversal and connection for the Neptune endpoint
+        :return: The Traversal object
+        """
         endpoint = ""
-        if not config['ssl']:
-            endpoint = f'ws://{config["server"]}:{config["port"]}/gremlin'
+        if neptune.ssl:
+            endpoint = f'wss://{neptune.host}:{neptune.port}/gremlin'
         else:
-            endpoint = f'wss://{config["server"]}:{config["port"]}/gremlin'
-        connection = DriverRemoteConnection(endpoint, 'g')
-        gts = traversal().withRemote(connection)
-        return gts, connection
+            endpoint = f'ws://{neptune.host}:{neptune.port}/gremlin'
+        gremlin_connection = DriverRemoteConnection(endpoint, 'g')
+        graph_traversal_source = traversal().withRemote(gremlin_connection)
+        return graph_traversal_source, gremlin_connection
 
     @staticmethod
-    def __write_vertices(g, vertices):
+    def __write_vertices(g: traversal, vertices: [Dict]):
+        """
+        Writes the vertices to the labeled property graph
+        :param g: The graph traversal source
+        :param vertices: A list of dictionaries for each vertex
+        :return: None
+        """
         for r in vertices:
             t = g.V(r['~id']).fold().coalesce(
                 __.unfold(), __.addV(r['~label']).property(T.id, str(r['~id'])))
@@ -584,13 +579,18 @@ class AltimeterNeptuneGremlinClient:
             try:
                 t.next()
             except:
-                print(f'{r["~id"]} - {k}')
-              #  raise NeptuneLoadGraphException(
-              #      (f"Error loading vertex {r} " f"with {str(t.bytecode)}")
-              #  )
+                raise NeptuneLoadGraphException(
+                    (f"Error loading vertex {r} " f"with {str(t.bytecode)}")
+                )
 
     @staticmethod
     def __write_edges(g, edges):
+        """
+        Writes the edges to the labeled property graph
+        :param g: The graph traversal source
+        :param edges: A list of dictionaries for each edge
+        :return: None
+        """
         for r in edges:
             (g.V(str(r['~from'])).fold().
                 coalesce(
@@ -611,9 +611,38 @@ class AltimeterNeptuneGremlinClient:
             )
             ).next()
 
-    @classmethod
-    def write_to_neptune(self, config, graph):
-        g, conn = self.__connect_to_neptune(config)
+    def write_to_neptune_lpg(self, graph):
+        """
+        Writes the graph to a labeled property graph
+        :param endpoint: The neptune endpoint
+        :param graph: The graph to write
+        :return: None
+        """
+        g, conn = self.connect_to_gremlin(self._neptune_endpoint)
         self.__write_vertices(g, graph['vertices'])
         self.__write_edges(g, graph['edges'])
         conn.close()
+
+    def write_to_neptune_rdf(self, graph):
+        """
+        Writes the graph to an RDF graph
+        :param endpoint: The neptune endpoint
+        :param graph: The graph to write
+        :return: None
+        """
+        auth = self._get_auth()
+        neptune_sparql_url = self._neptune_endpoint.get_sparql_endpoint()
+        for s, p, o in graph:
+            print(f'{s} {p} {o}')
+        insert_stmt = (
+            "INSERT DATA {"
+            f"    GRAPH <{META_GRAPH_NAME}> " + "{"
+            f"        {s} {p} {o} . "
+            f"}} "
+        )
+        resp = requests.post(neptune_sparql_url, data={
+            "update": insert_stmt}, auth=auth)
+        if resp.status_code != 200:
+            raise NeptuneUpdateGraphException(
+                f"Error updating graph {META_GRAPH_NAME} " f"with {insert_stmt} : {resp.text}"
+            )

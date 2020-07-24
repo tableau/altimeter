@@ -23,8 +23,7 @@ from altimeter.core.artifact_io.writer import ArtifactWriter, GZIP
 from altimeter.core.config import Config
 from altimeter.core.log import Logger
 from altimeter.core.log_events import LogEvent
-from altimeter.core.neptune.client import AltimeterNeptuneClient, GraphMetadata, NeptuneEndpoint, \
-    AltimeterNeptuneGremlinClient
+from altimeter.core.neptune.client import AltimeterNeptuneClient, NeptuneEndpoint
 from altimeter.core.parameters import get_required_str_env_var, get_required_int_env_var
 
 
@@ -56,13 +55,53 @@ def aws2neptune_lpg(scan_id: str, config: Config, muxer: AWSScanMuxer) -> AWS2Ne
         artifact_writer=artifact_writer,
         artifact_reader=artifact_reader,
     )
-    logger.info(LogEvent.NeptuneGremlinWriteStart, "Beginning writing Neptune Property Graph")
+    logger.info(LogEvent.NeptuneGremlinWriteStart)
     graph = graph_set.to_neptune_lpg()
-    config = {'server': 'XXX', 'port': 80, 'ssl': False}
-    AltimeterNeptuneGremlinClient().write_to_neptune(config, graph)
-    logger.info(LogEvent.NeptuneGremlinWriteEnd, "Beginning writing Neptune Property Graph")
+    if config.neptune is None:
+        raise Exception("Can not load to Neptune because config.neptune is empty.")
+    endpoint = NeptuneEndpoint(
+        host=config.neptune.host, port=config.neptune.port, region=config.neptune.region, ssl=config.neptune.ssl
+    )
+    neptune_client = AltimeterNeptuneClient(max_age_min=1440, neptune_endpoint=endpoint)
+    neptune_client.write_to_neptune_lpg(graph)
+    logger.info(LogEvent.NeptuneGremlinWriteEnd)
     return AWS2NeptuneResult()
 
+
+def aws2neptune_rdf(scan_id: str, config: Config, muxer: AWSScanMuxer) -> AWS2NeptuneResult:
+    """Scan AWS resources to json, convert to RDF and load into Neptune
+    if config.neptune is defined"""
+
+    logger = Logger()
+    artifact_reader = ArtifactReader.from_artifact_path(config.artifact_path)
+    artifact_writer = ArtifactWriter.from_artifact_path(
+        artifact_path=config.artifact_path, scan_id=scan_id
+    )
+
+    logger.info(
+        AWSLogEvents.ScanConfigured,
+        config=str(config),
+        reader=str(artifact_reader.__class__),
+        writer=str(artifact_writer.__class__),
+    )
+
+    scan_manifest, graph_set = run_scan(
+        muxer=muxer,
+        config=config,
+        artifact_writer=artifact_writer,
+        artifact_reader=artifact_reader,
+    )
+    logger.info(LogEvent.NeptuneRDFWriteStart)
+    graph = graph_set.to_rdf()
+    if config.neptune is None:
+        raise Exception("Can not load to Neptune because config.neptune is empty.")
+    endpoint = NeptuneEndpoint(
+        host=config.neptune.host, port=config.neptune.port, region=config.neptune.region, ssl=config.neptune.ssl
+    )
+    neptune_client = AltimeterNeptuneClient(max_age_min=1440, neptune_endpoint=endpoint)
+    neptune_client.write_to_neptune_rdf(endpoint, graph)
+    logger.info(LogEvent.NeptuneRDFWriteEnd)
+    return AWS2NeptuneResult()
 
 def generate_scan_id() -> str:
     """Generate a unique scan id"""
@@ -115,9 +154,14 @@ def main(argv: Optional[List[str]] = None) -> int:
     config = Config.from_path(config)
     scan_id = generate_scan_id()
     muxer = LocalAWSScanMuxer(scan_id=scan_id, config=config)
-    result = aws2neptune_lpg(scan_id=scan_id, config=config,
+
+    if config.neptune.use_lpg:
+        result = aws2neptune_lpg(scan_id=scan_id, config=config,
                    muxer=muxer)
-    print(result.rdf_path)
+    else:
+        result = aws2neptune_rdf(scan_id=scan_id, config=config,
+                             muxer=muxer)
+    print(result)
     return 0
 
 
