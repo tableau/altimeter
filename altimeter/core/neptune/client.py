@@ -632,14 +632,19 @@ class AltimeterNeptuneClient:
         """
         auth = self._get_auth()
         neptune_sparql_url = self._neptune_endpoint.get_sparql_endpoint()
-        for s, p, o in graph:
-            print(f'{s} {p} {o}')
+        triples = ""
+        for subject, predicate, obj in graph:
+            triples = triples + subject.n3() + " " + predicate.n3() + " " + obj.n3() + " . \n"
+
         insert_stmt = (
-            "INSERT DATA {"
-            f"    GRAPH <{META_GRAPH_NAME}> " + "{"
-            f"        {s} {p} {o} . "
-            f"}} "
+            f"INSERT DATA {{\n" +
+            f"    GRAPH <{META_GRAPH_NAME}>\n"
+            f"        {{ "
+            f"{triples}"
+            f"}}\n"
+            "}\n"
         )
+
         resp = requests.post(neptune_sparql_url, data={
             "update": insert_stmt}, auth=auth)
         if resp.status_code != 200:

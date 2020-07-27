@@ -99,7 +99,7 @@ def aws2neptune_rdf(scan_id: str, config: Config, muxer: AWSScanMuxer) -> AWS2Ne
         host=config.neptune.host, port=config.neptune.port, region=config.neptune.region, ssl=config.neptune.ssl
     )
     neptune_client = AltimeterNeptuneClient(max_age_min=1440, neptune_endpoint=endpoint)
-    neptune_client.write_to_neptune_rdf(endpoint, graph)
+    neptune_client.write_to_neptune_rdf(graph)
     logger.info(LogEvent.NeptuneRDFWriteEnd)
     return AWS2NeptuneResult()
 
