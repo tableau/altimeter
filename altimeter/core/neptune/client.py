@@ -50,6 +50,7 @@ def get_required_tag_value(tag_set: List[Dict[str, str]], key: str) -> str:
             return tag_value
     raise ValueError(f"Required tag key {key} not found in {tag_set}")
 
+
 @dataclass(frozen=True)
 class NeptuneEndpoint:
     """Represents an AWS Neptune endpoint.
@@ -89,6 +90,7 @@ class NeptuneEndpoint:
         """
         return f"http://{self.get_endpoint_str()}/loader"
 
+
 def discover_neptune_endpoint() -> NeptuneEndpoint:
     """Find a Neptune"""
     instance_id_prefix = "alti-"
@@ -106,6 +108,7 @@ def discover_neptune_endpoint() -> NeptuneEndpoint:
                     return NeptuneEndpoint(host=host, port=port, region=region)
     raise AltimeterException(
         f"No Neptune instance found matching {instance_id_prefix}*")
+
 
 @dataclass(frozen=True)
 class GraphMetadata:
@@ -127,6 +130,7 @@ class GraphMetadata:
     start_time: int
     end_time: int
 
+
 class AltimeterNeptuneClient:
     """Client to run sparql queries against a neptune instance using graph name conventions to
     determine most recent graph.
@@ -144,6 +148,7 @@ class AltimeterNeptuneClient:
         # initially set this to a time in the past such that _get_auth's logic is simpler
         # regarding first run.
         self._auth_expiration = datetime.now() - timedelta(hours=24)
+        self.logger = Logger()
 
     def run_query(self, graph_names: Set[str], query: str) -> QueryResult:
         """Runs a SPARQL query against the latest available graphs given a list of
@@ -196,12 +201,12 @@ class AltimeterNeptuneClient:
             start_time=graph_start_time,
             end_time=graph_end_time,
         )
-        logger = Logger()
+        logger = self.logger
         with logger.bind(
-            rdf_bucket=bucket,
-            rdf_key=key,
-            graph_uri=graph_metadata.uri,
-            neptune_endpoint=self._neptune_endpoint.get_endpoint_str(),
+                rdf_bucket=bucket,
+                rdf_key=key,
+                graph_uri=graph_metadata.uri,
+                neptune_endpoint=self._neptune_endpoint.get_endpoint_str(),
         ):
             session = boto3.Session(region_name=self._neptune_endpoint.region)
             credentials = session.get_credentials()
@@ -321,7 +326,7 @@ class AltimeterNeptuneClient:
             "}\n"
         )
         resp = requests.post(neptune_sparql_url, data={
-                             "update": update_stmt}, auth=auth)
+            "update": update_stmt}, auth=auth)
         if resp.status_code != 200:
             raise NeptuneUpdateGraphException(
                 (f"Error updating graph {META_GRAPH_NAME} " f"with {update_stmt} : {resp.text}")
@@ -503,7 +508,7 @@ class AltimeterNeptuneClient:
             f"            <alti:end_time>    ?end_time }}\n"
         )
         resp = requests.post(neptune_sparql_url, data={
-                             "update": delete_stmt}, auth=auth)
+            "update": delete_stmt}, auth=auth)
         if resp.status_code != 200:
             raise NeptuneUpdateGraphException(
                 (f"Error updating graph {META_GRAPH_NAME} " f"with {delete_stmt} : {resp.text}")
@@ -515,7 +520,7 @@ class AltimeterNeptuneClient:
         neptune_sparql_url = self._neptune_endpoint.get_sparql_endpoint()
         update_stmt = f"clear graph <{uri}>"
         resp = requests.post(neptune_sparql_url, data={
-                             "update": update_stmt}, auth=auth)
+            "update": update_stmt}, auth=auth)
         if resp.status_code != 200:
             raise NeptuneClearGraphException(
                 (f"Error clearing graph {uri} " f"with {update_stmt} : {resp.text}")
@@ -537,7 +542,7 @@ class AltimeterNeptuneClient:
         neptune_sparql_url = self._neptune_endpoint.get_sparql_endpoint()
         auth = self._get_auth()
         resp = requests.post(neptune_sparql_url, data={
-                             "query": query}, auth=auth)
+            "query": query}, auth=auth)
         if resp.status_code != 200:
             raise NeptuneQueryException(
                 f"Error running query {query}: {resp.text}")
@@ -558,49 +563,68 @@ class AltimeterNeptuneClient:
         graph_traversal_source = traversal().withRemote(gremlin_connection)
         return graph_traversal_source, gremlin_connection
 
-    @staticmethod
-    def __write_vertices(g: traversal, vertices: [Dict]):
+    def __write_vertices(self, g: traversal, vertices: [Dict], scan_id):
         """
         Writes the vertices to the labeled property graph
         :param g: The graph traversal source
         :param vertices: A list of dictionaries for each vertex
         :return: None
         """
+        cnt = 0
+        t = g
         for r in vertices:
-            t = g.V(r['~id']).fold().coalesce(
-                __.unfold(), __.addV(r['~label']).property(T.id, str(r['~id'])))
+            vertex_id = f'{scan_id}_{r["~id"]}'
+            t = t.V(vertex_id).fold().coalesce(
+                __.unfold(), __.addV(self.__parse_arn(r["~label"])['resource']).property(T.id, vertex_id))
             for k in r.keys():
                 # Need to handle numbers that are bigger than a Long in Java, for now we stringify it
                 if isinstance(r[k], int) and (r[k] > 9223372036854775807 or r[k] < -9223372036854775807):
-                    r[k]= str(r[k])
-                if not k in ['~id', '~label']:
+                    r[k] = str(r[k])
+                if k not in ['~id', '~label']:
                     t = t.property(k, r[k])
+            cnt += 1
+            if cnt % 50 == 0:
+                try:
+                    self.logger.info(event=LogEvent.NeptunePeriodicWrite,
+                                     msg=f'Writing vertices {cnt} of {len(vertices)}')
+                    t.next()
+                    t = g
+                except:
+                    raise NeptuneLoadGraphException(
+                        f"Error loading vertex {r} " f"with {str(t.bytecode)}"
+                    )
+        try:
+            self.logger.info(event=LogEvent.NeptunePeriodicWrite,
+                             msg=f'Final vertices {cnt} of {len(vertices)} written')
+            t.next()
+        except:
+            raise NeptuneLoadGraphException(
+                f"Error loading vertex {r} " f"with {str(t.bytecode)}"
+            )
 
-            try:
-                t.next()
-            except:
-                raise NeptuneLoadGraphException(
-                    (f"Error loading vertex {r} " f"with {str(t.bytecode)}")
-                )
-
-    @staticmethod
-    def __write_edges(g, edges):
+    def __write_edges(self, g, edges, scan_id):
         """
         Writes the edges to the labeled property graph
         :param g: The graph traversal source
         :param edges: A list of dictionaries for each edge
         :return: None
         """
+        cnt = 0
+        t = g
         for r in edges:
-            (g.V(str(r['~from'])).fold().
+            to_id = f'{scan_id}_{r["~to"]}'
+            from_id = f'{scan_id}_{r["~from"]}'
+            t = (t.V(from_id).fold().
                 coalesce(
                 __.unfold(),
-                __.addV().property(T.id, str(r['~from']))
+                __.addV(self.__parse_arn(r["~from"])['resource']).property(T.id, from_id).property('scan_id', scan_id).
+                    property('arn', r["~from"])
             ).store('from').
-                V(str(r['~to'])).fold().
+                V(to_id).fold().
                 coalesce(
                 __.unfold(),
-                __.addV('unspecified').property(T.id, str(r['~to']))
+                __.addV(self.__parse_arn(r["~to"])['resource']).property(T.id, to_id).property('scan_id', scan_id).
+                    property('arn', r['~to'])
             ).store('to').
                 inE().hasId(str(r['~id'])).
                 fold().
@@ -608,25 +632,71 @@ class AltimeterNeptuneClient:
                 __.unfold(),
                 __.addE(r['~label']).property(T.id, str(r['~id'])).
                     from_(__.select('from').unfold()).to(__.select('to').unfold())
+                )
             )
-            ).next()
+            cnt += 1
+            if cnt % 50 == 0:
+                try:
+                    self.logger.info(event=LogEvent.NeptunePeriodicWrite,
+                                     msg=f'Writing edges {cnt} of {len(edges)}')
+                    t.next()
+                    t = g
+                except:
+                    raise NeptuneLoadGraphException(
+                        f"Error loading edge {r} " f"with {str(t.bytecode)}"
+                    )
+        try:
+            self.logger.info(event=LogEvent.NeptunePeriodicWrite,
+                             msg=f'Final edges {cnt} of {len(edges)} written')
+            t.next()
+            t = g
+        except:
+            raise NeptuneLoadGraphException(
+                f"Error loading edge {r} " f"with {str(t.bytecode)}"
+            )
 
-    def write_to_neptune_lpg(self, graph):
+    @staticmethod
+    def __parse_arn(arn):
+        # http://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html
+        elements = arn.split(':', 5)
+        result = {}
+        if len(elements) == 6:
+            result = {
+                'arn': elements[0],
+                'partition': elements[1],
+                'service': elements[2],
+                'region': elements[3],
+                'account': elements[4],
+                'resource': elements[5],
+                'resource_type': None
+            }
+        else:
+            result['resource'] = arn
+        if '/' in result['resource']:
+            result['resource_type'], result['resource'] = result['resource'].split('/', 1)
+        elif ':' in result['resource']:
+            result['resource_type'], result['resource'] = result['resource'].split(':', 1)
+
+        if result['resource'].startswith("ami-"):
+            result['resource'] = result['resource_type']
+
+        return result
+
+    def write_to_neptune_lpg(self, graph, scan_id):
         """
         Writes the graph to a labeled property graph
-        :param endpoint: The neptune endpoint
+        :param scan_id: The unique string representing the scan
         :param graph: The graph to write
         :return: None
         """
         g, conn = self.connect_to_gremlin(self._neptune_endpoint)
-        self.__write_vertices(g, graph['vertices'])
-        self.__write_edges(g, graph['edges'])
+        self.__write_vertices(g, graph['vertices'], scan_id)
+        self.__write_edges(g, graph['edges'], scan_id)
         conn.close()
 
     def write_to_neptune_rdf(self, graph):
         """
         Writes the graph to an RDF graph
-        :param endpoint: The neptune endpoint
         :param graph: The graph to write
         :return: None
         """
@@ -637,12 +707,12 @@ class AltimeterNeptuneClient:
             triples = triples + subject.n3() + " " + predicate.n3() + " " + obj.n3() + " . \n"
 
         insert_stmt = (
-            f"INSERT DATA {{\n" +
-            f"    GRAPH <{META_GRAPH_NAME}>\n"
-            f"        {{ "
-            f"{triples}"
-            f"}}\n"
-            "}\n"
+                f"INSERT DATA {{\n" +
+                f"    GRAPH <{META_GRAPH_NAME}>\n"
+                f"        {{ "
+                f"{triples}"
+                f"}}\n"
+                "}\n"
         )
 
         resp = requests.post(neptune_sparql_url, data={

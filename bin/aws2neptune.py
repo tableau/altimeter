@@ -56,14 +56,14 @@ def aws2neptune_lpg(scan_id: str, config: Config, muxer: AWSScanMuxer) -> AWS2Ne
         artifact_reader=artifact_reader,
     )
     logger.info(LogEvent.NeptuneGremlinWriteStart)
-    graph = graph_set.to_neptune_lpg()
+    graph = graph_set.to_neptune_lpg(scan_id)
     if config.neptune is None:
         raise Exception("Can not load to Neptune because config.neptune is empty.")
     endpoint = NeptuneEndpoint(
         host=config.neptune.host, port=config.neptune.port, region=config.neptune.region, ssl=config.neptune.ssl
     )
     neptune_client = AltimeterNeptuneClient(max_age_min=1440, neptune_endpoint=endpoint)
-    neptune_client.write_to_neptune_lpg(graph)
+    neptune_client.write_to_neptune_lpg(graph, scan_id)
     logger.info(LogEvent.NeptuneGremlinWriteEnd)
     return AWS2NeptuneResult()
 

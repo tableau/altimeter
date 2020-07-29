@@ -75,7 +75,7 @@ class Resource:
             vertices: List containing dictionaries representing a vertex
             edges: List containing dictionaries representing an edge
         """
-        vertex={'~id': self.resource_id, '~label': self.type_name}
+        vertex={'~id': self.resource_id, '~label': self.type_name, 'arn': self.resource_id}
         for link in self.links:
             link.to_lpg(vertex, vertices, edges)
 

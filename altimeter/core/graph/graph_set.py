@@ -15,6 +15,7 @@ from altimeter.core.multilevel_counter import MultilevelCounter
 from altimeter.core.resource.resource import Resource
 from altimeter.core.resource.resource_spec import ResourceSpec
 
+
 class GraphSet:
     """A GraphSet represents the contents of a Graph.  It contains a list of Resource objects, a
     graph name and version and a few metadata fields describing the scan. Generally GraphSets
@@ -31,14 +32,14 @@ class GraphSet:
     """
 
     def __init__(
-        self,
-        name: str,
-        version: str,
-        start_time: int,
-        end_time: int,
-        resources: List[Resource],
-        errors: List[str],
-        stats: MultilevelCounter,
+            self,
+            name: str,
+            version: str,
+            start_time: int,
+            end_time: int,
+            resources: List[Resource],
+            errors: List[str],
+            stats: MultilevelCounter,
     ):
         self.name = name
         self.version = version
@@ -76,19 +77,27 @@ class GraphSet:
                             node_cache=node_cache)
         return graph
 
-    def to_neptune_lpg(self):
+    def to_neptune_lpg(self, scan_id):
         vertices = []
-        edges=[]
-        vertex = {'~id': f'{self.name}:{self.version}', '~label': "metadata", "name": self.name, "version": self.version,
-                "start_time": self.start_time, "end_time": self.end_time}
+        edges = []
+        vertex = {'~id': scan_id, '~label': "metadata", "name": self.name,
+                  "version": self.version, "start_time": self.start_time, "end_time": self.end_time}
         vertices.append(vertex)
         for error in self.errors:
             vertex = {'~id': uuid.uuid1(), '~label': "error", "error": error}
             vertices.append(vertex)
-            edge = {'~id': uuid.uuid1(), '~label': "generated", "~from": f'{self.name}:{self.version}', '~to': vertex['~id']}
+            edges.append({'~id': uuid.uuid1(), '~label': "generated", "~from": f'{self.name}:{self.version}',
+                          '~to': vertex['~id']})
             vertices.append(vertex)
         for resource in self.resources:
             resource.to_lpg(vertices, edges)
+
+        for v in vertices:
+            # Add the scan_id parameter to each vertex
+            v['scan_id']=scan_id
+            # Add an edge from each vertex to the metadata vertex
+            edges.append({'~id': uuid.uuid1(), '~label': "identified_resource", "~from": scan_id,
+                          '~to': v['~id']})
         return {'vertices': vertices, 'edges': edges}
 
     def to_dict(self) -> Dict[str, Any]:
