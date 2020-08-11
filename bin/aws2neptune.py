@@ -4,7 +4,7 @@ from datetime import datetime
 import argparse
 from dataclasses import dataclass
 import logging
-import json
+import boto3
 import os
 import sys
 from typing import Any, Dict, List, Optional
@@ -150,6 +150,8 @@ def main(argv: Optional[List[str]] = None) -> int:
     if config is None:
         print("config must be provided as a positional arg or env var 'CONFIG_PATH'")
         return 1
+
+    print(boto3.client('sts').get_caller_identity().get('Account'))
 
     config = Config.from_path(config)
     scan_id = generate_scan_id()

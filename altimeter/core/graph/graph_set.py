@@ -84,9 +84,9 @@ class GraphSet:
                   "version": self.version, "start_time": self.start_time, "end_time": self.end_time}
         vertices.append(vertex)
         for error in self.errors:
-            vertex = {'~id': uuid.uuid1(), '~label': "error", "error": error}
+            vertex = {'~id': str(uuid.uuid1()), '~label': "error", "error": error}
             vertices.append(vertex)
-            edges.append({'~id': uuid.uuid1(), '~label': "generated", "~from": f'{self.name}:{self.version}',
+            edges.append({'~id': str(uuid.uuid1()), '~label': "generated", "~from": f'{self.name}:{self.version}',
                           '~to': vertex['~id']})
             vertices.append(vertex)
         for resource in self.resources:

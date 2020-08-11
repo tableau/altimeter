@@ -2,6 +2,7 @@
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 import time
+import hashlib
 from typing import Dict, List, Optional, Set
 
 from aws_requests_auth.aws_auth import AWSRequestsAuth
@@ -573,7 +574,7 @@ class AltimeterNeptuneClient:
         cnt = 0
         t = g
         for r in vertices:
-            vertex_id = f'{scan_id}_{r["~id"]}'
+            vertex_id = f'{r["~id"]}_{scan_id}'
             t = t.V(vertex_id).fold().coalesce(
                 __.unfold(), __.addV(self.__parse_arn(r["~label"])['resource']).property(T.id, vertex_id))
             for k in r.keys():
@@ -583,24 +584,26 @@ class AltimeterNeptuneClient:
                 if k not in ['~id', '~label']:
                     t = t.property(k, r[k])
             cnt += 1
-            if cnt % 50 == 0:
+            if cnt % 1 == 0:
                 try:
                     self.logger.info(event=LogEvent.NeptunePeriodicWrite,
                                      msg=f'Writing vertices {cnt} of {len(vertices)}')
                     t.next()
                     t = g
-                except:
+                except Exception as err:
+                    print(str(err))
                     raise NeptuneLoadGraphException(
                         f"Error loading vertex {r} " f"with {str(t.bytecode)}"
                     )
-        try:
+            '''try:
             self.logger.info(event=LogEvent.NeptunePeriodicWrite,
                              msg=f'Final vertices {cnt} of {len(vertices)} written')
             t.next()
-        except:
+        except Exception as err:
+            print(str(err))
             raise NeptuneLoadGraphException(
                 f"Error loading vertex {r} " f"with {str(t.bytecode)}"
-            )
+            )'''
 
     def __write_edges(self, g, edges, scan_id):
         """
@@ -612,8 +615,8 @@ class AltimeterNeptuneClient:
         cnt = 0
         t = g
         for r in edges:
-            to_id = f'{scan_id}_{r["~to"]}'
-            from_id = f'{scan_id}_{r["~from"]}'
+            to_id = f'{r["~to"]}_{scan_id}'
+            from_id = f'{r["~from"]}_{scan_id}'
             t = (t.V(from_id).fold().
                 coalesce(
                 __.unfold(),
@@ -635,17 +638,18 @@ class AltimeterNeptuneClient:
                 )
             )
             cnt += 1
-            if cnt % 50 == 0:
+            if cnt % 1 == 0:
                 try:
                     self.logger.info(event=LogEvent.NeptunePeriodicWrite,
                                      msg=f'Writing edges {cnt} of {len(edges)}')
                     t.next()
                     t = g
-                except:
+                except Exception as err:
+                    print(str(err))
                     raise NeptuneLoadGraphException(
                         f"Error loading edge {r} " f"with {str(t.bytecode)}"
                     )
-        try:
+        '''try:
             self.logger.info(event=LogEvent.NeptunePeriodicWrite,
                              msg=f'Final edges {cnt} of {len(edges)} written')
             t.next()
@@ -653,12 +657,12 @@ class AltimeterNeptuneClient:
         except:
             raise NeptuneLoadGraphException(
                 f"Error loading edge {r} " f"with {str(t.bytecode)}"
-            )
+            )'''
 
     @staticmethod
     def __parse_arn(arn):
         # http://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html
-        elements = arn.split(':', 5)
+        elements = str(arn).split(':', 5)
         result = {}
         if len(elements) == 6:
             result = {
@@ -671,7 +675,7 @@ class AltimeterNeptuneClient:
                 'resource_type': None
             }
         else:
-            result['resource'] = arn
+            result['resource'] = str(arn)
         if '/' in result['resource']:
             result['resource_type'], result['resource'] = result['resource'].split('/', 1)
         elif ':' in result['resource']:
