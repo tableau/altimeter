@@ -14,7 +14,9 @@ class EC2ImageResourceSpec(EC2ResourceSpec):
 
     type_name = "image"
     schema = Schema(
-        ScalarField("Name"), ScalarField("Description", optional=True), ScalarField("Public"),
+        ScalarField("Name", optional=True),
+        ScalarField("Description", optional=True),
+        ScalarField("Public"),
     )
 
     @classmethod
