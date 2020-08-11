@@ -6,6 +6,7 @@ from botocore.client import BaseClient
 from altimeter.aws.resource.resource_spec import ListFromAWSResult
 from altimeter.aws.resource.ec2 import EC2ResourceSpec
 from altimeter.aws.resource.ec2.vpc import VPCResourceSpec
+from altimeter.aws.resource.ec2.subnet import SubnetResourceSpec
 from altimeter.core.graph.field.dict_field import AnonymousDictField
 from altimeter.core.graph.field.resource_link_field import ResourceLinkField
 from altimeter.core.graph.field.scalar_field import ScalarField
