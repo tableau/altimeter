@@ -29,6 +29,7 @@ class EC2NetworkInterfaceResourceSpec(EC2ResourceSpec):
         ScalarField("PrivateDnsName", optional=True),
         ScalarField("PrivateIpAddress", optional=True),
         ScalarField("Status"),
+        ResourceLinkField("SubnetId", SubnetResourceSpec, optional=True),
         ResourceLinkField("VpcId", VPCResourceSpec, optional=True),
     )
 
