@@ -2,8 +2,7 @@
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 import time
-import hashlib
-from typing import Dict, List, Optional, Set
+from typing import Dict, List, Optional, Set, Tuple
 
 from aws_requests_auth.aws_auth import AWSRequestsAuth
 import boto3
@@ -107,9 +106,7 @@ def discover_neptune_endpoint() -> NeptuneEndpoint:
                     port = endpoint["Port"]
                     region = boto3.session.Session().region_name
                     return NeptuneEndpoint(host=host, port=port, region=region)
-    raise AltimeterException(
-        f"No Neptune instance found matching {instance_id_prefix}*"
-    )
+    raise AltimeterException(f"No Neptune instance found matching {instance_id_prefix}*")
 
 
 @dataclass(frozen=True)
@@ -169,15 +166,11 @@ class AltimeterNeptuneClient:
         for graph_name in graph_names:
             graph_metadata = self._get_latest_graph_metadata(name=graph_name)
             graph_uris_load_times[graph_metadata.uri] = graph_metadata.end_time
-        finalized_query = finalize_query(
-            query, graph_uris=list(graph_uris_load_times.keys())
-        )
+        finalized_query = finalize_query(query, graph_uris=list(graph_uris_load_times.keys()))
         query_result_set = self.run_raw_query(finalized_query)
         return QueryResult(graph_uris_load_times, query_result_set)
 
-    def load_graph(
-        self, bucket: str, key: str, load_iam_role_arn: str
-    ) -> GraphMetadata:
+    def load_graph(self, bucket: str, key: str, load_iam_role_arn: str) -> GraphMetadata:
         """Load a graph into Neptune.
         Args:
              bucket: s3 bucket of graph rdf
@@ -264,9 +257,7 @@ class AltimeterNeptuneClient:
                         break
                     if status not in ("LOAD_NOT_STARTED", "LOAD_IN_PROGRESS"):
                         logger.error(event=LogEvent.NeptuneLoadError, status=status)
-                        raise NeptuneLoadGraphException(
-                            f"Error loading graph: {status_resp_json}"
-                        )
+                        raise NeptuneLoadGraphException(f"Error loading graph: {status_resp_json}")
                 logger.info(event=LogEvent.NeptuneLoadEnd)
 
                 logger.info(event=LogEvent.MetadataGraphUpdateStart)
@@ -298,9 +289,7 @@ class AltimeterNeptuneClient:
                 aws_service="neptune-db",
             )
             self._auth = auth
-            self._auth_expiration = datetime.now() + timedelta(
-                minutes=SESSION_LIFETIME_MINUTES
-            )
+            self._auth_expiration = datetime.now() + timedelta(minutes=SESSION_LIFETIME_MINUTES)
         return self._auth
 
     def _register_graph(self, graph_metadata: GraphMetadata) -> None:
@@ -330,15 +319,10 @@ class AltimeterNeptuneClient:
             f"}}\n"
             "}\n"
         )
-        resp = requests.post(
-            neptune_sparql_url, data={"update": update_stmt}, auth=auth
-        )
+        resp = requests.post(neptune_sparql_url, data={"update": update_stmt}, auth=auth)
         if resp.status_code != 200:
             raise NeptuneUpdateGraphException(
-                (
-                    f"Error updating graph {META_GRAPH_NAME} "
-                    f"with {update_stmt} : {resp.text}"
-                )
+                (f"Error updating graph {META_GRAPH_NAME} " f"with {update_stmt} : {resp.text}")
             )
 
     def get_graph_uris(self, name: str) -> List[str]:
@@ -358,9 +342,7 @@ class AltimeterNeptuneClient:
         graph_uris = [uri for uri in all_graph_uris if uri.startswith(graph_prefix)]
         return graph_uris
 
-    def get_graph_metadatas(
-        self, name: str, version: Optional[str] = None
-    ) -> List[GraphMetadata]:
+    def get_graph_metadatas(self, name: str, version: Optional[str] = None) -> List[GraphMetadata]:
         """Return all graph metadatas for a given name/version. These represent fully loaded
         graphs in the Neptune database.
 
@@ -410,9 +392,7 @@ class AltimeterNeptuneClient:
             graph_metadatas.append(graph_metadata)
         return graph_metadatas
 
-    def _get_latest_graph_metadata(
-        self, name: str, version: Optional[str] = None
-    ) -> GraphMetadata:
+    def _get_latest_graph_metadata(self, name: str, version: Optional[str] = None) -> GraphMetadata:
         """Return a GraphMetadata object representing the most recently successfully loaded graph
         for a given name / version.
 
@@ -457,9 +437,7 @@ class AltimeterNeptuneClient:
         results = self.run_raw_query(query=get_graph_metadatas_query)
         results_list = results.to_list()
         if not results_list:
-            raise NeptuneNoGraphsFoundException(
-                f"No graphs found for graph name '{name}'"
-            )
+            raise NeptuneNoGraphsFoundException(f"No graphs found for graph name '{name}'")
         if len(results_list) != 1:
             raise RuntimeError("Logic error - more than one graph returned.")
         result = results_list[0]
@@ -520,15 +498,10 @@ class AltimeterNeptuneClient:
             f"            <alti:start_time>  ?start_time ;\n"
             f"            <alti:end_time>    ?end_time }}\n"
         )
-        resp = requests.post(
-            neptune_sparql_url, data={"update": delete_stmt}, auth=auth
-        )
+        resp = requests.post(neptune_sparql_url, data={"update": delete_stmt}, auth=auth)
         if resp.status_code != 200:
             raise NeptuneUpdateGraphException(
-                (
-                    f"Error updating graph {META_GRAPH_NAME} "
-                    f"with {delete_stmt} : {resp.text}"
-                )
+                (f"Error updating graph {META_GRAPH_NAME} " f"with {delete_stmt} : {resp.text}")
             )
 
     def clear_graph_data(self, uri: str) -> None:
@@ -536,9 +509,7 @@ class AltimeterNeptuneClient:
         auth = self._get_auth()
         neptune_sparql_url = self._neptune_endpoint.get_sparql_endpoint()
         update_stmt = f"clear graph <{uri}>"
-        resp = requests.post(
-            neptune_sparql_url, data={"update": update_stmt}, auth=auth
-        )
+        resp = requests.post(neptune_sparql_url, data={"update": update_stmt}, auth=auth)
         if resp.status_code != 200:
             raise NeptuneClearGraphException(
                 (f"Error clearing graph {uri} " f"with {update_stmt} : {resp.text}")
@@ -565,7 +536,7 @@ class AltimeterNeptuneClient:
         return QueryResultSet.from_sparql_endpoint_json(resp.json())
 
     @staticmethod
-    def connect_to_gremlin(neptune: NeptuneEndpoint):
+    def connect_to_gremlin(neptune: NeptuneEndpoint) -> Tuple[traversal, DriverRemoteConnection]:
         """
         Get the Gremlin traversal and connection for the Neptune endpoint
         :return: The Traversal object
@@ -579,7 +550,7 @@ class AltimeterNeptuneClient:
         graph_traversal_source = traversal().withRemote(gremlin_connection)
         return graph_traversal_source, gremlin_connection
 
-    def __write_vertices(self, g: traversal, vertices: [Dict], scan_id):
+    def __write_vertices(self, g: traversal, vertices: List[Dict], scan_id: str) -> None:
         """
         Writes the vertices to the labeled property graph
         :param g: The graph traversal source
@@ -595,9 +566,7 @@ class AltimeterNeptuneClient:
                 .fold()
                 .coalesce(
                     __.unfold(),
-                    __.addV(self.__parse_arn(r["~label"])["resource"]).property(
-                        T.id, vertex_id
-                    ),
+                    __.addV(self.__parse_arn(r["~label"])["resource"]).property(T.id, vertex_id),
                 )
             )
             for k in r.keys():
@@ -623,7 +592,7 @@ class AltimeterNeptuneClient:
                         f"Error loading vertex {r} " f"with {str(t.bytecode)}"
                     )
 
-    def __write_edges(self, g, edges, scan_id):
+    def __write_edges(self, g: traversal, edges: List[Dict], scan_id: str) -> None:
         """
         Writes the edges to the labeled property graph
         :param g: The graph traversal source
@@ -683,7 +652,7 @@ class AltimeterNeptuneClient:
                     )
 
     @staticmethod
-    def __parse_arn(arn):
+    def __parse_arn(arn: str) -> Dict:
         # http://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html
         elements = str(arn).split(":", 5)
         result = {}
@@ -699,21 +668,17 @@ class AltimeterNeptuneClient:
             }
         else:
             result["resource"] = str(arn)
-        if "/" in result["resource"]:
-            result["resource_type"], result["resource"] = result["resource"].split(
-                "/", 1
-            )
-        elif ":" in result["resource"]:
-            result["resource_type"], result["resource"] = result["resource"].split(
-                ":", 1
-            )
+        if "/" in str(result["resource"]):
+            result["resource_type"], result["resource"] = str(result["resource"]).split("/", 1)
+        elif ":" in str(result["resource"]):
+            result["resource_type"], result["resource"] = str(result["resource"]).split(":", 1)
 
-        if result["resource"].startswith("ami-"):
+        if str(result["resource"]).startswith("ami-"):
             result["resource"] = result["resource_type"]
 
         return result
 
-    def write_to_neptune_lpg(self, graph, scan_id):
+    def write_to_neptune_lpg(self, graph: Dict, scan_id: str) -> None:
         """
         Writes the graph to a labeled property graph
         :param scan_id: The unique string representing the scan
@@ -725,7 +690,7 @@ class AltimeterNeptuneClient:
         self.__write_edges(g, graph["edges"], scan_id)
         conn.close()
 
-    def write_to_neptune_rdf(self, graph):
+    def write_to_neptune_rdf(self, graph: Dict) -> None:
         """
         Writes the graph to an RDF graph
         :param graph: The graph to write
@@ -735,23 +700,14 @@ class AltimeterNeptuneClient:
         neptune_sparql_url = self._neptune_endpoint.get_sparql_endpoint()
         triples = ""
         for subject, predicate, obj in graph:
-            triples = (
-                triples + subject.n3() + " " + predicate.n3() + " " + obj.n3() + " . \n"
-            )
+            triples = triples + subject.n3() + " " + predicate.n3() + " " + obj.n3() + " . \n"
 
         insert_stmt = (
-            f"INSERT DATA {{\n" + f"    GRAPH <{META_GRAPH_NAME}>\n"
-            f"        {{ "
-            f"{triples}"
-            f"}}\n"
-            "}\n"
+            "INSERT DATA {{\n" + f"    GRAPH <{META_GRAPH_NAME}>\n" "{{ " f"{triples}" f"}}\n" "}\n"
         )
 
-        resp = requests.post(
-            neptune_sparql_url, data={"update": insert_stmt}, auth=auth
-        )
+        resp = requests.post(neptune_sparql_url, data={"update": insert_stmt}, auth=auth)
         if resp.status_code != 200:
             raise NeptuneUpdateGraphException(
-                f"Error updating graph {META_GRAPH_NAME} "
-                f"with {insert_stmt} : {resp.text}"
+                f"Error updating graph {META_GRAPH_NAME} " f"with {insert_stmt} : {resp.text}"
             )

@@ -70,7 +70,7 @@ def aws2n(scan_id: str, config: Config, muxer: AWSScanMuxer, load_neptune: bool)
         if rdf_key is None:
             raise Exception(f"Invalid rdf s3 path {rdf_path}")
         graph_metadata = neptune_client.load_graph(
-            bucket=rdf_bucket, key=rdf_key, load_iam_role_arn=config.neptune.iam_role_arn
+            bucket=rdf_bucket, key=rdf_key, load_iam_role_arn=str(config.neptune.iam_role_arn)
         )
         logger.info(event=LogEvent.GraphLoadedSNSNotificationStart)
         sns_client = boto3.client("sns")

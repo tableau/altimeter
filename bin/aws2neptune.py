@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """Graph AWS resource data in Neptune"""
 from datetime import datetime
-from dataclasses import dataclass
 import sys
 import os
 from typing import List, Optional
@@ -21,14 +20,7 @@ from altimeter.core.log_events import LogEvent
 from altimeter.core.neptune.client import AltimeterNeptuneClient, NeptuneEndpoint
 
 
-@dataclass(frozen=True)
-class AWS2NeptuneResult:
-    errors: list = None
-
-
-def aws2neptune_lpg(
-    scan_id: str, config: Config, muxer: AWSScanMuxer
-) -> AWS2NeptuneResult:
+def aws2neptune_lpg(scan_id: str, config: Config, muxer: AWSScanMuxer) -> None:
     """Scan AWS resources to json, convert to RDF and load into Neptune
     if config.neptune is defined"""
 
@@ -59,17 +51,14 @@ def aws2neptune_lpg(
         host=config.neptune.host,
         port=config.neptune.port,
         region=config.neptune.region,
-        ssl=config.neptune.ssl,
+        ssl=bool(config.neptune.ssl),
     )
     neptune_client = AltimeterNeptuneClient(max_age_min=1440, neptune_endpoint=endpoint)
     neptune_client.write_to_neptune_lpg(graph, scan_id)
     logger.info(LogEvent.NeptuneGremlinWriteEnd)
-    return AWS2NeptuneResult()
 
 
-def aws2neptune_rdf(
-    scan_id: str, config: Config, muxer: AWSScanMuxer
-) -> AWS2NeptuneResult:
+def aws2neptune_rdf(scan_id: str, config: Config, muxer: AWSScanMuxer) -> None:
     """Scan AWS resources to json, convert to RDF and load into Neptune
     if config.neptune is defined"""
 
@@ -100,12 +89,11 @@ def aws2neptune_rdf(
         host=config.neptune.host,
         port=config.neptune.port,
         region=config.neptune.region,
-        ssl=config.neptune.ssl,
+        ssl=bool(config.neptune.ssl),
     )
     neptune_client = AltimeterNeptuneClient(max_age_min=1440, neptune_endpoint=endpoint)
     neptune_client.write_to_neptune_rdf(graph)
     logger.info(LogEvent.NeptuneRDFWriteEnd)
-    return AWS2NeptuneResult()
 
 
 def generate_scan_id() -> str:
@@ -149,11 +137,14 @@ def main(argv: Optional[List[str]] = None) -> int:
     scan_id = generate_scan_id()
     muxer = LocalAWSScanMuxer(scan_id=scan_id, config=config)
 
-    if config.neptune.use_lpg:
-        result = aws2neptune_lpg(scan_id=scan_id, config=config, muxer=muxer)
+    if config.neptune:
+        if bool(config.neptune.use_lpg):
+            aws2neptune_lpg(scan_id=scan_id, config=config, muxer=muxer)
+        else:
+            aws2neptune_rdf(scan_id=scan_id, config=config, muxer=muxer)
     else:
-        result = aws2neptune_rdf(scan_id=scan_id, config=config, muxer=muxer)
-    print(result)
+        raise Exception("Can not load to Neptune because config.neptune is empty.")
+
     return 0
 
 

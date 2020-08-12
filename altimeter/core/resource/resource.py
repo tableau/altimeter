@@ -17,9 +17,7 @@ class Resource:
          links: List of Links for this resource
     """
 
-    def __init__(
-        self, resource_id: str, type_name: str, links: Optional[List[Link]] = None
-    ):
+    def __init__(self, resource_id: str, type_name: str, links: Optional[List[Link]] = None):
         self.resource_id = resource_id
         self.type_name = type_name
         self.links = [] if links is None else links
@@ -68,11 +66,9 @@ class Resource:
         graph.add((node, RDF.type, getattr(namespace, self.type_name)))
         graph.add((node, getattr(namespace, "id"), Literal(self.resource_id)))
         for link in self.links:
-            link.to_rdf(
-                subj=node, namespace=namespace, graph=graph, node_cache=node_cache
-            )
+            link.to_rdf(subj=node, namespace=namespace, graph=graph, node_cache=node_cache)
 
-    def to_lpg(self, vertices, edges) -> None:
+    def to_lpg(self, vertices: List[Dict], edges: List[Dict]) -> None:
         """Graph this Resource as a dictionary into the vertices and edges lists.
 
         Args:
@@ -85,6 +81,6 @@ class Resource:
             "arn": self.resource_id,
         }
         for link in self.links:
-            link.to_lpg(vertex, vertices, edges)
+            link.to_lpg(vertex, vertices, edges, "")
 
         vertices.append(vertex)

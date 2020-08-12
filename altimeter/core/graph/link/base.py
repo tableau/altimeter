@@ -1,6 +1,6 @@
 import abc
 import inspect
-from typing import Any, Dict
+from typing import Any, Dict, List
 
 from rdflib import BNode, Namespace, Graph
 
@@ -67,9 +67,7 @@ class Link(abc.ABC):
         """
 
     @abc.abstractmethod
-    def to_lpg(
-        self, parent: Dict, vertices: [Dict], edges: [Dict], prefix: str
-    ) -> None:
+    def to_lpg(self, parent: Dict, vertices: List[Dict], edges: List[Dict], prefix: str) -> None:
         """Graph this link on a BNode in a Graph using a given Namespace to create the full
         predicate.
 

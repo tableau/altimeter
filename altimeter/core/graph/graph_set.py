@@ -63,19 +63,15 @@ class GraphSet:
         graph.add((metadata_node, RDF.type, getattr(namespace, "metadata")))
         graph.add((metadata_node, getattr(namespace, "name"), Literal(self.name)))
         graph.add((metadata_node, getattr(namespace, "version"), Literal(self.version)))
-        graph.add(
-            (metadata_node, getattr(namespace, "start_time"), Literal(self.start_time))
-        )
-        graph.add(
-            (metadata_node, getattr(namespace, "end_time"), Literal(self.end_time))
-        )
+        graph.add((metadata_node, getattr(namespace, "start_time"), Literal(self.start_time)))
+        graph.add((metadata_node, getattr(namespace, "end_time"), Literal(self.end_time)))
         for error in self.errors:
             graph.add((metadata_node, getattr(namespace, "error"), Literal(error)))
         for resource in self.resources:
             resource.to_rdf(namespace=namespace, graph=graph, node_cache=node_cache)
         return graph
 
-    def to_neptune_lpg(self, scan_id):
+    def to_neptune_lpg(self, scan_id: str) -> Dict:
         vertices = []
         edges = []
         vertex = {
@@ -122,9 +118,7 @@ class GraphSet:
         Returns:
             dict representation of this GraphSet
         """
-        resources = {
-            resource.resource_id: resource.to_dict() for resource in self.resources
-        }
+        resources = {resource.resource_id: resource.to_dict() for resource in self.resources}
         return {
             "name": self.name,
             "version": self.version,
@@ -154,10 +148,7 @@ class GraphSet:
         orphan_refs = resource_ref_ids - present_resource_ids
         if orphan_refs:
             raise GraphSetOrphanedReferencesException(
-                (
-                    "References to resources were found which were not scanned: "
-                    f"{orphan_refs}."
-                )
+                ("References to resources were found which were not scanned: " f"{orphan_refs}.")
             )
 
     def _resolve_duplicates(self) -> None:

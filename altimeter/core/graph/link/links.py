@@ -1,6 +1,6 @@
 """A Link represents the predicate-object portion of a triple."""
 import uuid
-from typing import Any, Dict, Type
+from typing import Any, Dict, Type, List
 
 from rdflib import BNode, Graph, Literal, Namespace, RDF, XSD
 
@@ -35,7 +35,7 @@ class SimpleLink(Link):
         graph.add((subj, getattr(namespace, self.pred), literal))
 
     def to_lpg(
-        self, parent: Dict, vertices: [Dict], edges: [Dict], prefix: str = ""
+        self, parent: Dict, vertices: List[Dict], edges: List[Dict], prefix: str = ""
     ) -> None:
         """Convert this link to the appropriate vertices, edges, and properties
 
@@ -91,7 +91,7 @@ class MultiLink(Link):
         graph.add((subj, getattr(namespace, self.pred), map_node))
 
     def to_lpg(
-        self, parent: Dict, vertices: [Dict], edges: [Dict], prefix: str = ""
+        self, parent: Dict, vertices: List[Dict], edges: List[Dict], prefix: str = ""
     ) -> None:
         """Convert this link to the appropriate vertices, edges, and properties
 
@@ -141,7 +141,7 @@ class ResourceLinkLink(Link):
         graph.add((subj, getattr(namespace, self.pred), link_node))
 
     def to_lpg(
-        self, parent: Dict, vertices: [Dict], edges: [Dict], prefix: str = ""
+        self, parent: Dict, vertices: List[Dict], edges: List[Dict], prefix: str = ""
     ) -> None:
         """Convert this link to the appropriate vertices, edges, and properties
 
@@ -181,7 +181,7 @@ class TransientResourceLinkLink(Link):
         graph.add((subj, getattr(namespace, self.pred), link_node))
 
     def to_lpg(
-        self, parent: Dict, vertices: [Dict], edges: [Dict], prefix: str = ""
+        self, parent: Dict, vertices: List[Dict], edges: List[Dict], prefix: str = ""
     ) -> None:
         """Convert this link to the appropriate vertices, edges, and properties
 
@@ -228,7 +228,7 @@ class TagLink(Link):
         graph.add((subj, getattr(namespace, "tag"), tag_node))
 
     def to_lpg(
-        self, parent: Dict, vertices: [Dict], edges: [Dict], prefix: str = ""
+        self, parent: Dict, vertices: List[Dict], edges: List[Dict], prefix: str = ""
     ) -> None:
         """Convert this link to the appropriate vertices, edges, and properties
 
