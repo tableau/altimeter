@@ -1,30 +1,24 @@
 #!/usr/bin/env python3
 """Graph AWS resource data in Neptune"""
 from datetime import datetime
-import argparse
 from dataclasses import dataclass
-import logging
-import boto3
-import os
 import sys
-from typing import Any, Dict, List, Optional
+import os
+from typing import List, Optional
 import uuid
-
 import boto3
 
+from distutils.util import strtobool
 from altimeter.aws.log_events import AWSLogEvents
 from altimeter.aws.scan.muxer import AWSScanMuxer
-from altimeter.aws.scan.muxer.lambda_muxer import LambdaAWSScanMuxer
 from altimeter.aws.scan.muxer.local_muxer import LocalAWSScanMuxer
 from altimeter.aws.scan.scan import run_scan
-from altimeter.core.artifact_io import parse_s3_uri
 from altimeter.core.artifact_io.reader import ArtifactReader
-from altimeter.core.artifact_io.writer import ArtifactWriter, GZIP
+from altimeter.core.artifact_io.writer import ArtifactWriter
 from altimeter.core.config import Config
 from altimeter.core.log import Logger
 from altimeter.core.log_events import LogEvent
 from altimeter.core.neptune.client import AltimeterNeptuneClient, NeptuneEndpoint
-from altimeter.core.parameters import get_required_str_env_var, get_required_int_env_var
 
 
 @dataclass(frozen=True)
@@ -32,7 +26,9 @@ class AWS2NeptuneResult:
     errors: list = None
 
 
-def aws2neptune_lpg(scan_id: str, config: Config, muxer: AWSScanMuxer) -> AWS2NeptuneResult:
+def aws2neptune_lpg(
+    scan_id: str, config: Config, muxer: AWSScanMuxer
+) -> AWS2NeptuneResult:
     """Scan AWS resources to json, convert to RDF and load into Neptune
     if config.neptune is defined"""
 
@@ -60,7 +56,10 @@ def aws2neptune_lpg(scan_id: str, config: Config, muxer: AWSScanMuxer) -> AWS2Ne
     if config.neptune is None:
         raise Exception("Can not load to Neptune because config.neptune is empty.")
     endpoint = NeptuneEndpoint(
-        host=config.neptune.host, port=config.neptune.port, region=config.neptune.region, ssl=config.neptune.ssl
+        host=config.neptune.host,
+        port=config.neptune.port,
+        region=config.neptune.region,
+        ssl=config.neptune.ssl,
     )
     neptune_client = AltimeterNeptuneClient(max_age_min=1440, neptune_endpoint=endpoint)
     neptune_client.write_to_neptune_lpg(graph, scan_id)
@@ -68,7 +67,9 @@ def aws2neptune_lpg(scan_id: str, config: Config, muxer: AWSScanMuxer) -> AWS2Ne
     return AWS2NeptuneResult()
 
 
-def aws2neptune_rdf(scan_id: str, config: Config, muxer: AWSScanMuxer) -> AWS2NeptuneResult:
+def aws2neptune_rdf(
+    scan_id: str, config: Config, muxer: AWSScanMuxer
+) -> AWS2NeptuneResult:
     """Scan AWS resources to json, convert to RDF and load into Neptune
     if config.neptune is defined"""
 
@@ -96,12 +97,16 @@ def aws2neptune_rdf(scan_id: str, config: Config, muxer: AWSScanMuxer) -> AWS2Ne
     if config.neptune is None:
         raise Exception("Can not load to Neptune because config.neptune is empty.")
     endpoint = NeptuneEndpoint(
-        host=config.neptune.host, port=config.neptune.port, region=config.neptune.region, ssl=config.neptune.ssl
+        host=config.neptune.host,
+        port=config.neptune.port,
+        region=config.neptune.region,
+        ssl=config.neptune.ssl,
     )
     neptune_client = AltimeterNeptuneClient(max_age_min=1440, neptune_endpoint=endpoint)
     neptune_client.write_to_neptune_rdf(graph)
     logger.info(LogEvent.NeptuneRDFWriteEnd)
     return AWS2NeptuneResult()
+
 
 def generate_scan_id() -> str:
     """Generate a unique scan id"""
@@ -112,57 +117,42 @@ def generate_scan_id() -> str:
     return scan_id
 
 
-def lambda_handler(event: Dict[str, Any], context: Any) -> None:
-    """AWS Lambda Handler"""
-    root = logging.getLogger()
-    if root.handlers:
-        for handler in root.handlers:
-            root.removeHandler(handler)
-
-    account_scan_lambda_name = get_required_str_env_var(
-        "ACCOUNT_SCAN_LAMBDA_NAME")
-    account_scan_lambda_timeout = get_required_int_env_var(
-        "ACCOUNT_SCAN_LAMBDA_TIMEOUT")
-
-    config_path = get_required_str_env_var("CONFIG_PATH")
-    config = Config.from_path(path=config_path)
-
-    scan_id = generate_scan_id()
-    muxer = LambdaAWSScanMuxer(
-        scan_id=scan_id,
-        config=config,
-        account_scan_lambda_name=account_scan_lambda_name,
-        account_scan_lambda_timeout=account_scan_lambda_timeout,
-    )
-    aws2neptune(scan_id=scan_id, config=config, muxer=muxer)
-
-
 def main(argv: Optional[List[str]] = None) -> int:
-    if argv is None:
-        argv = sys.argv[1:]
-    parser = argparse.ArgumentParser()
-    parser.add_argument("config", type=str, nargs="?")
-    args_ns = parser.parse_args(argv)
+    current_account = boto3.client("sts").get_caller_identity().get("Account")
+    current_region = boto3.session.Session().region_name
+    config_dict = {
+        "artifact_path": "./altimeter",
+        "pruner_max_age_min": 4320,
+        "graph_name": "alti",
+        "access": {"cache_creds": True},
+        "concurrency": {
+            "max_account_scan_threads": 1,
+            "max_accounts_per_thread": 1,
+            "max_svc_scan_threads": 64,
+        },
+        "scan": {
+            "accounts": [current_account],
+            "regions": [current_region],
+            "scan_sub_accounts": False,
+            "preferred_account_scan_regions": [current_region],
+        },
+        "neptune": {
+            "host": os.environ["GRAPH_NOTEBOOK_HOST"],
+            "port": int(os.environ["GRAPH_NOTEBOOK_PORT"]),
+            "region": os.environ["AWS_REGION"],
+            "ssl": bool(strtobool(os.environ["GRAPH_NOTEBOOK_SSL"])),
+            "use_lpg": True if os.environ["ALTIMETER_DATA_MODEL"] == "LPG" else False,
+        },
+    }
 
-    config = args_ns.config
-    if config is None:
-        config = os.environ.get("CONFIG_PATH")
-    if config is None:
-        print("config must be provided as a positional arg or env var 'CONFIG_PATH'")
-        return 1
-
-    print(boto3.client('sts').get_caller_identity().get('Account'))
-
-    config = Config.from_path(config)
+    config = Config.from_dict(config_dict)
     scan_id = generate_scan_id()
     muxer = LocalAWSScanMuxer(scan_id=scan_id, config=config)
 
     if config.neptune.use_lpg:
-        result = aws2neptune_lpg(scan_id=scan_id, config=config,
-                   muxer=muxer)
+        result = aws2neptune_lpg(scan_id=scan_id, config=config, muxer=muxer)
     else:
-        result = aws2neptune_rdf(scan_id=scan_id, config=config,
-                             muxer=muxer)
+        result = aws2neptune_rdf(scan_id=scan_id, config=config, muxer=muxer)
     print(result)
     return 0
 

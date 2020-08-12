@@ -29,6 +29,9 @@ htmlcov/
 # mypy cache
 .mypy_cache
 
+#pytest cache
+.pytest_cache
+
 # Build artifacts
 dist/
 build/

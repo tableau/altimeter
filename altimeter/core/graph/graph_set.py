@@ -32,14 +32,14 @@ class GraphSet:
     """
 
     def __init__(
-            self,
-            name: str,
-            version: str,
-            start_time: int,
-            end_time: int,
-            resources: List[Resource],
-            errors: List[str],
-            stats: MultilevelCounter,
+        self,
+        name: str,
+        version: str,
+        start_time: int,
+        end_time: int,
+        resources: List[Resource],
+        errors: List[str],
+        stats: MultilevelCounter,
     ):
         self.name = name
         self.version = version
@@ -61,44 +61,60 @@ class GraphSet:
         graph = Graph()
         metadata_node = BNode()
         graph.add((metadata_node, RDF.type, getattr(namespace, "metadata")))
-        graph.add((metadata_node, getattr(
-            namespace, "name"), Literal(self.name)))
-        graph.add((metadata_node, getattr(
-            namespace, "version"), Literal(self.version)))
-        graph.add((metadata_node, getattr(
-            namespace, "start_time"), Literal(self.start_time)))
-        graph.add((metadata_node, getattr(
-            namespace, "end_time"), Literal(self.end_time)))
+        graph.add((metadata_node, getattr(namespace, "name"), Literal(self.name)))
+        graph.add((metadata_node, getattr(namespace, "version"), Literal(self.version)))
+        graph.add(
+            (metadata_node, getattr(namespace, "start_time"), Literal(self.start_time))
+        )
+        graph.add(
+            (metadata_node, getattr(namespace, "end_time"), Literal(self.end_time))
+        )
         for error in self.errors:
-            graph.add((metadata_node, getattr(
-                namespace, "error"), Literal(error)))
+            graph.add((metadata_node, getattr(namespace, "error"), Literal(error)))
         for resource in self.resources:
-            resource.to_rdf(namespace=namespace, graph=graph,
-                            node_cache=node_cache)
+            resource.to_rdf(namespace=namespace, graph=graph, node_cache=node_cache)
         return graph
 
     def to_neptune_lpg(self, scan_id):
         vertices = []
         edges = []
-        vertex = {'~id': scan_id, '~label': "metadata", "name": self.name,
-                  "version": self.version, "start_time": self.start_time, "end_time": self.end_time}
+        vertex = {
+            "~id": scan_id,
+            "~label": "metadata",
+            "name": self.name,
+            "version": self.version,
+            "start_time": self.start_time,
+            "end_time": self.end_time,
+        }
         vertices.append(vertex)
         for error in self.errors:
-            vertex = {'~id': str(uuid.uuid1()), '~label': "error", "error": error}
+            vertex = {"~id": str(uuid.uuid1()), "~label": "error", "error": error}
             vertices.append(vertex)
-            edges.append({'~id': str(uuid.uuid1()), '~label': "generated", "~from": f'{self.name}:{self.version}',
-                          '~to': vertex['~id']})
+            edges.append(
+                {
+                    "~id": str(uuid.uuid1()),
+                    "~label": "generated",
+                    "~from": f"{self.name}:{self.version}",
+                    "~to": vertex["~id"],
+                }
+            )
             vertices.append(vertex)
         for resource in self.resources:
             resource.to_lpg(vertices, edges)
 
         for v in vertices:
             # Add the scan_id parameter to each vertex
-            v['scan_id']=scan_id
+            v["scan_id"] = scan_id
             # Add an edge from each vertex to the metadata vertex
-            edges.append({'~id': uuid.uuid1(), '~label': "identified_resource", "~from": scan_id,
-                          '~to': v['~id']})
-        return {'vertices': vertices, 'edges': edges}
+            edges.append(
+                {
+                    "~id": uuid.uuid1(),
+                    "~label": "identified_resource",
+                    "~from": scan_id,
+                    "~to": v["~id"],
+                }
+            )
+        return {"vertices": vertices, "edges": edges}
 
     def to_dict(self) -> Dict[str, Any]:
         """Generate a dictionary representation of this GraphSet.
@@ -106,8 +122,9 @@ class GraphSet:
         Returns:
             dict representation of this GraphSet
         """
-        resources = {resource.resource_id: resource.to_dict()
-                     for resource in self.resources}
+        resources = {
+            resource.resource_id: resource.to_dict() for resource in self.resources
+        }
         return {
             "name": self.name,
             "version": self.version,
@@ -127,20 +144,20 @@ class GraphSet:
                 references it as a ResourceLinkField if that VPC is not found as a Resource in the
                 graph this exception is raised.
         """
-        present_resource_ids = {
-            resource.resource_id for resource in self.resources}
-        resource_ref_ids_used_by_ids: DefaultDict[str, List[str]] = defaultdict(
-            list)
+        present_resource_ids = {resource.resource_id for resource in self.resources}
+        resource_ref_ids_used_by_ids: DefaultDict[str, List[str]] = defaultdict(list)
         for resource in self.resources:
             for link in resource.links:
                 if isinstance(link, ResourceLinkLink):
-                    resource_ref_ids_used_by_ids[link.obj].append(
-                        resource.resource_id)
+                    resource_ref_ids_used_by_ids[link.obj].append(resource.resource_id)
         resource_ref_ids = set(resource_ref_ids_used_by_ids.keys())
         orphan_refs = resource_ref_ids - present_resource_ids
         if orphan_refs:
             raise GraphSetOrphanedReferencesException(
-                ("References to resources were found which were not scanned: " f"{orphan_refs}.")
+                (
+                    "References to resources were found which were not scanned: "
+                    f"{orphan_refs}."
+                )
             )
 
     def _resolve_duplicates(self) -> None:
@@ -148,8 +165,7 @@ class GraphSet:
         have their Resource objects merged if they are of the same type and all fields
         are identical or additive only across the resources or if one of the Resources
         allows a special merge via its ResourceSpec class' `allow_clobber` attribute."""
-        resource_ids_resources: DefaultDict[str,
-                                            List[Resource]] = defaultdict(list)
+        resource_ids_resources: DefaultDict[str, List[Resource]] = defaultdict(list)
         for resource in self.resources:
             resource_ids_resources[resource.resource_id].append(resource)
         merged_resources: List[Resource] = []
