@@ -56,9 +56,6 @@ class Singleton(type):
         return cls._instances[cls]
 
 
-LoggableTypes = Union[int, str, Dict]
-
-
 class BaseLogger:
     """Provides contextmanager 'bind' which can be use to bind
     keys to the logger using 'with' syntax, they will be removed from the logger
@@ -104,7 +101,7 @@ class BaseLogger:
             loggers.append(logger)
         return loggers[-1]
 
-    def debug(self, event: EventName, **kwargs: LoggableTypes) -> None:
+    def debug(self, event: EventName, **kwargs: Any) -> None:
         """Create DEBUG level log entry.
 
         Args:
@@ -113,7 +110,7 @@ class BaseLogger:
         """
         self._get_current_logger().debug(event=event.name, **kwargs)
 
-    def info(self, event: EventName, **kwargs: LoggableTypes) -> None:
+    def info(self, event: EventName, **kwargs: Any) -> None:
         """Create INFO level log entry.
 
         Args:
@@ -122,7 +119,7 @@ class BaseLogger:
         """
         self._get_current_logger().info(event=event.name, **kwargs)
 
-    def warn(self, event: EventName, **kwargs: LoggableTypes) -> None:
+    def warn(self, event: EventName, **kwargs: Any) -> None:
         """Create WARN level log entry.
 
         Args:
@@ -131,7 +128,7 @@ class BaseLogger:
         """
         self._get_current_logger().warn(event=event.name, **kwargs)
 
-    def warning(self, event: EventName, **kwargs: LoggableTypes) -> None:
+    def warning(self, event: EventName, **kwargs: Any) -> None:
         """Create WARN level log entry.
 
         Args:
@@ -140,7 +137,7 @@ class BaseLogger:
         """
         self._get_current_logger().warning(event=event.name, **kwargs)
 
-    def error(self, event: EventName, **kwargs: LoggableTypes) -> None:
+    def error(self, event: EventName, **kwargs: Any) -> None:
         """Create ERROR level log entry.
 
         Args:
@@ -150,7 +147,7 @@ class BaseLogger:
         self._get_current_logger().error(event=event.name, **kwargs)
 
     @contextmanager
-    def bind(self, **bindings: LoggableTypes) -> structlog.BoundLogger:
+    def bind(self, **bindings: Any) -> structlog.BoundLogger:
         """Context manager to bind a set of k/vs to the logger.  The k/vs will be removed
         when the with block exits."""
         new_logger = self._get_current_logger().bind(**bindings)
