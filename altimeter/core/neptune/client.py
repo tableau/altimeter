@@ -535,17 +535,16 @@ class AltimeterNeptuneClient:
             raise NeptuneQueryException(f"Error running query {query}: {resp.text}")
         return QueryResultSet.from_sparql_endpoint_json(resp.json())
 
-    @staticmethod
-    def connect_to_gremlin(neptune: NeptuneEndpoint) -> Tuple[traversal, DriverRemoteConnection]:
+    def connect_to_gremlin(self) -> Tuple[traversal, DriverRemoteConnection]:
         """
         Get the Gremlin traversal and connection for the Neptune endpoint
         :return: The Traversal object
         """
         endpoint = ""
-        if neptune.ssl:
-            endpoint = f"wss://{neptune.host}:{neptune.port}/gremlin"
+        if self._neptune_endpoint.ssl:
+            endpoint = f"wss://{self._neptune_endpoint.host}:{self._neptune_endpoint.port}/gremlin"
         else:
-            endpoint = f"ws://{neptune.host}:{neptune.port}/gremlin"
+            endpoint = f"ws://{self._neptune_endpoint.host}:{self._neptune_endpoint.port}/gremlin"
         gremlin_connection = DriverRemoteConnection(endpoint, "g")
         graph_traversal_source = traversal().withRemote(gremlin_connection)
         return graph_traversal_source, gremlin_connection
@@ -566,7 +565,7 @@ class AltimeterNeptuneClient:
                 .fold()
                 .coalesce(
                     __.unfold(),
-                    __.addV(self.__parse_arn(r["~label"])["resource"]).property(T.id, vertex_id),
+                    __.addV(self.parse_arn(r["~label"])["resource"]).property(T.id, vertex_id),
                 )
             )
             for k in r.keys():
@@ -609,7 +608,7 @@ class AltimeterNeptuneClient:
                 .fold()
                 .coalesce(
                     __.unfold(),
-                    __.addV(self.__parse_arn(r["~from"])["resource"])
+                    __.addV(self.parse_arn(r["~from"])["resource"])
                     .property(T.id, from_id)
                     .property("scan_id", scan_id)
                     .property("arn", r["~from"]),
@@ -619,7 +618,7 @@ class AltimeterNeptuneClient:
                 .fold()
                 .coalesce(
                     __.unfold(),
-                    __.addV(self.__parse_arn(r["~to"])["resource"])
+                    __.addV(self.parse_arn(r["~to"])["resource"])
                     .property(T.id, to_id)
                     .property("scan_id", scan_id)
                     .property("arn", r["~to"]),
@@ -652,7 +651,7 @@ class AltimeterNeptuneClient:
                     )
 
     @staticmethod
-    def __parse_arn(arn: str) -> Dict:
+    def parse_arn(arn: str) -> Dict:
         # http://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html
         elements = str(arn).split(":", 5)
         result = {}
@@ -685,10 +684,13 @@ class AltimeterNeptuneClient:
         :param graph: The graph to write
         :return: None
         """
-        g, conn = self.connect_to_gremlin(self._neptune_endpoint)
-        self.__write_vertices(g, graph["vertices"], scan_id)
-        self.__write_edges(g, graph["edges"], scan_id)
-        conn.close()
+        if "vertices" in graph and "edges" in graph and len(graph["vertices"]) > 0:
+            g, conn = self.connect_to_gremlin()
+            self.__write_vertices(g, graph["vertices"], scan_id)
+            self.__write_edges(g, graph["edges"], scan_id)
+            conn.close()
+        else:
+            raise NeptuneNoGraphsFoundException
 
     def write_to_neptune_rdf(self, graph: Dict) -> None:
         """
@@ -696,6 +698,7 @@ class AltimeterNeptuneClient:
         :param graph: The graph to write
         :return: None
         """
+
         auth = self._get_auth()
         neptune_sparql_url = self._neptune_endpoint.get_sparql_endpoint()
         triples = ""

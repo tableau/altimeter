@@ -41,8 +41,9 @@ class SimpleLink(Link):
 
         Args:
              parent: the parent dictionary vertex
-             vertices: the list of all vertex dictionaries
-             edges: the list of all edge dictionaries
+             :param vertices: the list of all vertex dictionaries
+             :param edges: the list of all edge dictionaries
+             :param prefix: the prefix assigned to the key
              :type parent: Dict
         """
         if isinstance(self.obj, int):
