@@ -9,9 +9,11 @@ env:
     - secure: "bb3FiK5BzBRggzWBWZp7h9QNg7EWoiRgohs/Dy+ewZMsbOrH6mSFbYUiJ7ofJ7tVY0MZSbwlcveu9kh2ipkkgwFaMffmJOEzS7/N6o3kZKdlYTsOFVQgF76tw07IlYoHZUyafAW/ar2QU57UyAPjOw9FunqmF/Ldjmw3f6bkuEmdegxMw1xecGX9oegPZxQ3xJNUrdiyEMACzNqewG3Q2hNx+GVI0kMwRdDhTb6QNUumv/tk4gU04aBlHUhBIZoASJZ+JJ7/k0a5VwkfvWBidIxsze0PsX0QEQKNuctzyqv5nmKbEsFtyOxXovxdTA/xx2iNApiSRDediUdHYjQsRO66cW14Hrz8WJ+hZTRJoZP56cJFSdnSXolqXlSVhsEy4suJuAF3rvvPIcx7smPoQqXrZbfmAQMEpiOlvZTn2/bFFa+pq+nYN/rAZmbpNjJ7R2qUV6W32T5UIloxeQdCPXZ41sep2mt44WMDZg04Kf2JN4LV8K8ZhABrQEd6i+pMN/zvIaDFRxOy6NsLiYMhEplExEe8MYIJRqOhVTDQ8Cn6sW51h7rGCF/NEizzTILi8gUc5OjJmKzl4eYqWN/tpnW8A8FCRffdPxgfGuIon/gdg+OfSHKsRcvCN8jn6GcpkS9kHLLQuJnl6cEljLuMDVOjErffOV279RluEmm+i+U="
 install:
     - pip install -r requirements.txt
+    - pip install -r services/qj/requirements.txt
     - pip install -r ci/requirements.txt
     - pip install -r doc/requirements.txt
     - pip install -r tests/unit/requirements.txt
+    - pip check
 jobs:
     include:
         - stage: static-analysis
