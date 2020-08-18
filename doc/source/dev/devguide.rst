@@ -6,7 +6,7 @@ This document contains information on setting up a development environment.
 Requirements
 ------------
 
-Altimeter requires Python 3.7 or greater.
+Altimeter requires Python 3.8 or greater.
 
 To install project requirements, from the base repo dir:
 
