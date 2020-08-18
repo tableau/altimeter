@@ -199,6 +199,8 @@ class NeptuneConfig:
     graph_load_sns_topic_arn: Optional[str] = ""
     ssl: Optional[bool] = True
     use_lpg: Optional[bool] = False
+    iam_credentials_provider_type: Optional[str] = ""
+    auth_mode: Optional[str] = ""
 
     @classmethod
     def from_dict(cls: Type["NeptuneConfig"], config_dict: Dict[str, Any]) -> "NeptuneConfig":

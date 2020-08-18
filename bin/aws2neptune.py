@@ -2,12 +2,12 @@
 """Graph AWS resource data in Neptune"""
 from datetime import datetime
 import sys
-import os
 from typing import List, Optional
 import uuid
+import argparse
+import json
 import boto3
 
-from distutils.util import strtobool
 from altimeter.aws.log_events import AWSLogEvents
 from altimeter.aws.scan.muxer import AWSScanMuxer
 from altimeter.aws.scan.muxer.local_muxer import LocalAWSScanMuxer
@@ -106,10 +106,33 @@ def generate_scan_id() -> str:
 
 
 def main(argv: Optional[List[str]] = None) -> int:
+    """Main method for running a AWS to Neptune run"""
+    if argv is None:
+        argv = sys.argv[1:]
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("model", type=str, nargs="?")
+    parser.add_argument("config", type=str, nargs="?")
+    args_ns = parser.parse_args(argv)
+
+    if args_ns.model is None:
+        print("You need to specify the data model desired for this run (RDF or LPG).")
+        sys.exit()
+    if args_ns.model.lower() != "rdf" and args_ns.model.lower() != "lpg":
+        print("You need to specify the data model desired for this run (RDF or LPG).")
+        sys.exit()
+
+    config_path = (
+        "/home/ec2-user/graph_notebook_config.json" if args_ns.config is None else args_ns.config
+    )
+
+    with open(config_path) as f:
+        config = json.load(f)
+
     current_account = boto3.client("sts").get_caller_identity().get("Account")
     current_region = boto3.session.Session().region_name
     config_dict = {
-        "artifact_path": "./altimeter",
+        "artifact_path": "./altimeter_runs",
         "pruner_max_age_min": 4320,
         "graph_name": "alti",
         "access": {"cache_creds": True},
@@ -125,11 +148,13 @@ def main(argv: Optional[List[str]] = None) -> int:
             "preferred_account_scan_regions": [current_region],
         },
         "neptune": {
-            "host": os.environ["GRAPH_NOTEBOOK_HOST"],
-            "port": int(os.environ["GRAPH_NOTEBOOK_PORT"]),
-            "region": os.environ["AWS_REGION"],
-            "ssl": bool(strtobool(os.environ["GRAPH_NOTEBOOK_SSL"])),
-            "use_lpg": True if os.environ["ALTIMETER_DATA_MODEL"] == "LPG" else False,
+            "host": config["host"],
+            "port": int(config["port"]),
+            "auth_mode": config["auth_mode"],
+            "iam_credentials_provider_type": config["iam_credentials_provider_type"],
+            "ssl": config["ssl"],
+            "region": config["aws_region"],
+            "use_lpg": bool(args_ns.model.lower() == "lpg"),
         },
     }
 
