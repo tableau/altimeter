@@ -32,7 +32,16 @@ setup(
             "uvicorn>=0.11.5,<2",
         ]
     },
-    package_data={"altimeter": ["qj/alembic/alembic.ini"]},
+    data_files=[
+        (
+            "/etc/altimeter/qj/alembic",
+            ["services/qj/alembic/env.py", "services/qj/alembic/alembic.ini",],
+        ),
+        (
+            "/etc/altimeter/qj/alembic/versions",
+            ["services/qj/alembic/versions/dc8f1df07766_init.py",],
+        ),
+    ],
     scripts=[
         "bin/account_scan.py",
         "bin/altimeter",
