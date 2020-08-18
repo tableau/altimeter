@@ -32,6 +32,7 @@ setup(
             "uvicorn>=0.11.5,<2",
         ]
     },
+    package_data={"qj": ["alembic/alembic.ini"]},
     scripts=[
         "bin/account_scan.py",
         "bin/altimeter",
