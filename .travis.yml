@@ -3,6 +3,7 @@ language: python
 python: 3.8
 services:
   - docker
+  - postgresql
 addons:
   postgresql: "10.7"
 env:
