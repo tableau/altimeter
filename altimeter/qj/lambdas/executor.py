@@ -21,7 +21,7 @@ def lambda_handler(event: Dict[str, Any], _: Any) -> None:
     # repeated manual runs of executor will not be dedupe'd
     sns_message = event.get("Records", [{}])[0].get("Sns", {}).get("Message")
     if sns_message:
-        execution_hash = hashlib.sha256(json.dumps(sns_message.json()).encode()).hexdigest()
+        execution_hash = hashlib.sha256(sns_message.encode()).hexdigest()
     else:
         execution_hash = hashlib.sha256(str(uuid.uuid4()).encode()).hexdigest()
     config = ExecutorConfig()

@@ -34,13 +34,6 @@ class QJLogEvents(BaseLogEvent):
     CreateResultSetStart: EventName
     CreateResultSetEnd: EventName
 
-    # API key rotator
-    SecretAlreadyCurrent: EventName
-    SecretCreated: EventName
-    SecretRetrieved: EventName
-    SecretSetCurrent: EventName
-    SecretVersionAlreadyCurrent: EventName
-
     # CRUD Jobs
     CreateJob: EventName
     DeleteJob: EventName
