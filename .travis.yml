@@ -95,7 +95,7 @@ jobs:
           script:
               - echo "$DOCKER_PASSWORD" | docker login --username "$DOCKER_USERNAME" --password-stdin
               - docker build -f qj.Dockerfile -t altimeter/altimeter-qj:${TRAVIS_TAG} .
-              - docker push altimeter/altimeter:${TRAVIS_TAG}
+              - docker push altimeter/altimeter-qj:${TRAVIS_TAG}
 
 
         # only publish to pages for master with a tag matching a 'real' release.
