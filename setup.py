@@ -13,15 +13,34 @@ setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/tableau/altimeter",
-    python_requires=">=3.7,<4",
+    python_requires=">=3.8,<4",
     install_requires=[
         "aws-requests-auth==0.4.2",
         "rdflib==4.2.2",
         "structlog>=20.1.0,<21",
         "boto3>=1.9.130",
-        "typing_extensions>=3.7.4.1,<3.8",
         "jinja2>=2.11.1,<3",
         "toml>=0.10.0,<1",
+    ],
+    extras_require={
+        "qj": [
+            "alembic==1.4.2",
+            "fastapi>=0.60.1,<1",
+            "psycopg2-binary>=2.8.5,<3",
+            "pydantic>=1.6.1,<2",
+            "sqlalchemy>=1.3.16,<2",
+            "uvicorn>=0.11.5,<2",
+        ]
+    },
+    data_files=[
+        (
+            "/etc/altimeter/qj/alembic",
+            ["services/qj/alembic/env.py", "services/qj/alembic/alembic.ini",],
+        ),
+        (
+            "/etc/altimeter/qj/alembic/versions",
+            ["services/qj/alembic/versions/dc8f1df07766_init.py",],
+        ),
     ],
     scripts=[
         "bin/account_scan.py",

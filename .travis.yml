@@ -1,17 +1,27 @@
 os: linux
 language: python
-python: 3.7
+python: 3.8
 services:
   - docker
+  - postgresql
+addons:
+  postgresql: "10"
+  apt:
+    packages:
+      - postgresql-10
+      - postgresql-client-10
+      - postgresql-contrib-10
 env:
   global:
     - secure: "mnRyuTdnNoA99T/wtvjCwk1lNYbR3qAKQQKBy3niX+qpcfD+EzsLNm/sCaXuv3S++AkyiaXJA4K8MdQnhPrbwBvvPg+cNvpP75rdm/qIr5jvRKZk3VO2n45tTgdG9F6Imx8X3HgFtVbPSVGw0i3qZ21GDhnQTxUHNgryj3PTxWoQdt2WWECnu9OGuNLKZ3Zijro4mqcQThWDy1ez86F9//WYFvYBseKy0riZti6xFn2asvwcZ7bfe8qbZaYbofyFUhbUcSWUdf8CQLoy0kfX1ojqFOhQSwjzE5x6ITo5RdJWp7E9tmYB5kIioI7yZ6bF5VaHUgluJpCb0os3+pWiHemhrwzuqdm2NWkJojA4dtZSaPdR7StTTv26TgL5eQdEXWeFsVCEC83OJYFRcYhN9PJUYHAT044+JEsKiUWuJCvAPMkUdapWmIvzyqgkN+V4VVlyhanm6zN2O0SPupaGgUXtRgvwry2Qqfcg46ZyQJshZHX8ZNXF/bpmoIxR9rWx+Qxhc4jCbYKClo6M/A73pfY5nRICc37UL2BaEy4gl33xuBVHor9HrBQaZKigOXeTwnSalD2r5H3UcNK4TmKlxfZ3ombURdOLOf7A+iS8Rp25HU4BH5EzUT95SVK1UUE2+hF38+Z9oY5lLEad6zHI2SJ4BaaC+R1aHtVp6hjM4a0="
     - secure: "bb3FiK5BzBRggzWBWZp7h9QNg7EWoiRgohs/Dy+ewZMsbOrH6mSFbYUiJ7ofJ7tVY0MZSbwlcveu9kh2ipkkgwFaMffmJOEzS7/N6o3kZKdlYTsOFVQgF76tw07IlYoHZUyafAW/ar2QU57UyAPjOw9FunqmF/Ldjmw3f6bkuEmdegxMw1xecGX9oegPZxQ3xJNUrdiyEMACzNqewG3Q2hNx+GVI0kMwRdDhTb6QNUumv/tk4gU04aBlHUhBIZoASJZ+JJ7/k0a5VwkfvWBidIxsze0PsX0QEQKNuctzyqv5nmKbEsFtyOxXovxdTA/xx2iNApiSRDediUdHYjQsRO66cW14Hrz8WJ+hZTRJoZP56cJFSdnSXolqXlSVhsEy4suJuAF3rvvPIcx7smPoQqXrZbfmAQMEpiOlvZTn2/bFFa+pq+nYN/rAZmbpNjJ7R2qUV6W32T5UIloxeQdCPXZ41sep2mt44WMDZg04Kf2JN4LV8K8ZhABrQEd6i+pMN/zvIaDFRxOy6NsLiYMhEplExEe8MYIJRqOhVTDQ8Cn6sW51h7rGCF/NEizzTILi8gUc5OjJmKzl4eYqWN/tpnW8A8FCRffdPxgfGuIon/gdg+OfSHKsRcvCN8jn6GcpkS9kHLLQuJnl6cEljLuMDVOjErffOV279RluEmm+i+U="
 install:
     - pip install -r requirements.txt
+    - pip install -r services/qj/requirements.txt
     - pip install -r ci/requirements.txt
     - pip install -r doc/requirements.txt
-    - pip install -r tests/unit/requirements.txt
+    - pip install -r tests/requirements.txt
+    - pip check
 jobs:
     include:
         - stage: static-analysis
@@ -23,7 +33,7 @@ jobs:
         - stage: build-doc
           script:
               - export PYTHONPATH=.
-              - sphinx-apidoc -f -o doc/source altimeter
+              - sphinx-apidoc -f -o doc/source altimeter altimeter/qj/alembic
               - sphinx-build doc/source doc/html -E -W
 
         # rc packages are published if the tag matches n.n.n-rcn
@@ -47,8 +57,15 @@ jobs:
           if: tag =~ ^[0-9]+\.[0-9]+\.[0-9]+-rc[0-9]+$ AND type = push AND fork = false
           script:
               - echo "$DOCKER_PASSWORD" | docker login --username "$DOCKER_USERNAME" --password-stdin
-              - docker build -t altimeter/altimeter:${TRAVIS_TAG} .
+              - docker build -f scanner.Dockerfile -t altimeter/altimeter:${TRAVIS_TAG} .
               - docker push altimeter/altimeter:${TRAVIS_TAG}
+
+        - stage: build-push-docker-image-release-candidate
+          if: tag =~ ^[0-9]+\.[0-9]+\.[0-9]+-rc[0-9]+$ AND type = push AND fork = false
+          script:
+              - echo "$DOCKER_PASSWORD" | docker login --username "$DOCKER_USERNAME" --password-stdin
+              - docker build -f qj.Dockerfile -t altimeter/altimeter-qj:${TRAVIS_TAG} .
+              - docker push altimeter/altimeter-qj:${TRAVIS_TAG}
 
         # release packages are published if the tag matches n.n.n
         - stage: deploy-pypi-release
@@ -70,15 +87,23 @@ jobs:
           if: tag =~ ^[0-9]+\.[0-9]+\.[0-9]+$ AND type = push AND fork = false
           script:
               - echo "$DOCKER_PASSWORD" | docker login --username "$DOCKER_USERNAME" --password-stdin
-              - docker build -t altimeter/altimeter:${TRAVIS_TAG} .
+              - docker build -f scanner.Dockerfile -t altimeter/altimeter:${TRAVIS_TAG} .
               - docker push altimeter/altimeter:${TRAVIS_TAG}
+
+        - stage: build-push-docker-image-release
+          if: tag =~ ^[0-9]+\.[0-9]+\.[0-9]+$ AND type = push AND fork = false
+          script:
+              - echo "$DOCKER_PASSWORD" | docker login --username "$DOCKER_USERNAME" --password-stdin
+              - docker build -f qj.Dockerfile -t altimeter/altimeter-qj:${TRAVIS_TAG} .
+              - docker push altimeter/altimeter:${TRAVIS_TAG}
+
 
         # only publish to pages for master with a tag matching a 'real' release.
         - stage: deploy-github-pages
           if: tag =~ ^[0-9]+\.[0-9]+\.[0-9]+$ AND type = push AND fork = false
           script:
               - export PYTHONPATH=.
-              - sphinx-apidoc -f -o doc/source altimeter
+              - sphinx-apidoc -f -o doc/source altimeter altimeter/qj/alembic
               - sphinx-build doc/source doc/html -E -W
               - touch doc/html/.nojekyll
           deploy:
