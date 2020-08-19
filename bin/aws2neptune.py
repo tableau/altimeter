@@ -7,6 +7,7 @@ import uuid
 import argparse
 import json
 import boto3
+import logging
 
 from altimeter.aws.log_events import AWSLogEvents
 from altimeter.aws.scan.muxer import AWSScanMuxer
@@ -19,12 +20,16 @@ from altimeter.core.log import Logger
 from altimeter.core.log_events import LogEvent
 from altimeter.core.neptune.client import AltimeterNeptuneClient, NeptuneEndpoint
 
+FORMAT = '%(message)s'
+logging.basicConfig(format=FORMAT)
+logging.getLogger().setLevel(level=logging.WARNING)
 
 def aws2neptune_lpg(scan_id: str, config: Config, muxer: AWSScanMuxer) -> None:
     """Scan AWS resources to json, convert to RDF and load into Neptune
     if config.neptune is defined"""
 
     logger = Logger()
+    logging.basicConfig(filename=config.artifact_path + '/' + scan_id + '.log', level=logging.INFO)
     artifact_reader = ArtifactReader.from_artifact_path(config.artifact_path)
     artifact_writer = ArtifactWriter.from_artifact_path(
         artifact_path=config.artifact_path, scan_id=scan_id
@@ -36,6 +41,7 @@ def aws2neptune_lpg(scan_id: str, config: Config, muxer: AWSScanMuxer) -> None:
         reader=str(artifact_reader.__class__),
         writer=str(artifact_writer.__class__),
     )
+    print("Beginning AWS Account Scan")
 
     scan_manifest, graph_set = run_scan(
         muxer=muxer,
@@ -43,6 +49,7 @@ def aws2neptune_lpg(scan_id: str, config: Config, muxer: AWSScanMuxer) -> None:
         artifact_writer=artifact_writer,
         artifact_reader=artifact_reader,
     )
+    print("AWS Account Scan Complete. Beginning write to Amazon Neptune.")
     logger.info(LogEvent.NeptuneGremlinWriteStart)
     graph = graph_set.to_neptune_lpg(scan_id)
     if config.neptune is None:
@@ -52,10 +59,12 @@ def aws2neptune_lpg(scan_id: str, config: Config, muxer: AWSScanMuxer) -> None:
         port=config.neptune.port,
         region=config.neptune.region,
         ssl=bool(config.neptune.ssl),
+        auth_mode=config.neptune.auth_mode
     )
     neptune_client = AltimeterNeptuneClient(max_age_min=1440, neptune_endpoint=endpoint)
     neptune_client.write_to_neptune_lpg(graph, scan_id)
     logger.info(LogEvent.NeptuneGremlinWriteEnd)
+    print("Write to Amazon Neptune Complete")
 
 
 def aws2neptune_rdf(scan_id: str, config: Config, muxer: AWSScanMuxer) -> None:
@@ -63,6 +72,7 @@ def aws2neptune_rdf(scan_id: str, config: Config, muxer: AWSScanMuxer) -> None:
     if config.neptune is defined"""
 
     logger = Logger()
+    logging.basicConfig(filename=config.artifact_path + '/' + scan_id + '.log', level=logging.INFO)
     artifact_reader = ArtifactReader.from_artifact_path(config.artifact_path)
     artifact_writer = ArtifactWriter.from_artifact_path(
         artifact_path=config.artifact_path, scan_id=scan_id
@@ -74,13 +84,14 @@ def aws2neptune_rdf(scan_id: str, config: Config, muxer: AWSScanMuxer) -> None:
         reader=str(artifact_reader.__class__),
         writer=str(artifact_writer.__class__),
     )
-
+    print("Beginning AWS Account Scan")
     scan_manifest, graph_set = run_scan(
         muxer=muxer,
         config=config,
         artifact_writer=artifact_writer,
         artifact_reader=artifact_reader,
     )
+    print("AWS Account Scan Complete. Beginning write to Amazon Neptune.")
     logger.info(LogEvent.NeptuneRDFWriteStart)
     graph = graph_set.to_rdf()
     if config.neptune is None:
@@ -90,10 +101,12 @@ def aws2neptune_rdf(scan_id: str, config: Config, muxer: AWSScanMuxer) -> None:
         port=config.neptune.port,
         region=config.neptune.region,
         ssl=bool(config.neptune.ssl),
+        auth_mode=config.auth_mode
     )
     neptune_client = AltimeterNeptuneClient(max_age_min=1440, neptune_endpoint=endpoint)
     neptune_client.write_to_neptune_rdf(graph)
     logger.info(LogEvent.NeptuneRDFWriteEnd)
+    print("Write to Amazon Neptune Complete")
 
 
 def generate_scan_id() -> str:

@@ -6,7 +6,9 @@ from typing import Dict, List, Optional, Set, Tuple
 
 from aws_requests_auth.aws_auth import AWSRequestsAuth
 import boto3
-import requests
+from botocore.auth import SigV4Auth
+from botocore.awsrequest import AWSRequest
+from botocore.credentials import Credentials
 
 from gremlin_python.process.graph_traversal import __
 from gremlin_python.process.anonymous_traversal import traversal
@@ -65,6 +67,7 @@ class NeptuneEndpoint:
     port: int
     region: str
     ssl: bool = True
+    auth_mode: str = "DEFAULT"
 
     def get_endpoint_str(self) -> str:
         """Get the endpoint as a string in host:port format
@@ -535,18 +538,36 @@ class AltimeterNeptuneClient:
             raise NeptuneQueryException(f"Error running query {query}: {resp.text}")
         return QueryResultSet.from_sparql_endpoint_json(resp.json())
 
+    def _get_gremlin_auth_headers(self, endpoint) -> Dict:
+        session = boto3.Session()
+        credentials = session.get_credentials()
+        creds = credentials.get_frozen_credentials()
+
+        url = endpoint
+        region = self._neptune_endpoint.region
+        method = "GET"
+
+        # Calculate headers using botocore
+        request = AWSRequest(method=method, url=url, data=None)
+        SigV4Auth(creds, "neptune-db", region).add_auth(request)
+
+        return dict(request.headers)
+
     def connect_to_gremlin(self) -> Tuple[traversal, DriverRemoteConnection]:
         """
         Get the Gremlin traversal and connection for the Neptune endpoint
         :return: The Traversal object
         """
-        endpoint = ""
         if self._neptune_endpoint.ssl:
             endpoint = f"wss://{self._neptune_endpoint.host}:{self._neptune_endpoint.port}/gremlin"
         else:
             endpoint = f"ws://{self._neptune_endpoint.host}:{self._neptune_endpoint.port}/gremlin"
-        gremlin_connection = DriverRemoteConnection(endpoint, "g")
+        if self._neptune_endpoint.auth_mode.lower() == "default":
+            gremlin_connection = DriverRemoteConnection(endpoint, "g")
+        else:
+            gremlin_connection = DriverRemoteConnection(endpoint, "g", headers=self._get_gremlin_auth_headers(endpoint))
         graph_traversal_source = traversal().withRemote(gremlin_connection)
+        graph_traversal_source.V().count().toList()
         return graph_traversal_source, gremlin_connection
 
     def __write_vertices(self, g: traversal, vertices: List[Dict], scan_id: str) -> None:
