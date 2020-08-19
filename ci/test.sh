@@ -16,7 +16,7 @@ fi
 export DB_USER=postgres
 export DB_PASSWORD=""
 export DB_HOST=127.0.0.1
-export DB_NAME=qj_test
+export DB_NAME=qj
 psql -c "create database $DB_NAME;" -U $DB_USER
 export SQLALCHEMY_URL="postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}/${DB_NAME}"
 alembic -c services/qj/alembic/alembic.ini upgrade head
