@@ -2,6 +2,7 @@
 """Graph AWS resource data in Neptune"""
 from datetime import datetime
 import sys
+from pathlib import Path
 from typing import List, Optional
 import uuid
 import argparse
@@ -20,16 +21,13 @@ from altimeter.core.log import Logger
 from altimeter.core.log_events import LogEvent
 from altimeter.core.neptune.client import AltimeterNeptuneClient, NeptuneEndpoint
 
-FORMAT = '%(message)s'
-logging.basicConfig(format=FORMAT)
-logging.getLogger().setLevel(level=logging.WARNING)
+logger = Logger(pretty_output=True)
+
 
 def aws2neptune_lpg(scan_id: str, config: Config, muxer: AWSScanMuxer) -> None:
     """Scan AWS resources to json, convert to RDF and load into Neptune
     if config.neptune is defined"""
 
-    logger = Logger()
-    logging.basicConfig(filename=config.artifact_path + '/' + scan_id + '.log', level=logging.INFO)
     artifact_reader = ArtifactReader.from_artifact_path(config.artifact_path)
     artifact_writer = ArtifactWriter.from_artifact_path(
         artifact_path=config.artifact_path, scan_id=scan_id
@@ -59,7 +57,7 @@ def aws2neptune_lpg(scan_id: str, config: Config, muxer: AWSScanMuxer) -> None:
         port=config.neptune.port,
         region=config.neptune.region,
         ssl=bool(config.neptune.ssl),
-        auth_mode=config.neptune.auth_mode
+        auth_mode=str(config.neptune.auth_mode),
     )
     neptune_client = AltimeterNeptuneClient(max_age_min=1440, neptune_endpoint=endpoint)
     neptune_client.write_to_neptune_lpg(graph, scan_id)
@@ -71,8 +69,6 @@ def aws2neptune_rdf(scan_id: str, config: Config, muxer: AWSScanMuxer) -> None:
     """Scan AWS resources to json, convert to RDF and load into Neptune
     if config.neptune is defined"""
 
-    logger = Logger()
-    logging.basicConfig(filename=config.artifact_path + '/' + scan_id + '.log', level=logging.INFO)
     artifact_reader = ArtifactReader.from_artifact_path(config.artifact_path)
     artifact_writer = ArtifactWriter.from_artifact_path(
         artifact_path=config.artifact_path, scan_id=scan_id
@@ -101,7 +97,7 @@ def aws2neptune_rdf(scan_id: str, config: Config, muxer: AWSScanMuxer) -> None:
         port=config.neptune.port,
         region=config.neptune.region,
         ssl=bool(config.neptune.ssl),
-        auth_mode=config.auth_mode
+        auth_mode=str(config.neptune.auth_mode),
     )
     neptune_client = AltimeterNeptuneClient(max_age_min=1440, neptune_endpoint=endpoint)
     neptune_client.write_to_neptune_rdf(graph)

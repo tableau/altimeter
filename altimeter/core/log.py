@@ -64,10 +64,10 @@ class BaseLogger:
     keys to the logger using 'with' syntax, they will be removed from the logger
     in subsequent calls. In general use Logger, not BaseLogger directly."""
 
-    def __init__(self, log_tid: bool = True) -> None:
+    def __init__(self, log_tid: bool = True, pretty_output: bool = False) -> None:
         self._log_tid = log_tid
         self.logger_stack = threading.local()
-
+        self.pretty_output = pretty_output
         log_processors = [
             structlog.stdlib.add_log_level,
             structlog.stdlib.filter_by_level,
@@ -76,7 +76,7 @@ class BaseLogger:
             structlog.processors.format_exc_info,
         ]
 
-        if os.environ.get("DEV_LOG", "0") == "1":
+        if os.environ.get("DEV_LOG", "0") == "1" or self.pretty_output:
             log_processors.append(structlog.dev.ConsoleRenderer(colors=True, force_colors=True))
         else:
             log_processors.append(structlog.processors.JSONRenderer(sort_keys=True))

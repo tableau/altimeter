@@ -2,13 +2,13 @@
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 import time
+import requests
 from typing import Dict, List, Optional, Set, Tuple
 
 from aws_requests_auth.aws_auth import AWSRequestsAuth
 import boto3
 from botocore.auth import SigV4Auth
 from botocore.awsrequest import AWSRequest
-from botocore.credentials import Credentials
 
 from gremlin_python.process.graph_traversal import __
 from gremlin_python.process.anonymous_traversal import traversal
@@ -538,7 +538,7 @@ class AltimeterNeptuneClient:
             raise NeptuneQueryException(f"Error running query {query}: {resp.text}")
         return QueryResultSet.from_sparql_endpoint_json(resp.json())
 
-    def _get_gremlin_auth_headers(self, endpoint) -> Dict:
+    def _get_gremlin_auth_headers(self, endpoint: str) -> Dict:
         session = boto3.Session()
         credentials = session.get_credentials()
         creds = credentials.get_frozen_credentials()
@@ -565,7 +565,9 @@ class AltimeterNeptuneClient:
         if self._neptune_endpoint.auth_mode.lower() == "default":
             gremlin_connection = DriverRemoteConnection(endpoint, "g")
         else:
-            gremlin_connection = DriverRemoteConnection(endpoint, "g", headers=self._get_gremlin_auth_headers(endpoint))
+            gremlin_connection = DriverRemoteConnection(
+                endpoint, "g", headers=self._get_gremlin_auth_headers(endpoint)
+            )
         graph_traversal_source = traversal().withRemote(gremlin_connection)
         graph_traversal_source.V().count().toList()
         return graph_traversal_source, gremlin_connection
@@ -625,35 +627,29 @@ class AltimeterNeptuneClient:
             to_id = f'{r["~to"]}_{scan_id}'
             from_id = f'{r["~from"]}_{scan_id}'
             t = (
-                t.V(from_id)
-                .fold()
-                .coalesce(
-                    __.unfold(),
-                    __.addV(self.parse_arn(r["~from"])["resource"])
-                    .property(T.id, from_id)
-                    .property("scan_id", scan_id)
-                    .property("arn", r["~from"]),
+                t.addE(r["~label"])
+                .property(T.id, str(r["~id"]))
+                .from_(
+                    __.V(from_id)
+                    .fold()
+                    .coalesce(
+                        __.unfold(),
+                        __.addV(self.parse_arn(r["~from"])["resource"])
+                        .property(T.id, from_id)
+                        .property("scan_id", scan_id)
+                        .property("arn", r["~from"]),
+                    )
                 )
-                .store("from")
-                .V(to_id)
-                .fold()
-                .coalesce(
-                    __.unfold(),
-                    __.addV(self.parse_arn(r["~to"])["resource"])
-                    .property(T.id, to_id)
-                    .property("scan_id", scan_id)
-                    .property("arn", r["~to"]),
-                )
-                .store("to")
-                .inE()
-                .hasId(str(r["~id"]))
-                .fold()
-                .coalesce(
-                    __.unfold(),
-                    __.addE(r["~label"])
-                    .property(T.id, str(r["~id"]))
-                    .from_(__.select("from").unfold())
-                    .to(__.select("to").unfold()),
+                .to(
+                    __.V(to_id)
+                    .fold()
+                    .coalesce(
+                        __.unfold(),
+                        __.addV(self.parse_arn(r["~to"])["resource"])
+                        .property(T.id, to_id)
+                        .property("scan_id", scan_id)
+                        .property("arn", r["~to"]),
+                    )
                 )
             )
             cnt += 1
@@ -666,13 +662,18 @@ class AltimeterNeptuneClient:
                     t.next()
                     t = g
                 except Exception as err:
-                    print(str(err))
+                    self.logger.error(event=LogEvent.NeptuneLoadError, msg=str(err))
                     raise NeptuneLoadGraphException(
                         f"Error loading edge {r} " f"with {str(t.bytecode)}"
                     )
 
     @staticmethod
     def parse_arn(arn: str) -> Dict:
+        """
+        Parses an ARN into the component pieces
+        :param arn: The arn to parse
+        :return: A dictionary of the arn pieces
+        """
         # http://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html
         elements = str(arn).split(":", 5)
         result = {}
