@@ -1,19 +1,22 @@
 """Client for loading and accessing Altimeter generated data in Neptune"""
+import hmac
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 import time
 import requests
+import hashlib
 from typing import Dict, List, Optional, Set, Tuple
 
 from aws_requests_auth.aws_auth import AWSRequestsAuth
 import boto3
-from botocore.auth import SigV4Auth
-from botocore.awsrequest import AWSRequest
 
 from gremlin_python.process.graph_traversal import __
 from gremlin_python.process.anonymous_traversal import traversal
 from gremlin_python.driver.driver_remote_connection import DriverRemoteConnection
 from gremlin_python.process.traversal import T
+from tornado import httpclient
+from urllib import parse
+
 from altimeter.core.exceptions import AltimeterException
 from altimeter.core.log import Logger
 from altimeter.core.log_events import LogEvent
@@ -77,21 +80,38 @@ class NeptuneEndpoint:
         """
         return f"{self.host}:{self.port}"
 
-    def get_sparql_endpoint(self) -> str:
+    def get_sparql_endpoint(self, ssl: bool = True) -> str:
         """Get the sparql query url for this Neptune endpoint
 
         Returns:
             sparql query endpoint url
         """
-        return f"http://{self.get_endpoint_str()}/sparql"
+        if ssl:
+            return f"https://{self.get_endpoint_str()}/sparql"
+        else:
+            return f"http://{self.get_endpoint_str()}/sparql"
 
-    def get_loader_endpoint(self) -> str:
+    def get_loader_endpoint(self, ssl: bool = True) -> str:
         """Get the loader url for this Neptune endpoint
 
         Returns:
             loader endpoint url
         """
-        return f"http://{self.get_endpoint_str()}/loader"
+        if ssl:
+            return f"https://{self.get_endpoint_str()}/loader"
+        else:
+            return f"http://{self.get_endpoint_str()}/loader"
+
+    def get_gremlin_endpoint(self, ssl: bool = True) -> str:
+        """Get the loader url for this Neptune endpoint
+
+        Returns:
+            loader endpoint url
+        """
+        if ssl:
+            return f"wss://{self.get_endpoint_str()}/gremlin"
+        else:
+            return f"ws://{self.get_endpoint_str()}/gremlin"
 
 
 def discover_neptune_endpoint() -> NeptuneEndpoint:
@@ -131,6 +151,17 @@ class GraphMetadata:
     version: str
     start_time: int
     end_time: int
+
+
+class RequestParameters:
+    """
+    Holds the request parameters for Sigv4Signing
+    """
+
+    def __init__(self, uri: str, querystring: str, headers: Dict):
+        self.uri = uri
+        self.querystring = querystring
+        self.headers = headers
 
 
 class AltimeterNeptuneClient:
@@ -538,38 +569,119 @@ class AltimeterNeptuneClient:
             raise NeptuneQueryException(f"Error running query {query}: {resp.text}")
         return QueryResultSet.from_sparql_endpoint_json(resp.json())
 
-    def _get_gremlin_auth_headers(self, endpoint: str) -> Dict:
+    @staticmethod
+    def __normalize_query_string(query: str) -> str:
+        """Normalize the query string"""
+        kv = (list(map(str.strip, s.split("="))) for s in query.split("&") if len(s) > 0)
+
+        normalized = "&".join("%s=%s" % (p[0], p[1] if len(p) > 1 else "") for p in sorted(kv))
+        return normalized
+
+    def __get_signature_key(
+        self, key: str, datestamp: str, regionname: str, servicename: str
+    ) -> bytes:
+        """Get the signed signature key
+        :return: The signed key
+        """
+        key_date = self.__sign(("AWS4" + key).encode("utf-8"), datestamp)
+        key_region = self.__sign(key_date, regionname)
+        key_service = self.__sign(key_region, servicename)
+        key_signing = self.__sign(key_service, "aws4_request")
+        return key_signing
+
+    @staticmethod
+    def __sign(key: bytes, msg: str) -> bytes:
+        """ Sign the msg with the key """
+        return hmac.new(key, msg.encode("utf-8"), hashlib.sha256).digest()
+
+    def prepare_request(
+        self, method: str = "GET", payload: str = "", querystring: Dict = {}
+    ) -> RequestParameters:
+        """
+        This prepares the request for sigv4signing.  This is heavily influenced by the code here:
+        https://github.com/awslabs/amazon-neptune-tools/tree/master/neptune-python-utils
+        :param method: The method name
+        :param payload: The request payload
+        :param querystring: The request querystring
+        :return: The request parameters
+        """
         session = boto3.Session()
         credentials = session.get_credentials()
-        creds = credentials.get_frozen_credentials()
+        access_key = credentials.access_key
+        secret_key = credentials.secret_key
+        session_token = credentials.token
 
-        url = endpoint
-        region = self._neptune_endpoint.region
-        method = "GET"
+        service = "neptune-db"
+        algorithm = "AWS4-HMAC-SHA256"
 
-        # Calculate headers using botocore
-        request = AWSRequest(method=method, url=url, data=None)
-        SigV4Auth(creds, "neptune-db", region).add_auth(request)
+        request_parameters = parse.urlencode(querystring).replace("%27", "%22")
+        canonical_querystring = self.__normalize_query_string(request_parameters)
 
-        return dict(request.headers)
+        t = datetime.utcnow()
+        amz_date = t.strftime("%Y%m%dT%H%M%SZ")
+        datestamp = t.strftime("%Y%m%d")
+        canonical_headers = "host:{}:{}\nx-amz-date:{}\n".format(
+            self._neptune_endpoint.host, self._neptune_endpoint.port, amz_date
+        )
+        signed_headers = "host;x-amz-date"
+        payload_hash = hashlib.sha256(payload.encode("utf-8")).hexdigest()
+        canonical_request = "{}\n/{}\n{}\n{}\n{}\n{}".format(
+            method,
+            "gremlin",
+            canonical_querystring,
+            canonical_headers,
+            signed_headers,
+            payload_hash,
+        )
+        credential_scope = "{}/{}/{}/aws4_request".format(
+            datestamp, self._neptune_endpoint.region, service
+        )
+        string_to_sign = "{}\n{}\n{}\n{}".format(
+            algorithm,
+            amz_date,
+            credential_scope,
+            hashlib.sha256(canonical_request.encode("utf-8")).hexdigest(),
+        )
+        signing_key = self.__get_signature_key(
+            secret_key, datestamp, self._neptune_endpoint.region, service
+        )
+        signature = hmac.new(
+            signing_key, string_to_sign.encode("utf-8"), hashlib.sha256
+        ).hexdigest()
+        authorization_header = "{} Credential={}/{}, SignedHeaders={}, Signature={}".format(
+            algorithm, access_key, credential_scope, signed_headers, signature
+        )
+        headers = {"x-amz-date": amz_date, "Authorization": authorization_header}
+        if session_token:
+            headers["x-amz-security-token"] = session_token
+        return RequestParameters(
+            "{}?{}".format(
+                self._neptune_endpoint.get_gremlin_endpoint(self._neptune_endpoint.ssl),
+                canonical_querystring,
+            )
+            if canonical_querystring
+            else self._neptune_endpoint.get_gremlin_endpoint(),
+            canonical_querystring,
+            headers,
+        )
 
     def connect_to_gremlin(self) -> Tuple[traversal, DriverRemoteConnection]:
         """
         Get the Gremlin traversal and connection for the Neptune endpoint
         :return: The Traversal object
         """
-        if self._neptune_endpoint.ssl:
-            endpoint = f"wss://{self._neptune_endpoint.host}:{self._neptune_endpoint.port}/gremlin"
-        else:
-            endpoint = f"ws://{self._neptune_endpoint.host}:{self._neptune_endpoint.port}/gremlin"
         if self._neptune_endpoint.auth_mode.lower() == "default":
-            gremlin_connection = DriverRemoteConnection(endpoint, "g")
-        else:
             gremlin_connection = DriverRemoteConnection(
-                endpoint, "g", headers=self._get_gremlin_auth_headers(endpoint)
+                self._neptune_endpoint.get_gremlin_endpoint(self._neptune_endpoint.ssl), "g"
             )
+        else:
+            request_parameters = self.prepare_request()
+            signed_ws_request = httpclient.HTTPRequest(
+                request_parameters.uri, headers=request_parameters.headers
+            )
+            gremlin_connection = DriverRemoteConnection(signed_ws_request, "g")
         graph_traversal_source = traversal().withRemote(gremlin_connection)
-        graph_traversal_source.V().count().toList()
+
         return graph_traversal_source, gremlin_connection
 
     def __write_vertices(self, g: traversal, vertices: List[Dict], scan_id: str) -> None:
@@ -728,7 +840,7 @@ class AltimeterNeptuneClient:
             triples = triples + subject.n3() + " " + predicate.n3() + " " + obj.n3() + " . \n"
 
         insert_stmt = (
-            "INSERT DATA {{\n" + f"    GRAPH <{META_GRAPH_NAME}>\n" "{{ " f"{triples}" f"}}\n" "}\n"
+            "INSERT DATA {\n" + f"    GRAPH <{META_GRAPH_NAME}>\n" "{\n" f"{triples}" "}\n" "}\n"
         )
 
         resp = requests.post(neptune_sparql_url, data={"update": insert_stmt}, auth=auth)

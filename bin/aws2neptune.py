@@ -2,13 +2,11 @@
 """Graph AWS resource data in Neptune"""
 from datetime import datetime
 import sys
-from pathlib import Path
 from typing import List, Optional
 import uuid
 import argparse
 import json
 import boto3
-import logging
 
 from altimeter.aws.log_events import AWSLogEvents
 from altimeter.aws.scan.muxer import AWSScanMuxer

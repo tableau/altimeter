@@ -211,6 +211,7 @@ class NeptuneConfig:
         ssl = get_optional_bool_param("ssl", config_dict)
         use_lpg = get_optional_bool_param("use_lpg", config_dict)
         iam_role_arn = get_optional_str_param("iam_role_arn", config_dict)
+        auth_mode = get_optional_str_param("auth_mode", config_dict)
         graph_load_sns_topic_arn = get_optional_str_param("graph_load_sns_topic_arn", config_dict)
         return NeptuneConfig(
             host=host,
@@ -220,6 +221,7 @@ class NeptuneConfig:
             use_lpg=use_lpg,
             iam_role_arn=iam_role_arn,
             graph_load_sns_topic_arn=graph_load_sns_topic_arn,
+            auth_mode=auth_mode,
         )
 
 
