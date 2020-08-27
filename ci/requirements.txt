@@ -1,4 +1,4 @@
 pylint>=2.4.4,<3
 mypy>=0.770,<3
 vulture>=1.4,<2
-black
+black<20,>=19.3b0
