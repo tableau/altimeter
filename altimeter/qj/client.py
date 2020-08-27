@@ -32,7 +32,7 @@ class QJAPIClient:
         try:
             response = requests.get(url, headers=self._auth_header)
         except Exception as ex:
-            raise QJAPIClientError(f"Error connecting to {url}: {str(ex)}")
+            raise QJAPIClientError(f"Error connecting to {url}: {str(ex)}") from ex
         try:
             response.raise_for_status()
         except Exception as ex:
@@ -45,7 +45,7 @@ class QJAPIClient:
         try:
             response = requests.get(url, params={"active_only": active_only})
         except Exception as ex:
-            raise QJAPIClientError(f"Error connecting to {url}: {str(ex)}")
+            raise QJAPIClientError(f"Error connecting to {url}: {str(ex)}") from ex
         try:
             response.raise_for_status()
         except Exception as ex:
@@ -61,7 +61,7 @@ class QJAPIClient:
             if response.status_code == 404:
                 return None
         except Exception as ex:
-            raise QJAPIClientError(f"Error connecting to {url}: {str(ex)}")
+            raise QJAPIClientError(f"Error connecting to {url}: {str(ex)}") from ex
         try:
             response.raise_for_status()
         except Exception as ex:
@@ -75,7 +75,7 @@ class QJAPIClient:
         try:
             response = requests.post(url, json=json.loads(job_in.json()), headers=self._auth_header)
         except Exception as ex:
-            raise QJAPIClientError(f"Error connecting to {url}: {str(ex)}")
+            raise QJAPIClientError(f"Error connecting to {url}: {str(ex)}") from ex
         try:
             response.raise_for_status()
         except Exception as ex:
@@ -93,7 +93,7 @@ class QJAPIClient:
                 url, json=json.loads(job_in.json()), headers=self._auth_header
             )
         except Exception as ex:
-            raise QJAPIClientError(f"Error connecting to {url}: {str(ex)}")
+            raise QJAPIClientError(f"Error connecting to {url}: {str(ex)}") from ex
         try:
             response.raise_for_status()
         except Exception as ex:
@@ -121,17 +121,18 @@ class QJAPIClient:
                 return False
         return True
 
-    def create_or_update_active_job(self, job_in: schemas.JobCreate) -> schemas.Job:
+    def create_or_update_active_job(self, job_in: schemas.JobCreate) -> Optional[schemas.Job]:
         """This method ensures that an active Job as described by JobCreate exists.
         If the Job does not exist it will be created.  If a Job which can be updated
         exists (e.g. query is the same but perhaps category is different) that job will
         be updated.  The created or updated job will be activated. Note that for
         finding a job candidate to update, only active jobs are considered - an inactive
-        job will never be updated and used, instead a new version would be created."""
+        job will never be updated and used, instead a new version would be created.
+        If an update was made, a Job object is returned, otherwise None"""
         job = self.get_job(job_name=job_in.name)
         if job:
             if self._job_job_create_identical(job, job_in):
-                return job
+                return None
             if self._job_job_create_nonupdatable_fields_identical(job, job_in):
                 job_update = schemas.JobUpdate.from_job_create(job_in)
                 return self.update_job(
@@ -152,7 +153,7 @@ class QJAPIClient:
                 url, json=json.loads(result_set.json()), headers=self._auth_header
             )
         except Exception as ex:
-            raise QJAPIClientError(f"Error connecting to {url}: {str(ex)}")
+            raise QJAPIClientError(f"Error connecting to {url}: {str(ex)}") from ex
         try:
             response.raise_for_status()
         except Exception as ex:
@@ -166,7 +167,7 @@ class QJAPIClient:
         try:
             response = requests.delete(url, headers=self._auth_header)
         except Exception as ex:
-            raise QJAPIClientError(f"Error connecting to {url}: {str(ex)}")
+            raise QJAPIClientError(f"Error connecting to {url}: {str(ex)}") from ex
         try:
             response.raise_for_status()
         except Exception as ex:

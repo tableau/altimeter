@@ -50,7 +50,7 @@ def create_job(
     try:
         return job_crud.create(db_session, job_create_in=job_in)
     except (JobQueryInvalid, JobQueryMissingAccountId, JobInvalid) as ex:
-        raise HTTPException(status_code=HTTP_400_BAD_REQUEST, detail=str(ex))
+        raise HTTPException(status_code=HTTP_400_BAD_REQUEST, detail=str(ex)) from ex
 
 
 @JOBS_ROUTER.delete("/{job_name}", dependencies=[Security(deps.api_key)])
@@ -75,7 +75,7 @@ def get_job(
     try:
         return job_crud.get_active(db_session, job_name=job_name)
     except ActiveJobVersionNotFound as ex:
-        raise HTTPException(status_code=HTTP_404_NOT_FOUND, detail=str(ex))
+        raise HTTPException(status_code=HTTP_404_NOT_FOUND, detail=str(ex)) from ex
 
 
 @JOBS_ROUTER.get("/{job_name}/latest_result_set", response_model=schemas.ResultSet)
@@ -89,7 +89,7 @@ def get_job_latest_result_set(
     try:
         return result_set_crud.get_latest_for_active_job(db_session, job_name=job_name)
     except ResultSetNotFound as ex:
-        raise HTTPException(status_code=HTTP_404_NOT_FOUND, detail=str(ex))
+        raise HTTPException(status_code=HTTP_404_NOT_FOUND, detail=str(ex)) from ex
 
 
 @JOBS_ROUTER.get("/{job_name}/versions", response_model=List[schemas.Job])
@@ -103,7 +103,7 @@ def get_job_versions(
     try:
         return job_crud.get_versions(db_session, job_name=job_name)
     except JobNotFound as ex:
-        raise HTTPException(status_code=HTTP_404_NOT_FOUND, detail=str(ex))
+        raise HTTPException(status_code=HTTP_404_NOT_FOUND, detail=str(ex)) from ex
 
 
 @JOBS_ROUTER.get("/{job_name}/versions/{created}", response_model=schemas.Job)
@@ -122,11 +122,11 @@ def get_job_version(
             status_code=HTTP_404_NOT_FOUND,
             detail=f"Job {job_name} version {created} not found. "
             f"It appears this is not a valid ISO 8601 datetime: {v_e}",
-        )
+        ) from v_e
     try:
         return job_crud.get_version(db_session, job_name=job_name, created=created_datetime)
     except JobVersionNotFound as ex:
-        raise HTTPException(status_code=HTTP_404_NOT_FOUND, detail=str(ex))
+        raise HTTPException(status_code=HTTP_404_NOT_FOUND, detail=str(ex)) from ex
 
 
 @JOBS_ROUTER.patch(
@@ -149,10 +149,10 @@ def update_job_version(
         raise HTTPException(
             status_code=HTTP_400_BAD_REQUEST,
             detail=f"Timestamp {created} is not a valid ISO 8601 datetime: {v_e}",
-        )
+        ) from v_e
     try:
         return job_crud.update_version(
             db_session, job_name=job_name, created=created_datetime, job_update=job_update
         )
     except JobVersionNotFound as ex:
-        raise HTTPException(status_code=HTTP_400_BAD_REQUEST, detail=str(ex))
+        raise HTTPException(status_code=HTTP_400_BAD_REQUEST, detail=str(ex)) from ex
