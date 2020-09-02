@@ -1,14 +1,10 @@
 """Resource for IAM Groups"""
-import copy
-from typing import Any, List, Dict, Type
+from typing import Type
 
 from botocore.client import BaseClient
-from botocore.exceptions import ClientError
 
 from altimeter.aws.resource.resource_spec import ListFromAWSResult
 from altimeter.aws.resource.iam import IAMResourceSpec
-from altimeter.core.graph.field.dict_field import AnonymousDictField, DictField, EmbeddedDictField
-from altimeter.core.graph.field.list_field import ListField
 from altimeter.core.graph.field.scalar_field import ScalarField
 from altimeter.core.graph.schema import Schema
 
