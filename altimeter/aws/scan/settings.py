@@ -31,6 +31,7 @@ from altimeter.aws.resource.events.cloudwatchevents_rule import EventsRuleResour
 from altimeter.aws.resource.events.event_bus import EventBusResourceSpec
 from altimeter.aws.resource.guardduty.detector import DetectorResourceSpec
 from altimeter.aws.resource.iam.account_password_policy import IAMAccountPasswordPolicyResourceSpec
+from altimeter.aws.resource.iam.group import IAMGroupResourceSpec
 from altimeter.aws.resource.iam.iam_saml_provider import IAMSAMLProviderResourceSpec
 from altimeter.aws.resource.iam.instance_profile import InstanceProfileResourceSpec
 from altimeter.aws.resource.iam.policy import IAMPolicyResourceSpec, IAMAWSManagedPolicyResourceSpec
@@ -62,6 +63,7 @@ RESOURCE_SPEC_CLASSES: Tuple[Type[AWSResourceSpec], ...] = (
     FlowLogResourceSpec,
     IAMAccountPasswordPolicyResourceSpec,
     IAMAWSManagedPolicyResourceSpec,
+    IAMGroupResourceSpec,
     IAMPolicyResourceSpec,
     IAMRoleResourceSpec,
     IAMSAMLProviderResourceSpec,
