@@ -1,5 +1,7 @@
 """A GraphSet represents the contents of a Graph."""
 from collections import defaultdict
+import json
+from pathlib import Path
 from typing import Any, DefaultDict, Dict, List, Type
 
 from rdflib import BNode, Graph, Literal, Namespace, RDF
@@ -161,6 +163,13 @@ class GraphSet:
             errors=errors,
             stats=stats,
         )
+
+    @classmethod
+    def from_json_file(cls: Type["GraphSet"], path: Path) -> "GraphSet":
+        with path.open("r") as json_fp:
+            json_data = json.load(json_fp)
+            return cls.from_dict(json_data)
+
 
     def merge(self, other: "GraphSet") -> None:
         """Merge another GraphSet into this GraphSet.

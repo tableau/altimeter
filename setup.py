@@ -30,6 +30,10 @@ setup(
             "pydantic>=1.6.1,<2",
             "sqlalchemy>=1.3.16,<2",
             "uvicorn>=0.11.5,<2",
+        ],
+        "hyper": [
+            "tableauhyperapi>=0.0.11355,<1",
+            "pydantic>=1.6.1,<2",
         ]
     },
     data_files=[
