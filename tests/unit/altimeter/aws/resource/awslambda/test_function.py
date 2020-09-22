@@ -2,7 +2,7 @@ import json
 from unittest import TestCase
 
 import boto3
-from moto import mock_ec2, mock_lambda
+from moto import mock_ec2, mock_iam, mock_lambda
 
 from altimeter.aws.resource.awslambda.function import LambdaFunctionResourceSpec
 from altimeter.aws.scan.aws_accessor import AWSAccessor
@@ -11,6 +11,7 @@ from altimeter.aws.scan.aws_accessor import AWSAccessor
 class TestLambdaFunctionResourceSpec(TestCase):
     @mock_lambda
     @mock_ec2
+    @mock_iam
     def test_scan(self):
         account_id = "123456789012"
         region_name = "us-east-1"
