@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Convert Altimeter intermediate json to hyper format"""
+"""Convert Altimeter intermediate json to hyper format. This is experimental."""
 import abc
 import argparse
 from collections import defaultdict
@@ -31,6 +31,7 @@ TAG_TABLE_NAME = "tag"
 @dataclass(frozen=True)  # type: ignore
 class Column(abc.ABC):
     """Generic representation of a db column"""
+
     name: str
 
     @abc.abstractmethod
@@ -42,6 +43,7 @@ class Column(abc.ABC):
 @dataclass(frozen=True)
 class PKColumn(Column):
     """Generic pk db column"""
+
     def to_hyper(self) -> tableauhyperapi.TableDefinition.Column:
         """Create a hyper Column object from this Column"""
         return tableauhyperapi.TableDefinition.Column(
@@ -52,6 +54,7 @@ class PKColumn(Column):
 @dataclass(frozen=True)
 class FKColumn(Column):
     """Generic fk db column"""
+
     def to_hyper(self) -> tableauhyperapi.TableDefinition.Column:
         """Create a hyper Column object from this Column"""
         return tableauhyperapi.TableDefinition.Column(
@@ -62,6 +65,7 @@ class FKColumn(Column):
 @dataclass(frozen=True)
 class TextColumn(Column):
     """Generic text db column"""
+
     def to_hyper(self) -> tableauhyperapi.TableDefinition.Column:
         """Create a hyper Column object from this Column"""
         return tableauhyperapi.TableDefinition.Column(
@@ -72,6 +76,7 @@ class TextColumn(Column):
 @dataclass(frozen=True)
 class IntColumn(Column):
     """Generic integer db column"""
+
     def to_hyper(self) -> tableauhyperapi.TableDefinition.Column:
         """Create a hyper Column object from this Column"""
         return tableauhyperapi.TableDefinition.Column(
@@ -82,6 +87,7 @@ class IntColumn(Column):
 @dataclass(frozen=True)
 class BoolColumn(Column):
     """Generic boolean db column"""
+
     def to_hyper(self) -> tableauhyperapi.TableDefinition.Column:
         """Create a hyper Column object from this Column"""
         return tableauhyperapi.TableDefinition.Column(
@@ -91,7 +97,10 @@ class BoolColumn(Column):
 
 @dataclass(frozen=True)
 class TimestampColumn(Column):
+    """Generic timestamp db column"""
+
     def to_hyper(self) -> tableauhyperapi.TableDefinition.Column:
+        """Create a hyper Column object from this Column"""
         return tableauhyperapi.TableDefinition.Column(
             self.name, tableauhyperapi.SqlType.timestamp(), nullability=tableauhyperapi.NULLABLE,
         )
@@ -258,7 +267,7 @@ def build_data(
                         parent_table_name=table_name,
                         parent_pk=pk,
                     )
-    return MappingProxyType({key: values for key, values in table_names_datas.items()})
+    return MappingProxyType(table_names_datas)
 
 
 def build_multilink_data(
@@ -367,7 +376,7 @@ def main(argv: Optional[List[str]] = None) -> int:
     ) as hyper:
         with tableauhyperapi.Connection(
             endpoint=hyper.endpoint,
-            database=f"altimeter.hyper",
+            database="altimeter.hyper",
             create_mode=tableauhyperapi.CreateMode.CREATE_AND_REPLACE,
         ) as connection:
             # create tables
