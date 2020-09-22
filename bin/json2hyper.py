@@ -4,7 +4,7 @@ import abc
 import argparse
 from collections import defaultdict
 from dataclasses import dataclass
-import json
+from datetime import datetime
 from operator import attrgetter
 from pathlib import Path
 import sys
@@ -23,9 +23,9 @@ from altimeter.core.graph.link.links import (
     MultiLink,
     TransientResourceLinkLink,
 )
-from altimeter.core.resource.resource import Resource
 
-Primitive = Union[int, bool, str, None]
+Primitive = Union[int, bool, str, datetime, None]
+TAG_TABLE_NAME = "tag"
 
 # see https://github.com/python/mypy/issues/5374
 @dataclass(frozen=True)  # type: ignore
@@ -87,6 +87,16 @@ class BoolColumn(Column):
         )
 
 
+@dataclass(frozen=True)
+class TimestampColumn(Column):
+    def to_hyper(self) -> tableauhyperapi.TableDefinition.Column:
+        return tableauhyperapi.TableDefinition.Column(
+            self.name,
+            tableauhyperapi.SqlType.timestamp(),
+            nullability=tableauhyperapi.NULLABLE,
+        )
+
+
 def normalize_name(name: str) -> str:
     normalized_name = name
     if normalized_name.startswith("aws:"):
@@ -106,7 +116,6 @@ def build_table_defns(graph_sets: Iterable[GraphSet]) -> Mapping[str, Tuple[Colu
             for link in resource.links:
                 if isinstance(link, SimpleLink):
                     table_names_simple_obj_types[table_name][link.pred].add(type(link.obj))
-
     table_names_columns: DefaultDict[str, Set[Column]] = defaultdict(set)
     for graph_set in graph_sets:
         for resource in graph_set.resources:
@@ -127,6 +136,13 @@ def build_table_defns(graph_sets: Iterable[GraphSet]) -> Mapping[str, Tuple[Colu
         table_name: tuple(sorted(columns, key=attrgetter("name")))
         for table_name, columns in table_names_columns.items()
     }
+    # define the tag table
+    tag_columns = (
+        FKColumn("resource_id"),
+        TextColumn("key"),
+        TextColumn("value"),
+    )
+    table_defns[TAG_TABLE_NAME] = tag_columns
     return MappingProxyType(table_defns)
 
 
@@ -178,7 +194,7 @@ def build_table_defns_helper(
                 simple_obj_types=simple_obj_types,
             )
         elif isinstance(link, TagLink):
-            pass  # TODO IMPLEMENT ME
+            pass  # a single Tags table is built in build_table_defns
         else:
             raise NotImplementedError(f"Link type {type(link)} is not implemented")
 
@@ -191,17 +207,21 @@ def build_data(
     arns_pks: Dict[str, int] = {}
     table_names_datas: DefaultDict[str, List[Tuple[Primitive, ...]]] = defaultdict(list)
     for graph_set in graph_sets:
-        # TODO scan id
         for resource in graph_set.resources:
-            # TODO tags
             resource_data: List[Primitive] = []
             table_name = normalize_name(resource.type_name)
             arn = resource.resource_id
+            # build a primary key for this resource
             pk = arns_pks.get(arn)
             if pk is None:
                 pk_counters[table_name] += 1
                 pk = pk_counters[table_name]
                 arns_pks[arn] = pk
+            # add tag data
+            for link in resource.links:
+                if isinstance(link, TagLink):
+                    tag_key, tag_value = link.pred, link.obj
+                    table_names_datas[TAG_TABLE_NAME].append((pk, tag_key, tag_value))
             # iterate over the columns we expect the corresponding resource for this
             # table and fill them by looking for corresponding values in the resource
             for column in table_defns[table_name]:
@@ -237,14 +257,14 @@ def build_data(
                                     text_data = str(candidate_simple_link.obj)
                                     break
                     resource_data.append(text_data)
-                elif type(column) in (IntColumn, BoolColumn):
-                    bool_or_int_data = None
+                elif type(column) in (IntColumn, BoolColumn, TimestampColumn):
+                    bool_or_int_or_timestamp_data = None
                     for candidate_simple_link in resource.links:
                         if isinstance(candidate_simple_link, SimpleLink):
                             if candidate_simple_link.pred == column.name:
-                                bool_or_int_data = candidate_simple_link.obj
+                                bool_or_int_or_timestamp_data = candidate_simple_link.obj
                                 break
-                    resource_data.append(bool_or_int_data)
+                    resource_data.append(bool_or_int_or_timestamp_data)
                 else:
                     raise NotImplementedError(f"Column type {type(column)} not implemented")
             table_names_datas[table_name].append(tuple(resource_data))
@@ -347,6 +367,8 @@ def main(argv: Optional[List[str]] = None) -> int:
     args_ns = parser.parse_args(argv)
 
     input_json_filepaths = args_ns.input_json_filepaths
+    if len(input_json_filepaths) > 1:
+        raise NotImplementedError("Only one input supported at this time")
 
     # create a dict of scan ids to GraphSets. This contains all of the data in the provided input.
     scan_ids_graph_sets: Dict[int, GraphSet] = {
