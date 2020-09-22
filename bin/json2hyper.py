@@ -30,16 +30,20 @@ TAG_TABLE_NAME = "tag"
 # see https://github.com/python/mypy/issues/5374
 @dataclass(frozen=True)  # type: ignore
 class Column(abc.ABC):
+    """Generic representation of a db column"""
     name: str
 
     @abc.abstractmethod
     def to_hyper(self) -> tableauhyperapi.TableDefinition.Column:
+        """Create a hyper Column object from this Column"""
         raise NotImplementedError
 
 
 @dataclass(frozen=True)
 class PKColumn(Column):
+    """Generic pk db column"""
     def to_hyper(self) -> tableauhyperapi.TableDefinition.Column:
+        """Create a hyper Column object from this Column"""
         return tableauhyperapi.TableDefinition.Column(
             self.name, tableauhyperapi.SqlType.big_int(), nullability=tableauhyperapi.NOT_NULLABLE,
         )
@@ -47,7 +51,9 @@ class PKColumn(Column):
 
 @dataclass(frozen=True)
 class FKColumn(Column):
+    """Generic fk db column"""
     def to_hyper(self) -> tableauhyperapi.TableDefinition.Column:
+        """Create a hyper Column object from this Column"""
         return tableauhyperapi.TableDefinition.Column(
             self.name, tableauhyperapi.SqlType.big_int(), nullability=tableauhyperapi.NULLABLE,
         )
@@ -55,7 +61,9 @@ class FKColumn(Column):
 
 @dataclass(frozen=True)
 class TextColumn(Column):
+    """Generic text db column"""
     def to_hyper(self) -> tableauhyperapi.TableDefinition.Column:
+        """Create a hyper Column object from this Column"""
         return tableauhyperapi.TableDefinition.Column(
             self.name, tableauhyperapi.SqlType.text(), nullability=tableauhyperapi.NULLABLE,
         )
@@ -63,7 +71,9 @@ class TextColumn(Column):
 
 @dataclass(frozen=True)
 class IntColumn(Column):
+    """Generic integer db column"""
     def to_hyper(self) -> tableauhyperapi.TableDefinition.Column:
+        """Create a hyper Column object from this Column"""
         return tableauhyperapi.TableDefinition.Column(
             self.name, tableauhyperapi.SqlType.big_int(), nullability=tableauhyperapi.NULLABLE,
         )
@@ -71,7 +81,9 @@ class IntColumn(Column):
 
 @dataclass(frozen=True)
 class BoolColumn(Column):
+    """Generic boolean db column"""
     def to_hyper(self) -> tableauhyperapi.TableDefinition.Column:
+        """Create a hyper Column object from this Column"""
         return tableauhyperapi.TableDefinition.Column(
             self.name, tableauhyperapi.SqlType.bool(), nullability=tableauhyperapi.NULLABLE,
         )
@@ -342,8 +354,8 @@ def main(argv: Optional[List[str]] = None) -> int:
         for scan_id, filepath in enumerate(input_json_filepaths)
     }
 
-    # discover tables which need to be created by iterating over resources and finding the maximum set of
-    # predicates used for each type
+    # discover tables which need to be created by iterating over resources and finding the maximum
+    # set of predicates used for each type
     table_defns = build_table_defns(scan_ids_graph_sets.values())
 
     # build data
