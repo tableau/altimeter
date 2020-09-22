@@ -40,3 +40,6 @@ altimeter*.rst
 modules.rst
 doc/html/**/*
 public/**
+
+*.hyper
+*.log

@@ -1,23 +1,343 @@
 #!/usr/bin/env python3
 """Convert Altimeter intermediate json to hyper format"""
-from datetime import datetime
+import abc
 import argparse
 from collections import defaultdict
+from dataclasses import dataclass
 import json
+from operator import attrgetter
 from pathlib import Path
 import sys
-from typing import DefaultDict, Dict, Iterable, List, Mapping, Optional, Set, Tuple, Type
-from types import MappingProxyType # TODO
-
-# LEFT OFF - since Tableau doesn't support multiple relationships, I think
-# we have to create join tables for all fk relationships :(
+from typing import DefaultDict, Dict, Iterable, List, Mapping, Optional, Set, Tuple, Type, Union
+from types import MappingProxyType
+import uuid
 
 import tableauhyperapi
 
 from altimeter.core.graph.graph_set import GraphSet
 from altimeter.core.graph.link.base import Link
-from altimeter.core.graph.link.links import SimpleLink, ResourceLinkLink, TagLink, MultiLink, TransientResourceLinkLink
+from altimeter.core.graph.link.links import (
+    SimpleLink,
+    ResourceLinkLink,
+    TagLink,
+    MultiLink,
+    TransientResourceLinkLink,
+)
 from altimeter.core.resource.resource import Resource
+
+Primitive = Union[int, bool, str, None]
+
+# see https://github.com/python/mypy/issues/5374
+@dataclass(frozen=True)  # type: ignore
+class Column(abc.ABC):
+    name: str
+
+    @abc.abstractmethod
+    def to_hyper(self) -> tableauhyperapi.TableDefinition.Column:
+        raise NotImplementedError
+
+
+@dataclass(frozen=True)
+class PKColumn(Column):
+    def to_hyper(self) -> tableauhyperapi.TableDefinition.Column:
+        return tableauhyperapi.TableDefinition.Column(
+            self.name,
+            tableauhyperapi.SqlType.big_int(),
+            nullability=tableauhyperapi.NOT_NULLABLE,
+        )
+
+
+@dataclass(frozen=True)
+class FKColumn(Column):
+    def to_hyper(self) -> tableauhyperapi.TableDefinition.Column:
+        return tableauhyperapi.TableDefinition.Column(
+            self.name,
+            tableauhyperapi.SqlType.big_int(),
+            nullability=tableauhyperapi.NULLABLE,
+        )
+
+
+@dataclass(frozen=True)
+class TextColumn(Column):
+    def to_hyper(self) -> tableauhyperapi.TableDefinition.Column:
+        return tableauhyperapi.TableDefinition.Column(
+            self.name,
+            tableauhyperapi.SqlType.text(),
+            nullability=tableauhyperapi.NULLABLE,
+        )
+
+
+@dataclass(frozen=True)
+class IntColumn(Column):
+    def to_hyper(self) -> tableauhyperapi.TableDefinition.Column:
+        return tableauhyperapi.TableDefinition.Column(
+            self.name,
+            tableauhyperapi.SqlType.big_int(),
+            nullability=tableauhyperapi.NULLABLE,
+        )
+
+
+@dataclass(frozen=True)
+class BoolColumn(Column):
+    def to_hyper(self) -> tableauhyperapi.TableDefinition.Column:
+        return tableauhyperapi.TableDefinition.Column(
+            self.name,
+            tableauhyperapi.SqlType.bool(),
+            nullability=tableauhyperapi.NULLABLE,
+        )
+
+
+def normalize_name(name: str) -> str:
+    normalized_name = name
+    if normalized_name.startswith("aws:"):
+        normalized_name = normalized_name[len("aws:") :]
+    normalized_name = normalized_name.replace(":", "_").replace("-", "_")
+    return normalized_name
+
+
+def build_table_defns(graph_sets: Iterable[GraphSet]) -> Mapping[str, Tuple[Column, ...]]:
+    # discover simple link obj types - generally str, bool or int
+    table_names_simple_obj_types: DefaultDict[
+        str, DefaultDict[str, Set[Type[Primitive]]]
+    ] = defaultdict(lambda: defaultdict(set))
+    for graph_set in graph_sets:
+        for resource in graph_set.resources:
+            table_name = normalize_name(resource.type_name)
+            for link in resource.links:
+                if isinstance(link, SimpleLink):
+                    table_names_simple_obj_types[table_name][link.pred].add(type(link.obj))
+
+    table_names_columns: DefaultDict[str, Set[Column]] = defaultdict(set)
+    for graph_set in graph_sets:
+        for resource in graph_set.resources:
+            table_name = normalize_name(resource.type_name)
+            # all top level types have an id column
+            table_names_columns[table_name].add(PKColumn(f"_{table_name}_id"))
+            # all top level types have an arn
+            table_names_columns[table_name].add(TextColumn(f"{table_name}_arn"))
+            links = resource.links
+            simple_obj_types = MappingProxyType(table_names_simple_obj_types[table_name])
+            build_table_defns_helper(
+                links,
+                table_name,
+                table_names_columns,
+                simple_obj_types,
+            )
+    table_defns = {
+        table_name: tuple(sorted(columns, key=attrgetter("name")))
+        for table_name, columns in table_names_columns.items()
+    }
+    return MappingProxyType(table_defns)
+
+
+def build_table_defns_helper(
+    links: Iterable[Link],
+    table_name: str,
+    table_names_columns: Dict[str, Set[Column]],
+    simple_obj_types: Mapping[str, Set[Type[Primitive]]],
+) -> None:
+    for link in links:
+        if isinstance(link, SimpleLink):
+            simple_column: Union[IntColumn, BoolColumn, TextColumn]
+            if simple_obj_types[link.pred] == set((int,)):
+                simple_column = IntColumn(
+                    name=link.pred,
+                )
+            elif simple_obj_types[link.pred] == set((bool,)):
+                simple_column = BoolColumn(
+                    name=link.pred,
+                )
+            else:
+                simple_column = TextColumn(
+                    name=link.pred,
+                )
+            table_names_columns[table_name].add(simple_column)
+        elif type(link) in (ResourceLinkLink, TransientResourceLinkLink):
+            table_names_columns[table_name].add(
+                FKColumn(
+                    name=f"_{link.pred}_id",
+                )
+            )
+        elif isinstance(link, MultiLink):
+            multilink_table_name = f"_{table_name}_{link.pred}"
+            # multilink tables have a pk id column and a fk to the parent
+            table_names_columns[multilink_table_name].add(
+                PKColumn(
+                    f"_{multilink_table_name}_id",
+                )
+            )
+            table_names_columns[multilink_table_name].add(
+                FKColumn(
+                    name=f"_{table_name}_id",
+                )
+            )
+            build_table_defns_helper(
+                links=link.obj,
+                table_name=multilink_table_name,
+                table_names_columns=table_names_columns,
+                simple_obj_types=simple_obj_types,
+            )
+        elif isinstance(link, TagLink):
+            pass  # TODO IMPLEMENT ME
+        else:
+            raise NotImplementedError(f"Link type {type(link)} is not implemented")
+
+
+def build_data(
+    graph_sets: Iterable[GraphSet],
+    table_defns: Mapping[str, Tuple[Column, ...]],
+) -> Mapping[str, List[Tuple[Primitive, ...]]]:
+    pk_counters: DefaultDict[str, int] = defaultdict(int)
+    arns_pks: Dict[str, int] = {}
+    table_names_datas: DefaultDict[str, List[Tuple[Primitive, ...]]] = defaultdict(list)
+    for graph_set in graph_sets:
+        # TODO scan id
+        for resource in graph_set.resources:
+            # TODO tags
+            resource_data: List[Primitive] = []
+            table_name = normalize_name(resource.type_name)
+            arn = resource.resource_id
+            pk = arns_pks.get(arn)
+            if pk is None:
+                pk_counters[table_name] += 1
+                pk = pk_counters[table_name]
+                arns_pks[arn] = pk
+            # iterate over the columns we expect the corresponding resource for this
+            # table and fill them by looking for corresponding values in the resource
+            for column in table_defns[table_name]:
+                if isinstance(column, PKColumn):
+                    if not pk:
+                        raise Exception(
+                            f"BUG: No pk found for {table_name} : {table_defns[table_name]}"
+                        )
+                    resource_data.append(pk)
+                elif isinstance(column, FKColumn):
+                    column_link_name = column.name.lstrip("_")[:-3]  # strip leading _, and _id
+                    fk = None
+                    for candidate_fk_link in resource.links:
+                        if type(candidate_fk_link) in (ResourceLinkLink, TransientResourceLinkLink):
+                            if candidate_fk_link.pred == column_link_name:
+                                f_table_name = normalize_name(candidate_fk_link.pred)
+                                f_arn = candidate_fk_link.obj
+                                fk = arns_pks.get(f_arn)
+                                if fk is None:
+                                    pk_counters[f_table_name] += 1
+                                    fk = pk_counters[f_table_name]
+                                    arns_pks[f_arn] = fk
+                                break
+                    resource_data.append(fk)
+                elif isinstance(column, TextColumn):
+                    text_data = None
+                    if column.name == "arn":
+                        text_data = resource.resource_id
+                    else:
+                        for candidate_simple_link in resource.links:
+                            if isinstance(candidate_simple_link, SimpleLink):
+                                if candidate_simple_link.pred == column.name:
+                                    text_data = str(candidate_simple_link.obj)
+                                    break
+                    resource_data.append(text_data)
+                elif type(column) in (IntColumn, BoolColumn):
+                    bool_or_int_data = None
+                    for candidate_simple_link in resource.links:
+                        if isinstance(candidate_simple_link, SimpleLink):
+                            if candidate_simple_link.pred == column.name:
+                                bool_or_int_data = candidate_simple_link.obj
+                                break
+                    resource_data.append(bool_or_int_data)
+                else:
+                    raise NotImplementedError(f"Column type {type(column)} not implemented")
+            table_names_datas[table_name].append(tuple(resource_data))
+            # now look for MultiLinks in this resource.  Each of these represent a table
+            for link in resource.links:
+                if isinstance(link, MultiLink):
+                    build_multilink_data(
+                        pk_counters=pk_counters,
+                        arns_pks=arns_pks,
+                        table_names_datas=table_names_datas,
+                        table_defns=table_defns,
+                        multi_link=link,
+                        parent_table_name=table_name,
+                        parent_pk=pk,
+                    )
+    return MappingProxyType({key: values for key, values in table_names_datas.items()})
+
+
+def build_multilink_data(
+    pk_counters: Dict[str, int],
+    arns_pks: Dict[str, int],
+    table_names_datas: DefaultDict[str, List[Tuple[Primitive, ...]]],
+    table_defns: Mapping[str, Tuple[Column, ...]],
+    parent_table_name: str,
+    parent_pk: int,
+    multi_link: MultiLink,
+) -> None:
+    table_name = f"_{parent_table_name}_{multi_link.pred}"
+    resource_data: List[Primitive] = []
+    columns = table_defns[table_name]
+    # assign a pk. MultiLinks don't really have arns so we create a uuid
+    arn = str(uuid.uuid4())
+    pk = arns_pks.get(arn)
+    if pk is None:
+        pk_counters[table_name] += 1
+        pk = pk_counters[table_name]
+        arns_pks[arn] = pk
+    # MultiLinks always have a primary key and then a parent fk
+    resource_data.append(pk)
+    resource_data.append(parent_pk)
+    for column in columns[2:]:  # skip the primary key and parent fk
+        if isinstance(column, FKColumn):
+            fk = None
+            for candidate_resource_link in multi_link.obj:
+                if type(candidate_resource_link) in (ResourceLinkLink, TransientResourceLinkLink):
+                    pred = f"_{candidate_resource_link.pred}_id"
+                    if pred == column.name:
+                        f_arn = candidate_resource_link.obj
+                        f_arn_parts = f_arn.split(":")
+                        f_arn_svc = f_arn_parts[2]
+                        f_arn_type = f_arn_parts[5].split("/")[0]
+                        fk = arns_pks.get(f_arn)
+                        if fk is None:
+                            f_table_name = "_".join((f_arn_svc, f_arn_type))
+                            pk_counters[f_table_name] += 1
+                            fk = pk_counters[f_table_name]
+                            arns_pks[f_arn] = fk
+                        break
+            resource_data.append(fk)
+        elif isinstance(column, TextColumn):
+            text_data = None
+            for candidate_simple_link in multi_link.obj:
+                if isinstance(candidate_simple_link, SimpleLink):
+                    if candidate_simple_link.pred == column.name:
+                        text_data = str(candidate_simple_link.obj)
+                        break
+            resource_data.append(text_data)
+        elif type(column) in (IntColumn, BoolColumn):
+            bool_or_int_data = None
+            for candidate_simple_link in multi_link.obj:
+                if isinstance(candidate_simple_link, SimpleLink):
+                    if candidate_simple_link.pred == column.name:
+                        bool_or_int_data = candidate_simple_link.obj
+                        break
+            resource_data.append(bool_or_int_data)
+        else:
+            raise NotImplementedError(f"Column type {type(column)} not implemented")
+
+    # now recurse
+    for link in multi_link.obj:
+        if isinstance(link, MultiLink):
+            build_multilink_data(
+                pk_counters=pk_counters,
+                arns_pks=arns_pks,
+                table_names_datas=table_names_datas,
+                table_defns=table_defns,
+                parent_table_name=table_name,
+                parent_pk=pk,
+                multi_link=link,
+            )
+
+    table_names_datas[table_name].append(tuple(resource_data))
+
 
 def main(argv: Optional[List[str]] = None) -> int:
     if argv is None:
@@ -27,286 +347,46 @@ def main(argv: Optional[List[str]] = None) -> int:
     args_ns = parser.parse_args(argv)
 
     input_json_filepaths = args_ns.input_json_filepaths
-    scan_ids_graph_sets: Dict[int, GraphSet] = {scan_id: GraphSet.from_json_file(filepath) for scan_id, filepath in enumerate(input_json_filepaths)}
 
+    # create a dict of scan ids to GraphSets. This contains all of the data in the provided input.
+    scan_ids_graph_sets: Dict[int, GraphSet] = {
+        scan_id: GraphSet.from_json_file(filepath)
+        for scan_id, filepath in enumerate(input_json_filepaths)
+    }
+
+    # discover tables which need to be created by iterating over resources and finding the maximum set of
+    # predicates used for each type
+    table_defns = build_table_defns(scan_ids_graph_sets.values())
+
+    # build data
+    table_names_datas = build_data(scan_ids_graph_sets.values(), table_defns)
+
+    table_names_tables: Dict[str, tableauhyperapi.TableDefinition] = {}
     with tableauhyperapi.HyperProcess(
-            telemetry=tableauhyperapi.Telemetry.DO_NOT_SEND_USAGE_DATA_TO_TABLEAU) as hyper:
-        with tableauhyperapi.Connection(endpoint=hyper.endpoint, database=f"altimeter.hyper",
-                                        create_mode=tableauhyperapi.CreateMode.CREATE_AND_REPLACE) as connection:
-            scan_table = tableauhyperapi.TableDefinition(
-                table_name="scans",
-                columns=[
-                    tableauhyperapi.TableDefinition.Column("id", tableauhyperapi.SqlType.int(),
-                                                           nullability=tableauhyperapi.NOT_NULLABLE),
-                    tableauhyperapi.TableDefinition.Column("name", tableauhyperapi.SqlType.text(),
-                                                           nullability=tableauhyperapi.NOT_NULLABLE),
-                    tableauhyperapi.TableDefinition.Column("version", tableauhyperapi.SqlType.text(),
-                                                           nullability=tableauhyperapi.NOT_NULLABLE),
-                    tableauhyperapi.TableDefinition.Column("start_time", tableauhyperapi.SqlType.timestamp(),
-                                                           nullability=tableauhyperapi.NOT_NULLABLE),
-                    tableauhyperapi.TableDefinition.Column("end_time", tableauhyperapi.SqlType.timestamp(),
-                                                           nullability=tableauhyperapi.NOT_NULLABLE),
-
-                ]
-            )
-            connection.catalog.create_table(scan_table)
-            # insert scan data
-            for scan_id, graph_set in scan_ids_graph_sets.items():
-                with tableauhyperapi.Inserter(connection, scan_table) as scan_inserter:
-                    data = [(
-                        scan_id,
-                        graph_set.name,
-                        graph_set.version,
-                        datetime.fromtimestamp(graph_set.start_time),
-                        datetime.fromtimestamp(graph_set.end_time),
-                    )]
-                    scan_inserter.add_rows(data)
-                    scan_inserter.execute()
-
-            tags_table = tableauhyperapi.TableDefinition(
-                table_name="tags",
-                columns=[
-                    tableauhyperapi.TableDefinition.Column("scan_id", tableauhyperapi.SqlType.int(),
-                                                           nullability=tableauhyperapi.NOT_NULLABLE),
-                    tableauhyperapi.TableDefinition.Column("resource_id", tableauhyperapi.SqlType.text(),
-                                                           nullability=tableauhyperapi.NOT_NULLABLE),
-                    tableauhyperapi.TableDefinition.Column("key", tableauhyperapi.SqlType.text(),
-                                                           nullability=tableauhyperapi.NOT_NULLABLE),
-                    tableauhyperapi.TableDefinition.Column("value", tableauhyperapi.SqlType.text(),
-                                                           nullability=tableauhyperapi.NOT_NULLABLE),
-
-                ],
-            )
-            connection.catalog.create_table(tags_table)
-
-            # first discover the relationships we need to model by iterating over all resources
-            # in all provided graph sets
-            type_names: Set[str] = set()
-            types_simple_preds: DefaultDict[str, Set[str]] = defaultdict(set)
-            types_resource_preds: DefaultDict[str, Set[str]] = defaultdict(set)
-            types_transient_resource_preds: DefaultDict[str, Set[str]] = defaultdict(set)
-            scan_ids_types_resources: DefaultDict[int, DefaultDict[str, List[Resource]]] = defaultdict(lambda: defaultdict(list))
-            join_table_type_names__predicates: DefaultDict[Tuple[str, str], Set[str]] = defaultdict(set)
-            tags_data: List[Tuple[str, str, str]] = []
-            for scan_id, graph_set in scan_ids_graph_sets.items():
-                for resource in graph_set.resources:
-                    type_name = normalize_name(resource.type_name)
-                    type_names.add(type_name)
-                    for link in resource.links:
-                        if isinstance(link, TagLink):
-                            tags_data.append((scan_id, resource.resource_id, link.pred, link.obj))
-                        elif isinstance(link, ResourceLinkLink):
-                            types_resource_preds[type_name].add(link.pred)
-                        elif isinstance(link, SimpleLink):
-                            types_simple_preds[type_name].add(link.pred)
-                        elif isinstance(link, MultiLink):
-                            record_multilink_relationships(join_table_type_names__predicates, link, type_name)
-                        elif isinstance(link, TransientResourceLinkLink):
-                            types_transient_resource_preds[type_name].add(link.pred)
-                        else:
-                            raise NotImplementedError(f"Link type {type(link)} not supported")
-                    scan_ids_types_resources[scan_id][type_name].append(resource)
-            with tableauhyperapi.Inserter(connection, tags_table) as tags_inserter:
-                tags_inserter.add_rows(tags_data)
-                tags_inserter.execute()
-
-            # process MultiLinks
-            for (type_name, target_type_name), preds in join_table_type_names__predicates.items():
-                build_multilink_tables_and_data(type_name, target_type_name, preds, scan_ids_types_resources, connection)
-
-            # create entity tables
-            for type_name in type_names:
-                columns = []
-                columns.append(
-                    tableauhyperapi.TableDefinition.Column("scan_id", tableauhyperapi.SqlType.int(),
-                                                           nullability=tableauhyperapi.NOT_NULLABLE),
-                )
-                # id column
-                columns.append(
-                    tableauhyperapi.TableDefinition.Column(f"{type_name}_arn", tableauhyperapi.SqlType.text(),
-                                                           nullability=tableauhyperapi.NOT_NULLABLE)
-                )
-                # SimpleLink columns
-                unnormalized_simple_column_names: List[str] = []
-                for simple_pred in types_simple_preds.get(type_name, set()):
-                    simple_pred_type = get_pred_obj_type(simple_pred, type_name, scan_ids_types_resources)
-                    if simple_pred_type in (bool, int, str):
-                        unnormalized_simple_column_names.append(simple_pred)
-                        simple_pred_name = normalize_name(simple_pred)
-                        if simple_pred_type == str:
-                            column = tableauhyperapi.TableDefinition.Column(simple_pred_name, tableauhyperapi.SqlType.text())
-                        elif simple_pred_type == int:
-                            column = tableauhyperapi.TableDefinition.Column(simple_pred_name, tableauhyperapi.SqlType.big_int())
-                        elif simple_pred_type == bool:
-                            column = tableauhyperapi.TableDefinition.Column(simple_pred_name, tableauhyperapi.SqlType.bool())
-                        else:
-                            raise Exception(f"I don't know how to handle simple_pred_type {simple_pred_type}")
-                        columns.append(column)
-                # ResourceLinkLink columns
-                unnormalized_resource_link_column_names: List[str] = []
-                for resource_pred in types_resource_preds.get(type_name, set()):
-                    resource_pred_type = get_pred_obj_type(resource_pred, type_name, scan_ids_types_resources)
-                    if resource_pred_type != str:
-                        raise Exception(f"I don't know how to handle resource_pred_type {resource_pred_type}")
-                    unnormalized_resource_link_column_names.append(resource_pred)
-                    resource_pred_name = f"{normalize_name(resource_pred)}_arn"
-                    column = tableauhyperapi.TableDefinition.Column(resource_pred_name, tableauhyperapi.SqlType.text())
-                    columns.append(column)
-                # TransientResourceLinkLink columns
-                unnormalized_transient_resource_link_column_names: List[str] = []
-                for transient_resource_pred in types_transient_resource_preds.get(type_name, set()):
-                    transient_resource_pred_type = get_pred_obj_type(transient_resource_pred, type_name, scan_ids_types_resources)
-                    if transient_resource_pred_type != str:
-                        raise Exception(f"I don't know how to handle transient_resource_pred_type {transient_resource_pred_type}")
-                    unnormalized_transient_resource_link_column_names.append(transient_resource_pred)
-                    transient_resource_pred_name = f"{normalize_name(transient_resource_pred)}_arn"
-                    column = tableauhyperapi.TableDefinition.Column(transient_resource_pred_name,
-                                                                    tableauhyperapi.SqlType.text())
-                    columns.append(column)
-                # create the table
+        telemetry=tableauhyperapi.Telemetry.DO_NOT_SEND_USAGE_DATA_TO_TABLEAU
+    ) as hyper:
+        with tableauhyperapi.Connection(
+            endpoint=hyper.endpoint,
+            database=f"altimeter.hyper",
+            create_mode=tableauhyperapi.CreateMode.CREATE_AND_REPLACE,
+        ) as connection:
+            # create tables
+            for table_name, columns in table_defns.items():
                 table = tableauhyperapi.TableDefinition(
-                    table_name=type_name,
-                    columns=columns,
+                    table_name=table_name, columns=[column.to_hyper() for column in columns]
                 )
                 connection.catalog.create_table(table)
+                table_names_tables[table_name] = table
 
-                # insert data
-                with tableauhyperapi.Inserter(connection, table) as inserter:
-                    data = []
-                    for scan_id, types_resources in scan_ids_types_resources.items():
-                        for resource in types_resources[type_name]:
-                            resource_data = [scan_id, resource.resource_id]
-                            # add SimpleLink data
-                            for unnormalized_column_name in unnormalized_simple_column_names:
-                                found = False
-                                for link in resource.links:
-                                    if link.pred == unnormalized_column_name:
-                                        if isinstance(link.obj, bool):
-                                            resource_data.append(link.obj)
-                                        else:
-                                            resource_data.append(link.obj)
-                                        found = True
-                                        break
-                                if not found:
-                                    resource_data.append(None)
-                            # add ResourceLink data
-                            for unnormalized_column_name in unnormalized_resource_link_column_names:
-                                found = False
-                                for link in resource.links:
-                                    if link.pred == unnormalized_column_name:
-                                        resource_data.append(link.obj)
-                                        found = True
-                                        break
-                                if not found:
-                                    resource_data.append(None)
-                            # add TransientResourceLink data
-                            for unnormalized_column_name in unnormalized_transient_resource_link_column_names:
-                                found = False
-                                for link in resource.links:
-                                    if link.pred == unnormalized_column_name:
-                                        resource_data.append(link.obj)
-                                        found = True
-                                        break
-                                if not found:
-                                    resource_data.append(None)
-                            data.append(tuple(resource_data))
-                    inserter.add_rows(data)
+            for table_name, datas in table_names_datas.items():
+                with tableauhyperapi.Inserter(
+                    connection, table_names_tables[table_name]
+                ) as inserter:
+                    inserter.add_rows(datas)
                     inserter.execute()
+
     return 0
 
-def record_multilink_relationships(join_table_type_names__predicates: DefaultDict[Tuple[str, str], Set[str]], link: Link, type_name: str):
-    # LEFT OFF HERE:
-    # I think what we are missing is that a MultiLink should be represented by a table with a synthetic
-    # id of some kind. That way child multilinks can refer to the parent.
-    for obj in link.obj:
-        if type(obj) in (ResourceLinkLink, TransientResourceLinkLink):
-            normalized_pred = f"{obj.pred}_arn"
-        elif isinstance(obj, SimpleLink):
-            normalized_pred = obj.pred
-        elif isinstance(obj, MultiLink):
-            # TODO
-            pass
-        else:
-            raise NotImplementedError(f"MultiLink sub-object type {type(obj)} not implemented")
-        join_table_type_names__predicates[(type_name, link.pred)].add(normalized_pred)
-
-def build_multilink_tables_and_data(parent_type_name: str, target_type_name: str, preds: Set[str],
-                                    scan_ids_types_resources: Mapping[int, Mapping[str, Iterable[Resource]]],
-                                    connection) -> None:
-    join_table_name = f"_{parent_type_name}_{target_type_name}"
-    join_columns = [
-        tableauhyperapi.TableDefinition.Column("scan_id", tableauhyperapi.SqlType.int(),
-                                               nullability=tableauhyperapi.NOT_NULLABLE),
-    ]
-    # arn of parent object
-    join_columns.append(
-        tableauhyperapi.TableDefinition.Column(f"{parent_type_name}_arn", tableauhyperapi.SqlType.text(),
-                                               nullability=tableauhyperapi.NOT_NULLABLE),
-    )
-    for pred in sorted(preds):
-        join_columns.append(
-            tableauhyperapi.TableDefinition.Column(pred, tableauhyperapi.SqlType.text(),
-                                                   nullability=tableauhyperapi.NULLABLE)
-        )
-    join_table = tableauhyperapi.TableDefinition(
-        table_name=join_table_name,
-        columns=join_columns,
-    )
-    connection.catalog.create_table(join_table)
-    # insert join data.
-    with tableauhyperapi.Inserter(connection, join_table) as join_inserter:
-        data = []
-        for scan_id, types_resources in scan_ids_types_resources.items():
-            for resource in types_resources[parent_type_name]:
-                for link in resource.links:
-                    if link.pred == target_type_name:
-                        resource_data = [scan_id, resource.resource_id]
-                        for pred in sorted(preds):
-                            datapoint = None
-                            for obj in link.obj:
-                                if isinstance(obj, SimpleLink):
-                                    if obj.pred == pred:
-                                        datapoint = str(obj.obj)
-                                elif type(obj) in (ResourceLinkLink, TransientResourceLinkLink):
-                                    normalized_pred = f"{obj.pred}_arn"
-                                    if normalized_pred == pred:
-                                        datapoint = str(obj.obj)
-                                elif isinstance(obj, MultiLink):
-                                    pass # TODO
-                                else:
-                                    raise NotImplementedError(f"MultiLink sub-object type {type(obj)} not implemented")
-                            resource_data.append(datapoint)
-                        data.append(tuple(resource_data))
-        join_inserter.add_rows(data)
-        join_inserter.execute()
-
-def get_pred_obj_type(pred: str, type_name: str, scan_ids_types_resources: Mapping[int, Mapping[str, Iterable[Resource]]]) -> Type:
-    types = set()
-    for types_resources in scan_ids_types_resources.values():
-        for resource in types_resources[type_name]:
-            for link in resource.links:
-                if link.pred == pred:
-                    types.add(type(link.obj))
-        if types in ({str}, {list}, {int}, {bool}):
-            return types.pop()
-        raise Exception(f"I don't know how to handle {types}")
-
-
-def pred_is_scalar(pred: str, resources: Iterable[Resource]) -> bool:
-    for resource in resources:
-        for link in resource.links:
-            if link.pred == pred:
-                if not isinstance(link.obj, str) and not isinstance(link.obj, int):
-                    return False
-    return True
-
-
-def normalize_name(name: str) -> str:
-    normalized_name = name
-    if normalized_name.startswith("aws:"):
-        normalized_name = normalized_name[len("aws:"):]
-    normalized_name = normalized_name.replace(":", "_").replace("-", "_")
-    return normalized_name
 
 if __name__ == "__main__":
     sys.exit(main())
