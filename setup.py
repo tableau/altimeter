@@ -51,6 +51,7 @@ setup(
         "bin/altimeter",
         "bin/aws2n.py",
         "bin/graphpruner.py",
+        "bin/json2hyper.py",
         "bin/rdf2blaze",
         "bin/runquery.py",
         "bin/scan_resource.py",
