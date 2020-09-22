@@ -1,3 +1,4 @@
+import json
 from unittest import TestCase
 
 import boto3
@@ -15,12 +16,29 @@ class TestLambdaFunctionResourceSpec(TestCase):
         region_name = "us-east-1"
 
         session = boto3.Session()
+        iam_client = session.client("iam")
+        test_assume_role_policy_doc = {
+            "Version": "2012-10-17",
+            "Statement": [
+                {
+                    "Sid": "abc",
+                    "Effect": "Allow",
+                    "Principal": {"Service": "lambda.amazonaws.com"},
+                    "Action": "sts:AssumeRole",
+                }
+            ],
+        }
+        iam_role_resp = iam_client.create_role(
+            RoleName="testrole",
+            AssumeRolePolicyDocument=json.dumps(test_assume_role_policy_doc),
+        )
+        iam_role_arn = iam_role_resp["Role"]["Arn"]
 
         lambda_client = session.client("lambda", region_name=region_name)
         lambda_client.create_function(
             FunctionName="func_name",
             Runtime="python3.7",
-            Role=f"arn:aws:iam::{account_id}:role/testrole",
+            Role=iam_role_arn,
             Handler="testhandler",
             Description="testdescr",
             Timeout=90,
