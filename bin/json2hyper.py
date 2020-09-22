@@ -41,9 +41,7 @@ class Column(abc.ABC):
 class PKColumn(Column):
     def to_hyper(self) -> tableauhyperapi.TableDefinition.Column:
         return tableauhyperapi.TableDefinition.Column(
-            self.name,
-            tableauhyperapi.SqlType.big_int(),
-            nullability=tableauhyperapi.NOT_NULLABLE,
+            self.name, tableauhyperapi.SqlType.big_int(), nullability=tableauhyperapi.NOT_NULLABLE,
         )
 
 
@@ -51,9 +49,7 @@ class PKColumn(Column):
 class FKColumn(Column):
     def to_hyper(self) -> tableauhyperapi.TableDefinition.Column:
         return tableauhyperapi.TableDefinition.Column(
-            self.name,
-            tableauhyperapi.SqlType.big_int(),
-            nullability=tableauhyperapi.NULLABLE,
+            self.name, tableauhyperapi.SqlType.big_int(), nullability=tableauhyperapi.NULLABLE,
         )
 
 
@@ -61,9 +57,7 @@ class FKColumn(Column):
 class TextColumn(Column):
     def to_hyper(self) -> tableauhyperapi.TableDefinition.Column:
         return tableauhyperapi.TableDefinition.Column(
-            self.name,
-            tableauhyperapi.SqlType.text(),
-            nullability=tableauhyperapi.NULLABLE,
+            self.name, tableauhyperapi.SqlType.text(), nullability=tableauhyperapi.NULLABLE,
         )
 
 
@@ -71,9 +65,7 @@ class TextColumn(Column):
 class IntColumn(Column):
     def to_hyper(self) -> tableauhyperapi.TableDefinition.Column:
         return tableauhyperapi.TableDefinition.Column(
-            self.name,
-            tableauhyperapi.SqlType.big_int(),
-            nullability=tableauhyperapi.NULLABLE,
+            self.name, tableauhyperapi.SqlType.big_int(), nullability=tableauhyperapi.NULLABLE,
         )
 
 
@@ -81,9 +73,7 @@ class IntColumn(Column):
 class BoolColumn(Column):
     def to_hyper(self) -> tableauhyperapi.TableDefinition.Column:
         return tableauhyperapi.TableDefinition.Column(
-            self.name,
-            tableauhyperapi.SqlType.bool(),
-            nullability=tableauhyperapi.NULLABLE,
+            self.name, tableauhyperapi.SqlType.bool(), nullability=tableauhyperapi.NULLABLE,
         )
 
 
@@ -91,9 +81,7 @@ class BoolColumn(Column):
 class TimestampColumn(Column):
     def to_hyper(self) -> tableauhyperapi.TableDefinition.Column:
         return tableauhyperapi.TableDefinition.Column(
-            self.name,
-            tableauhyperapi.SqlType.timestamp(),
-            nullability=tableauhyperapi.NULLABLE,
+            self.name, tableauhyperapi.SqlType.timestamp(), nullability=tableauhyperapi.NULLABLE,
         )
 
 
@@ -127,10 +115,7 @@ def build_table_defns(graph_sets: Iterable[GraphSet]) -> Mapping[str, Tuple[Colu
             links = resource.links
             simple_obj_types = MappingProxyType(table_names_simple_obj_types[table_name])
             build_table_defns_helper(
-                links,
-                table_name,
-                table_names_columns,
-                simple_obj_types,
+                links, table_name, table_names_columns, simple_obj_types,
             )
     table_defns = {
         table_name: tuple(sorted(columns, key=attrgetter("name")))
@@ -156,37 +141,19 @@ def build_table_defns_helper(
         if isinstance(link, SimpleLink):
             simple_column: Union[IntColumn, BoolColumn, TextColumn]
             if simple_obj_types[link.pred] == set((int,)):
-                simple_column = IntColumn(
-                    name=link.pred,
-                )
+                simple_column = IntColumn(name=link.pred,)
             elif simple_obj_types[link.pred] == set((bool,)):
-                simple_column = BoolColumn(
-                    name=link.pred,
-                )
+                simple_column = BoolColumn(name=link.pred,)
             else:
-                simple_column = TextColumn(
-                    name=link.pred,
-                )
+                simple_column = TextColumn(name=link.pred,)
             table_names_columns[table_name].add(simple_column)
         elif type(link) in (ResourceLinkLink, TransientResourceLinkLink):
-            table_names_columns[table_name].add(
-                FKColumn(
-                    name=f"_{link.pred}_id",
-                )
-            )
+            table_names_columns[table_name].add(FKColumn(name=f"_{link.pred}_id",))
         elif isinstance(link, MultiLink):
             multilink_table_name = f"_{table_name}_{link.pred}"
             # multilink tables have a pk id column and a fk to the parent
-            table_names_columns[multilink_table_name].add(
-                PKColumn(
-                    f"_{multilink_table_name}_id",
-                )
-            )
-            table_names_columns[multilink_table_name].add(
-                FKColumn(
-                    name=f"_{table_name}_id",
-                )
-            )
+            table_names_columns[multilink_table_name].add(PKColumn(f"_{multilink_table_name}_id",))
+            table_names_columns[multilink_table_name].add(FKColumn(name=f"_{table_name}_id",))
             build_table_defns_helper(
                 links=link.obj,
                 table_name=multilink_table_name,
@@ -200,8 +167,7 @@ def build_table_defns_helper(
 
 
 def build_data(
-    graph_sets: Iterable[GraphSet],
-    table_defns: Mapping[str, Tuple[Column, ...]],
+    graph_sets: Iterable[GraphSet], table_defns: Mapping[str, Tuple[Column, ...]],
 ) -> Mapping[str, List[Tuple[Primitive, ...]]]:
     pk_counters: DefaultDict[str, int] = defaultdict(int)
     arns_pks: Dict[str, int] = {}

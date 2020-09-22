@@ -170,7 +170,6 @@ class GraphSet:
             json_data = json.load(json_fp)
             return cls.from_dict(json_data)
 
-
     def merge(self, other: "GraphSet") -> None:
         """Merge another GraphSet into this GraphSet.
 
