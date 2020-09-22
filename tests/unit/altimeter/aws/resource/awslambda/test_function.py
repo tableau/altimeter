@@ -20,7 +20,7 @@ class TestLambdaFunctionResourceSpec(TestCase):
         lambda_client.create_function(
             FunctionName="func_name",
             Runtime="python3.7",
-            Role="testrole",
+            Role=f"arn:aws:iam::{account_id}:role/testrole",
             Handler="testhandler",
             Description="testdescr",
             Timeout=90,
