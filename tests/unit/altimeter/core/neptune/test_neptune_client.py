@@ -28,16 +28,65 @@ class TestNeptuneEndpoint(TestCase):
 
     def test_get_sparql_endpoint(self):
         endpoint = NeptuneEndpoint(host="host", port=5555, region="us-east-1")
-        expected_sparql_endpoint = "http://host:5555/sparql"
+        expected_sparql_endpoint = "https://host:5555/sparql"
 
         sparql_endpoint = endpoint.get_sparql_endpoint()
         self.assertEqual(expected_sparql_endpoint, sparql_endpoint)
 
+    def test_get_sparql_endpoint_ssl_true(self):
+        endpoint = NeptuneEndpoint(host="host", port=5555, region="us-east-1")
+        expected_sparql_endpoint = "https://host:5555/sparql"
+
+        sparql_endpoint = endpoint.get_sparql_endpoint(ssl=True)
+        self.assertEqual(expected_sparql_endpoint, sparql_endpoint)
+
+    def test_get_sparql_endpoint_ssl_false(self):
+        endpoint = NeptuneEndpoint(host="host", port=5555, region="us-east-1")
+        expected_sparql_endpoint = "http://host:5555/sparql"
+
+        sparql_endpoint = endpoint.get_sparql_endpoint(ssl=False)
+        self.assertEqual(expected_sparql_endpoint, sparql_endpoint)
+
     def test_get_loader_endpoint(self):
+        endpoint = NeptuneEndpoint(host="host", port=5555, region="us-east-1")
+        expected_loader_endpoint = "https://host:5555/loader"
+
+        loader_endpoint = endpoint.get_loader_endpoint()
+        self.assertEqual(expected_loader_endpoint, loader_endpoint)
+
+    def test_get_loader_endpoint_ssl_true(self):
+        endpoint = NeptuneEndpoint(host="host", port=5555, region="us-east-1")
+        expected_loader_endpoint = "https://host:5555/loader"
+
+        loader_endpoint = endpoint.get_loader_endpoint(ssl=True)
+        self.assertEqual(expected_loader_endpoint, loader_endpoint)
+
+    def test_get_loader_endpoint_ssl_false(self):
         endpoint = NeptuneEndpoint(host="host", port=5555, region="us-east-1")
         expected_loader_endpoint = "http://host:5555/loader"
 
-        loader_endpoint = endpoint.get_loader_endpoint()
+        loader_endpoint = endpoint.get_loader_endpoint(ssl=False)
+        self.assertEqual(expected_loader_endpoint, loader_endpoint)
+
+    def test_get_gremlin_endpoint(self):
+        endpoint = NeptuneEndpoint(host="host", port=5555, region="us-east-1")
+        expected_loader_endpoint = "wss://host:5555/gremlin"
+
+        loader_endpoint = endpoint.get_gremlin_endpoint()
+        self.assertEqual(expected_loader_endpoint, loader_endpoint)
+
+    def test_get_gremlin_endpoint_ssl_true(self):
+        endpoint = NeptuneEndpoint(host="host", port=5555, region="us-east-1")
+        expected_loader_endpoint = "wss://host:5555/gremlin"
+
+        loader_endpoint = endpoint.get_gremlin_endpoint(ssl=True)
+        self.assertEqual(expected_loader_endpoint, loader_endpoint)
+
+    def test_get_gremlin_endpoint_ssl_false(self):
+        endpoint = NeptuneEndpoint(host="host", port=5555, region="us-east-1")
+        expected_loader_endpoint = "ws://host:5555/gremlin"
+
+        loader_endpoint = endpoint.get_gremlin_endpoint(ssl=False)
         self.assertEqual(expected_loader_endpoint, loader_endpoint)
 
 
