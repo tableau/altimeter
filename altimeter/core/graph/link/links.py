@@ -40,7 +40,7 @@ class SimpleLink(Link):
         """Convert this link to the appropriate vertices, edges, and properties
 
         Args:
-             parent: the parent dictionary vertex
+             :parent: the parent dictionary vertex
              :param vertices: the list of all vertex dictionaries
              :param edges: the list of all edge dictionaries
              :param prefix: the prefix assigned to the key
@@ -97,7 +97,7 @@ class MultiLink(Link):
         """Convert this link to the appropriate vertices, edges, and properties
 
         Args:
-             parent: the parent dictionary vertex
+             :parent: the parent dictionary vertex
              vertices: the list of all vertex dictionaries
              edges: the list of all edge dictionaries
              prefix: A string to prefix the property name with
@@ -147,7 +147,7 @@ class ResourceLinkLink(Link):
         """Convert this link to the appropriate vertices, edges, and properties
 
         Args:
-             parent: the parent dictionary vertex
+             :parent: the parent dictionary vertex
              vertices: the list of all vertex dictionaries
              edges: the list of all edge dictionaries
              prefix: string to prefix the property name with
@@ -187,7 +187,7 @@ class TransientResourceLinkLink(Link):
         """Convert this link to the appropriate vertices, edges, and properties
 
         Args:
-             parent: the parent dictionary vertex
+             :parent: the parent dictionary vertex
              vertices: the list of all vertex dictionaries
              edges: the list of all edge dictionaries
              prefix: string to prefix the property name with
@@ -234,7 +234,7 @@ class TagLink(Link):
         """Convert this link to the appropriate vertices, edges, and properties
 
         Args:
-             parent: the parent dictionary vertex
+             :parent:git  the parent dictionary vertex
              vertices: the list of all vertex dictionaries
              edges: the list of all edge dictionaries
              prefix: string to prefix the property name with
