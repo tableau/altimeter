@@ -1,6 +1,6 @@
 import abc
 import inspect
-from typing import Any, Dict
+from typing import Any, Dict, List
 
 from rdflib import BNode, Namespace, Graph
 
@@ -64,4 +64,16 @@ class Link(abc.ABC):
              namespace: RDF namespace to use for this triple's predicate
              graph: RDF graph
              node_cache: NodeCache to use to find cached nodes.
+        """
+
+    @abc.abstractmethod
+    def to_lpg(self, parent: Dict, vertices: List[Dict], edges: List[Dict], prefix: str) -> None:
+        """Graph this link on a BNode in a Graph using a given Namespace to create the full
+        predicate.
+
+        Args:
+             parent: a dictionary og the parent
+             vertices: a list of dictionaries of the vertices for a labeled property graph
+             edges: a list of dictionaries of the edges for a labeled property graph
+             prefix: a prefix to add to the attribute name
         """

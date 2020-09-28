@@ -1,12 +1,21 @@
 """Client for loading and accessing Altimeter generated data in Neptune"""
+import hmac
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 import time
-from typing import Dict, List, Optional, Set
+import requests
+import hashlib
+from typing import Dict, List, Optional, Set, Tuple
 
 from aws_requests_auth.aws_auth import AWSRequestsAuth
 import boto3
-import requests
+
+from gremlin_python.process.graph_traversal import __
+from gremlin_python.process.anonymous_traversal import traversal
+from gremlin_python.driver.driver_remote_connection import DriverRemoteConnection
+from gremlin_python.process.traversal import T
+from tornado import httpclient
+from urllib import parse
 
 from altimeter.core.exceptions import AltimeterException
 from altimeter.core.log import Logger
@@ -60,6 +69,8 @@ class NeptuneEndpoint:
     host: str
     port: int
     region: str
+    ssl: bool = True
+    auth_mode: str = "DEFAULT"
 
     def get_endpoint_str(self) -> str:
         """Get the endpoint as a string in host:port format
@@ -69,21 +80,38 @@ class NeptuneEndpoint:
         """
         return f"{self.host}:{self.port}"
 
-    def get_sparql_endpoint(self) -> str:
+    def get_sparql_endpoint(self, ssl: bool = True) -> str:
         """Get the sparql query url for this Neptune endpoint
 
         Returns:
             sparql query endpoint url
         """
-        return f"http://{self.get_endpoint_str()}/sparql"
+        if ssl:
+            return f"https://{self.get_endpoint_str()}/sparql"
+        else:
+            return f"http://{self.get_endpoint_str()}/sparql"
 
-    def get_loader_endpoint(self) -> str:
+    def get_loader_endpoint(self, ssl: bool = True) -> str:
         """Get the loader url for this Neptune endpoint
 
         Returns:
             loader endpoint url
         """
-        return f"http://{self.get_endpoint_str()}/loader"
+        if ssl:
+            return f"https://{self.get_endpoint_str()}/loader"
+        else:
+            return f"http://{self.get_endpoint_str()}/loader"
+
+    def get_gremlin_endpoint(self, ssl: bool = True) -> str:
+        """Get the loader url for this Neptune endpoint
+
+        Returns:
+            loader endpoint url
+        """
+        if ssl:
+            return f"wss://{self.get_endpoint_str()}/gremlin"
+        else:
+            return f"ws://{self.get_endpoint_str()}/gremlin"
 
 
 def discover_neptune_endpoint() -> NeptuneEndpoint:
@@ -125,6 +153,17 @@ class GraphMetadata:
     end_time: int
 
 
+class RequestParameters:
+    """
+    Holds the request parameters for Sigv4Signing
+    """
+
+    def __init__(self, uri: str, querystring: str, headers: Dict):
+        self.uri = uri
+        self.querystring = querystring
+        self.headers = headers
+
+
 class AltimeterNeptuneClient:
     """Client to run sparql queries against a neptune instance using graph name conventions to
     determine most recent graph.
@@ -142,6 +181,7 @@ class AltimeterNeptuneClient:
         # initially set this to a time in the past such that _get_auth's logic is simpler
         # regarding first run.
         self._auth_expiration = datetime.now() - timedelta(hours=24)
+        self.logger = Logger()
 
     def run_query(self, graph_names: Set[str], query: str) -> QueryResult:
         """Runs a SPARQL query against the latest available graphs given a list of
@@ -192,7 +232,7 @@ class AltimeterNeptuneClient:
             start_time=graph_start_time,
             end_time=graph_end_time,
         )
-        logger = Logger()
+        logger = self.logger
         with logger.bind(
             rdf_bucket=bucket,
             rdf_key=key,
@@ -528,3 +568,283 @@ class AltimeterNeptuneClient:
         if resp.status_code != 200:
             raise NeptuneQueryException(f"Error running query {query}: {resp.text}")
         return QueryResultSet.from_sparql_endpoint_json(resp.json())
+
+    @staticmethod
+    def __normalize_query_string(query: str) -> str:
+        """Normalize the query string"""
+        kv = (list(map(str.strip, s.split("="))) for s in query.split("&") if len(s) > 0)
+
+        normalized = "&".join("%s=%s" % (p[0], p[1] if len(p) > 1 else "") for p in sorted(kv))
+        return normalized
+
+    def __get_signature_key(
+        self, key: str, datestamp: str, regionname: str, servicename: str
+    ) -> bytes:
+        """Get the signed signature key
+        :return: The signed key
+        """
+        key_date = self.__sign(("AWS4" + key).encode("utf-8"), datestamp)
+        key_region = self.__sign(key_date, regionname)
+        key_service = self.__sign(key_region, servicename)
+        key_signing = self.__sign(key_service, "aws4_request")
+        return key_signing
+
+    @staticmethod
+    def __sign(key: bytes, msg: str) -> bytes:
+        """ Sign the msg with the key """
+        return hmac.new(key, msg.encode("utf-8"), hashlib.sha256).digest()
+
+    def prepare_request(
+        self, method: str = "GET", payload: str = "", querystring: Dict = {}
+    ) -> RequestParameters:
+        """
+        This prepares the request for sigv4signing.  This is heavily influenced by the code here:
+        https://github.com/awslabs/amazon-neptune-tools/tree/master/neptune-python-utils
+        :param method: The method name
+        :param payload: The request payload
+        :param querystring: The request querystring
+        :return: The request parameters
+        """
+        session = boto3.Session()
+        credentials = session.get_credentials()
+        access_key = credentials.access_key
+        secret_key = credentials.secret_key
+        session_token = credentials.token
+
+        service = "neptune-db"
+        algorithm = "AWS4-HMAC-SHA256"
+
+        request_parameters = parse.urlencode(querystring).replace("%27", "%22")
+        canonical_querystring = self.__normalize_query_string(request_parameters)
+
+        t = datetime.utcnow()
+        amz_date = t.strftime("%Y%m%dT%H%M%SZ")
+        datestamp = t.strftime("%Y%m%d")
+        canonical_headers = "host:{}:{}\nx-amz-date:{}\n".format(
+            self._neptune_endpoint.host, self._neptune_endpoint.port, amz_date
+        )
+        signed_headers = "host;x-amz-date"
+        payload_hash = hashlib.sha256(payload.encode("utf-8")).hexdigest()
+        canonical_request = "{}\n/{}\n{}\n{}\n{}\n{}".format(
+            method,
+            "gremlin",
+            canonical_querystring,
+            canonical_headers,
+            signed_headers,
+            payload_hash,
+        )
+        credential_scope = "{}/{}/{}/aws4_request".format(
+            datestamp, self._neptune_endpoint.region, service
+        )
+        string_to_sign = "{}\n{}\n{}\n{}".format(
+            algorithm,
+            amz_date,
+            credential_scope,
+            hashlib.sha256(canonical_request.encode("utf-8")).hexdigest(),
+        )
+        signing_key = self.__get_signature_key(
+            secret_key, datestamp, self._neptune_endpoint.region, service
+        )
+        signature = hmac.new(
+            signing_key, string_to_sign.encode("utf-8"), hashlib.sha256
+        ).hexdigest()
+        authorization_header = "{} Credential={}/{}, SignedHeaders={}, Signature={}".format(
+            algorithm, access_key, credential_scope, signed_headers, signature
+        )
+        headers = {"x-amz-date": amz_date, "Authorization": authorization_header}
+        if session_token:
+            headers["x-amz-security-token"] = session_token
+        return RequestParameters(
+            "{}?{}".format(
+                self._neptune_endpoint.get_gremlin_endpoint(self._neptune_endpoint.ssl),
+                canonical_querystring,
+            )
+            if canonical_querystring
+            else self._neptune_endpoint.get_gremlin_endpoint(),
+            canonical_querystring,
+            headers,
+        )
+
+    def connect_to_gremlin(self) -> Tuple[traversal, DriverRemoteConnection]:
+        """
+        Get the Gremlin traversal and connection for the Neptune endpoint
+        :return: The Traversal object
+        """
+        if self._neptune_endpoint.auth_mode.lower() == "default":
+            gremlin_connection = DriverRemoteConnection(
+                self._neptune_endpoint.get_gremlin_endpoint(self._neptune_endpoint.ssl), "g"
+            )
+        else:
+            request_parameters = self.prepare_request()
+            signed_ws_request = httpclient.HTTPRequest(
+                request_parameters.uri, headers=request_parameters.headers
+            )
+            gremlin_connection = DriverRemoteConnection(signed_ws_request, "g")
+        graph_traversal_source = traversal().withRemote(gremlin_connection)
+
+        return graph_traversal_source, gremlin_connection
+
+    def __write_vertices(self, g: traversal, vertices: List[Dict], scan_id: str) -> None:
+        """
+        Writes the vertices to the labeled property graph
+        :param g: The graph traversal source
+        :param vertices: A list of dictionaries for each vertex
+        :return: None
+        """
+        cnt = 0
+        t = g
+        for r in vertices:
+            vertex_id = f'{r["~id"]}_{scan_id}'
+            t = (
+                t.V(vertex_id)
+                .fold()
+                .coalesce(
+                    __.unfold(),
+                    __.addV(self.parse_arn(r["~label"])["resource"]).property(T.id, vertex_id),
+                )
+            )
+            for k in r.keys():
+                # Need to handle numbers that are bigger than a Long in Java, for now we stringify it
+                if isinstance(r[k], int) and (
+                    r[k] > 9223372036854775807 or r[k] < -9223372036854775807
+                ):
+                    r[k] = str(r[k])
+                if k not in ["~id", "~label"]:
+                    t = t.property(k, r[k])
+            cnt += 1
+            if cnt % 100 == 0 or cnt == len(vertices):
+                try:
+                    self.logger.info(
+                        event=LogEvent.NeptunePeriodicWrite,
+                        msg=f"Writing vertices {cnt} of {len(vertices)}",
+                    )
+                    t.next()
+                    t = g
+                except Exception as err:
+                    print(str(err))
+                    raise NeptuneLoadGraphException(
+                        f"Error loading vertex {r} " f"with {str(t.bytecode)}"
+                    )
+
+    def __write_edges(self, g: traversal, edges: List[Dict], scan_id: str) -> None:
+        """
+        Writes the edges to the labeled property graph
+        :param g: The graph traversal source
+        :param edges: A list of dictionaries for each edge
+        :return: None
+        """
+        cnt = 0
+        t = g
+        for r in edges:
+            to_id = f'{r["~to"]}_{scan_id}'
+            from_id = f'{r["~from"]}_{scan_id}'
+            t = (
+                t.addE(r["~label"])
+                .property(T.id, str(r["~id"]))
+                .from_(
+                    __.V(from_id)
+                    .fold()
+                    .coalesce(
+                        __.unfold(),
+                        __.addV(self.parse_arn(r["~from"])["resource"])
+                        .property(T.id, from_id)
+                        .property("scan_id", scan_id)
+                        .property("arn", r["~from"]),
+                    )
+                )
+                .to(
+                    __.V(to_id)
+                    .fold()
+                    .coalesce(
+                        __.unfold(),
+                        __.addV(self.parse_arn(r["~to"])["resource"])
+                        .property(T.id, to_id)
+                        .property("scan_id", scan_id)
+                        .property("arn", r["~to"]),
+                    )
+                )
+            )
+            cnt += 1
+            if cnt % 100 == 0 or cnt == len(edges):
+                try:
+                    self.logger.info(
+                        event=LogEvent.NeptunePeriodicWrite,
+                        msg=f"Writing edges {cnt} of {len(edges)}",
+                    )
+                    t.next()
+                    t = g
+                except Exception as err:
+                    self.logger.error(event=LogEvent.NeptuneLoadError, msg=str(err))
+                    raise NeptuneLoadGraphException(
+                        f"Error loading edge {r} " f"with {str(t.bytecode)}"
+                    )
+
+    @staticmethod
+    def parse_arn(arn: str) -> Dict:
+        """
+        Parses an ARN into the component pieces
+        :param arn: The arn to parse
+        :return: A dictionary of the arn pieces
+        """
+        # http://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html
+        elements = str(arn).split(":", 5)
+        result = {}
+        if len(elements) == 6:
+            result = {
+                "arn": elements[0],
+                "partition": elements[1],
+                "service": elements[2],
+                "region": elements[3],
+                "account": elements[4],
+                "resource": elements[5],
+                "resource_type": None,
+            }
+        else:
+            result["resource"] = str(arn)
+        if "/" in str(result["resource"]):
+            result["resource_type"], result["resource"] = str(result["resource"]).split("/", 1)
+        elif ":" in str(result["resource"]):
+            result["resource_type"], result["resource"] = str(result["resource"]).split(":", 1)
+
+        if str(result["resource"]).startswith("ami-"):
+            result["resource"] = result["resource_type"]
+
+        return result
+
+    def write_to_neptune_lpg(self, graph: Dict, scan_id: str) -> None:
+        """
+        Writes the graph to a labeled property graph
+        :param scan_id: The unique string representing the scan
+        :param graph: The graph to write
+        :return: None
+        """
+        if "vertices" in graph and "edges" in graph and len(graph["vertices"]) > 0:
+            g, conn = self.connect_to_gremlin()
+            self.__write_vertices(g, graph["vertices"], scan_id)
+            self.__write_edges(g, graph["edges"], scan_id)
+            conn.close()
+        else:
+            raise NeptuneNoGraphsFoundException
+
+    def write_to_neptune_rdf(self, graph: Dict) -> None:
+        """
+        Writes the graph to an RDF graph
+        :param graph: The graph to write
+        :return: None
+        """
+
+        auth = self._get_auth()
+        neptune_sparql_url = self._neptune_endpoint.get_sparql_endpoint()
+        triples = ""
+        for subject, predicate, obj in graph:
+            triples = triples + subject.n3() + " " + predicate.n3() + " " + obj.n3() + " . \n"
+
+        insert_stmt = (
+            "INSERT DATA {\n" + f"    GRAPH <{META_GRAPH_NAME}>\n" "{\n" f"{triples}" "}\n" "}\n"
+        )
+
+        resp = requests.post(neptune_sparql_url, data={"update": insert_stmt}, auth=auth)
+        if resp.status_code != 200:
+            raise NeptuneUpdateGraphException(
+                f"Error updating graph {META_GRAPH_NAME} " f"with {insert_stmt} : {resp.text}"
+            )

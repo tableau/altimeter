@@ -22,6 +22,12 @@ class LogEvent(BaseLogEvent):
     NeptuneLoadPolling: EventName
     NeptuneLoadError: EventName
 
+    NeptuneRDFWriteStart: EventName
+    NeptuneRDFWriteEnd: EventName
+    NeptuneGremlinWriteStart: EventName
+    NeptuneGremlinWriteEnd: EventName
+    NeptunePeriodicWrite: EventName
+
     PruneNeptuneGraphStart: EventName
     PruneNeptuneGraphEnd: EventName
     PruneNeptuneGraphError: EventName

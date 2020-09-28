@@ -61,6 +61,17 @@ def get_optional_bool_param(key: str, config_dict: Dict[str, Any]) -> Optional[b
     return value
 
 
+def get_optional_str_param(key: str, config_dict: Dict[str, Any]) -> Optional[str]:
+    """Get a str parameter by key from a config dict. Return None if it does not exist,
+    raise InvalidConfigException if its value is not a bool."""
+    value = _get_optional_param(key, config_dict)
+    if value is None:
+        return None
+    if not isinstance(value, str):
+        raise InvalidConfigException(f"Parameter '{key}' should be a str. Is {type(value)}")
+    return value
+
+
 def get_required_int_param(key: str, config_dict: Dict[str, Any]) -> int:
     """Get a int parameter by key from a config dict. Raise InvalidConfigException if it does
     not exist or its value is not a int."""
@@ -184,8 +195,12 @@ class NeptuneConfig:
     host: str
     port: int
     region: str
-    iam_role_arn: str
-    graph_load_sns_topic_arn: str
+    iam_role_arn: Optional[str] = ""
+    graph_load_sns_topic_arn: Optional[str] = ""
+    ssl: Optional[bool] = True
+    use_lpg: Optional[bool] = False
+    iam_credentials_provider_type: Optional[str] = ""
+    auth_mode: Optional[str] = ""
 
     @classmethod
     def from_dict(cls: Type["NeptuneConfig"], config_dict: Dict[str, Any]) -> "NeptuneConfig":
@@ -193,14 +208,20 @@ class NeptuneConfig:
         host = get_required_str_param("host", config_dict)
         port = get_required_int_param("port", config_dict)
         region = get_required_str_param("region", config_dict)
-        iam_role_arn = get_required_str_param("iam_role_arn", config_dict)
-        graph_load_sns_topic_arn = get_required_str_param("graph_load_sns_topic_arn", config_dict)
+        ssl = get_optional_bool_param("ssl", config_dict)
+        use_lpg = get_optional_bool_param("use_lpg", config_dict)
+        iam_role_arn = get_optional_str_param("iam_role_arn", config_dict)
+        auth_mode = get_optional_str_param("auth_mode", config_dict)
+        graph_load_sns_topic_arn = get_optional_str_param("graph_load_sns_topic_arn", config_dict)
         return NeptuneConfig(
             host=host,
             port=port,
             region=region,
+            ssl=ssl,
+            use_lpg=use_lpg,
             iam_role_arn=iam_role_arn,
             graph_load_sns_topic_arn=graph_load_sns_topic_arn,
+            auth_mode=auth_mode,
         )
 
 
@@ -228,14 +249,6 @@ class Config:
             if key_prefix is not None:
                 raise InvalidConfigException(
                     f"S3 artifact_path should be s3://<bucket>, no key - got {self.artifact_path}"
-                )
-        if self.neptune:
-            if not is_s3_uri(self.artifact_path):
-                raise InvalidConfigException(
-                    (
-                        "Neptune config is only supported if artifact_path is an s3 uri "
-                        f"(s3://bucket).  artifact_path is '{self.artifact_path}'."
-                    )
                 )
 
     @classmethod
