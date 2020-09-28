@@ -302,6 +302,7 @@ def scan_scan_unit(scan_unit: ScanUnit) -> Tuple[str, Dict[str, Any]]:
     with logger.bind(
         account_id=scan_unit.account_id, region=scan_unit.region_name, service=scan_unit.service
     ):
+        start_t = time.time()
         logger.info(event=AWSLogEvents.ScanAWSAccountServiceStart)
         session = boto3.Session(
             aws_access_key_id=scan_unit.access_key,
@@ -341,7 +342,9 @@ def scan_scan_unit(scan_unit: ScanUnit) -> Tuple[str, Dict[str, Any]]:
             errors=errors,
             stats=scan_accessor.api_call_stats,
         )
-        logger.info(event=AWSLogEvents.ScanAWSAccountServiceEnd)
+        end_t = time.time()
+        elapsed_sec = end_t - start_t
+        logger.info(event=AWSLogEvents.ScanAWSAccountServiceEnd, elapsed_sec=elapsed_sec)
         return (scan_unit.account_id, graph_set.to_dict())
 
 
