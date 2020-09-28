@@ -84,8 +84,8 @@ class AWSScanMuxer(abc.ABC):
                     logger.info(
                         event=AWSLogEvents.MuxerStat,
                         num_scanned=processed_accounts,
-                        scanned_account_ids=scanned_account_ids,
-                        unscanned_account_ids=unscanned_account_ids,
+                        scanned_account_ids=sorted(scanned_account_ids),
+                        unscanned_account_ids=sorted(unscanned_account_ids),
                     )
             logger.info(event=AWSLogEvents.MuxerEnd)
 
