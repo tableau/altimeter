@@ -137,6 +137,7 @@ class ScanConfig:
     scan_sub_accounts: bool
     preferred_account_scan_regions: Tuple[str, ...]
     single_account_mode: bool
+    scan_lambda_tcp_keepalive: Optional[bool] = False
 
     @classmethod
     def from_dict(cls: Type["ScanConfig"], config_dict: Dict[str, Any]) -> "ScanConfig":

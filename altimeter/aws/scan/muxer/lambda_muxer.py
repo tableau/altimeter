@@ -51,11 +51,14 @@ class LambdaAWSScanMuxer(AWSScanMuxer):
             invoke_lambda,
             self.account_scan_lambda_name,
             self.account_scan_lambda_timeout,
+            self.config.scan.scan_lambda_tcp_keepalive,
             lambda_event,
         )
 
 
-def invoke_lambda(lambda_name: str, lambda_timeout: int, event: Dict[str, Any]) -> Dict[str, Any]:
+def invoke_lambda(
+    lambda_name: str, lambda_timeout: int, tcp_keepalive: bool, event: Dict[str, Any]
+) -> Dict[str, Any]:
     """Invoke an AWS Lambda function
 
     Args:
@@ -74,7 +77,9 @@ def invoke_lambda(lambda_name: str, lambda_timeout: int, event: Dict[str, Any]) 
     with logger.bind(lambda_name=lambda_name, lambda_timeout=lambda_timeout):
         logger.info(event=AWSLogEvents.RunAccountScanLambdaStart)
         boto_config = botocore.config.Config(
-            read_timeout=lambda_timeout + 10, retries={"max_attempts": 0}
+            read_timeout=lambda_timeout + 10,
+            retries={"max_attempts": 0},
+            tcp_keepalive=tcp_keepalive,
         )
         session = boto3.Session()
         lambda_client = session.client("lambda", config=boto_config)
