@@ -1,6 +1,8 @@
 """AWSScanMuxer that runs account scans one-per-lambda"""
 from concurrent.futures import Future, ThreadPoolExecutor
+from configparser import ConfigParser
 import json
+from pathlib import Path
 from typing import Any, Dict
 
 import boto3
@@ -33,6 +35,14 @@ class LambdaAWSScanMuxer(AWSScanMuxer):
         super().__init__(scan_id=scan_id, config=config)
         self.account_scan_lambda_name = account_scan_lambda_name
         self.account_scan_lambda_timeout = account_scan_lambda_timeout
+        if self.config.scan.scan_lambda_tcp_keepalive:
+            config_file = ConfigParser()
+            config_file["default"] = {"tcp_keepalive": "true"}
+            config_dir = Path.home().joinpath(".aws")
+            config_dir.mkdir(exist_ok=True)
+            config_filepath = config_dir.joinpath("config")
+            with config_filepath.open("w") as config_fp:
+                config_file.write(config_fp)
 
     def _schedule_account_scan(
         self, executor: ThreadPoolExecutor, account_scan_plan: AccountScanPlan
@@ -51,14 +61,11 @@ class LambdaAWSScanMuxer(AWSScanMuxer):
             invoke_lambda,
             self.account_scan_lambda_name,
             self.account_scan_lambda_timeout,
-            self.config.scan.scan_lambda_tcp_keepalive,
             lambda_event,
         )
 
 
-def invoke_lambda(
-    lambda_name: str, lambda_timeout: int, tcp_keepalive: bool, event: Dict[str, Any]
-) -> Dict[str, Any]:
+def invoke_lambda(lambda_name: str, lambda_timeout: int, event: Dict[str, Any]) -> Dict[str, Any]:
     """Invoke an AWS Lambda function
 
     Args:
@@ -77,9 +84,7 @@ def invoke_lambda(
     with logger.bind(lambda_name=lambda_name, lambda_timeout=lambda_timeout):
         logger.info(event=AWSLogEvents.RunAccountScanLambdaStart)
         boto_config = botocore.config.Config(
-            read_timeout=lambda_timeout + 10,
-            retries={"max_attempts": 0},
-            tcp_keepalive=tcp_keepalive,
+            read_timeout=lambda_timeout + 10, retries={"max_attempts": 0},
         )
         session = boto3.Session()
         lambda_client = session.client("lambda", config=boto_config)
