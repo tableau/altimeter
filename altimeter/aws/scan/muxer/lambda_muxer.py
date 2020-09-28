@@ -4,7 +4,6 @@ from configparser import ConfigParser
 import json
 from pathlib import Path
 from typing import Any, Dict, List
-from urllib3.exceptions import ReadTimeoutError
 
 import boto3
 import botocore
@@ -99,8 +98,8 @@ def invoke_lambda(
             resp = lambda_client.invoke(
                 FunctionName=lambda_name, Payload=json.dumps(event).encode("utf-8")
             )
-        except ReadTimeoutError as rte:
-            error = str(rte)
+        except Exception as invoke_ex:
+            error = str(invoke_ex)
             logger.info(event=AWSLogEvents.RunAccountScanLambdaError, error=error)
             return [
                 {
