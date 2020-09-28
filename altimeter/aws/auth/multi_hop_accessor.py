@@ -6,6 +6,7 @@ from typing import Any, Dict, List, Optional, Type
 
 import boto3
 import jinja2
+from jinja2 import Environment, select_autoescape
 
 from altimeter.aws.auth.cache import AWSCredentials, AWSCredentialsCache
 from altimeter.core.log import Logger
@@ -40,7 +41,11 @@ class AccessStep:
         external_id = data.get("external_id")
         if external_id is not None:
             template = jinja2.Environment(
-                loader=jinja2.BaseLoader(), undefined=jinja2.StrictUndefined
+                loader=jinja2.BaseLoader(),
+                undefined=jinja2.StrictUndefined,
+                autoescape=select_autoescape(
+                    enabled_extensions=("html", "xml"), default_for_string=True
+                ),
             ).from_string(external_id)
             external_id = template.render(env=os.environ)
         return cls(role_name=role_name, account_id=account_id, external_id=external_id)

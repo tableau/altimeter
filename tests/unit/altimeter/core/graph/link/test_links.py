@@ -70,6 +70,9 @@ class TestLinkSubclassing(unittest.TestCase):
                 def to_rdf(self, subj, namespace, graph, node_cache):
                     pass
 
+                def to_lpg(self, subj, namespace, graph, node_cache):
+                    pass
+
     def testInitAbstractSubclass(self):
         class LinkSubClass(Link):
             pass
@@ -133,6 +136,50 @@ class TestSimpleLink(unittest.TestCase):
             _, _, o = result
             self.assertEqual(o.datatype, URIRef("http://www.w3.org/2001/XMLSchema#integer"))
 
+    def testToLpg(self):
+        pred = "test-pred"
+        obj = "test-obj"
+        link = SimpleLink(pred=pred, obj=obj)
+        expected_link_dict = {"test-pred": "test-obj"}
+        parent = {}
+        vertices = []
+        edges = []
+        link.to_lpg(parent, vertices, edges, "")
+        self.assertDictEqual(expected_link_dict, parent)
+
+    def testToLpgPrefix(self):
+        pred = "test-pred"
+        obj = "test-obj"
+        link = SimpleLink(pred=pred, obj=obj)
+        expected_link_dict = {"abctest-pred": "test-obj"}
+        parent = {}
+        vertices = []
+        edges = []
+        link.to_lpg(parent, vertices, edges, "abc")
+        self.assertDictEqual(expected_link_dict, parent)
+
+    def testToLpgSmallInt(self):
+        pred = "test-pred"
+        obj = 1
+        link = SimpleLink(pred=pred, obj=obj)
+        expected_link_dict = {"test-pred": 1}
+        parent = {}
+        vertices = []
+        edges = []
+        link.to_lpg(parent, vertices, edges, "")
+        self.assertDictEqual(expected_link_dict, parent)
+
+    def testToLpgLargeInt(self):
+        pred = "test-pred"
+        obj = 9223372036854775808
+        link = SimpleLink(pred=pred, obj=obj)
+        expected_link_dict = {"test-pred": "9223372036854775808"}
+        parent = {}
+        vertices = []
+        edges = []
+        link.to_lpg(parent, vertices, edges, "")
+        self.assertDictEqual(expected_link_dict, parent)
+
 
 class TestMultiLink(unittest.TestCase):
     def testToJson(self):
@@ -159,8 +206,8 @@ class TestMultiLink(unittest.TestCase):
         pred = "test-multi-pred"
         obj = [
             SimpleLink(pred="test-simple-pred-1", obj="test-simple-obj-1"),
-            SimpleLink(pred="test-simple-pred-1", obj="test-simple-obj-2"),
-            SimpleLink(pred="test-simple-pred-2", obj="test-simple-obj-3"),
+            SimpleLink(pred="test-simple-pred-2", obj="test-simple-obj-2"),
+            SimpleLink(pred="test-simple-pred-3", obj="test-simple-obj-3"),
         ]
         link = MultiLink(pred=pred, obj=obj)
         bnode = BNode()
@@ -178,10 +225,28 @@ class TestMultiLink(unittest.TestCase):
         expected_result_tuples = [
             ("http://www.w3.org/1999/02/22-rdf-syntax-ns#type", "test:test-multi-pred"),
             ("test:test-simple-pred-1", "test-simple-obj-1"),
-            ("test:test-simple-pred-1", "test-simple-obj-2"),
-            ("test:test-simple-pred-2", "test-simple-obj-3"),
+            ("test:test-simple-pred-2", "test-simple-obj-2"),
+            ("test:test-simple-pred-3", "test-simple-obj-3"),
         ]
         self.assertEqual(result_tuples, expected_result_tuples)
+
+    def testToLpg(self):
+        pred = "test-multi-pred"
+        obj = [
+            SimpleLink(pred="test-simple-pred-1", obj="test-simple-obj-1"),
+            SimpleLink(pred="test-simple-pred-2", obj="test-simple-obj-2"),
+            SimpleLink(pred="test-simple-pred-3", obj="test-simple-obj-3"),
+        ]
+        link = MultiLink(pred=pred, obj=obj)
+        expected_link_dict = {"test-multi-pred.test-simple-pred-1": "test-simple-obj-1",
+                              "test-multi-pred.test-simple-pred-2": "test-simple-obj-2",
+                              "test-multi-pred.test-simple-pred-3": "test-simple-obj-3",
+                              }
+        parent = {}
+        vertices = []
+        edges = []
+        link.to_lpg(parent, vertices, edges, "")
+        self.assertDictEqual(expected_link_dict, parent)
 
 
 class TestResourceLink(unittest.TestCase):
@@ -208,6 +273,19 @@ class TestResourceLink(unittest.TestCase):
             self.assertEqual(s, bnode)
             self.assertEqual(str(p), "test:test-pred")
             self.assertEqual(o, obj_bnode)
+
+    def testToLpg(self):
+        pred = "test-pred"
+        obj = "test-obj"
+        link = ResourceLinkLink(pred=pred, obj=obj)
+        parent = {"~id": "123"}
+        vertices = []
+        edges = []
+        link.to_lpg(parent, vertices, edges, "")
+        self.assertEqual(1, len(edges))
+        self.assertEqual("resource_link", edges[0]["~label"])
+        self.assertEqual(parent["~id"], edges[0]["~from"])
+        self.assertEqual("test-obj", edges[0]["~to"])
 
 
 class TestTransientResourceLink(unittest.TestCase):
@@ -236,6 +314,20 @@ class TestTransientResourceLink(unittest.TestCase):
             self.assertEqual(s, bnode)
             self.assertEqual(str(p), "test:test-pred")
             self.assertEqual(o, obj_bnode)
+
+
+    def testToLpg(self):
+        pred = "test-pred"
+        obj = "test-obj"
+        link = TransientResourceLinkLink(pred=pred, obj=obj)
+        parent = {"~id": "123"}
+        vertices = []
+        edges = []
+        link.to_lpg(parent, vertices, edges, "")
+        self.assertEqual(1, len(edges))
+        self.assertEqual("transient_resource_link", edges[0]["~label"])
+        self.assertEqual(parent["~id"], edges[0]["~from"])
+        self.assertEqual("test-obj", edges[0]["~to"])
 
 
 class TestTagLink(unittest.TestCase):
@@ -299,3 +391,21 @@ class TestTagLink(unittest.TestCase):
             s, p, o = result
             result_tuples.append((s, p, o))
         self.assertEqual(expected_result_tuples, result_tuples)
+
+    def testToLpg(self):
+        pred = "test-pred"
+        obj = "test-obj"
+        link = TagLink(pred=pred, obj=obj)
+        parent = {"~id": "123"}
+        vertices = []
+        edges = []
+        link.to_lpg(parent, vertices, edges, "")
+        self.assertEqual(1, len(vertices))
+        self.assertEqual("test-pred:test-obj", vertices[0]["~id"])
+        self.assertEqual("tag", vertices[0]["~label"])
+        self.assertEqual("test-obj", vertices[0]["test-pred"])
+
+        self.assertEqual(1, len(edges))
+        self.assertEqual("tagged", edges[0]["~label"])
+        self.assertEqual(parent["~id"], edges[0]["~from"])
+        self.assertEqual("test-pred:test-obj", edges[0]["~to"])

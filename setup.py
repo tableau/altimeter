@@ -21,6 +21,7 @@ setup(
         "boto3>=1.9.130,<2",
         "jinja2>=2.11.1,<3",
         "toml>=0.10.0,<1",
+        "gremlinpython>=3.4.3"
     ],
     extras_require={
         "qj": [
@@ -50,6 +51,7 @@ setup(
         "bin/account_scan.py",
         "bin/altimeter",
         "bin/aws2n.py",
+        "bin/aws2neptune.py",
         "bin/graphpruner.py",
         "bin/json2hyper.py",
         "bin/rdf2blaze",

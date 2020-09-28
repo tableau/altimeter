@@ -4,6 +4,19 @@
 # JetBrains IDE project files (e.g. PyCharm)
 .idea
 
+# VSCode IDE project files (e.g. PyCharm)
+.vscode
+
+# Environments
+myvenv/
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
 # Python binary artifacts we generally never want to check in.
 *.pyc
 __pycache__/
@@ -15,6 +28,9 @@ htmlcov/
 
 # mypy cache
 .mypy_cache
+
+#pytest cache
+.pytest_cache
 
 # Build artifacts
 dist/

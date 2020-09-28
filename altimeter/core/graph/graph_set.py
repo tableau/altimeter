@@ -1,4 +1,5 @@
 """A GraphSet represents the contents of a Graph."""
+import uuid
 from collections import defaultdict
 import json
 from pathlib import Path
@@ -71,6 +72,47 @@ class GraphSet:
         for resource in self.resources:
             resource.to_rdf(namespace=namespace, graph=graph, node_cache=node_cache)
         return graph
+
+    def to_neptune_lpg(self, scan_id: str) -> Dict:
+        vertices = []
+        edges = []
+        vertex = {
+            "~id": scan_id,
+            "~label": "metadata",
+            "name": self.name,
+            "version": self.version,
+            "start_time": self.start_time,
+            "end_time": self.end_time,
+        }
+        vertices.append(vertex)
+        for error in self.errors:
+            vertex = {"~id": str(uuid.uuid1()), "~label": "error", "error": error}
+            vertices.append(vertex)
+            edges.append(
+                {
+                    "~id": str(uuid.uuid1()),
+                    "~label": "generated",
+                    "~from": f"{self.name}:{self.version}",
+                    "~to": vertex["~id"],
+                }
+            )
+            vertices.append(vertex)
+        for resource in self.resources:
+            resource.to_lpg(vertices, edges)
+
+        for v in vertices:
+            # Add the scan_id parameter to each vertex
+            v["scan_id"] = scan_id
+            # Add an edge from each vertex to the metadata vertex
+            edges.append(
+                {
+                    "~id": uuid.uuid1(),
+                    "~label": "identified_resource",
+                    "~from": scan_id,
+                    "~to": v["~id"],
+                }
+            )
+        return {"vertices": vertices, "edges": edges}
 
     def to_dict(self) -> Dict[str, Any]:
         """Generate a dictionary representation of this GraphSet.
