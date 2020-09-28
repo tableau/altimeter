@@ -85,7 +85,10 @@ def invoke_lambda(
         Exception if there was an error invoking the lambda.
     """
     logger = Logger()
-    with logger.bind(lambda_name=lambda_name, lambda_timeout=lambda_timeout):
+    account_ids = [account_id for account_id in event["account_ids"]]
+    with logger.bind(
+        lambda_name=lambda_name, lambda_timeout=lambda_timeout, account_ids=account_ids
+    ):
         logger.info(event=AWSLogEvents.RunAccountScanLambdaStart)
         boto_config = botocore.config.Config(
             read_timeout=lambda_timeout + 10, retries={"max_attempts": 0},
@@ -97,18 +100,22 @@ def invoke_lambda(
                 FunctionName=lambda_name, Payload=json.dumps(event).encode("utf-8")
             )
         except ReadTimeoutError as rte:
+            error = str(rte)
+            logger.info(event=AWSLogEvents.RunAccountScanLambdaError, error=error)
             return [
                 {
                     "account_id": account_id,
                     "output_artifact": None,
-                    "errors": [str(rte)],
+                    "errors": [error],
                     "api_call_stats": {},
                 }
-                for account_id in event["account_ids"]
+                for account_id in account_ids
             ]
         payload: bytes = resp["Payload"].read()
         if resp.get("FunctionError", None):
-            raise Exception(f"Error invoking {lambda_name} with event {event}: {payload.decode()}")
+            function_error = payload.decode()
+            logger.info(event=AWSLogEvents.RunAccountScanLambdaError, error=function_error)
+            raise Exception(f"Error invoking {lambda_name} with event {event}: {function_error}")
         payload_dict = json.loads(payload)
         logger.info(event=AWSLogEvents.RunAccountScanLambdaEnd)
         return payload_dict
