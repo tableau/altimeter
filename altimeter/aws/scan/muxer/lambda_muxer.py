@@ -3,7 +3,8 @@ from concurrent.futures import Future, ThreadPoolExecutor
 from configparser import ConfigParser
 import json
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any, Dict, List
+from urllib3.exceptions import ReadTimeoutError
 
 import boto3
 import botocore
@@ -50,6 +51,7 @@ class LambdaAWSScanMuxer(AWSScanMuxer):
         """Schedule an account scan by calling the AccountScan lambda with
         the proper arguments."""
         lambda_event = {
+            "account_ids": account_scan_plan.account_ids,
             "account_scan_plan": account_scan_plan.to_dict(),
             "scan_id": self.scan_id,
             "artifact_path": self.config.artifact_path,
@@ -65,7 +67,9 @@ class LambdaAWSScanMuxer(AWSScanMuxer):
         )
 
 
-def invoke_lambda(lambda_name: str, lambda_timeout: int, event: Dict[str, Any]) -> Dict[str, Any]:
+def invoke_lambda(
+    lambda_name: str, lambda_timeout: int, event: Dict[str, Any]
+) -> List[Dict[str, Any]]:
     """Invoke an AWS Lambda function
 
     Args:
@@ -88,9 +92,20 @@ def invoke_lambda(lambda_name: str, lambda_timeout: int, event: Dict[str, Any]) 
         )
         session = boto3.Session()
         lambda_client = session.client("lambda", config=boto_config)
-        resp = lambda_client.invoke(
-            FunctionName=lambda_name, Payload=json.dumps(event).encode("utf-8")
-        )
+        try:
+            resp = lambda_client.invoke(
+                FunctionName=lambda_name, Payload=json.dumps(event).encode("utf-8")
+            )
+        except ReadTimeoutError as rte:
+            return [
+                {
+                    "account_id": account_id,
+                    "output_artifact": None,
+                    "errors": [str(rte)],
+                    "api_call_stats": {},
+                }
+                for account_id in event["account_ids"]
+            ]
         payload: bytes = resp["Payload"].read()
         if resp.get("FunctionError", None):
             raise Exception(f"Error invoking {lambda_name} with event {event}: {payload.decode()}")
