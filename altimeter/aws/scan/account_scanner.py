@@ -326,7 +326,10 @@ class AccountScanner:
 def scan_scan_unit(scan_unit: ScanUnit) -> Tuple[str, Dict[str, Any]]:
     logger = Logger()
     with logger.bind(
-        account_id=scan_unit.account_id, region=scan_unit.region_name, service=scan_unit.service
+        account_id=scan_unit.account_id,
+        region=scan_unit.region_name,
+        service=scan_unit.service,
+        resource_classes=scan_unit.resource_spec_classes,
     ):
         start_t = time.time()
         logger.info(event=AWSLogEvents.ScanAWSAccountServiceStart)
