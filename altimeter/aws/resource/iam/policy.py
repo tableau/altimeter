@@ -14,6 +14,7 @@ class IAMPolicyResourceSpec(IAMResourceSpec):
     """Resource for user-managed IAM Policies"""
 
     type_name = "policy"
+    parallel_scan = True
     schema = Schema(
         ScalarField("PolicyName", "name"),
         ScalarField("PolicyId"),
