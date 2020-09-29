@@ -1,7 +1,9 @@
 """AWSScanMuxer that runs account scans one-per-lambda"""
 from concurrent.futures import Future, ThreadPoolExecutor
+from configparser import ConfigParser
 import json
-from typing import Any, Dict
+from pathlib import Path
+from typing import Any, Dict, List
 
 import boto3
 import botocore
@@ -33,6 +35,14 @@ class LambdaAWSScanMuxer(AWSScanMuxer):
         super().__init__(scan_id=scan_id, config=config)
         self.account_scan_lambda_name = account_scan_lambda_name
         self.account_scan_lambda_timeout = account_scan_lambda_timeout
+        if self.config.scan.scan_lambda_tcp_keepalive:
+            config_file = ConfigParser()
+            config_file["default"] = {"tcp_keepalive": "true"}
+            config_dir = Path.home().joinpath(".aws")
+            config_dir.mkdir(exist_ok=True)
+            config_filepath = config_dir.joinpath("config")
+            with config_filepath.open("w") as config_fp:
+                config_file.write(config_fp)
 
     def _schedule_account_scan(
         self, executor: ThreadPoolExecutor, account_scan_plan: AccountScanPlan
@@ -40,6 +50,7 @@ class LambdaAWSScanMuxer(AWSScanMuxer):
         """Schedule an account scan by calling the AccountScan lambda with
         the proper arguments."""
         lambda_event = {
+            "account_ids": account_scan_plan.account_ids,
             "account_scan_plan": account_scan_plan.to_dict(),
             "scan_id": self.scan_id,
             "artifact_path": self.config.artifact_path,
@@ -55,7 +66,9 @@ class LambdaAWSScanMuxer(AWSScanMuxer):
         )
 
 
-def invoke_lambda(lambda_name: str, lambda_timeout: int, event: Dict[str, Any]) -> Dict[str, Any]:
+def invoke_lambda(
+    lambda_name: str, lambda_timeout: int, event: Dict[str, Any]
+) -> List[Dict[str, Any]]:
     """Invoke an AWS Lambda function
 
     Args:
@@ -71,19 +84,37 @@ def invoke_lambda(lambda_name: str, lambda_timeout: int, event: Dict[str, Any]) 
         Exception if there was an error invoking the lambda.
     """
     logger = Logger()
-    with logger.bind(lambda_name=lambda_name, lambda_timeout=lambda_timeout):
+    account_ids = [account_id for account_id in event["account_ids"]]
+    with logger.bind(
+        lambda_name=lambda_name, lambda_timeout=lambda_timeout, account_ids=account_ids
+    ):
         logger.info(event=AWSLogEvents.RunAccountScanLambdaStart)
         boto_config = botocore.config.Config(
-            read_timeout=lambda_timeout + 10, retries={"max_attempts": 0}
+            read_timeout=lambda_timeout + 10, retries={"max_attempts": 0},
         )
         session = boto3.Session()
         lambda_client = session.client("lambda", config=boto_config)
-        resp = lambda_client.invoke(
-            FunctionName=lambda_name, Payload=json.dumps(event).encode("utf-8")
-        )
+        try:
+            resp = lambda_client.invoke(
+                FunctionName=lambda_name, Payload=json.dumps(event).encode("utf-8")
+            )
+        except Exception as invoke_ex:
+            error = str(invoke_ex)
+            logger.info(event=AWSLogEvents.RunAccountScanLambdaError, error=error)
+            return [
+                {
+                    "account_id": account_id,
+                    "output_artifact": None,
+                    "errors": [error],
+                    "api_call_stats": {},
+                }
+                for account_id in account_ids
+            ]
         payload: bytes = resp["Payload"].read()
         if resp.get("FunctionError", None):
-            raise Exception(f"Error invoking {lambda_name} with event {event}: {payload.decode()}")
+            function_error = payload.decode()
+            logger.info(event=AWSLogEvents.RunAccountScanLambdaError, error=function_error)
+            raise Exception(f"Error invoking {lambda_name} with event {event}: {function_error}")
         payload_dict = json.loads(payload)
         logger.info(event=AWSLogEvents.RunAccountScanLambdaEnd)
         return payload_dict

@@ -36,6 +36,8 @@ class AWSScanMuxer(abc.ABC):
             AccountScanManifest objects
         """
         num_total_accounts = len(account_scan_plan.account_ids)
+        scanned_account_ids = set()
+        unscanned_account_ids = set(account_scan_plan.account_ids)
         account_scan_plans = account_scan_plan.to_batches(
             max_accounts=self.config.concurrency.max_accounts_per_thread
         )
@@ -77,7 +79,14 @@ class AWSScanMuxer(abc.ABC):
                         )
                         yield account_scan_result
                         processed_accounts += 1
-                    logger.info(event=AWSLogEvents.MuxerStat, num_scanned=processed_accounts)
+                        scanned_account_ids.add(account_id)
+                        unscanned_account_ids.remove(account_id)
+                    logger.info(
+                        event=AWSLogEvents.MuxerStat,
+                        num_scanned=processed_accounts,
+                        scanned_account_ids=sorted(scanned_account_ids),
+                        unscanned_account_ids=sorted(unscanned_account_ids),
+                    )
             logger.info(event=AWSLogEvents.MuxerEnd)
 
     @abc.abstractmethod

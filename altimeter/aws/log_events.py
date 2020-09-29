@@ -17,6 +17,7 @@ class AWSLogEvents(BaseLogEvent):
 
     RunAccountScanLambdaStart: EventName
     RunAccountScanLambdaEnd: EventName
+    RunAccountScanLambdaError: EventName
 
     MuxerQueueScan: EventName
     MuxerStart: EventName

@@ -52,12 +52,15 @@ def run_scan(
     scanned_accounts: List[str] = []
     artifacts: List[str] = []
     errors: Dict[str, List[str]] = {}
-    unscanned_accounts: List[str] = []
+    unscanned_accounts: Set[str] = set()
     stats = MultilevelCounter()
     graph_set = None
 
     for account_scan_manifest in muxer.scan(account_scan_plan=account_scan_plan):
         account_id = account_scan_manifest.account_id
+        if account_scan_manifest.errors:
+            errors[account_id] = account_scan_manifest.errors
+            unscanned_accounts.add(account_id)
         if account_scan_manifest.artifacts:
             for account_scan_artifact in account_scan_manifest.artifacts:
                 artifacts.append(account_scan_artifact)
@@ -67,13 +70,10 @@ def run_scan(
                     graph_set = artifact_graph_set
                 else:
                     graph_set.merge(artifact_graph_set)
-            if account_scan_manifest.errors:
-                errors[account_id] = account_scan_manifest.errors
-                unscanned_accounts.append(account_id)
             else:
                 scanned_accounts.append(account_id)
         else:
-            unscanned_accounts.append(account_id)
+            unscanned_accounts.add(account_id)
         account_stats = MultilevelCounter.from_dict(account_scan_manifest.api_call_stats)
         stats.merge(account_stats)
     if graph_set is None:
@@ -87,7 +87,7 @@ def run_scan(
         master_artifact=master_artifact_path,
         artifacts=artifacts,
         errors=errors,
-        unscanned_accounts=unscanned_accounts,
+        unscanned_accounts=list(unscanned_accounts),
         api_call_stats=stats.to_dict(),
         start_time=start_time,
         end_time=end_time,
