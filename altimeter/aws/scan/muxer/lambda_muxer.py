@@ -101,20 +101,12 @@ def invoke_lambda(
         except Exception as invoke_ex:
             error = str(invoke_ex)
             logger.info(event=AWSLogEvents.RunAccountScanLambdaError, error=error)
-            return [
-                {
-                    "account_id": account_id,
-                    "output_artifact": None,
-                    "errors": [error],
-                    "api_call_stats": {},
-                }
-                for account_id in account_ids
-            ]
+            raise Exception(f"Error while invoking {lambda_name} with event {event}: {error}")
         payload: bytes = resp["Payload"].read()
         if resp.get("FunctionError", None):
             function_error = payload.decode()
             logger.info(event=AWSLogEvents.RunAccountScanLambdaError, error=function_error)
-            raise Exception(f"Error invoking {lambda_name} with event {event}: {function_error}")
+            raise Exception(f"Function error in {lambda_name} with event {event}: {function_error}")
         payload_dict = json.loads(payload)
         logger.info(event=AWSLogEvents.RunAccountScanLambdaEnd)
         return payload_dict
