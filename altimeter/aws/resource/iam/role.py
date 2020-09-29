@@ -23,6 +23,7 @@ class IAMRoleResourceSpec(IAMResourceSpec):
     """Resource for IAM Roles"""
 
     type_name = "role"
+    parallel_scan = True
     schema = Schema(
         ScalarField("RoleName", "name"),
         ScalarField("MaxSessionDuration"),

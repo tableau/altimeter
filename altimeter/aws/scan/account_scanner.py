@@ -179,7 +179,33 @@ class AccountScanner:
                                 service,
                                 svc_resource_spec_classes,
                             ) in shuffled_services_resource_spec_classes:
-                                future = schedule_scan(
+                                parallel_svc_resource_spec_classes = [
+                                    svc_resource_spec_class
+                                    for svc_resource_spec_class in svc_resource_spec_classes
+                                    if svc_resource_spec_class.parallel_scan
+                                ]
+                                serial_svc_resource_spec_classes = [
+                                    svc_resource_spec_class
+                                    for svc_resource_spec_class in svc_resource_spec_classes
+                                    if not svc_resource_spec_class.parallel_scan
+                                ]
+                                for (
+                                    parallel_svc_resource_spec_class
+                                ) in parallel_svc_resource_spec_classes:
+                                    parallel_future = schedule_scan(
+                                        executor=executor,
+                                        graph_name=self.graph_name,
+                                        graph_version=self.graph_version,
+                                        account_id=account_id,
+                                        region_name=region,
+                                        service=service,
+                                        access_key=region_creds.access_key,
+                                        secret_key=region_creds.secret_key,
+                                        token=region_creds.token,
+                                        resource_spec_classes=(parallel_svc_resource_spec_class,),
+                                    )
+                                    futures.append(parallel_future)
+                                serial_future = schedule_scan(
                                     executor=executor,
                                     graph_name=self.graph_name,
                                     graph_version=self.graph_version,
@@ -189,9 +215,9 @@ class AccountScanner:
                                     access_key=region_creds.access_key,
                                     secret_key=region_creds.secret_key,
                                     token=region_creds.token,
-                                    resource_spec_classes=tuple(svc_resource_spec_classes),
+                                    resource_spec_classes=tuple(serial_svc_resource_spec_classes),
                                 )
-                                futures.append(future)
+                                futures.append(serial_future)
                     except Exception as ex:
                         error_str = str(ex)
                         trace_back = traceback.format_exc()
@@ -300,7 +326,15 @@ class AccountScanner:
 def scan_scan_unit(scan_unit: ScanUnit) -> Tuple[str, Dict[str, Any]]:
     logger = Logger()
     with logger.bind(
-        account_id=scan_unit.account_id, region=scan_unit.region_name, service=scan_unit.service
+        account_id=scan_unit.account_id,
+        region=scan_unit.region_name,
+        service=scan_unit.service,
+        resource_classes=sorted(
+            [
+                resource_spec_class.__name__
+                for resource_spec_class in scan_unit.resource_spec_classes
+            ]
+        ),
     ):
         start_t = time.time()
         logger.info(event=AWSLogEvents.ScanAWSAccountServiceStart)
