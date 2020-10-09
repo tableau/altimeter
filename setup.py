@@ -39,11 +39,11 @@ setup(
     },
     data_files=[
         (
-            "/etc/altimeter/qj/alembic",
+            "altimeter/services/qj/alembic",
             ["services/qj/alembic/env.py", "services/qj/alembic/alembic.ini",],
         ),
         (
-            "/etc/altimeter/qj/alembic/versions",
+            "altimeter/services/qj/alembic/versions",
             ["services/qj/alembic/versions/dc8f1df07766_init.py",],
         ),
     ],
