@@ -4,6 +4,7 @@ from typing import Tuple, Type
 from altimeter.aws.resource.resource_spec import AWSResourceSpec
 from altimeter.aws.resource.account import AccountResourceSpec
 from altimeter.aws.resource.awslambda.function import LambdaFunctionResourceSpec
+from altimeter.aws.resource.cloudtrail.trail import CloudTrailTrailResourceSpec
 from altimeter.aws.resource.dynamodb.dynamodb_table import DynamoDbTableResourceSpec
 from altimeter.aws.resource.ec2.flow_log import FlowLogResourceSpec
 from altimeter.aws.resource.ec2.image import EC2ImageResourceSpec
@@ -49,6 +50,7 @@ from altimeter.aws.resource.support.severity_level import SeverityLevelResourceS
 # To enable a resource to be scanned, add it here.
 RESOURCE_SPEC_CLASSES: Tuple[Type[AWSResourceSpec], ...] = (
     ClassicLoadBalancerResourceSpec,
+    CloudTrailTrailResourceSpec,
     DetectorResourceSpec,
     DynamoDbTableResourceSpec,
     EBSSnapshotResourceSpec,
