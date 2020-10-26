@@ -17,7 +17,7 @@ class CloudTrailTrailResourceSpec(CloudTrailResourceSpec):
     type_name = "trail"
     schema = Schema(
         ScalarField("Name"),
-        ResourceLinkField("S3BucketName", S3BucketResourceSpec),
+        ScalarField("S3BucketName"),
         ScalarField("IncludeGlobalServiceEvents"),
         ScalarField("IsMultiRegionTrail"),
     )
