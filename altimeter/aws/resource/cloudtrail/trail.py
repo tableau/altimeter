@@ -5,8 +5,6 @@ from botocore.client import BaseClient
 
 from altimeter.aws.resource.resource_spec import ListFromAWSResult
 from altimeter.aws.resource.cloudtrail import CloudTrailResourceSpec
-from altimeter.aws.resource.s3.bucket import S3BucketResourceSpec
-from altimeter.core.graph.field.resource_link_field import ResourceLinkField
 from altimeter.core.graph.field.scalar_field import ScalarField
 from altimeter.core.graph.schema import Schema
 
