@@ -1,8 +1,8 @@
 """A Link represents the predicate-object portion of a triple."""
 import uuid
-from typing import Any, Dict, Type, List
+from typing import Any, Dict, Type, List, Union
 
-from rdflib import BNode, Graph, Literal, Namespace, RDF, XSD
+from rdflib import BNode, Graph, Literal, Namespace, RDF, URIRef, XSD
 
 from altimeter.core.graph.exceptions import LinkParseException
 from altimeter.core.graph.link.base import Link
@@ -16,9 +16,9 @@ class SimpleLink(Link):
     field_type = "simple"
 
     def to_rdf(
-        self, subj: BNode, namespace: Namespace, graph: Graph, node_cache: NodeCache
+        self, subj: Union[BNode, URIRef], namespace: Namespace, graph: Graph, node_cache: NodeCache
     ) -> None:
-        """Graph this link on a BNode in a Graph using a given Namespace to create the full
+        """Graph this link on a BNode/URIRef in a Graph using a given Namespace to create the full
         predicate.
 
         Args:
@@ -74,9 +74,9 @@ class MultiLink(Link):
         }
 
     def to_rdf(
-        self, subj: BNode, namespace: Namespace, graph: Graph, node_cache: NodeCache
+        self, subj: Union[BNode, URIRef], namespace: Namespace, graph: Graph, node_cache: NodeCache
     ) -> None:
-        """Graph this link on a BNode in a Graph using a given Namespace to create the full
+        """Graph this link on a BNode/URIRef in a Graph using a given Namespace to create the full
         predicate.
 
         Args:
@@ -127,9 +127,9 @@ class ResourceLinkLink(Link):
     field_type = "resource_link"
 
     def to_rdf(
-        self, subj: BNode, namespace: Namespace, graph: Graph, node_cache: NodeCache
+        self, subj: Union[BNode, URIRef], namespace: Namespace, graph: Graph, node_cache: NodeCache
     ) -> None:
-        """Graph this link on a BNode in a Graph using a given Namespace to create the full
+        """Graph this link on a BNode/URIRef in a Graph using a given Namespace to create the full
         predicate.
 
         Args:
@@ -138,7 +138,7 @@ class ResourceLinkLink(Link):
              graph: RDF graph
              node_cache: NodeCache to use to find cached nodes.
         """
-        link_node = node_cache.setdefault(self.obj, BNode())
+        link_node = node_cache.setdefault(self.obj, URIRef(self.obj))
         graph.add((subj, getattr(namespace, self.pred), link_node))
 
     def to_lpg(
@@ -167,9 +167,9 @@ class TransientResourceLinkLink(Link):
     field_type = "transient_resource_link"
 
     def to_rdf(
-        self, subj: BNode, namespace: Namespace, graph: Graph, node_cache: NodeCache
+        self, subj: Union[BNode, URIRef], namespace: Namespace, graph: Graph, node_cache: NodeCache
     ) -> None:
-        """Graph this link on a BNode in a Graph using a given Namespace to create the full
+        """Graph this link on a BNode/URIRef in a Graph using a given Namespace to create the full
         predicate.
 
         Args:
@@ -178,7 +178,7 @@ class TransientResourceLinkLink(Link):
              graph: RDF graph
              node_cache: NodeCache to use to find cached nodes.
         """
-        link_node = node_cache.setdefault(self.obj, BNode())
+        link_node = node_cache.setdefault(self.obj, URIRef(self.obj))
         graph.add((subj, getattr(namespace, self.pred), link_node))
 
     def to_lpg(
@@ -207,9 +207,9 @@ class TagLink(Link):
     field_type = "tag"
 
     def to_rdf(
-        self, subj: BNode, namespace: Namespace, graph: Graph, node_cache: NodeCache
+        self, subj: URIRef, namespace: Namespace, graph: Graph, node_cache: NodeCache
     ) -> None:
-        """Graph this link on a BNode in a Graph using a given Namespace to create the full
+        """Graph this link on a URIRef in a Graph using a given Namespace to create the full
         predicate.
 
         Args:

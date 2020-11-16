@@ -1,12 +1,14 @@
 """A NodeCache is a simple cache for graph nodes."""
-from rdflib import BNode
+from typing import Union
+
+from rdflib import BNode, URIRef
 
 
 class NodeCache(dict):
     """A NodeCache is a simple cache for graph nodes. Unlike a standard
     dict it does not allow overwriting entries."""
 
-    def __setitem__(self, key: str, value: BNode) -> None:
+    def __setitem__(self, key: str, value: Union[BNode, URIRef]) -> None:
         """Set an item in this NodeCache
             key: cache key
             value: BNode value

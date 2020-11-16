@@ -1,6 +1,6 @@
 from typing import Optional, List, Dict, Any, Type
 
-from rdflib import Namespace, Graph, BNode, RDF, Literal
+from rdflib import Namespace, Graph, RDF, Literal, URIRef
 
 from altimeter.core.graph.link.base import Link
 from altimeter.core.graph.link.links import link_from_dict
@@ -54,15 +54,15 @@ class Resource:
         return cls(resource_id=resource_id, type_name=type_name, links=links)
 
     def to_rdf(self, namespace: Namespace, graph: Graph, node_cache: NodeCache) -> None:
-        """Graph this Resource as a BNode on a Graph.
+        """Graph this Resource as a URIRef on a Graph.
 
         Args:
             namespace: RDF namespace to use for predicates and objects when graphing
                        this resource's links
             graph: RDF graph
-            node_cache: NodeCache to use for any cached BNode lookups
+            node_cache: NodeCache to use for any cached URIRef lookups
         """
-        node = node_cache.setdefault(self.resource_id, BNode())
+        node = node_cache.setdefault(self.resource_id, URIRef(self.resource_id))
         graph.add((node, RDF.type, getattr(namespace, self.type_name)))
         graph.add((node, getattr(namespace, "id"), Literal(self.resource_id)))
         for link in self.links:
