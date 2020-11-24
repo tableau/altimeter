@@ -46,5 +46,4 @@ class VpcEndpointServiceResourceSpec(EC2ResourceSpec):
                     account_id=account_id, region=region, resource_id=service["ServiceId"]
                 )
                 services[resource_arn] = service
-        print(services)
         return ListFromAWSResult(resources=services)
