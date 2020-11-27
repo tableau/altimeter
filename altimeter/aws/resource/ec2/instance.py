@@ -28,6 +28,8 @@ class EC2InstanceResourceSpec(EC2ResourceSpec):
     schema = Schema(
         ScalarField("Name", optional=True),
         TransientResourceLinkField("ImageId", EC2ImageResourceSpec),
+        ScalarField("KeyName", optional=True),
+        AnonymousDictField("Placement", ScalarField("AvailabilityZone"), ScalarField("Tenancy")),
         ScalarField("InstanceType"),
         ScalarField("LaunchTime"),
         AnonymousDictField("State", ScalarField("Name", "state")),
