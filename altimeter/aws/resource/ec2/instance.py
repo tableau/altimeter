@@ -35,7 +35,9 @@ class EC2InstanceResourceSpec(EC2ResourceSpec):
         AnonymousDictField("State", ScalarField("Name", "state")),
         ScalarField("Platform", optional=True),
         ScalarField("PrivateIpAddress", optional=True),
+        ScalarField("PrivateDnsName", optional=True),
         ScalarField("PublicIpAddress", optional=True),
+        ScalarField("PublicDnsName", optional=True),
         ResourceLinkField("VpcId", VPCResourceSpec, optional=True),
         ResourceLinkField("SubnetId", SubnetResourceSpec, optional=True),
         AnonymousListField(
