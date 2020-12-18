@@ -4,22 +4,27 @@ from datetime import datetime
 import logging
 from typing import Any, Dict
 
+from pydantic import BaseSettings
+
 from altimeter.core.config import Config, InvalidConfigException
 from altimeter.core.log import Logger
 from altimeter.core.log_events import LogEvent
 from altimeter.core.neptune.client import AltimeterNeptuneClient, NeptuneEndpoint
-from altimeter.core.parameters import get_required_str_env_var
 
 
-def lambda_handler(event: Dict[str, Any], context: Any) -> None:
+class GraphPrunerConfig(BaseSettings):
+    config_path: str
+
+
+def lambda_handler(_: Dict[str, Any], __: Any) -> None:
     """Entrypoint"""
     root = logging.getLogger()
     if root.handlers:
         for handler in root.handlers:
             root.removeHandler(handler)
 
-    config_path = get_required_str_env_var("CONFIG_PATH")
-    config = Config.from_path(path=config_path)
+    graph_pruner_config = GraphPrunerConfig()
+    config = Config.from_path(path=graph_pruner_config.config_path)
 
     if config.neptune is None:
         raise InvalidConfigException("Configuration missing neptune section.")

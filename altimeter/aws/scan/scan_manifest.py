@@ -1,11 +1,12 @@
 """A ScanManifest defines the output of a complete scan."""
 
-from dataclasses import dataclass
-from typing import Any, Dict, List
+from typing import Dict, List
+
+from altimeter.core.base_model import BaseImmutableModel
+from altimeter.core.multilevel_counter import MultilevelCounter
 
 
-@dataclass(frozen=True)
-class ScanManifest:
+class ScanManifest(BaseImmutableModel):
     """A ScanManifest defines the output of a complete scan. It contains pointers to the
     per-account scan result artifacts and summaries of what was scanned, errors which occurred,
     scan datetime and api call statistics.
@@ -26,23 +27,6 @@ class ScanManifest:
     artifacts: List[str]
     errors: Dict[str, List[str]]
     unscanned_accounts: List[str]
-    api_call_stats: Dict[str, Any]
+    api_call_stats: MultilevelCounter
     start_time: int
     end_time: int
-
-    def to_dict(self) -> Dict[str, Any]:
-        """Generate a dict representation of this ScanManifest.
-
-        Returns:
-            dict representation of this ScanManifest
-        """
-        return {
-            "scanned_accounts": self.scanned_accounts,
-            "master_artifact": self.master_artifact,
-            "artifacts": self.artifacts,
-            "errors": self.errors,
-            "unscanned_accounts": self.unscanned_accounts,
-            "start_time": self.start_time,
-            "end_time": self.end_time,
-            "api_call_stats": self.api_call_stats,
-        }

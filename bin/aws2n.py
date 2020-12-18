@@ -11,6 +11,7 @@ from typing import Any, Dict, List, Optional
 import uuid
 
 import boto3
+from pydantic import BaseSettings
 
 from altimeter.aws.log_events import AWSLogEvents
 from altimeter.aws.scan.muxer import AWSScanMuxer
@@ -24,7 +25,12 @@ from altimeter.core.config import Config
 from altimeter.core.log import Logger
 from altimeter.core.log_events import LogEvent
 from altimeter.core.neptune.client import AltimeterNeptuneClient, GraphMetadata, NeptuneEndpoint
-from altimeter.core.parameters import get_required_str_env_var, get_required_int_env_var
+
+
+class AWS2NConfig(BaseSettings):
+    config_path: str
+    account_scan_lambda_name: str
+    account_scan_lambda_timeout: int
 
 
 @dataclass(frozen=True)
@@ -101,25 +107,23 @@ def generate_scan_id() -> str:
     return scan_id
 
 
-def lambda_handler(event: Dict[str, Any], context: Any) -> None:
+def lambda_handler(_: Dict[str, Any], __: Any) -> None:
     """AWS Lambda Handler"""
     root = logging.getLogger()
     if root.handlers:
         for handler in root.handlers:
             root.removeHandler(handler)
 
-    account_scan_lambda_name = get_required_str_env_var("ACCOUNT_SCAN_LAMBDA_NAME")
-    account_scan_lambda_timeout = get_required_int_env_var("ACCOUNT_SCAN_LAMBDA_TIMEOUT")
+    aws2n_config = AWS2NConfig()
 
-    config_path = get_required_str_env_var("CONFIG_PATH")
-    config = Config.from_path(path=config_path)
+    config = Config.from_path(path=aws2n_config.config_path)
 
     scan_id = generate_scan_id()
     muxer = LambdaAWSScanMuxer(
         scan_id=scan_id,
         config=config,
-        account_scan_lambda_name=account_scan_lambda_name,
-        account_scan_lambda_timeout=account_scan_lambda_timeout,
+        account_scan_lambda_name=aws2n_config.account_scan_lambda_name,
+        account_scan_lambda_timeout=aws2n_config.account_scan_lambda_timeout,
     )
     aws2n(scan_id=scan_id, config=config, muxer=muxer, load_neptune=True)
 

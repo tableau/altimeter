@@ -5,11 +5,11 @@ artifact_path = "/tmp/altimeter_multi_account"
 graph_name = "alti"
 pruner_max_age_min = 4320 # prune graphs over 3 days old
 
-[access]
+[accessor]
     cache_creds = true
-    [[access.multi_hop_accessors]]
+    [[accessor.multi_hop_accessors]]
         role_session_name = "altimeter"
-        [[access.multi_hop_accessors.access_steps]]
+        [[accessor.multi_hop_accessors.access_steps]]
             role_name = "OrganizationAccountAccessRole"
 
 [scan]
@@ -32,6 +32,5 @@ pruner_max_age_min = 4320 # prune graphs over 3 days old
     #
     # In general, the maximum number of concurrent scan operations is
     #   max_account_scan_threads * max_svc_scan_threads
-    max_account_scan_threads = 4            # number of account scan threads to spawn
-    max_accounts_per_thread = 1             # number of accounts to scan in each account scan thread
+    max_account_scan_threads = 16           # number of account scan threads to spawn
     max_svc_scan_threads = 64               # the number of scan threads to spawn in each account scan thread

@@ -7,8 +7,23 @@ class TestMultiLevelCounter(TestCase):
     def test_increment(self):
         ml_counter = MultilevelCounter()
         ml_counter.increment("foo", "boo", "goo")
-        expected_data = {"count": 1, "foo": {"count": 1, "boo": {"count": 1, "goo": {"count": 1}}}}
-        self.assertDictEqual(expected_data, ml_counter.to_dict())
+        expected_ml_counter = MultilevelCounter(
+            count=1,
+            multilevel_counters={
+                "foo": MultilevelCounter(
+                    count=1,
+                    multilevel_counters={
+                        "boo": MultilevelCounter(
+                            count=1,
+                            multilevel_counters={
+                                "goo": MultilevelCounter(count=1, multilevel_counters={})
+                            },
+                        )
+                    },
+                )
+            },
+        )
+        self.assertEqual(ml_counter, expected_ml_counter)
 
     def test_merge_updates_self(self):
         ml_counter_self = MultilevelCounter()
@@ -19,13 +34,34 @@ class TestMultiLevelCounter(TestCase):
 
         ml_counter_self.merge(ml_counter_other)
 
-        expected_data = {
-            "count": 2,
-            "foo": {"count": 1, "boo": {"count": 1, "goo": {"count": 1}}},
-            "boo": {"count": 1, "goo": {"count": 1, "moo": {"count": 1}}},
-        }
-
-        self.assertDictEqual(expected_data, ml_counter_self.to_dict())
+        expected_ml_counter_self = MultilevelCounter(
+            count=2,
+            multilevel_counters={
+                "foo": MultilevelCounter(
+                    count=1,
+                    multilevel_counters={
+                        "boo": MultilevelCounter(
+                            count=1,
+                            multilevel_counters={
+                                "goo": MultilevelCounter(count=1, multilevel_counters={})
+                            },
+                        )
+                    },
+                ),
+                "boo": MultilevelCounter(
+                    count=1,
+                    multilevel_counters={
+                        "goo": MultilevelCounter(
+                            count=1,
+                            multilevel_counters={
+                                "moo": MultilevelCounter(count=1, multilevel_counters={})
+                            },
+                        )
+                    },
+                ),
+            },
+        )
+        self.assertEqual(ml_counter_self, expected_ml_counter_self)
 
     def test_merge_does_not_update_other(self):
         ml_counter_self = MultilevelCounter()
@@ -36,15 +72,21 @@ class TestMultiLevelCounter(TestCase):
 
         ml_counter_self.merge(ml_counter_other)
 
-        expected_data = {"count": 1, "boo": {"count": 1, "goo": {"count": 1, "moo": {"count": 1}}}}
+        expected_ml_counter_other = MultilevelCounter(
+            count=1,
+            multilevel_counters={
+                "boo": MultilevelCounter(
+                    count=1,
+                    multilevel_counters={
+                        "goo": MultilevelCounter(
+                            count=1,
+                            multilevel_counters={
+                                "moo": MultilevelCounter(count=1, multilevel_counters={})
+                            },
+                        )
+                    },
+                )
+            },
+        )
 
-        self.assertDictEqual(expected_data, ml_counter_other.to_dict())
-
-    def test_from_dict(self):
-        data = {
-            "count": 2,
-            "foo": {"count": 1, "boo": {"count": 1, "goo": {"count": 1}}},
-            "boo": {"count": 1, "goo": {"count": 1, "moo": {"count": 1}}},
-        }
-        ml_counter = MultilevelCounter.from_dict(data)
-        self.assertDictEqual(ml_counter.to_dict(), data)
+        self.assertEqual(ml_counter_other, expected_ml_counter_other)

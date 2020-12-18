@@ -46,7 +46,7 @@ class IAMRoleResourceSpec(IAMResourceSpec):
                 "Statement",
                 EmbeddedDictField(
                     ScalarField("Effect"),
-                    ListField("Action", EmbeddedScalarField(), allow_scalar=True),
+                    ScalarField("Action"),
                     DictField(
                         "Principal",
                         ListField("AWS", EmbeddedScalarField(), optional=True, allow_scalar=True),

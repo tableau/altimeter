@@ -8,7 +8,6 @@ from altimeter.aws.scan.aws_accessor import AWSAccessor
 
 class TestAWSResourceSpecSubClassing(TestCase):
     def test_valid_concrete(self):
-
         class C(AWSResourceSpec):
             type_name = "t"
             service_name = "c"
@@ -42,13 +41,14 @@ class TestSkipResourceScanFlag(TestCase):
             return None
 
     def test_true(self):
-
         class TestResource(AWSResourceSpec):
             type_name = "t"
             service_name = "fakesvc"
 
             @classmethod
-            def skip_resource_scan(cls: Type["TestResource"], client, account_id: str, region: str) -> bool:
+            def skip_resource_scan(
+                cls: Type["TestResource"], client, account_id: str, region: str
+            ) -> bool:
                 return True
 
         accessor = TestSkipResourceScanFlag.TestAWSAccessor(None, None, None)

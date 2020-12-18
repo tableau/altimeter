@@ -3,8 +3,7 @@ from typing import Dict, Any, List
 
 from altimeter.core.graph.field.base import Field
 from altimeter.core.graph.field.exceptions import TagsFieldMissingTagsKeyException
-from altimeter.core.graph.link.links import TagLink
-from altimeter.core.graph.link.base import Link
+from altimeter.core.graph.links import LinkCollection, TagLink
 
 
 class TagsField(Field):
@@ -16,11 +15,9 @@ class TagsField(Field):
         >>> input = {"Tags": [{"Key": "Name", "Value": "Jerry"}, \
                               {"Key": "DOB", "Value": "1942-08-01"}]}
         >>> field = TagsField()
-        >>> links = field.parse(data=input, context={})
-        >>> print(links[0].to_dict())
-        {'pred': 'Name', 'obj': 'Jerry', 'type': 'tag'}
-        >>> print(links[1].to_dict())
-        {'pred': 'DOB', 'obj': '1942-08-01', 'type': 'tag'}
+        >>> link_collection = field.parse(data=input, context={})
+        >>> print(link_collection.dict())
+        {'simple_links': (), 'multi_links': (), 'tag_links': ({'pred': 'Name', 'obj': 'Jerry'}, {'pred': 'DOB', 'obj': '1942-08-01'}), 'resource_links': (), 'transient_resource_links': ()}
 
     Args:
         optional: Whether this key is optional. Defaults to False.
@@ -29,7 +26,7 @@ class TagsField(Field):
     def __init__(self, optional: bool = True):
         self.optional = optional
 
-    def parse(self, data: Dict[str, Any], context: Dict[str, Any]) -> List[Link]:
+    def parse(self, data: Dict[str, Any], context: Dict[str, Any]) -> LinkCollection:
         """Parse this field and return a list of Links.
 
        Args:
@@ -39,13 +36,12 @@ class TagsField(Field):
         Returns:
             List of TagLink objects, one for each tag.
         """
-        fields: List[Link] = []
+        links: List[TagLink] = []
         tag_dicts = data.get("Tags")
         if tag_dicts:
             for tag_dict in tag_dicts:
-                field = TagLink(pred=tag_dict["Key"], obj=tag_dict["Value"])
-                fields.append(field)
-            return fields
+                links.append(TagLink(pred=tag_dict["Key"], obj=tag_dict["Value"]))
+            return LinkCollection(tag_links=links)
         if self.optional:
-            return []
+            return LinkCollection()
         raise TagsFieldMissingTagsKeyException(f"Expected key 'Tags' in {data}")

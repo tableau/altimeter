@@ -109,10 +109,10 @@ class TestAccessor(TestCase):
                     accessor.get_session(account_id="123456789012")
 
     def test_from_dict(self):
-        accessor = Accessor.from_dict(data=TEST_ACCESSOR_DICT)
+        accessor = Accessor(**TEST_ACCESSOR_DICT)
         self.maxDiff = None
         self.assertDictEqual(
-            accessor.to_dict(),
+            accessor.dict(),
             {
                 "multi_hop_accessors": [
                     {
@@ -152,6 +152,7 @@ class TestAccessor(TestCase):
                     },
                 ],
                 "credentials_cache": {"cache": {}},
+                "cache_creds": True,
             },
         )
 
@@ -171,7 +172,7 @@ class TestAccessor(TestCase):
                 fp.write(json.dumps(TEST_ACCESSOR_FILE_CONTENT))
             accessor = Accessor.from_file(filepath=access_config_path)
         self.assertDictEqual(
-            accessor.to_dict(),
+            accessor.dict(),
             {
                 "multi_hop_accessors": [
                     {
@@ -211,6 +212,7 @@ class TestAccessor(TestCase):
                     },
                 ],
                 "credentials_cache": {"cache": {}},
+                "cache_creds": True,
             },
         )
 
@@ -222,7 +224,7 @@ class TestAccessor(TestCase):
                 fp.write(json.dumps(TEST_ACCESSOR_FILE_CONTENT))
             accessor = Accessor.from_file(filepath=access_config_path, cache_creds=False)
         self.assertDictEqual(
-            accessor.to_dict(),
+            accessor.dict(),
             {
                 "multi_hop_accessors": [
                     {
@@ -262,6 +264,7 @@ class TestAccessor(TestCase):
                     },
                 ],
                 "credentials_cache": {"cache": {}},
+                "cache_creds": False,
             },
         )
 
@@ -306,7 +309,7 @@ class TestAccessor(TestCase):
             ],
             "credentials_cache": {"cache": {}},
         }
-        self.assertDictEqual(data, Accessor.from_dict(data=data).to_dict())
+        self.assertDictEqual(data, Accessor(**data).dict())
 
     @mock.patch.dict(os.environ, {"TEST_EXT_ID": TEST_EXT_ID})
     def from_dict_to_dict_with_cache(self):
@@ -366,10 +369,10 @@ class TestAccessor(TestCase):
                 }
             },
         }
-        self.assertDictEqual(data, Accessor.from_dict(data=data).to_dict())
+        self.assertDictEqual(data, Accessor(**data).dict())
 
     def test_str(self):
-        accessor = Accessor.from_dict(data=TEST_ACCESSOR_DICT)
+        accessor = Accessor(**TEST_ACCESSOR_DICT)
         self.assertEqual(
             str(accessor),
             (

@@ -19,7 +19,7 @@ class TestAccessStep(TestCase):
 
     def test_from_dict_all_attrs(self):
         data = {"role_name": "test_rn", "account_id": "123456789012", "external_id": "test_ext_id"}
-        access_step = AccessStep.from_dict(data)
+        access_step = AccessStep(**data)
         self.assertEqual(
             access_step,
             AccessStep(role_name="test_rn", account_id="123456789012", external_id="test_ext_id"),
@@ -27,7 +27,7 @@ class TestAccessStep(TestCase):
 
     def test_from_dict_role_name_only(self):
         data = {"role_name": "test_rn"}
-        access_step = AccessStep.from_dict(data)
+        access_step = AccessStep(**data)
         self.assertEqual(
             access_step, AccessStep(role_name="test_rn"),
         )
@@ -91,7 +91,7 @@ class TestMultiHopAccessor(TestCase):
         session = mha.get_session("123456789012", credentials_cache=cache)
         self.assertIsNone(session.region_name)
         self.assertEqual(
-            sorted(cache.to_dict()["cache"].keys()),
+            sorted(cache.dict()["cache"].keys()),
             [
                 "123456789012:test_role_name1:test_role_session_name",
                 "123456789012:test_role_name2:test_role_session_name",
@@ -136,7 +136,7 @@ class TestMultiHopAccessor(TestCase):
             ],
         )
         self.assertDictEqual(
-            mha.to_dict(),
+            mha.dict(),
             {
                 "role_session_name": "foo",
                 "access_steps": [
@@ -161,7 +161,7 @@ class TestMultiHopAccessor(TestCase):
                 {"role_name": "boo", "account_id": None, "external_id": None},
             ],
         }
-        from_dict_mha = MultiHopAccessor.from_dict(data)
+        from_dict_mha = MultiHopAccessor(**data)
         self.assertEqual(mha, from_dict_mha)
 
     def test_from_dict_to_dict(self):
@@ -172,7 +172,7 @@ class TestMultiHopAccessor(TestCase):
                 {"role_name": "boo", "account_id": None, "external_id": None},
             ],
         }
-        self.assertDictEqual(data, MultiHopAccessor.from_dict(data).to_dict())
+        self.assertDictEqual(data, MultiHopAccessor(**data).dict())
 
     def test_from_dict_missing_role_session_name(self):
         data = {
@@ -182,4 +182,4 @@ class TestMultiHopAccessor(TestCase):
             ],
         }
         with self.assertRaises(ValueError):
-            MultiHopAccessor.from_dict(data)
+            MultiHopAccessor(**data)

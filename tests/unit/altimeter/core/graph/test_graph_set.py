@@ -6,13 +6,12 @@ from altimeter.core.graph.exceptions import (
     UnmergableDuplicateResourceIdsFoundException,
     UnmergableGraphSetsException,
 )
-from altimeter.core.graph.graph_set import GraphSet
-from altimeter.core.graph.link.links import ResourceLinkLink, SimpleLink
+from altimeter.core.graph.graph_set import GraphSet, ValidatedGraphSet
+from altimeter.core.graph.links import LinkCollection, ResourceLink, SimpleLink
 from altimeter.core.multilevel_counter import MultilevelCounter
 from altimeter.core.resource.resource import Resource
 from altimeter.core.resource.resource_spec import ResourceSpec
 from altimeter.core.resource.exceptions import ResourceSpecClassNotFoundException
-
 
 
 class TestResourceSpecA(ResourceSpec):
@@ -25,7 +24,6 @@ class TestResourceSpecA(ResourceSpec):
     @classmethod
     def scan(cls: Type["TestResourceSpecA"], scan_accessor: Any) -> List[Resource]:
         raise NotImplementedError()
-
 
 
 class TestResourceSpecB(ResourceSpec):
@@ -47,17 +45,23 @@ class TestScanAccessor:
 class TestGraphSetWithValidDataNoMerging(TestCase):
     def setUp(self):
         resource_a1 = Resource(
-            resource_id="123", type_name="test:a", links=[SimpleLink(pred="has-foo", obj="goo")]
+            resource_id="123",
+            type="test:a",
+            link_collection=LinkCollection(simple_links=[SimpleLink(pred="has-foo", obj="goo")]),
         )
-        resource_a2 = Resource(resource_id="456", type_name="test:a")
+        resource_a2 = Resource(resource_id="456", type="test:a", link_collection=LinkCollection(),)
         resource_b1 = Resource(
-            resource_id="abc", type_name="test:b", links=[ResourceLinkLink(pred="has-a", obj="123")]
+            resource_id="abc",
+            type="test:b",
+            link_collection=LinkCollection(simple_links=[SimpleLink(pred="has-a", obj="123")]),
         )
         resource_b2 = Resource(
-            resource_id="def", type_name="test:b", links=[SimpleLink(pred="name", obj="sue")]
+            resource_id="def",
+            type="test:b",
+            link_collection=LinkCollection(simple_links=[SimpleLink(pred="name", obj="sue")]),
         )
-        resources = [resource_a1, resource_a2, resource_b1, resource_b2]
-        self.graph_set = GraphSet(
+        resources = (resource_a1, resource_a2, resource_b1, resource_b2)
+        self.validated_graph_set = ValidatedGraphSet(
             name="test-name",
             version="1",
             start_time=1234,
@@ -68,7 +72,7 @@ class TestGraphSetWithValidDataNoMerging(TestCase):
         )
 
     def test_rdf_a_type(self):
-        graph = self.graph_set.to_rdf()
+        graph = self.validated_graph_set.to_rdf()
 
         a_results = graph.query(
             "select ?p ?o where {?s a <test-name:test:a> ; ?p ?o} order by ?p ?o"
@@ -87,7 +91,7 @@ class TestGraphSetWithValidDataNoMerging(TestCase):
         self.assertEqual(expected_a_result_tuples, a_result_tuples)
 
     def test_rdf_b_type(self):
-        graph = self.graph_set.to_rdf()
+        graph = self.validated_graph_set.to_rdf()
         graph.serialize("/tmp/test.rdf")
         linked_a_node_results = graph.query(
             "select ?s where {?s a <test-name:test:a>; <test-name:id> '123' }"
@@ -113,7 +117,7 @@ class TestGraphSetWithValidDataNoMerging(TestCase):
         self.assertEqual(expected_b_result_tuples, b_result_tuples)
 
     def test_rdf_error_graphing(self):
-        graph = self.graph_set.to_rdf()
+        graph = self.validated_graph_set.to_rdf()
 
         err_results = graph.query("select ?o where { ?s <test-name:error> ?o } order by ?o")
         err_strs = []
@@ -123,79 +127,82 @@ class TestGraphSetWithValidDataNoMerging(TestCase):
             err_strs.append(str(err_result[0]))
         self.assertEqual(err_strs, expected_err_strs)
 
-    def test_to_dict(self):
-        expected_dict = {
-            "name": "test-name",
-            "version": "1",
-            "start_time": 1234,
-            "end_time": 4567,
-            "resources": {
-                "123": {
-                    "type": "test:a",
-                    "links": [{"pred": "has-foo", "obj": "goo", "type": "simple"}],
-                },
-                "456": {"type": "test:a"},
-                "abc": {
-                    "type": "test:b",
-                    "links": [{"pred": "has-a", "obj": "123", "type": "resource_link"}],
-                },
-                "def": {
-                    "type": "test:b",
-                    "links": [{"pred": "name", "obj": "sue", "type": "simple"}],
-                },
-            },
-            "errors": ["test err 1", "test err 2"],
-            "stats": {"count": 0},
-        }
-        self.assertDictEqual(expected_dict, self.graph_set.to_dict())
-
-    def test_from_dict(self):
-        input_dict = {
-            "name": "test-name",
-            "version": "1",
-            "start_time": 1234,
-            "end_time": 4567,
-            "resources": {
-                "123": {
-                    "type": "test:a",
-                    "links": [{"pred": "has-foo", "obj": "goo", "type": "simple"}],
-                },
-                "456": {"type": "test:a"},
-                "abc": {
-                    "type": "test:b",
-                    "links": [{"pred": "has-a", "obj": "123", "type": "resource_link"}],
-                },
-                "def": {
-                    "type": "test:b",
-                    "links": [{"pred": "name", "obj": "sue", "type": "simple"}],
-                },
-            },
-            "errors": ["test err 1", "test err 2"],
-            "stats": {"count": 0},
-        }
-        graph_set = GraphSet.from_dict(input_dict)
-        self.assertEqual(graph_set.to_dict(), input_dict)
-
-    def test_validate(self):
-        self.graph_set.validate()
+    def test_graph_content(self):
+        expected_resources = (
+            Resource(
+                resource_id="123",
+                type="test:a",
+                link_collection=LinkCollection(
+                    simple_links=(SimpleLink(pred="has-foo", obj="goo"),),
+                    multi_links=(),
+                    tag_links=(),
+                    resource_links=(),
+                    transient_resource_links=(),
+                ),
+            ),
+            Resource(
+                resource_id="456",
+                type="test:a",
+                link_collection=LinkCollection(
+                    simple_links=(),
+                    multi_links=(),
+                    tag_links=(),
+                    resource_links=(),
+                    transient_resource_links=(),
+                ),
+            ),
+            Resource(
+                resource_id="abc",
+                type="test:b",
+                link_collection=LinkCollection(
+                    simple_links=(SimpleLink(pred="has-a", obj=123),),
+                    multi_links=(),
+                    tag_links=(),
+                    resource_links=(),
+                    transient_resource_links=(),
+                ),
+            ),
+            Resource(
+                resource_id="def",
+                type="test:b",
+                link_collection=LinkCollection(
+                    simple_links=(SimpleLink(pred="name", obj="sue"),),
+                    multi_links=(),
+                    tag_links=(),
+                    resource_links=(),
+                    transient_resource_links=(),
+                ),
+            ),
+        )
+        expected_errors = ["test err 1", "test err 2"]
+        self.assertEqual(self.validated_graph_set.resources, expected_resources)
+        self.assertEqual(self.validated_graph_set.errors, expected_errors)
 
 
 class TestGraphSetWithValidDataMerging(TestCase):
     def setUp(self):
         resource_a1 = Resource(
-            resource_id="123", type_name="test:a", links=[SimpleLink(pred="has-foo", obj="goo")]
+            resource_id="123",
+            type="test:a",
+            link_collection=LinkCollection(simple_links=[SimpleLink(pred="has-foo", obj="goo")]),
         )
         resource_a2 = Resource(
-            resource_id="123", type_name="test:a", links=[SimpleLink(pred="has-goo", obj="foo")]
+            resource_id="123",
+            type="test:a",
+            link_collection=LinkCollection(simple_links=[SimpleLink(pred="has-goo", obj="foo")]),
         )
         resource_b1 = Resource(
-            resource_id="abc", type_name="test:b", links=[ResourceLinkLink(pred="has-a", obj="123")]
+            resource_id="abc",
+            type="test:b",
+            link_collection=LinkCollection(resource_links=[ResourceLink(pred="has-a", obj="123")]),
         )
         resource_b2 = Resource(
-            resource_id="def", type_name="test:b", links=[SimpleLink(pred="name", obj="sue")]
+            resource_id="def",
+            type="test:b",
+            link_collection=LinkCollection(simple_links=[SimpleLink(pred="name", obj="sue")]),
         )
-        resources = [resource_a1, resource_a2, resource_b1, resource_b2]
-        self.graph_set = GraphSet(
+        resources = (resource_a1, resource_a2, resource_b1, resource_b2)
+        self.validated_graph_set = ValidatedGraphSet(
             name="test-name",
             version="1",
             start_time=1234,
@@ -206,7 +213,7 @@ class TestGraphSetWithValidDataMerging(TestCase):
         )
 
     def test_rdf_a_type(self):
-        graph = self.graph_set.to_rdf()
+        graph = self.validated_graph_set.to_rdf()
 
         a_results = graph.query(
             "select ?p ?o where {?s a <test-name:test:a> ; ?p ?o} order by ?p ?o"
@@ -223,18 +230,15 @@ class TestGraphSetWithValidDataMerging(TestCase):
             a_result_tuples.append((str(a_result[0]), str(a_result[1])))
         self.assertEqual(expected_a_result_tuples, a_result_tuples)
 
-    def test_validate(self):
-        self.graph_set.validate()
-
 
 class TestGraphSetWithInValidData(TestCase):
     def test_unknown_type_name(self):
         resources = [
-            Resource(resource_id="xyz", type_name="test:a"),
-            Resource(resource_id="xyz", type_name="test:c"),
+            Resource(resource_id="xyz", type="test:a", link_collection=LinkCollection()),
+            Resource(resource_id="xyz", type="test:c", link_collection=LinkCollection()),
         ]
         with self.assertRaises(ResourceSpecClassNotFoundException):
-            GraphSet(
+            ValidatedGraphSet(
                 name="test-name",
                 version="1",
                 start_time=1234,
@@ -246,11 +250,11 @@ class TestGraphSetWithInValidData(TestCase):
 
     def test_invalid_resources_dupes_same_class_conflicting_types_no_allow_clobber(self):
         resources = [
-            Resource(resource_id="123", type_name="test:a"),
-            Resource(resource_id="123", type_name="test:b"),
+            Resource(resource_id="123", type="test:a", link_collection=LinkCollection()),
+            Resource(resource_id="123", type="test:b", link_collection=LinkCollection()),
         ]
         with self.assertRaises(UnmergableDuplicateResourceIdsFoundException):
-            GraphSet(
+            ValidatedGraphSet(
                 name="test-name",
                 version="1",
                 start_time=1234,
@@ -262,10 +266,14 @@ class TestGraphSetWithInValidData(TestCase):
 
     def test_orphaned_ref(self):
         resource_a1 = Resource(
-            resource_id="123", type_name="test:a", links=[SimpleLink(pred="has-foo", obj="goo")]
+            resource_id="123",
+            type="test:a",
+            link_collection=LinkCollection(simple_links=[SimpleLink(pred="has-foo", obj="goo")]),
         )
         resource_b1 = Resource(
-            resource_id="abc", type_name="test:b", links=[ResourceLinkLink(pred="has-a", obj="456")]
+            resource_id="abc",
+            type="test:b",
+            link_collection=LinkCollection(resource_links=[ResourceLink(pred="has-a", obj="456")]),
         )
         resources = [resource_a1, resource_b1]
         graph_set = GraphSet(
@@ -278,10 +286,10 @@ class TestGraphSetWithInValidData(TestCase):
             stats=MultilevelCounter(),
         )
         with self.assertRaises(GraphSetOrphanedReferencesException):
-            graph_set.validate()
+            ValidatedGraphSet.from_graph_set(graph_set)
 
 
-class TestGraphSetMerge(TestCase):
+class TestGraphSetFromGraphSets(TestCase):
     def test_invalid_diff_names(self):
         graph_set_1 = GraphSet(
             name="graph-1",
@@ -302,7 +310,7 @@ class TestGraphSetMerge(TestCase):
             stats=MultilevelCounter(),
         )
         with self.assertRaises(UnmergableGraphSetsException):
-            graph_set_1.merge(graph_set_2)
+            GraphSet.from_graph_sets([graph_set_1, graph_set_2])
 
     def test_invalid_diff_versions(self):
         graph_set_1 = GraphSet(
@@ -324,18 +332,24 @@ class TestGraphSetMerge(TestCase):
             stats=MultilevelCounter(),
         )
         with self.assertRaises(UnmergableGraphSetsException):
-            graph_set_1.merge(graph_set_2)
+            GraphSet.from_graph_sets([graph_set_1, graph_set_2])
 
     def test_valid_merge(self):
         resource_a1 = Resource(
-            resource_id="123", type_name="test:a", links=[SimpleLink(pred="has-foo", obj="goo")]
+            resource_id="123",
+            type="test:a",
+            link_collection=LinkCollection(simple_links=[SimpleLink(pred="has-foo", obj="goo")]),
         )
-        resource_a2 = Resource(resource_id="456", type_name="test:a")
+        resource_a2 = Resource(resource_id="456", type="test:a", link_collection=LinkCollection())
         resource_b1 = Resource(
-            resource_id="abc", type_name="test:b", links=[ResourceLinkLink(pred="has-a", obj="123")]
+            resource_id="abc",
+            type="test:b",
+            link_collection=LinkCollection(simple_links=[SimpleLink(pred="has-a", obj="123")]),
         )
         resource_b2 = Resource(
-            resource_id="def", type_name="test:b", links=[SimpleLink(pred="name", obj="sue")]
+            resource_id="def",
+            type="test:b",
+            link_collection=LinkCollection(simple_links=[SimpleLink(pred="name", obj="sue")]),
         )
         graph_set_1 = GraphSet(
             name="graph-1",
@@ -355,18 +369,35 @@ class TestGraphSetMerge(TestCase):
             errors=["errorb1", "errorb2"],
             stats=MultilevelCounter(),
         )
-        graph_set_1.merge(graph_set_2)
+        merged_graph_set = ValidatedGraphSet.from_graph_sets([graph_set_1, graph_set_2])
 
-        self.assertEqual(graph_set_1.name, "graph-1")
-        self.assertEqual(graph_set_1.version, "1")
-        self.assertEqual(graph_set_1.start_time, 10)
-        self.assertEqual(graph_set_1.end_time, 25)
-        self.assertCountEqual(graph_set_1.errors, ["errora1", "errora2", "errorb1", "errorb2"])
-        expected_resource_dicts = [
-            {"type": "test:a", "links": [{"pred": "has-foo", "obj": "goo", "type": "simple"}]},
-            {"type": "test:a"},
-            {"type": "test:b", "links": [{"pred": "has-a", "obj": "123", "type": "resource_link"}]},
-            {"type": "test:b", "links": [{"pred": "name", "obj": "sue", "type": "simple"}]},
-        ]
-        resource_dicts = [resource.to_dict() for resource in graph_set_1.resources]
-        self.assertCountEqual(expected_resource_dicts, resource_dicts)
+        self.assertEqual(merged_graph_set.name, "graph-1")
+        self.assertEqual(merged_graph_set.version, "1")
+        self.assertEqual(merged_graph_set.start_time, 10)
+        self.assertEqual(merged_graph_set.end_time, 25)
+        self.assertCountEqual(merged_graph_set.errors, ["errora1", "errora2", "errorb1", "errorb2"])
+
+        expected_resources = (
+            Resource(
+                resource_id="123",
+                type="test:a",
+                link_collection=LinkCollection(
+                    simple_links=(SimpleLink(pred="has-foo", obj="goo"),),
+                ),
+            ),
+            Resource(resource_id="456", type="test:a", link_collection=LinkCollection(),),
+            Resource(
+                resource_id="abc",
+                type="test:b",
+                link_collection=LinkCollection(simple_links=(SimpleLink(pred="has-a", obj=123),),),
+            ),
+            Resource(
+                resource_id="def",
+                type="test:b",
+                link_collection=LinkCollection(simple_links=(SimpleLink(pred="name", obj="sue"),),),
+            ),
+        )
+        expected_errors = ["errora1", "errora2", "errorb1", "errorb2"]
+
+        self.assertCountEqual(merged_graph_set.resources, expected_resources)
+        self.assertCountEqual(merged_graph_set.errors, expected_errors)

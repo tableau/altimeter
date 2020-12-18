@@ -1,6 +1,7 @@
 import json
 from unittest import TestCase
 
+from altimeter.core.graph.links import LinkCollection, TagLink
 from altimeter.core.graph.field.tags_field import TagsField
 from altimeter.core.graph.field.exceptions import TagsFieldMissingTagsKeyException
 
@@ -17,9 +18,12 @@ class TestTagsField(TestCase):
         ]
 
         input_data = json.loads(input_str)
-        links = field.parse(data=input_data, context={})
-        output_data = [link.to_dict() for link in links]
-        self.assertCountEqual(output_data, expected_output_data)
+        link_collection = field.parse(data=input_data, context={})
+
+        expected_link_collection = LinkCollection(
+            tag_links=(TagLink(pred="tag1", obj="value1"), TagLink(pred="tag2", obj="value2")),
+        )
+        self.assertEqual(link_collection, expected_link_collection)
 
     def test_invalid_input(self):
         input_str = (
@@ -34,9 +38,8 @@ class TestTagsField(TestCase):
     def test_optional(self):
         input_str = '{"NoTagsHere": []}'
         field = TagsField(optional=True)
-        expected_output_data = []
 
         input_data = json.loads(input_str)
-        links = field.parse(data=input_data, context={})
-        output_data = [link.to_dict() for link in links]
-        self.assertCountEqual(output_data, expected_output_data)
+        link_collection = field.parse(data=input_data, context={})
+
+        self.assertCountEqual(link_collection, LinkCollection())

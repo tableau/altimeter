@@ -1,21 +1,20 @@
 """Client for loading and accessing Altimeter generated data in Neptune"""
-import hmac
 from dataclasses import dataclass
 from datetime import datetime, timedelta
-import time
-import requests
 import hashlib
+import hmac
+import time
 from typing import Dict, List, Optional, Set, Tuple
+from urllib import parse
 
 from aws_requests_auth.aws_auth import AWSRequestsAuth
 import boto3
-
 from gremlin_python.process.graph_traversal import __
 from gremlin_python.process.anonymous_traversal import traversal
 from gremlin_python.driver.driver_remote_connection import DriverRemoteConnection
 from gremlin_python.process.traversal import T
+import requests
 from tornado import httpclient
-from urllib import parse
 
 from altimeter.core.exceptions import AltimeterException
 from altimeter.core.log import Logger
@@ -88,8 +87,7 @@ class NeptuneEndpoint:
         """
         if ssl:
             return f"https://{self.get_endpoint_str()}/sparql"
-        else:
-            return f"http://{self.get_endpoint_str()}/sparql"
+        return f"http://{self.get_endpoint_str()}/sparql"
 
     def get_loader_endpoint(self, ssl: bool = True) -> str:
         """Get the loader url for this Neptune endpoint
@@ -99,8 +97,7 @@ class NeptuneEndpoint:
         """
         if ssl:
             return f"https://{self.get_endpoint_str()}/loader"
-        else:
-            return f"http://{self.get_endpoint_str()}/loader"
+        return f"http://{self.get_endpoint_str()}/loader"
 
     def get_gremlin_endpoint(self, ssl: bool = True) -> str:
         """Get the loader url for this Neptune endpoint
@@ -110,8 +107,7 @@ class NeptuneEndpoint:
         """
         if ssl:
             return f"wss://{self.get_endpoint_str()}/gremlin"
-        else:
-            return f"ws://{self.get_endpoint_str()}/gremlin"
+        return f"ws://{self.get_endpoint_str()}/gremlin"
 
 
 def discover_neptune_endpoint() -> NeptuneEndpoint:
@@ -724,7 +720,7 @@ class AltimeterNeptuneClient:
                     print(str(err))
                     raise NeptuneLoadGraphException(
                         f"Error loading vertex {r} " f"with {str(t.bytecode)}"
-                    )
+                    ) from err
 
     def __write_edges(self, g: traversal, edges: List[Dict], scan_id: str) -> None:
         """
@@ -777,7 +773,7 @@ class AltimeterNeptuneClient:
                     self.logger.error(event=LogEvent.NeptuneLoadError, msg=str(err))
                     raise NeptuneLoadGraphException(
                         f"Error loading edge {r} " f"with {str(t.bytecode)}"
-                    )
+                    ) from err
 
     @staticmethod
     def parse_arn(arn: str) -> Dict:

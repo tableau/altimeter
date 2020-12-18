@@ -1,24 +1,57 @@
 """A Link represents the predicate-object portion of a triple."""
+import abc
 import uuid
-from typing import Any, Dict, Type, List, Union
+from typing import Dict, Iterable, List, Tuple, Type, Union
 
+from pydantic import Field
 from rdflib import BNode, Graph, Literal, Namespace, RDF, URIRef, XSD
 
-from altimeter.core.graph.exceptions import LinkParseException
-from altimeter.core.graph.link.base import Link
+from altimeter.core.base_model import BaseImmutableModel
+from altimeter.core.graph import Scalar
 from altimeter.core.graph.node_cache import NodeCache
 
 
-class SimpleLink(Link):
+class BaseLink(BaseImmutableModel, abc.ABC):
+    """A link represents the predicate-object portion of a triple.
+    BaseLink is an abstract base class for Link subclasses.
+    """
+
+    def to_rdf(
+        self, subj: BNode, namespace: Namespace, graph: Graph, node_cache: NodeCache
+    ) -> None:
+        """Graph this link on a BNode in a Graph using a given Namespace to create the full
+        predicate.
+
+        Args:
+             subj: subject portion of triple - graph this link's pred, obj against it.
+             namespace: RDF namespace to use for this triple's predicate
+             graph: RDF graph
+             node_cache: NodeCache to use to find cached nodes.
+        """
+
+    def to_lpg(self, parent: Dict, vertices: List[Dict], edges: List[Dict], prefix: str) -> None:
+        """Graph this link on a BNode in a Graph using a given Namespace to create the full
+        predicate.
+
+        Args:
+             parent: a dictionary og the parent
+             vertices: a list of dictionaries of the vertices for a labeled property graph
+             edges: a list of dictionaries of the edges for a labeled property graph
+             prefix: a prefix to add to the attribute name
+        """
+
+
+class SimpleLink(BaseLink):
     """A SimpleLink represents a scalar value. In RDF terms a SimpleLink creates a Literal
     in the graph."""
 
-    field_type = "simple"
+    pred: str
+    obj: Scalar
 
     def to_rdf(
-        self, subj: Union[BNode, URIRef], namespace: Namespace, graph: Graph, node_cache: NodeCache
+        self, subj: BNode, namespace: Namespace, graph: Graph, node_cache: NodeCache
     ) -> None:
-        """Graph this link on a BNode/URIRef in a Graph using a given Namespace to create the full
+        """Graph this link on a BNode in a Graph using a given Namespace to create the full
         predicate.
 
         Args:
@@ -46,37 +79,27 @@ class SimpleLink(Link):
              :param prefix: the prefix assigned to the key
              :type parent: Dict
         """
-        if isinstance(self.obj, int):
+        obj = self.obj
+        if isinstance(obj, int):
             # Need to handle numbers that are bigger than a Long in Java, for now we stringify it
-            if self.obj > 9223372036854775807 or self.obj < -9223372036854775807:
-                self.obj = str(self.obj)
-        elif isinstance(self.obj, SimpleLink):
+            if obj > 9223372036854775807 or obj < -9223372036854775807:
+                obj = str(obj)
+        elif isinstance(obj, SimpleLink):
             print("ERROR ERROR")
-        parent[prefix + self.pred] = self.obj
+        parent[prefix + self.pred] = obj
 
 
-class MultiLink(Link):
+class MultiLink(BaseLink):
     """Represents a named set of sublinks.  For example an 'EBSVolumeAttachemnt'
     MultiLink could exist which specifies sublinks Volume, AttachTime"""
 
-    field_type = "multi"
-
-    def to_dict(self) -> Dict[str, Any]:
-        """Return a dictionary representation of this Link
-
-        Returns:
-            Dict representation of this Link
-        """
-        return {
-            "pred": self.pred,
-            "obj": [field.to_dict() for field in self.obj],
-            "type": self.field_type,
-        }
+    pred: str
+    obj: "LinkCollection"
 
     def to_rdf(
-        self, subj: Union[BNode, URIRef], namespace: Namespace, graph: Graph, node_cache: NodeCache
+        self, subj: BNode, namespace: Namespace, graph: Graph, node_cache: NodeCache
     ) -> None:
-        """Graph this link on a BNode/URIRef in a Graph using a given Namespace to create the full
+        """Graph this link on a BNode in a Graph using a given Namespace to create the full
         predicate.
 
         Args:
@@ -87,8 +110,8 @@ class MultiLink(Link):
         """
         map_node = BNode()
         graph.add((map_node, RDF.type, getattr(namespace, f"{self.pred}")))
-        for field in self.obj:
-            field.to_rdf(map_node, namespace, graph, node_cache)
+        for link in self.obj.get_links():
+            link.to_rdf(map_node, namespace, graph, node_cache)
         graph.add((subj, getattr(namespace, self.pred), map_node))
 
     def to_lpg(
@@ -102,34 +125,20 @@ class MultiLink(Link):
              edges: the list of all edge dictionaries
              prefix: A string to prefix the property name with
         """
-
-        for field in self.obj:
-            field.to_lpg(parent, vertices, edges, prefix=self.pred + ".")
-
-    @classmethod
-    def from_dict(cls: Type["MultiLink"], pred: str, obj: Any) -> "MultiLink":
-        """Create a MultiLink object from a dict
-
-        Args:
-            pred: Link predicate
-            obj: Link object, in the case of a MultiLink this is a list of Fields
-
-        Returns:
-            Link subclass object
-        """
-        fields = [link_from_dict(field) for field in obj]
-        return cls(pred=pred, obj=fields)
+        for link in self.obj.get_links():
+            link.to_lpg(parent, vertices, edges, prefix=self.pred + ".")
 
 
-class ResourceLinkLink(Link):
+class ResourceLink(BaseLink):
     """Represents a link to another resource which must exist in the graph."""
 
-    field_type = "resource_link"
+    pred: str
+    obj: str
 
     def to_rdf(
-        self, subj: Union[BNode, URIRef], namespace: Namespace, graph: Graph, node_cache: NodeCache
+        self, subj: BNode, namespace: Namespace, graph: Graph, node_cache: NodeCache
     ) -> None:
-        """Graph this link on a BNode/URIRef in a Graph using a given Namespace to create the full
+        """Graph this link on a BNode in a Graph using a given Namespace to create the full
         predicate.
 
         Args:
@@ -154,22 +163,23 @@ class ResourceLinkLink(Link):
         """
         edge = {
             "~id": uuid.uuid1(),
-            "~label": self.field_type,
+            "~label": "resource_link",
             "~from": parent["~id"],
             "~to": self.obj,
         }
         edges.append(edge)
 
 
-class TransientResourceLinkLink(Link):
+class TransientResourceLink(BaseLink):
     """Represents a link to another resource which may or may not exist in the graph."""
 
-    field_type = "transient_resource_link"
+    pred: str
+    obj: str
 
     def to_rdf(
-        self, subj: Union[BNode, URIRef], namespace: Namespace, graph: Graph, node_cache: NodeCache
+        self, subj: BNode, namespace: Namespace, graph: Graph, node_cache: NodeCache
     ) -> None:
-        """Graph this link on a BNode/URIRef in a Graph using a given Namespace to create the full
+        """Graph this link on a BNode in a Graph using a given Namespace to create the full
         predicate.
 
         Args:
@@ -194,22 +204,23 @@ class TransientResourceLinkLink(Link):
         """
         edge = {
             "~id": uuid.uuid1(),
-            "~label": self.field_type,
+            "~label": "transient_resource_link",
             "~from": parent["~id"],
             "~to": self.obj,
         }
         edges.append(edge)
 
 
-class TagLink(Link):
+class TagLink(BaseLink):
     """Represents a AWS-style Tag attached to a node."""
 
-    field_type = "tag"
+    pred: str
+    obj: str
 
     def to_rdf(
-        self, subj: URIRef, namespace: Namespace, graph: Graph, node_cache: NodeCache
+        self, subj: BNode, namespace: Namespace, graph: Graph, node_cache: NodeCache
     ) -> None:
-        """Graph this link on a URIRef in a Graph using a given Namespace to create the full
+        """Graph this link on a BNode in a Graph using a given Namespace to create the full
         predicate.
 
         Args:
@@ -242,7 +253,7 @@ class TagLink(Link):
         if not any(x["~id"] == f"{self.pred}:{self.obj}" for x in vertices):
             vertex = {}
             vertex["~id"] = f"{self.pred}:{self.obj}"
-            vertex["~label"] = self.field_type
+            vertex["~label"] = "tag"
             vertex[self.pred] = self.obj
             vertices.append(vertex)
         edge = {
@@ -254,32 +265,60 @@ class TagLink(Link):
         edges.append(edge)
 
 
-def link_from_dict(data: Dict[str, Any]) -> Link:
-    """Create and return a Link subclass object from dict data.
+Link = Union[SimpleLink, MultiLink, TagLink, ResourceLink, TransientResourceLink]
 
-    Args:
-        data: data to generate a Link from
 
-    Returns:
-        object of the appropriate Link subclass
-    """
-    field_type = data.get("type")
-    if field_type is None:
-        raise LinkParseException(f"key 'type' not found in {data}")
-    pred = data.get("pred")
-    if pred is None:
-        raise LinkParseException(f"key 'pred' not found in {data}")
-    obj = data.get("obj")
-    if field_type == "transient_resource_link":
-        return TransientResourceLinkLink.from_dict(pred, obj)
-    if obj is None:
-        raise LinkParseException(f"key 'obj' not found in {data}")
-    if field_type == "simple":
-        return SimpleLink.from_dict(pred, obj)
-    if field_type == "multi":
-        return MultiLink.from_dict(pred, obj)
-    if field_type == "resource_link":
-        return ResourceLinkLink.from_dict(pred, obj)
-    if field_type == "tag":
-        return TagLink.from_dict(pred, obj)
-    raise LinkParseException(f"Unknown field type '{field_type}")
+class LinkCollection(BaseImmutableModel):
+    simple_links: Tuple[SimpleLink, ...] = Field(default_factory=tuple)
+    multi_links: Tuple[MultiLink, ...] = Field(default_factory=tuple)
+    tag_links: Tuple[TagLink, ...] = Field(default_factory=tuple)
+    resource_links: Tuple[ResourceLink, ...] = Field(default_factory=tuple)
+    transient_resource_links: Tuple[TransientResourceLink, ...] = Field(default_factory=tuple)
+
+    def get_links(self) -> Tuple[Link, ...]:
+        return (
+            self.simple_links
+            + self.multi_links
+            + self.tag_links
+            + self.resource_links
+            + self.transient_resource_links
+        )
+
+    @classmethod
+    def from_links(cls: Type["LinkCollection"], links: Iterable[Link]) -> "LinkCollection":
+        simple_links: List[SimpleLink] = []
+        multi_links: List[MultiLink] = []
+        tag_links: List[TagLink] = []
+        resource_links: List[ResourceLink] = []
+        transient_resource_links: List[TransientResourceLink] = []
+
+        for link in links:
+            if isinstance(link, SimpleLink):
+                simple_links.append(link)
+            elif isinstance(link, MultiLink):
+                multi_links.append(link)
+            elif isinstance(link, TagLink):
+                tag_links.append(link)
+            elif isinstance(link, ResourceLink):
+                resource_links.append(link)
+            elif isinstance(link, TransientResourceLink):
+                transient_resource_links.append(link)
+        return cls(
+            simple_links=tuple(simple_links),
+            multi_links=tuple(multi_links),
+            tag_links=tuple(tag_links),
+            resource_links=tuple(resource_links),
+            transient_resource_links=tuple(transient_resource_links),
+        )
+
+    def __add__(self, other: "LinkCollection") -> "LinkCollection":
+        return LinkCollection(
+            simple_links=self.simple_links + other.simple_links,
+            multi_links=self.multi_links + other.multi_links,
+            tag_links=self.tag_links + other.tag_links,
+            resource_links=self.resource_links + other.resource_links,
+            transient_resource_links=self.transient_resource_links + other.transient_resource_links,
+        )
+
+
+MultiLink.update_forward_refs()

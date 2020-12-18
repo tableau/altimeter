@@ -57,5 +57,12 @@ modules.rst
 doc/html/**/*
 public/**
 
+# tox
+.tox/
+
+# misc
+
 *.hyper
 *.log
+postgres_docker_container.id
+*.prof

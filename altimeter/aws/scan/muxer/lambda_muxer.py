@@ -10,7 +10,7 @@ import botocore
 
 from altimeter.aws.log_events import AWSLogEvents
 from altimeter.aws.scan.muxer import AWSScanMuxer
-from altimeter.aws.scan.account_scan_plan import AccountScanPlan
+from altimeter.aws.scan.scan_plan import AccountScanPlan
 from altimeter.core.config import Config
 from altimeter.core.log import Logger
 
@@ -50,8 +50,8 @@ class LambdaAWSScanMuxer(AWSScanMuxer):
         """Schedule an account scan by calling the AccountScan lambda with
         the proper arguments."""
         lambda_event = {
-            "account_ids": account_scan_plan.account_ids,
-            "account_scan_plan": account_scan_plan.to_dict(),
+            "account_id": account_scan_plan.account_id,
+            "account_scan_plan": account_scan_plan.dict(),
             "scan_id": self.scan_id,
             "artifact_path": self.config.artifact_path,
             "max_svc_scan_threads": self.config.concurrency.max_svc_scan_threads,
@@ -101,7 +101,9 @@ def invoke_lambda(
         except Exception as invoke_ex:
             error = str(invoke_ex)
             logger.info(event=AWSLogEvents.RunAccountScanLambdaError, error=error)
-            raise Exception(f"Error while invoking {lambda_name} with event {event}: {error}")
+            raise Exception(
+                f"Error while invoking {lambda_name} with event {event}: {error}"
+            ) from invoke_ex
         payload: bytes = resp["Payload"].read()
         if resp.get("FunctionError", None):
             function_error = payload.decode()

@@ -11,7 +11,11 @@ class SchemaParseException(AltimeterException):
 
 
 class UnmergableDuplicateResourceIdsFoundException(AltimeterException):
-    """Duplicate resource ids were found in a GraphSet and are not mergable"""
+    """Duplicate unmergable resource ids were found"""
+
+
+class DuplicateResourceIdsFoundException(AltimeterException):
+    """Duplicate resource ids were found"""
 
 
 class ListFieldSourceKeyNotFoundException(AltimeterException):

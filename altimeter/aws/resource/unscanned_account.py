@@ -4,8 +4,7 @@ import uuid
 
 from botocore.client import BaseClient
 
-from altimeter.core.graph.link.links import SimpleLink
-from altimeter.core.graph.link.base import Link
+from altimeter.core.graph.links import SimpleLink
 from altimeter.core.graph.schema import Schema
 from altimeter.aws.resource.resource_spec import ScanGranularity, ListFromAWSResult, AWSResourceSpec
 from altimeter.core.resource.resource import Resource
@@ -24,7 +23,7 @@ class UnscannedAccountResourceSpec(AWSResourceSpec):
     def create_resource(
         cls: Type["UnscannedAccountResourceSpec"], account_id: str, errors: List[str]
     ) -> Resource:
-        links: List[Link] = []
+        links: List[SimpleLink] = []
         links.append(SimpleLink(pred="account_id", obj=account_id))
         for error in errors:
             link = SimpleLink(pred="error", obj=f"{error} - {uuid.uuid4()}")

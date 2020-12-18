@@ -1,21 +1,21 @@
 """Base classes for Fields.  Fields define how individual elements of input JSON are parsed
-into Links."""
+into a LinkCollection."""
 import abc
-from typing import Dict, Any, List
+from typing import Any, Dict
 
 from altimeter.core.graph.field.exceptions import (
     ParentKeyMissingException,
     InvalidParentKeyException,
 )
-from altimeter.core.graph.link.base import Link
+from altimeter.core.graph.links import LinkCollection
 
 
 class Field(abc.ABC):
     """Abstract base class for all fields"""
 
     @abc.abstractmethod
-    def parse(self, data: Any, context: Dict[str, Any]) -> List[Link]:
-        """Parse data into a list of Links using this field's definition."""
+    def parse(self, data: Any, context: Dict[str, Any]) -> LinkCollection:
+        """Parse data into a LinkCollection using this field's definition."""
 
 
 class SubField(Field):

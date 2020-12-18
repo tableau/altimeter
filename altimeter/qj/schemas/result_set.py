@@ -27,7 +27,7 @@ class Result(BaseModel):
         try:
             int(value)
         except ValueError as v_e:
-            raise ValueError(f"account_id {value} is not an integer: {v_e}")
+            raise ValueError(f"account_id {value} is not an integer: {v_e}") from v_e
         return value
 
     class Config:

@@ -2,6 +2,7 @@ from typing import Any, List, Type
 from unittest import TestCase
 
 from altimeter.core.graph.graph_spec import GraphSpec
+from altimeter.core.graph.links import LinkCollection
 from altimeter.core.multilevel_counter import MultilevelCounter
 from altimeter.core.resource.resource import Resource
 from altimeter.core.resource.resource_spec import ResourceSpec
@@ -17,11 +18,10 @@ class TestResourceSpecA(ResourceSpec):
     @classmethod
     def scan(cls: Type["TestResourceSpecA"], scan_accessor: Any) -> List[Resource]:
         resources = [
-            Resource(resource_id="123", type_name=cls.type_name, links=[]),
-            Resource(resource_id="456", type_name=cls.type_name, links=[]),
+            Resource(resource_id="123", type=cls.type_name, link_collection=LinkCollection()),
+            Resource(resource_id="456", type=cls.type_name, link_collection=LinkCollection()),
         ]
         return resources
-
 
 
 class TestResourceSpecB(ResourceSpec):
@@ -34,8 +34,8 @@ class TestResourceSpecB(ResourceSpec):
     @classmethod
     def scan(cls: Type["TestResourceSpecB"], scan_accessor: Any) -> List[Resource]:
         resources = [
-            Resource(resource_id="abc", type_name=cls.type_name, links=[]),
-            Resource(resource_id="def", type_name=cls.type_name, links=[]),
+            Resource(resource_id="abc", type=cls.type_name, link_collection=LinkCollection()),
+            Resource(resource_id="def", type=cls.type_name, link_collection=LinkCollection()),
         ]
         return resources
 
@@ -54,12 +54,11 @@ class TestGraphSpec(TestCase):
             scan_accessor=scan_accessor,
         )
         resources = graph_spec.scan()
-        expected_resource_dicts = [
-            Resource(resource_id="123", type_name=TestResourceSpecA.type_name).to_dict(),
-            Resource(resource_id="456", type_name=TestResourceSpecA.type_name).to_dict(),
-            Resource(resource_id="abc", type_name=TestResourceSpecB.type_name).to_dict(),
-            Resource(resource_id="def", type_name=TestResourceSpecB.type_name).to_dict(),
+
+        expected_resources = [
+            Resource(resource_id="123", type="a", link_collection=LinkCollection()),
+            Resource(resource_id="456", type="a", link_collection=LinkCollection()),
+            Resource(resource_id="abc", type="b", link_collection=LinkCollection()),
+            Resource(resource_id="def", type="b", link_collection=LinkCollection()),
         ]
-        self.assertCountEqual(
-            [resource.to_dict() for resource in resources], expected_resource_dicts
-        )
+        self.assertEqual(resources, expected_resources)

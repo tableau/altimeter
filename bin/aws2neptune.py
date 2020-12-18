@@ -14,7 +14,7 @@ from altimeter.aws.scan.muxer.local_muxer import LocalAWSScanMuxer
 from altimeter.aws.scan.scan import run_scan
 from altimeter.core.artifact_io.reader import ArtifactReader
 from altimeter.core.artifact_io.writer import ArtifactWriter
-from altimeter.core.config import Config
+from altimeter.core.config import ConcurrencyConfig, Config, NeptuneConfig, ScanConfig
 from altimeter.core.log import Logger
 from altimeter.core.log_events import LogEvent
 from altimeter.core.neptune.client import AltimeterNeptuneClient, NeptuneEndpoint
@@ -39,7 +39,7 @@ def aws2neptune_lpg(scan_id: str, config: Config, muxer: AWSScanMuxer) -> None:
     )
     print("Beginning AWS Account Scan")
 
-    scan_manifest, graph_set = run_scan(
+    _, graph_set = run_scan(
         muxer=muxer,
         config=config,
         artifact_writer=artifact_writer,
@@ -79,7 +79,7 @@ def aws2neptune_rdf(scan_id: str, config: Config, muxer: AWSScanMuxer) -> None:
         writer=str(artifact_writer.__class__),
     )
     print("Beginning AWS Account Scan")
-    scan_manifest, graph_set = run_scan(
+    _, graph_set = run_scan(
         muxer=muxer,
         config=config,
         artifact_writer=artifact_writer,
@@ -134,38 +134,33 @@ def main(argv: Optional[List[str]] = None) -> int:
     )
 
     with open(config_path) as f:
-        config = json.load(f)
+        config_dict = json.load(f)
 
     current_account = boto3.client("sts").get_caller_identity().get("Account")
     current_region = boto3.session.Session().region_name
-    config_dict = {
-        "artifact_path": "./altimeter_runs",
-        "pruner_max_age_min": 4320,
-        "graph_name": "alti",
-        "access": {"cache_creds": True},
-        "concurrency": {
-            "max_account_scan_threads": 1,
-            "max_accounts_per_thread": 1,
-            "max_svc_scan_threads": 64,
-        },
-        "scan": {
-            "accounts": [current_account],
-            "regions": [current_region],
-            "scan_sub_accounts": False,
-            "preferred_account_scan_regions": [current_region],
-        },
-        "neptune": {
-            "host": config["host"],
-            "port": int(config["port"]),
-            "auth_mode": config["auth_mode"],
-            "iam_credentials_provider_type": config["iam_credentials_provider_type"],
-            "ssl": config["ssl"],
-            "region": config["aws_region"],
-            "use_lpg": bool(args_ns.model.lower() == "lpg"),
-        },
-    }
 
-    config = Config.from_dict(config_dict)
+    config = Config(
+        artifact_path="./altimeter_runs",
+        pruner_max_age_min=4320,
+        graph_name="alti",
+        concurrency=ConcurrencyConfig(max_account_scan_threads=1, max_svc_scan_threads=64,),
+        scan=ScanConfig(
+            accounts=[current_account],
+            regions=[current_region],
+            scan_sub_accounts=False,
+            preferred_account_scan_regions=[current_region],
+        ),
+        neptune=NeptuneConfig(
+            host=config_dict["host"],
+            port=int(config_dict["port"]),
+            auth_mode=config_dict["auth_mode"],
+            iam_credentials_provider_type=config_dict["iam_credentials_provider_type"],
+            ssl=config_dict["ssl"],
+            region=config_dict["aws_region"],
+            use_lpg=bool(args_ns.model.lower() == "lpg"),
+        ),
+    )
+
     scan_id = generate_scan_id()
     muxer = LocalAWSScanMuxer(scan_id=scan_id, config=config)
 

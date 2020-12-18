@@ -1,7 +1,8 @@
 import unittest
 
-from altimeter.core.resource.resource import Resource
 from altimeter.aws.resource.ec2.vpc_endpoint_service import VpcEndpointServiceResourceSpec
+from altimeter.core.resource.resource import Resource
+from altimeter.core.graph.links import LinkCollection, SimpleLink, TagLink
 
 
 class TestVpcEndpointServiceResourceSpec(unittest.TestCase):
@@ -25,30 +26,34 @@ class TestVpcEndpointServiceResourceSpec(unittest.TestCase):
             "Tags": [{"Key": "Name", "Value": "Splunk HEC"}],
         }
 
-        links = VpcEndpointServiceResourceSpec.schema.parse(
+        link_collection = VpcEndpointServiceResourceSpec.schema.parse(
             data=aws_resource_dict, context={"account_id": "111122223333", "region": "us-west-2"}
         )
         resource = Resource(
             resource_id=resource_arn,
-            type_name=VpcEndpointServiceResourceSpec.type_name,
-            links=links,
+            type=VpcEndpointServiceResourceSpec.type_name,
+            link_collection=link_collection,
         )
-        alti_resource_dict = resource.to_dict()
 
-        expected_alti_resource_dict = {
-            "type": "vpc-endpoint-service",
-            "links": [
-                {"pred": "service_type", "obj": "Interface", "type": "simple"},
-                {
-                    "pred": "service_name",
-                    "obj": "com.amazonaws.vpce.us-west-2.vpce-svc-01234abcd5678ef01",
-                    "type": "simple",
-                },
-                {"pred": "service_state", "obj": "Available", "type": "simple"},
-                {"pred": "acceptance_required", "obj": True, "type": "simple"},
-                {"pred": "availability_zones", "obj": "us-west-2a", "type": "simple"},
-                {"pred": "availability_zones", "obj": "us-west-2b", "type": "simple"},
-                {"pred": "Name", "obj": "Splunk HEC", "type": "tag"},
-            ],
-        }
-        self.assertDictEqual(alti_resource_dict, expected_alti_resource_dict)
+        expected_resource = Resource(
+            resource_id="arn:aws:ec2:us-west-2:111122223333:vpc-endpoint-service/com.amazonaws.vpce.us-west-2.vpce-svc-01234abcd5678ef01",
+            type="vpc-endpoint-service",
+            link_collection=LinkCollection(
+                simple_links=(
+                    SimpleLink(pred="service_type", obj="Interface"),
+                    SimpleLink(
+                        pred="service_name",
+                        obj="com.amazonaws.vpce.us-west-2.vpce-svc-01234abcd5678ef01",
+                    ),
+                    SimpleLink(pred="service_state", obj="Available"),
+                    SimpleLink(pred="acceptance_required", obj=True),
+                    SimpleLink(pred="availability_zones", obj="us-west-2a"),
+                    SimpleLink(pred="availability_zones", obj="us-west-2b"),
+                ),
+                multi_links=(),
+                tag_links=(TagLink(pred="Name", obj="Splunk HEC"),),
+                resource_links=(),
+                transient_resource_links=(),
+            ),
+        )
+        self.assertEqual(resource, expected_resource)
