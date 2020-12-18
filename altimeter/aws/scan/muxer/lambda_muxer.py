@@ -50,7 +50,6 @@ class LambdaAWSScanMuxer(AWSScanMuxer):
         """Schedule an account scan by calling the AccountScan lambda with
         the proper arguments."""
         lambda_event = {
-            "account_id": account_scan_plan.account_id,
             "account_scan_plan": account_scan_plan.dict(),
             "scan_id": self.scan_id,
             "artifact_path": self.config.artifact_path,
