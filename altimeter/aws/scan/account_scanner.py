@@ -236,8 +236,7 @@ class AccountScanner:
                     prescan_errors.append(f"{error_str}\n{trace_back}")
             graph_sets: List[GraphSet] = []
             for future in as_completed(futures):
-                # TODO where is account_id coming from? we don't really need it.
-                account_id, graph_set = future.result()
+                graph_set = future.result()
                 graph_sets.append(graph_set)
             # if there was a prescan error graph it and return the result
             if prescan_errors:
