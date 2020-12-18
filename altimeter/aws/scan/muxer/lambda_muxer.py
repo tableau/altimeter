@@ -84,10 +84,8 @@ def invoke_lambda(
         Exception if there was an error invoking the lambda.
     """
     logger = Logger()
-    account_ids = [account_id for account_id in event["account_ids"]]
-    with logger.bind(
-        lambda_name=lambda_name, lambda_timeout=lambda_timeout, account_ids=account_ids
-    ):
+    account_id = event["account_id"]
+    with logger.bind(lambda_name=lambda_name, lambda_timeout=lambda_timeout, account_id=account_id):
         logger.info(event=AWSLogEvents.RunAccountScanLambdaStart)
         boto_config = botocore.config.Config(
             read_timeout=lambda_timeout + 10, retries={"max_attempts": 0},
