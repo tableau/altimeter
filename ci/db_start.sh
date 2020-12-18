@@ -43,7 +43,7 @@ if [[ "$PWD" != *travis* ]]; then
     echo "postgres local up"
 else
     echo "Running in travis-ci mode"
-    psql -c "create database $DB_NAME;" -U $DB_USER
+    psql -c "create database $DB_NAME;" -U postgres
 fi
 
 echo "Creating tables"
