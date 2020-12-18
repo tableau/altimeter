@@ -4,6 +4,10 @@ set -ef -o pipefail
 
 rm -f postgres_docker_container.id
 
+echo "TESTING"
+env
+echo "TESTING"
+
 if [[ -z "$TRAVIS" ]]; then
     echo "Running in local mode"
 
