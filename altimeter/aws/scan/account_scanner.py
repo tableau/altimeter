@@ -106,15 +106,14 @@ class AccountScanner:
         if scan_sub_accounts:
             self.resource_spec_classes += ORG_RESOURCE_SPEC_CLASSES
 
-    def scan(self) -> List[AccountScanResult]:
+    def scan(self) -> AccountScanResult:
         logger = Logger()
-        account_scan_results: List[AccountScanResult] = []
         now = int(time.time())
-        prescan_account_ids_errors: DefaultDict[str, List[str]] = defaultdict(list)
+        prescan_errors: List[str]
         futures: List[Future] = []
-        with ThreadPoolExecutor(max_workers=self.max_threads) as executor:
-            account_id = self.account_scan_plan.account_id
-            with logger.bind(account_id=account_id):
+        account_id = self.account_scan_plan.account_id
+        with logger.bind(account_id=account_id):
+            with ThreadPoolExecutor(max_workers=self.max_threads) as executor:
                 logger.info(event=AWSLogEvents.ScanAWSAccountStart)
                 try:
                     session = self.account_scan_plan.accessor.get_session(account_id=account_id)
@@ -234,26 +233,41 @@ class AccountScanner:
                         error=error_str,
                         trace_back=trace_back,
                     )
-                    prescan_account_ids_errors[account_id].append(f"{error_str}\n{trace_back}")
-        account_ids_graph_sets: Dict[str, List[GraphSet]] = defaultdict(list)
-        for future in as_completed(futures):
-            account_id, graph_set = future.result()
-            account_ids_graph_sets[account_id].append(graph_set)
-        # first make sure no account id appears both in account_ids_graph_sets
-        # and prescan_account_ids_errors - this should never happen
-        doubled_accounts = set(account_ids_graph_sets.keys()).intersection(
-            set(prescan_account_ids_errors.keys())
-        )
-        if doubled_accounts:
-            raise Exception(
-                (
-                    f"BUG: Account(s) {doubled_accounts} in both "
-                    "account_ids_graph_sets and prescan_account_ids_errors."
+                    prescan_errors.append(f"{error_str}\n{trace_back}")
+            graph_sets: List[GraphSet] = []
+            for future in as_completed(futures):
+                # TODO where is account_id coming from? we don't really need it.
+                account_id, graph_set = future.result()
+                graph_sets.append(graph_set)
+            # if there was a prescan error graph it and return the result
+            if prescan_errors:
+                unscanned_account_resource = UnscannedAccountResourceSpec.create_resource(
+                    account_id=account_id, errors=prescan_errors
                 )
-            )
-        # graph prescan error accounts
-        for account_id, errors in prescan_account_ids_errors.items():
-            with logger.bind(account_id=account_id):
+                account_graph_set = GraphSet(
+                    name=self.graph_name,
+                    version=self.graph_version,
+                    start_time=now,
+                    end_time=now,
+                    resources=[unscanned_account_resource],
+                    errors=prescan_errors,
+                    stats=MultilevelCounter(),
+                )
+                output_artifact = self.artifact_writer.write_json(
+                    name=account_id, data=account_graph_set,
+                )
+                logger.info(event=AWSLogEvents.ScanAWSAccountEnd)
+                return AccountScanResult(
+                    account_id=account_id,
+                    artifacts=[output_artifact],
+                    errors=prescan_errors,
+                    api_call_stats=account_graph_set.stats,
+                )
+            # if there are any errors whatsoever we generate an empty graph with errors only
+            errors = []
+            for graph_set in graph_sets:
+                errors += graph_set.errors
+            if errors:
                 unscanned_account_resource = UnscannedAccountResourceSpec.create_resource(
                     account_id=account_id, errors=errors
                 )
@@ -264,59 +278,23 @@ class AccountScanner:
                     end_time=now,
                     resources=[unscanned_account_resource],
                     errors=errors,
-                    stats=MultilevelCounter(),
+                    stats=MultilevelCounter(),  # ENHANCHMENT: could technically get partial stats.
                 )
-                output_artifact = self.artifact_writer.write_json(
-                    name=account_id, data=account_graph_set,
-                )
-                logger.info(event=AWSLogEvents.ScanAWSAccountEnd)
-                account_scan_results.append(
-                    AccountScanResult(
-                        account_id=account_id,
-                        artifacts=[output_artifact],
-                        errors=errors,
-                        api_call_stats=account_graph_set.stats,
-                    )
-                )
-        # graph rest
-        for account_id, graph_sets in account_ids_graph_sets.items():
-            with logger.bind(account_id=account_id):
-                # if there are any errors whatsoever we generate an empty graph with
-                # errors only
-                errors = []
-                for graph_set in graph_sets:
-                    errors += graph_set.errors
-                if errors:
-                    unscanned_account_resource = UnscannedAccountResourceSpec.create_resource(
-                        account_id=account_id, errors=errors
-                    )
-                    account_graph_set = GraphSet(
-                        name=self.graph_name,
-                        version=self.graph_version,
-                        start_time=now,
-                        end_time=now,
-                        resources=[unscanned_account_resource],
-                        errors=errors,
-                        stats=MultilevelCounter(),  # ENHANCHMENT: could technically get partial stats.
-                    )
-                else:
-                    account_graph_set = GraphSet.from_graph_sets(graph_sets)
-                output_artifact = self.artifact_writer.write_json(
-                    name=account_id, data=account_graph_set,
-                )
-                logger.info(event=AWSLogEvents.ScanAWSAccountEnd)
-                account_scan_results.append(
-                    AccountScanResult(
-                        account_id=account_id,
-                        artifacts=[output_artifact],
-                        errors=errors,
-                        api_call_stats=account_graph_set.stats,
-                    )
-                )
-        return account_scan_results
+            else:
+                account_graph_set = GraphSet.from_graph_sets(graph_sets)
+            output_artifact = self.artifact_writer.write_json(
+                name=account_id, data=account_graph_set,
+            )
+            logger.info(event=AWSLogEvents.ScanAWSAccountEnd)
+            return AccountScanResult(
+                account_id=account_id,
+                artifacts=[output_artifact],
+                errors=errors,
+                api_call_stats=account_graph_set.stats,
+            )
 
 
-def scan_scan_unit(scan_unit: ScanUnit) -> Tuple[str, GraphSet]:
+def scan_scan_unit(scan_unit: ScanUnit) -> GraphSet:
     logger = Logger()
     with logger.bind(
         account_id=scan_unit.account_id,
@@ -372,7 +350,7 @@ def scan_scan_unit(scan_unit: ScanUnit) -> Tuple[str, GraphSet]:
         end_t = time.time()
         elapsed_sec = end_t - start_t
         logger.info(event=AWSLogEvents.ScanAWSAccountServiceEnd, elapsed_sec=elapsed_sec)
-        return (scan_unit.account_id, graph_set)
+        return graph_set
 
 
 def schedule_scan(

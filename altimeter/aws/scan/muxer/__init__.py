@@ -55,18 +55,17 @@ class AWSScanMuxer(abc.ABC):
                         event=AWSLogEvents.MuxerQueueScan, account_id=account_scan_plan.account_id,
                     )
                 for future in as_completed(futures):
-                    account_scan_results = future.result()
-                    for account_scan_result in account_scan_results:
-                        account_scan_manifest = AccountScanManifest(
-                            account_id=account_scan_result.account_id,
-                            artifacts=account_scan_result.artifacts,
-                            errors=account_scan_result.errors,
-                            api_call_stats=account_scan_result.api_call_stats,
-                        )
-                        yield account_scan_manifest
-                        processed_accounts += 1
-                        scanned_account_ids.add(account_scan_result.account_id)
-                        unscanned_account_ids.remove(account_scan_result.account_id)
+                    account_scan_result = future.result()
+                    account_scan_manifest = AccountScanManifest(
+                        account_id=account_scan_result.account_id,
+                        artifacts=account_scan_result.artifacts,
+                        errors=account_scan_result.errors,
+                        api_call_stats=account_scan_result.api_call_stats,
+                    )
+                    yield account_scan_manifest
+                    processed_accounts += 1
+                    scanned_account_ids.add(account_scan_result.account_id)
+                    unscanned_account_ids.remove(account_scan_result.account_id)
                     logger.info(
                         event=AWSLogEvents.MuxerStat,
                         num_scanned=processed_accounts,

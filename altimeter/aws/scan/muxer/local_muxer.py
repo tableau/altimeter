@@ -1,6 +1,5 @@
 """AWSScanMuxer that runs account scans one-per-thread"""
 from concurrent.futures import Future, ThreadPoolExecutor
-from typing import Any, Dict, List
 
 from altimeter.aws.scan.account_scanner import AccountScanner, AccountScanResult
 from altimeter.aws.scan.scan_plan import AccountScanPlan
@@ -11,7 +10,7 @@ from altimeter.core.config import Config
 
 def local_account_scan(
     scan_id: str, account_scan_plan: AccountScanPlan, config: Config,
-) -> List[AccountScanResult]:
+) -> AccountScanResult:
     """Scan a set of accounts.
 
     Args:
