@@ -19,7 +19,7 @@ class AccountScanInput(BaseImmutableModel):
     scan_sub_accounts: bool
 
 
-def lambda_handler(event: Dict[str, Any], _: Any) -> None:
+def lambda_handler(event: Dict[str, Any], _: Any) -> Dict[str, Any]:
     """Entrypoint"""
     root = logging.getLogger()
     if root.handlers:
@@ -38,7 +38,5 @@ def lambda_handler(event: Dict[str, Any], _: Any) -> None:
         preferred_account_scan_regions=account_scan_input.preferred_account_scan_regions,
         scan_sub_accounts=account_scan_input.scan_sub_accounts,
     )
-    scan_results_dict = account_scanner.scan()
-    scan_results_str = json.dumps(scan_results_dict, default=json_encoder)
-    json_results = json.loads(scan_results_str)
-    return json_results
+    scan_results = account_scanner.scan()
+    return scan_results.dict()
