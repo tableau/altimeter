@@ -1,7 +1,9 @@
 """An AccountScanManifest defines the output of an account scan."""
 
 from dataclasses import dataclass
-from typing import Any, Dict, List
+from typing import List
+
+from altimeter.core.multilevel_counter import MultilevelCounter
 
 
 @dataclass(frozen=True)
@@ -14,10 +16,10 @@ class AccountScanManifest:
         account_id: account id
         artifacts: list of scan artifacts
         errors: list of error strings
-        api_call_stats: dict of api call stats
+        api_call_stats: api call stats
     """
 
     account_id: str
     artifacts: List[str]
     errors: List[str]
-    api_call_stats: Dict[str, Any]
+    api_call_stats: MultilevelCounter

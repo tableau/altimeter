@@ -6,6 +6,7 @@ from typing import Generator
 from altimeter.aws.log_events import AWSLogEvents
 from altimeter.aws.scan.scan_plan import AccountScanPlan, ScanPlan
 from altimeter.aws.scan.account_scan_manifest import AccountScanManifest
+from altimeter.aws.scan.account_scanner import AccountScanResult
 from altimeter.core.config import Config
 from altimeter.core.log import Logger
 
@@ -55,7 +56,8 @@ class AWSScanMuxer(abc.ABC):
                         event=AWSLogEvents.MuxerQueueScan, account_id=account_scan_plan.account_id,
                     )
                 for future in as_completed(futures):
-                    account_scan_result = future.result()
+                    account_scan_result_dict = future.result()
+                    account_scan_result = AccountScanResult(**account_scan_result_dict)
                     account_scan_manifest = AccountScanManifest(
                         account_id=account_scan_result.account_id,
                         artifacts=account_scan_result.artifacts,
