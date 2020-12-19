@@ -25,7 +25,6 @@ class Resource(BaseImmutableModel):
          resource_id: id of this resource
          type: type name of this resource
          link_collection: a LinkCollection representing links from this resource
-         transient_resource_links: Tuple of TransientResourceLinks for this resource
     """
 
     resource_id: str
