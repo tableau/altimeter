@@ -109,7 +109,7 @@ class AccountScanner:
     def scan(self) -> AccountScanResult:
         logger = Logger()
         now = int(time.time())
-        prescan_errors: List[str]
+        prescan_errors: List[str] = []
         futures: List[Future] = []
         account_id = self.account_scan_plan.account_id
         with logger.bind(account_id=account_id):
