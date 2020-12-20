@@ -1,9 +1,8 @@
 """A Link represents the predicate-object portion of a triple."""
 import abc
 import uuid
-from typing import Dict, Iterable, List, Optional, Tuple, Type, Union
+from typing import Any, Dict, Iterable, List, Optional, Tuple, Type, Union
 
-from pydantic import Field
 from rdflib import BNode, Graph, Literal, Namespace, RDF, URIRef, XSD
 
 from altimeter.core.base_model import BaseImmutableModel
@@ -110,8 +109,7 @@ class MultiLink(BaseLink):
         """
         map_node = BNode()
         graph.add((map_node, RDF.type, getattr(namespace, f"{self.pred}")))
-        for link in self.obj.get_links():
-            link.to_rdf(map_node, namespace, graph, node_cache)
+        self.obj.to_rdf(map_node, namespace, graph, node_cache)
         graph.add((subj, getattr(namespace, self.pred), map_node))
 
     def to_lpg(
@@ -125,8 +123,7 @@ class MultiLink(BaseLink):
              edges: the list of all edge dictionaries
              prefix: A string to prefix the property name with
         """
-        for link in self.obj.get_links():
-            link.to_lpg(parent, vertices, edges, prefix=self.pred + ".")
+        self.obj.to_lpg(parent, vertices, edges, prefix=self.pred + ".")
 
 
 class ResourceLink(BaseLink):
@@ -274,6 +271,54 @@ class LinkCollection(BaseImmutableModel):
     tag_links: Optional[Tuple[TagLink, ...]] = None
     resource_links: Optional[Tuple[ResourceLink, ...]] = None
     transient_resource_links: Optional[Tuple[TransientResourceLink, ...]] = None
+
+    def to_rdf(
+        self, subj: BNode, namespace: Namespace, graph: Graph, node_cache: NodeCache
+    ) -> None:
+        """Graph this LinkCollection on an RDF graph"""
+        if self.simple_links:
+            for simple_link in self.simple_links:
+                simple_link.to_rdf(
+                    subj=subj, namespace=namespace, graph=graph, node_cache=node_cache
+                )
+        if self.multi_links:
+            for multi_link in self.multi_links:
+                multi_link.to_rdf(
+                    subj=subj, namespace=namespace, graph=graph, node_cache=node_cache
+                )
+        if self.tag_links:
+            for tag_link in self.tag_links:
+                tag_link.to_rdf(subj=subj, namespace=namespace, graph=graph, node_cache=node_cache)
+        if self.resource_links:
+            for resource_link in self.resource_links:
+                resource_link.to_rdf(
+                    subj=subj, namespace=namespace, graph=graph, node_cache=node_cache
+                )
+        if self.transient_resource_links:
+            for transient_resource_link in self.transient_resource_links:
+                transient_resource_link.to_rdf(
+                    subj=subj, namespace=namespace, graph=graph, node_cache=node_cache
+                )
+
+    def to_lpg(
+        self, vertex: Dict[str, Any], vertices: List[Dict], edges: List[Dict], prefix: str = ""
+    ) -> None:
+        """Graph this LinkCollection as a labelled property graph"""
+        if self.simple_links:
+            for simple_link in self.simple_links:
+                simple_link.to_lpg(vertex, vertices, edges, prefix)
+        if self.multi_links:
+            for multi_link in self.multi_links:
+                multi_link.to_lpg(vertex, vertices, edges, prefix)
+        if self.tag_links:
+            for tag_link in self.tag_links:
+                tag_link.to_lpg(vertex, vertices, edges, prefix)
+        if self.resource_links:
+            for resource_link in self.resource_links:
+                resource_link.to_lpg(vertex, vertices, edges, prefix)
+        if self.transient_resource_links:
+            for transient_resource_link in self.transient_resource_links:
+                transient_resource_link.to_lpg(vertex, vertices, edges, prefix)
 
     def get_links(self) -> Tuple[Link, ...]:
         return (

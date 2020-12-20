@@ -62,7 +62,7 @@ def run_scan(
     errors: Dict[str, List[str]] = {}
     unscanned_accounts: Set[str] = set()
     stats = MultilevelCounter()
-    graph_sets: List[GraphSet] = []
+    graph_set: Optional[GraphSet] = None
 
     for account_scan_manifest in muxer.scan(scan_plan=scan_plan):
         account_id = account_scan_manifest.account_id
@@ -73,16 +73,18 @@ def run_scan(
             for account_scan_artifact in account_scan_manifest.artifacts:
                 artifacts.append(account_scan_artifact)
                 artifact_graph_set_dict = artifact_reader.read_json(account_scan_artifact)
-                graph_set = GraphSet.parse_obj(artifact_graph_set_dict)
-                graph_sets.append(graph_set)
+                account_graph_set = GraphSet.parse_obj(artifact_graph_set_dict)
+                if graph_set is None:
+                    graph_set = account_graph_set
+                else:
+                    graph_set = GraphSet.from_graph_sets([graph_set, account_graph_set])
             scanned_accounts.append(account_id)
         else:
             unscanned_accounts.add(account_id)
         account_stats = MultilevelCounter.parse_obj(account_scan_manifest.api_call_stats)
         stats.merge(account_stats)
-    if not graph_sets:
+    if graph_set is None:
         raise Exception("BUG: No graph_sets generated.")
-    graph_set = GraphSet.from_graph_sets(graph_sets)
     validated_graph_set = ValidatedGraphSet.from_graph_set(graph_set)
     master_artifact_path: Optional[str] = None
     if config.write_master_json:
