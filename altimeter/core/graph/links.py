@@ -277,17 +277,11 @@ class LinkCollection(BaseImmutableModel):
 
     def get_links(self) -> Tuple[Link, ...]:
         return (
-            self.simple_links
-            if self.simple_links
-            else () + self.multi_links
-            if self.multi_links
-            else () + self.tag_links
-            if self.tag_links
-            else () + self.resource_links
-            if self.resource_links
-            else () + self.transient_resource_links
-            if self.transient_resource_links
-            else ()
+            (self.simple_links if self.simple_links else ())
+            + (self.multi_links if self.multi_links else ())
+            + (self.tag_links if self.tag_links else ())
+            + (self.resource_links if self.resource_links else ())
+            + (self.transient_resource_links if self.transient_resource_links else ())
         )
 
     @classmethod
