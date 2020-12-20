@@ -128,7 +128,7 @@ class TestMultiLink(unittest.TestCase):
             ),
         )
         link = MultiLink(pred=pred, obj=obj)
-        link_dict = link.dict()
+        link_dict = link.dict(exclude_unset=True)
 
         expected_link_dict = {
             "pred": "test-multi-pred",
@@ -138,10 +138,6 @@ class TestMultiLink(unittest.TestCase):
                     {"pred": "test-simple-pred-1", "obj": "test-simple-obj-2"},
                     {"pred": "test-simple-pred-2", "obj": "test-simple-obj-3"},
                 ),
-                "multi_links": (),
-                "tag_links": (),
-                "resource_links": (),
-                "transient_resource_links": (),
             },
         }
         self.assertDictEqual(expected_link_dict, link_dict)

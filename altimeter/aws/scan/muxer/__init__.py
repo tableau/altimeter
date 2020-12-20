@@ -56,6 +56,7 @@ class AWSScanMuxer(abc.ABC):
                         event=AWSLogEvents.MuxerQueueScan, account_id=account_scan_plan.account_id,
                     )
                 for future in as_completed(futures):
+                    # account_scan_result = future.result() TODO this is diff in local vs lambda, this works in local
                     account_scan_result_dict = future.result()
                     account_scan_result = AccountScanResult(**account_scan_result_dict)
                     account_scan_manifest = AccountScanManifest(

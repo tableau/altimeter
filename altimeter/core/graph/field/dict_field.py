@@ -22,8 +22,8 @@ class DictField(Field):
             >>> input = {"Person": {"FirstName": "Bob", "LastName": "Smith"}}
             >>> field = DictField("Person", ScalarField("FirstName"), ScalarField("LastName"))
             >>> link_collection = field.parse(data=input, context={})
-            >>> print(link_collection.dict())
-            {'simple_links': (), 'multi_links': ({'pred': 'person', 'obj': {'simple_links': ({'pred': 'first_name', 'obj': 'Bob'}, {'pred': 'last_name', 'obj': 'Smith'}), 'multi_links': (), 'tag_links': (), 'resource_links': (), 'transient_resource_links': ()}},), 'tag_links': (), 'resource_links': (), 'transient_resource_links': ()}
+            >>> print(link_collection.dict(exclude_unset=True))
+            {'multi_links': ({'pred': 'person', 'obj': {'simple_links': ({'pred': 'first_name', 'obj': 'Bob'}, {'pred': 'last_name', 'obj': 'Smith'})}},)}
 
     Args:
         source_key: Name of the key in the input JSON
@@ -96,8 +96,8 @@ class AnonymousDictField(Field):
             >>> input = {"Person": {"FirstName": "Bob", "LastName": "Smith"}}
             >>> field = AnonymousDictField("Person", ScalarField("FirstName"), ScalarField("LastName"))
             >>> link_collection = field.parse(data=input, context={})
-            >>> print(link_collection.dict())
-            {'simple_links': ({'pred': 'first_name', 'obj': 'Bob'}, {'pred': 'last_name', 'obj': 'Smith'}), 'multi_links': (), 'tag_links': (), 'resource_links': (), 'transient_resource_links': ()}
+            >>> print(link_collection.dict(exclude_unset=True))
+            {'simple_links': ({'pred': 'first_name', 'obj': 'Bob'}, {'pred': 'last_name', 'obj': 'Smith'})}
     """
 
     def __init__(
@@ -165,8 +165,8 @@ class EmbeddedDictField(SubField):
             >>> field = ListField("People", EmbeddedDictField(ScalarField("FirstName"),\
                                   ScalarField("LastName")))
             >>> link_collection = field.parse(data=input, context={})
-            >>> print(link_collection.dict())
-            {'simple_links': (), 'multi_links': ({'pred': 'people', 'obj': {'simple_links': ({'pred': 'first_name', 'obj': 'Bob'}, {'pred': 'last_name', 'obj': 'Smith'}), 'multi_links': (), 'tag_links': (), 'resource_links': (), 'transient_resource_links': ()}}, {'pred': 'people', 'obj': {'simple_links': ({'pred': 'first_name', 'obj': 'Alice'}, {'pred': 'last_name', 'obj': 'Smith'}), 'multi_links': (), 'tag_links': (), 'resource_links': (), 'transient_resource_links': ()}}), 'tag_links': (), 'resource_links': (), 'transient_resource_links': ()}
+            >>> print(link_collection.dict(exclude_unset=True))
+            {'multi_links': ({'pred': 'people', 'obj': {'simple_links': ({'pred': 'first_name', 'obj': 'Bob'}, {'pred': 'last_name', 'obj': 'Smith'})}}, {'pred': 'people', 'obj': {'simple_links': ({'pred': 'first_name', 'obj': 'Alice'}, {'pred': 'last_name', 'obj': 'Smith'})}})}
     """
 
     def __init__(self, *fields: Field) -> None:
@@ -216,8 +216,8 @@ class AnonymousEmbeddedDictField(Field):
             >>> field = ListField("People", AnonymousEmbeddedDictField(ScalarField("FirstName"),\
                                   ScalarField("LastName")))
             >>> link_collection = field.parse(data=input, context={})
-            >>> print(link_collection.dict())
-            {'simple_links': ({'pred': 'first_name', 'obj': 'Bob'}, {'pred': 'last_name', 'obj': 'Smith'}, {'pred': 'first_name', 'obj': 'Alice'}, {'pred': 'last_name', 'obj': 'Smith'}), 'multi_links': (), 'tag_links': (), 'resource_links': (), 'transient_resource_links': ()}
+            >>> print(link_collection.dict(exclude_unset=True))
+            {'simple_links': ({'pred': 'first_name', 'obj': 'Bob'}, {'pred': 'last_name', 'obj': 'Smith'}, {'pred': 'first_name', 'obj': 'Alice'}, {'pred': 'last_name', 'obj': 'Smith'})}
     """
 
     def __init__(self, *fields: Field) -> None:

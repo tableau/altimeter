@@ -1,7 +1,7 @@
 """A Link represents the predicate-object portion of a triple."""
 import abc
 import uuid
-from typing import Dict, Iterable, List, Tuple, Type, Union
+from typing import Dict, Iterable, List, Optional, Tuple, Type, Union
 
 from pydantic import Field
 from rdflib import BNode, Graph, Literal, Namespace, RDF, URIRef, XSD
@@ -269,19 +269,25 @@ Link = Union[SimpleLink, MultiLink, TagLink, ResourceLink, TransientResourceLink
 
 
 class LinkCollection(BaseImmutableModel):
-    simple_links: Tuple[SimpleLink, ...] = Field(default_factory=tuple)
-    multi_links: Tuple[MultiLink, ...] = Field(default_factory=tuple)
-    tag_links: Tuple[TagLink, ...] = Field(default_factory=tuple)
-    resource_links: Tuple[ResourceLink, ...] = Field(default_factory=tuple)
-    transient_resource_links: Tuple[TransientResourceLink, ...] = Field(default_factory=tuple)
+    simple_links: Optional[Tuple[SimpleLink, ...]] = None
+    multi_links: Optional[Tuple[MultiLink, ...]] = None
+    tag_links: Optional[Tuple[TagLink, ...]] = None
+    resource_links: Optional[Tuple[ResourceLink, ...]] = None
+    transient_resource_links: Optional[Tuple[TransientResourceLink, ...]] = None
 
     def get_links(self) -> Tuple[Link, ...]:
         return (
             self.simple_links
-            + self.multi_links
-            + self.tag_links
-            + self.resource_links
-            + self.transient_resource_links
+            if self.simple_links
+            else () + self.multi_links
+            if self.multi_links
+            else () + self.tag_links
+            if self.tag_links
+            else () + self.resource_links
+            if self.resource_links
+            else () + self.transient_resource_links
+            if self.transient_resource_links
+            else ()
         )
 
     @classmethod
@@ -303,22 +309,42 @@ class LinkCollection(BaseImmutableModel):
                 resource_links.append(link)
             elif isinstance(link, TransientResourceLink):
                 transient_resource_links.append(link)
-        return cls(
-            simple_links=tuple(simple_links),
-            multi_links=tuple(multi_links),
-            tag_links=tuple(tag_links),
-            resource_links=tuple(resource_links),
-            transient_resource_links=tuple(transient_resource_links),
-        )
+
+        args = {
+            "simple_links": simple_links,
+            "multi_links": multi_links,
+            "tag_links": tag_links,
+            "resource_links": resource_links,
+            "transient_resource_links": transient_resource_links,
+        }
+        args_without_nulls = {key: val for key, val in args.items() if val}
+        return cls(**args_without_nulls)
 
     def __add__(self, other: "LinkCollection") -> "LinkCollection":
-        return LinkCollection(
-            simple_links=self.simple_links + other.simple_links,
-            multi_links=self.multi_links + other.multi_links,
-            tag_links=self.tag_links + other.tag_links,
-            resource_links=self.resource_links + other.resource_links,
-            transient_resource_links=self.transient_resource_links + other.transient_resource_links,
+        simple_links = (self.simple_links if self.simple_links else ()) + (
+            other.simple_links if other.simple_links else ()
         )
+        multi_links = (self.multi_links if self.multi_links else ()) + (
+            other.multi_links if other.multi_links else ()
+        )
+        tag_links = (self.tag_links if self.tag_links else ()) + (
+            other.tag_links if other.tag_links else ()
+        )
+        resource_links = (self.resource_links if self.resource_links else ()) + (
+            other.resource_links if other.resource_links else ()
+        )
+        transient_resource_links = (
+            self.transient_resource_links if self.transient_resource_links else ()
+        ) + (other.transient_resource_links if other.transient_resource_links else ())
+        args = {
+            "simple_links": simple_links,
+            "multi_links": multi_links,
+            "tag_links": tag_links,
+            "resource_links": resource_links,
+            "transient_resource_links": transient_resource_links,
+        }
+        args_without_nulls = {key: val for key, val in args.items() if val}
+        return LinkCollection(**args_without_nulls)
 
 
 MultiLink.update_forward_refs()

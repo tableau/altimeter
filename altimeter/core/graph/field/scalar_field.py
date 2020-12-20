@@ -20,29 +20,29 @@ class ScalarField(Field):
             >>> input = {"FieldName": "Value"}
             >>> field = ScalarField("FieldName")
             >>> link_collection = field.parse(data=input, context={})
-            >>> print(link_collection.dict())
-            {'simple_links': ({'pred': 'field_name', 'obj': 'Value'},), 'multi_links': (), 'tag_links': (), 'resource_links': (), 'transient_resource_links': ()}
+            >>> print(link_collection.dict(exclude_unset=True))
+            {'simple_links': ({'pred': 'field_name', 'obj': 'Value'},)}
 
         A ScalarField with a string value and an alti_key specified::
             >>> input = {"FieldName": "Value"}
             >>> field = ScalarField("FieldName", alti_key="custom_name")
             >>> link_collection = field.parse(data=input, context={})
-            >>> print(link_collection.dict())
-            {'simple_links': ({'pred': 'custom_name', 'obj': 'Value'},), 'multi_links': (), 'tag_links': (), 'resource_links': (), 'transient_resource_links': ()}
+            >>> print(link_collection.dict(exclude_unset=True))
+            {'simple_links': ({'pred': 'custom_name', 'obj': 'Value'},)}
 
         An optional ScalarField with no default value::
             >>> input = {"SomeOtherFieldName": "Value"}
             >>> field = ScalarField("FieldName", optional=True)
             >>> link_collection = field.parse(data=input, context={})
-            >>> print(link_collection.dict())
-            {'simple_links': (), 'multi_links': (), 'tag_links': (), 'resource_links': (), 'transient_resource_links': ()}
+            >>> print(link_collection.dict(exclude_unset=True))
+            {}
 
         An optional ScalarField with a default value::
             >>> input = {"SomeOtherFieldName": "Value"}
             >>> field = ScalarField("FieldName", optional=True, default_value="DefaultValue")
             >>> link_collection = field.parse(data=input, context={})
-            >>> print(link_collection.dict())
-            {'simple_links': ({'pred': 'field_name', 'obj': 'DefaultValue'},), 'multi_links': (), 'tag_links': (), 'resource_links': (), 'transient_resource_links': ()}
+            >>> print(link_collection.dict(exclude_unset=True))
+            {'simple_links': ({'pred': 'field_name', 'obj': 'DefaultValue'},)}
 
     Args:
         source_key: Name of the key in the input JSON
@@ -105,8 +105,8 @@ class EmbeddedScalarField(SubField):
             >>> input = {"Animal": ["Value1", "Value2"]}
             >>> field = ListField("Animal", EmbeddedScalarField())
             >>> link_collection = field.parse(data=input, context={})
-            >>> print(link_collection.dict())
-            {'simple_links': ({'pred': 'animal', 'obj': 'Value1'}, {'pred': 'animal', 'obj': 'Value2'}), 'multi_links': (), 'tag_links': (), 'resource_links': (), 'transient_resource_links': ()}
+            >>> print(link_collection.dict(exclude_unset=True))
+            {'simple_links': ({'pred': 'animal', 'obj': 'Value1'}, {'pred': 'animal', 'obj': 'Value2'})}
     """
 
     def parse(self, data: Union[str, bool, int, float], context: Dict[str, Any]) -> LinkCollection:

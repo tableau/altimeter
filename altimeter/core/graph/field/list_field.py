@@ -22,8 +22,8 @@ class ListField(Field):
             >>> input = {"Animals": ["cow", "pig", "human"]}
             >>> field = ListField("Animals", EmbeddedScalarField())
             >>> link_collection = field.parse(data=input, context={})
-            >>> print(link_collection.dict())
-            {'simple_links': ({'pred': 'animals', 'obj': 'cow'}, {'pred': 'animals', 'obj': 'pig'}, {'pred': 'animals', 'obj': 'human'}), 'multi_links': (), 'tag_links': (), 'resource_links': (), 'transient_resource_links': ()}
+            >>> print(link_collection.dict(exclude_unset=True))
+            {'simple_links': ({'pred': 'animals', 'obj': 'cow'}, {'pred': 'animals', 'obj': 'pig'}, {'pred': 'animals', 'obj': 'human'})}
 
         A list of dicts:
             >>> from altimeter.core.graph.field.dict_field import EmbeddedDictField
@@ -32,8 +32,8 @@ class ListField(Field):
             >>> field = ListField("People", EmbeddedDictField(ScalarField("Name"),\
                                   ScalarField("Age")))
             >>> link_collection = field.parse(data=input, context={})
-            >>> print(link_collection.dict())
-            {'simple_links': (), 'multi_links': ({'pred': 'people', 'obj': {'simple_links': ({'pred': 'name', 'obj': 'Bob'}, {'pred': 'age', 'obj': 49}), 'multi_links': (), 'tag_links': (), 'resource_links': (), 'transient_resource_links': ()}}, {'pred': 'people', 'obj': {'simple_links': ({'pred': 'name', 'obj': 'Sue'}, {'pred': 'age', 'obj': 42}), 'multi_links': (), 'tag_links': (), 'resource_links': (), 'transient_resource_links': ()}}), 'tag_links': (), 'resource_links': (), 'transient_resource_links': ()}
+            >>> print(link_collection.dict(exclude_unset=True))
+            {'multi_links': ({'pred': 'people', 'obj': {'simple_links': ({'pred': 'name', 'obj': 'Bob'}, {'pred': 'age', 'obj': 49})}}, {'pred': 'people', 'obj': {'simple_links': ({'pred': 'name', 'obj': 'Sue'}, {'pred': 'age', 'obj': 42})}})}
 
     Args:
         source_key: Name of the key in the input JSON
@@ -118,8 +118,8 @@ class AnonymousListField(Field):
                                    "Plants": ["tree", "fern"]}}
             >>> field = DictField("Biota", AnonymousListField("Animals", EmbeddedScalarField()))
             >>> link_collection = field.parse(data=input, context={})
-            >>> print(link_collection.dict())
-            {'simple_links': (), 'multi_links': ({'pred': 'biota', 'obj': {'simple_links': ({'pred': 'biota', 'obj': 'cow'}, {'pred': 'biota', 'obj': 'pig'}, {'pred': 'biota', 'obj': 'human'}), 'multi_links': (), 'tag_links': (), 'resource_links': (), 'transient_resource_links': ()}},), 'tag_links': (), 'resource_links': (), 'transient_resource_links': ()}
+            >>> print(link_collection.dict(exclude_unset=True))
+            {'multi_links': ({'pred': 'biota', 'obj': {'simple_links': ({'pred': 'biota', 'obj': 'cow'}, {'pred': 'biota', 'obj': 'pig'}, {'pred': 'biota', 'obj': 'human'})}},)}
     """
 
     def __init__(

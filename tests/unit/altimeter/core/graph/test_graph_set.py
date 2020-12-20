@@ -134,44 +134,18 @@ class TestGraphSetWithValidDataNoMerging(TestCase):
                 type="test:a",
                 link_collection=LinkCollection(
                     simple_links=(SimpleLink(pred="has-foo", obj="goo"),),
-                    multi_links=(),
-                    tag_links=(),
-                    resource_links=(),
-                    transient_resource_links=(),
                 ),
             ),
-            Resource(
-                resource_id="456",
-                type="test:a",
-                link_collection=LinkCollection(
-                    simple_links=(),
-                    multi_links=(),
-                    tag_links=(),
-                    resource_links=(),
-                    transient_resource_links=(),
-                ),
-            ),
+            Resource(resource_id="456", type="test:a", link_collection=LinkCollection(),),
             Resource(
                 resource_id="abc",
                 type="test:b",
-                link_collection=LinkCollection(
-                    simple_links=(SimpleLink(pred="has-a", obj=123),),
-                    multi_links=(),
-                    tag_links=(),
-                    resource_links=(),
-                    transient_resource_links=(),
-                ),
+                link_collection=LinkCollection(simple_links=(SimpleLink(pred="has-a", obj=123),),),
             ),
             Resource(
                 resource_id="def",
                 type="test:b",
-                link_collection=LinkCollection(
-                    simple_links=(SimpleLink(pred="name", obj="sue"),),
-                    multi_links=(),
-                    tag_links=(),
-                    resource_links=(),
-                    transient_resource_links=(),
-                ),
+                link_collection=LinkCollection(simple_links=(SimpleLink(pred="name", obj="sue"),),),
             ),
         )
         expected_errors = ["test err 1", "test err 2"]

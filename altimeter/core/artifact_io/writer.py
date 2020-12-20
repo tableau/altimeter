@@ -89,7 +89,7 @@ class FileArtifactWriter(ArtifactWriter):
         with logger.bind(artifact_path=artifact_path):
             logger.info(event=LogEvent.WriteToFSStart)
             with open(artifact_path, "w") as artifact_fp:
-                artifact_fp.write(data.json())
+                artifact_fp.write(data.json(exclude_unset=True))
             logger.info(event=LogEvent.WriteToFSEnd)
         return artifact_path
 
@@ -156,7 +156,7 @@ class S3ArtifactWriter(ArtifactWriter):
         with logger.bind(bucket=self.bucket, key=output_key):
             logger.info(event=LogEvent.WriteToS3Start)
             s3_client = boto3.Session().client("s3")
-            results_str = data.json()
+            results_str = data.json(exclude_unset=True)
             results_bytes = results_str.encode("utf-8")
             with io.BytesIO(results_bytes) as results_bytes_stream:
                 s3_client.upload_fileobj(results_bytes_stream, self.bucket, output_key)

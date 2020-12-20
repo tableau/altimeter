@@ -16,8 +16,8 @@ class TagsField(Field):
                               {"Key": "DOB", "Value": "1942-08-01"}]}
         >>> field = TagsField()
         >>> link_collection = field.parse(data=input, context={})
-        >>> print(link_collection.dict())
-        {'simple_links': (), 'multi_links': (), 'tag_links': ({'pred': 'Name', 'obj': 'Jerry'}, {'pred': 'DOB', 'obj': '1942-08-01'}), 'resource_links': (), 'transient_resource_links': ()}
+        >>> print(link_collection.dict(exclude_unset=True))
+        {'tag_links': ({'pred': 'Name', 'obj': 'Jerry'}, {'pred': 'DOB', 'obj': '1942-08-01'})}
 
     Args:
         optional: Whether this key is optional. Defaults to False.

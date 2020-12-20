@@ -122,8 +122,9 @@ def build_table_defns(graph_sets: Iterable[GraphSet]) -> Mapping[str, Tuple[Colu
     for graph_set in graph_sets:
         for resource in graph_set.resources:
             table_name = normalize_name(resource.type)
-            for link in resource.link_collection.simple_links:
-                table_names_simple_obj_types[table_name][link.pred].add(type(link.obj))
+            if resource.link_collection.simple_links:
+                for link in resource.link_collection.simple_links:
+                    table_names_simple_obj_types[table_name][link.pred].add(type(link.obj))
     table_names_columns: DefaultDict[str, Set[Column]] = defaultdict(set)
     for graph_set in graph_sets:
         for resource in graph_set.resources:
@@ -156,30 +157,36 @@ def build_table_defns_helper(
     table_names_columns: Dict[str, Set[Column]],
     simple_obj_types: Mapping[str, Set[Type[Scalar]]],
 ) -> None:
-    for simple_link in link_collection.simple_links:
-        simple_column: Union[IntColumn, BoolColumn, TextColumn]
-        if simple_obj_types[simple_link.pred] == set((int,)):
-            simple_column = IntColumn(name=simple_link.pred,)
-        elif simple_obj_types[simple_link.pred] == set((bool,)):
-            simple_column = BoolColumn(name=simple_link.pred,)
-        else:
-            simple_column = TextColumn(name=simple_link.pred,)
-        table_names_columns[table_name].add(simple_column)
-    for resource_link in link_collection.resource_links:
-        table_names_columns[table_name].add(FKColumn(name=f"_{resource_link.pred}_id",))
-    for transient_resource_link in link_collection.transient_resource_links:
-        table_names_columns[table_name].add(FKColumn(name=f"_{transient_resource_link.pred}_id",))
-    for multi_link in link_collection.multi_links:
-        multilink_table_name = f"_{table_name}_{multi_link.pred}"
-        # multilink tables have a pk id column and a fk to the parent
-        table_names_columns[multilink_table_name].add(PKColumn(f"_{multilink_table_name}_id",))
-        table_names_columns[multilink_table_name].add(FKColumn(name=f"_{table_name}_id",))
-        build_table_defns_helper(
-            link_collection=multi_link.obj,
-            table_name=multilink_table_name,
-            table_names_columns=table_names_columns,
-            simple_obj_types=simple_obj_types,
-        )
+    if link_collection.simple_links:
+        for simple_link in link_collection.simple_links:
+            simple_column: Union[IntColumn, BoolColumn, TextColumn]
+            if simple_obj_types[simple_link.pred] == set((int,)):
+                simple_column = IntColumn(name=simple_link.pred,)
+            elif simple_obj_types[simple_link.pred] == set((bool,)):
+                simple_column = BoolColumn(name=simple_link.pred,)
+            else:
+                simple_column = TextColumn(name=simple_link.pred,)
+            table_names_columns[table_name].add(simple_column)
+    if link_collection.resource_links:
+        for resource_link in link_collection.resource_links:
+            table_names_columns[table_name].add(FKColumn(name=f"_{resource_link.pred}_id",))
+    if link_collection.transient_resource_links:
+        for transient_resource_link in link_collection.transient_resource_links:
+            table_names_columns[table_name].add(
+                FKColumn(name=f"_{transient_resource_link.pred}_id",)
+            )
+    if link_collection.multi_links:
+        for multi_link in link_collection.multi_links:
+            multilink_table_name = f"_{table_name}_{multi_link.pred}"
+            # multilink tables have a pk id column and a fk to the parent
+            table_names_columns[multilink_table_name].add(PKColumn(f"_{multilink_table_name}_id",))
+            table_names_columns[multilink_table_name].add(FKColumn(name=f"_{table_name}_id",))
+            build_table_defns_helper(
+                link_collection=multi_link.obj,
+                table_name=multilink_table_name,
+                table_names_columns=table_names_columns,
+                simple_obj_types=simple_obj_types,
+            )
     # Note: a single Tags table is built in build_table_defns
 
 
@@ -201,9 +208,10 @@ def build_data(
                 pk = pk_counters[table_name]
                 arns_pks[arn] = pk
             # add tag data
-            for link in resource.link_collection.tag_links:
-                tag_key, tag_value = link.pred, link.obj
-                table_names_datas[TAG_TABLE_NAME].append((pk, tag_key, tag_value))
+            if resource.link_collection.tag_links:
+                for link in resource.link_collection.tag_links:
+                    tag_key, tag_value = link.pred, link.obj
+                    table_names_datas[TAG_TABLE_NAME].append((pk, tag_key, tag_value))
             # iterate over the columns we expect the corresponding resource for this
             # table and fill them by looking for corresponding values in the resource
             for column in table_defns[table_name]:
@@ -218,7 +226,10 @@ def build_data(
                     fk = None
                     for candidate_fk_link in (
                         resource.link_collection.resource_links
-                        + resource.link_collection.transient_resource_links
+                        if resource.link_collection.resource_links
+                        else () + resource.link_collection.transient_resource_links
+                        if resource.link_collection.transient_resource_links
+                        else ()
                     ):
                         if candidate_fk_link.pred == column_link_name:
                             f_table_name = normalize_name(candidate_fk_link.pred)
@@ -235,32 +246,35 @@ def build_data(
                     if column.name == "arn":
                         text_data = resource.resource_id
                     else:
-                        for candidate_simple_link in resource.link_collection.simple_links:
-                            if candidate_simple_link.pred == column.name:
-                                text_data = str(candidate_simple_link.obj)
-                                break
+                        if resource.link_collection.simple_links:
+                            for candidate_simple_link in resource.link_collection.simple_links:
+                                if candidate_simple_link.pred == column.name:
+                                    text_data = str(candidate_simple_link.obj)
+                                    break
                     resource_data.append(text_data)
                 elif type(column) in (IntColumn, BoolColumn, TimestampColumn):
                     bool_or_int_or_timestamp_data = None
-                    for candidate_simple_link in resource.link_collection.simple_links:
-                        if candidate_simple_link.pred == column.name:
-                            bool_or_int_or_timestamp_data = candidate_simple_link.obj
-                            break
+                    if resource.link_collection.simple_links:
+                        for candidate_simple_link in resource.link_collection.simple_links:
+                            if candidate_simple_link.pred == column.name:
+                                bool_or_int_or_timestamp_data = candidate_simple_link.obj
+                                break
                     resource_data.append(bool_or_int_or_timestamp_data)
                 else:
                     raise NotImplementedError(f"Column type {type(column)} not implemented")
             table_names_datas[table_name].append(tuple(resource_data))
             # now look for MultiLinks in this resource.  Each of these represent a table
-            for multi_link in resource.link_collection.multi_links:
-                build_multilink_data(
-                    pk_counters=pk_counters,
-                    arns_pks=arns_pks,
-                    table_names_datas=table_names_datas,
-                    table_defns=table_defns,
-                    multi_link=multi_link,
-                    parent_table_name=table_name,
-                    parent_pk=pk,
-                )
+            if resource.link_collection.multi_links:
+                for multi_link in resource.link_collection.multi_links:
+                    build_multilink_data(
+                        pk_counters=pk_counters,
+                        arns_pks=arns_pks,
+                        table_names_datas=table_names_datas,
+                        table_defns=table_defns,
+                        multi_link=multi_link,
+                        parent_table_name=table_name,
+                        parent_pk=pk,
+                    )
     return MappingProxyType(table_names_datas)
 
 
@@ -290,7 +304,11 @@ def build_multilink_data(
         if isinstance(column, FKColumn):
             fk = None
             for candidate_resource_link in (
-                multi_link.obj.resource_links + multi_link.obj.transient_resource_links
+                multi_link.obj.resource_links
+                if multi_link.obj.resource_links
+                else () + multi_link.obj.transient_resource_links
+                if multi_link.obj.transient_resource_links
+                else ()
             ):
                 pred = f"_{candidate_resource_link.pred}_id"
                 if pred == column.name:

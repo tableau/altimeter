@@ -50,10 +50,7 @@ class TestVpcEndpointServiceResourceSpec(unittest.TestCase):
                     SimpleLink(pred="availability_zones", obj="us-west-2a"),
                     SimpleLink(pred="availability_zones", obj="us-west-2b"),
                 ),
-                multi_links=(),
                 tag_links=(TagLink(pred="Name", obj="Splunk HEC"),),
-                resource_links=(),
-                transient_resource_links=(),
             ),
         )
         self.assertEqual(resource, expected_resource)

@@ -23,8 +23,8 @@ class ResourceLinkField(Field):
             >>> input = {"ThingId": "123"}
             >>> field = ResourceLinkField("ThingId", TestResourceSpec)
             >>> link_collection = field.parse(data=input, context={})
-            >>> print(link_collection.dict())
-            {'simple_links': (), 'multi_links': (), 'tag_links': (), 'resource_links': ({'pred': 'thing', 'obj': 'thing:123'},), 'transient_resource_links': ()}
+            >>> print(link_collection.dict(exclude_unset=True))
+            {'resource_links': ({'pred': 'thing', 'obj': 'thing:123'},)}
 
         A link to a TestResourceSpec resource using value_is_id::
             >>> from altimeter.core.resource.resource_spec import ResourceSpec
@@ -32,8 +32,8 @@ class ResourceLinkField(Field):
             >>> input = {"ThingId": "thing:123"}
             >>> field = ResourceLinkField("ThingId", TestResourceSpec, value_is_id=True)
             >>> link_collection = field.parse(data=input, context={})
-            >>> print(link_collection.dict())
-            {'simple_links': (), 'multi_links': (), 'tag_links': (), 'resource_links': ({'pred': 'thing', 'obj': 'thing:123'},), 'transient_resource_links': ()}
+            >>> print(link_collection.dict(exclude_unset=True))
+            {'resource_links': ({'pred': 'thing', 'obj': 'thing:123'},)}
 
     Args:
         source_key: Name of the key in the input JSON
@@ -111,8 +111,8 @@ class EmbeddedResourceLinkField(SubField):
             >>> input = {"Thing": ["123", "456"]}
             >>> field = ListField("Thing", EmbeddedResourceLinkField(TestResourceSpec))
             >>> link_collection = field.parse(data=input, context={})
-            >>> print(link_collection.dict())
-            {'simple_links': (), 'multi_links': (), 'tag_links': (), 'resource_links': ({'pred': 'thing', 'obj': 'thing:123'}, {'pred': 'thing', 'obj': 'thing:456'}), 'transient_resource_links': ()}
+            >>> print(link_collection.dict(exclude_unset=True))
+            {'resource_links': ({'pred': 'thing', 'obj': 'thing:123'}, {'pred': 'thing', 'obj': 'thing:456'})}
 
     Args:
         resource_spec_class: The name of the ResourceSpec class or the ResourceSpec class which
@@ -184,8 +184,8 @@ class TransientResourceLinkField(Field):
             >>> input = {"ThingId": "123"}
             >>> field = TransientResourceLinkField("ThingId", TestResourceSpec)
             >>> link_collection = field.parse(data=input, context={})
-            >>> print(link_collection.dict())
-            {'simple_links': (), 'multi_links': (), 'tag_links': (), 'resource_links': (), 'transient_resource_links': ({'pred': 'thing', 'obj': 'thing:123'},)}
+            >>> print(link_collection.dict(exclude_unset=True))
+            {'transient_resource_links': ({'pred': 'thing', 'obj': 'thing:123'},)}
     """
 
     def __init__(

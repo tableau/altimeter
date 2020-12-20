@@ -218,8 +218,9 @@ def validate_resources(resources: Tuple[Resource, ...]) -> None:
         )
     resource_ref_ids_used_by_ids: DefaultDict[str, List[str]] = defaultdict(list)
     for resource in resources:
-        for link in resource.link_collection.resource_links:
-            resource_ref_ids_used_by_ids[link.obj].append(resource.resource_id)
+        if resource.link_collection.resource_links:
+            for link in resource.link_collection.resource_links:
+                resource_ref_ids_used_by_ids[link.obj].append(resource.resource_id)
     resource_ref_ids = set(resource_ref_ids_used_by_ids.keys())
     orphan_refs = resource_ref_ids - present_resource_ids
     if orphan_refs:

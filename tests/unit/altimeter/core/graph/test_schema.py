@@ -5,7 +5,7 @@ from altimeter.core.graph.links import LinkCollection, SimpleLink
 from altimeter.core.graph.schema import Schema
 
 
-class TestSchemna(TestCase):
+class TestSchema(TestCase):
     def test_parse(self):
         schema = Schema(ScalarField("Key1"), ScalarField("Key2"))
         data = {"Key1": "Value1", "Key2": "Value2"}
