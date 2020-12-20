@@ -62,7 +62,7 @@ def run_scan(
     errors: Dict[str, List[str]] = {}
     unscanned_accounts: Set[str] = set()
     stats = MultilevelCounter()
-    graph_set: Optional[GraphSet] = None
+    graph_sets: List[GraphSet] = []
 
     for account_scan_manifest in muxer.scan(scan_plan=scan_plan):
         account_id = account_scan_manifest.account_id
@@ -73,25 +73,21 @@ def run_scan(
             for account_scan_artifact in account_scan_manifest.artifacts:
                 artifacts.append(account_scan_artifact)
                 artifact_graph_set_dict = artifact_reader.read_json(account_scan_artifact)
-                account_graph_set = GraphSet.parse_obj(artifact_graph_set_dict)
-                if graph_set is None:
-                    graph_set = account_graph_set
-                else:
-                    graph_set = GraphSet.from_graph_sets([graph_set, account_graph_set])
+                graph_sets.append(GraphSet.parse_obj(artifact_graph_set_dict))
             scanned_accounts.append(account_id)
         else:
             unscanned_accounts.add(account_id)
         account_stats = MultilevelCounter.parse_obj(account_scan_manifest.api_call_stats)
         stats.merge(account_stats)
-    if graph_set is None:
+    if not graph_sets:
         raise Exception("BUG: No graph_sets generated.")
-    validated_graph_set = ValidatedGraphSet.from_graph_set(graph_set)
+    validated_graph_set = ValidatedGraphSet.from_graph_set(GraphSet.from_graph_sets(graph_sets))
     master_artifact_path: Optional[str] = None
     if config.write_master_json:
-        master_artifact_path = artifact_writer.write_json(name="master", data=graph_set)
+        master_artifact_path = artifact_writer.write_json(name="master", data=validated_graph_set)
     logger.info(event=AWSLogEvents.ScanAWSAccountsEnd)
-    start_time = graph_set.start_time
-    end_time = graph_set.end_time
+    start_time = validated_graph_set.start_time
+    end_time = validated_graph_set.end_time
     scan_manifest = ScanManifest(
         scanned_accounts=scanned_accounts,
         master_artifact=master_artifact_path,
