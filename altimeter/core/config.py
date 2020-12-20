@@ -55,6 +55,7 @@ class Config(BaseImmutableModel):
     concurrency: ConcurrencyConfig
     scan: ScanConfig
     accessor: Accessor = Field(default_factory=Accessor)
+    write_master_json: bool = False
     neptune: Optional[NeptuneConfig] = None
 
     def __init__(self, **data: Any):

@@ -1,4 +1,4 @@
-from typing import Tuple, Set, List, Dict
+from typing import Dict, List, Optional, Set, Tuple
 
 import boto3
 
@@ -84,7 +84,9 @@ def run_scan(
         raise Exception("BUG: No graph_sets generated.")
     graph_set = GraphSet.from_graph_sets(graph_sets)
     validated_graph_set = ValidatedGraphSet.from_graph_set(graph_set)
-    master_artifact_path = artifact_writer.write_json(name="master", data=graph_set)
+    master_artifact_path: Optional[str] = None
+    if config.write_master_json:
+        master_artifact_path = artifact_writer.write_json(name="master", data=graph_set)
     logger.info(event=AWSLogEvents.ScanAWSAccountsEnd)
     start_time = graph_set.start_time
     end_time = graph_set.end_time
@@ -100,4 +102,3 @@ def run_scan(
     )
     artifact_writer.write_json("manifest", data=scan_manifest)
     return scan_manifest, validated_graph_set
-    # LEFT OFF HERE diff+cp old ScanManifest

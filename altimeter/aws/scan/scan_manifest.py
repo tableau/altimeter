@@ -1,6 +1,6 @@
 """A ScanManifest defines the output of a complete scan."""
 
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 from altimeter.core.base_model import BaseImmutableModel
 from altimeter.core.multilevel_counter import MultilevelCounter
@@ -23,7 +23,7 @@ class ScanManifest(BaseImmutableModel):
     """
 
     scanned_accounts: List[str]
-    master_artifact: str
+    master_artifact: Optional[str] = None
     artifacts: List[str]
     errors: Dict[str, List[str]]
     unscanned_accounts: List[str]

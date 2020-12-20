@@ -35,9 +35,9 @@ class AWS2NConfig(BaseSettings):
 
 @dataclass(frozen=True)
 class AWS2NResult:
-    json_path: str
     rdf_path: str
     graph_metadata: Optional[GraphMetadata]
+    json_path: Optional[str] = None
 
 
 def aws2n(scan_id: str, config: Config, muxer: AWSScanMuxer, load_neptune: bool) -> AWS2NResult:
@@ -95,7 +95,7 @@ def aws2n(scan_id: str, config: Config, muxer: AWSScanMuxer, load_neptune: bool)
             Message=json.dumps(message_dict),
         )
         logger.info(event=LogEvent.GraphLoadedSNSNotificationEnd)
-    return AWS2NResult(json_path=json_path, rdf_path=rdf_path, graph_metadata=graph_metadata)
+    return AWS2NResult(rdf_path=rdf_path, graph_metadata=graph_metadata, json_path=json_path)
 
 
 def generate_scan_id() -> str:
