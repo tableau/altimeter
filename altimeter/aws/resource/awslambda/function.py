@@ -18,7 +18,7 @@ class LambdaFunctionResourceSpec(LambdaResourceSpec):
     type_name = "function"
     schema = Schema(
         ScalarField("FunctionName"),
-        ScalarField("Runtime"),
+        ScalarField("Runtime", optional=True),
         AnonymousDictField(
             "VpcConfig",
             TransientResourceLinkField("VpcId", VPCResourceSpec, optional=True),
