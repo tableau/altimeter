@@ -26,9 +26,9 @@ class UnscannedAccountResourceSpec(AWSResourceSpec):
     ) -> Resource:
         links: List[Link] = []
         links.append(SimpleLink(pred="account_id", obj=account_id))
-        for error in errors:
-            link = SimpleLink(pred="error", obj=f"{error} - {uuid.uuid4()}")
-            links.append(link)
+        if errors:
+            error = "\n".join(errors)
+            links.append(SimpleLink(pred="error", obj=f"{error} - {uuid.uuid4()}"))
         return Resource(
             resource_id=cls.generate_arn(resource_id=account_id),
             type_name=cls.get_full_type_name(),
