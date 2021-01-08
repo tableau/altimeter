@@ -3,18 +3,8 @@ from typing import Dict, List, Union
 from rdflib import Graph, Literal, Namespace, RDF, URIRef
 
 from altimeter.core.base_model import BaseImmutableModel
-from altimeter.core.graph.links import (
-    LinkCollection,
-    MultiLink,
-    ResourceLink,
-    SimpleLink,
-    TagLink,
-    TransientResourceLink,
-)
+from altimeter.core.graph.links import LinkCollection
 from altimeter.core.graph.node_cache import NodeCache
-
-# TODO move this
-Link = Union[MultiLink, ResourceLink, SimpleLink, TagLink, TransientResourceLink]
 
 
 class Resource(BaseImmutableModel):
