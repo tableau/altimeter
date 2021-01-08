@@ -3,7 +3,7 @@ from concurrent.futures import Future, ThreadPoolExecutor
 from configparser import ConfigParser
 import json
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Tuple
 
 import boto3
 import botocore
@@ -11,8 +11,18 @@ import botocore
 from altimeter.aws.log_events import AWSLogEvents
 from altimeter.aws.scan.muxer import AWSScanMuxer
 from altimeter.aws.scan.scan_plan import AccountScanPlan
+from altimeter.core.base_model import BaseImmutableModel
 from altimeter.core.config import Config
 from altimeter.core.log import Logger
+
+
+class AccountScanLambdaEvent(BaseImmutableModel):
+    account_scan_plan: AccountScanPlan
+    scan_id: str
+    artifact_path: str
+    max_svc_scan_threads: int
+    preferred_account_scan_regions: Tuple[str, ...]
+    scan_sub_accounts: bool
 
 
 class LambdaAWSScanMuxer(AWSScanMuxer):
@@ -49,14 +59,14 @@ class LambdaAWSScanMuxer(AWSScanMuxer):
     ) -> Future:
         """Schedule an account scan by calling the AccountScan lambda with
         the proper arguments."""
-        lambda_event = {
-            "account_scan_plan": account_scan_plan.dict(),
-            "scan_id": self.scan_id,
-            "artifact_path": self.config.artifact_path,
-            "max_svc_scan_threads": self.config.concurrency.max_svc_scan_threads,
-            "preferred_account_scan_regions": self.config.scan.preferred_account_scan_regions,
-            "scan_sub_accounts": self.config.scan.scan_sub_accounts,
-        }
+        lambda_event = AccountScanLambdaEvent(
+            account_scan_plan=account_scan_plan,
+            scan_id=self.scan_id,
+            artifact_path=self.config.artifact_path,
+            max_svc_scan_threads=self.config.concurrency.max_svc_scan_threads,
+            preferred_account_scan_regions=self.config.scan.preferred_account_scan_regions,
+            scan_sub_accounts=self.config.scan.scan_sub_accounts,
+        )
         return executor.submit(
             invoke_lambda,
             self.account_scan_lambda_name,
@@ -66,7 +76,7 @@ class LambdaAWSScanMuxer(AWSScanMuxer):
 
 
 def invoke_lambda(
-    lambda_name: str, lambda_timeout: int, event: Dict[str, Any]
+    lambda_name: str, lambda_timeout: int, account_scan_lambda_event: AccountScanLambdaEvent
 ) -> List[Dict[str, Any]]:
     """Invoke an AWS Lambda function
 
@@ -74,7 +84,7 @@ def invoke_lambda(
         lambda_name: name of lambda
         lambda_timeout: timeout of the lambda. Used to tell the boto3 lambda client to wait
                         at least this long for a response before timing out.
-        event: event data to send to the lambda
+        account_scan_lambda_event: AccountScanLambdaEvent object to serialize to json and send to the lambda
 
     Returns:
         lambda response payload
@@ -83,7 +93,7 @@ def invoke_lambda(
         Exception if there was an error invoking the lambda.
     """
     logger = Logger()
-    account_id = event["account_scan_plan"]["account_id"]
+    account_id = account_scan_lambda_event.account_scan_plan.account_id
     with logger.bind(lambda_name=lambda_name, lambda_timeout=lambda_timeout, account_id=account_id):
         logger.info(event=AWSLogEvents.RunAccountScanLambdaStart)
         boto_config = botocore.config.Config(
@@ -93,19 +103,21 @@ def invoke_lambda(
         lambda_client = session.client("lambda", config=boto_config)
         try:
             resp = lambda_client.invoke(
-                FunctionName=lambda_name, Payload=json.dumps(event).encode("utf-8")
+                FunctionName=lambda_name, Payload=account_scan_lambda_event.json().encode("utf-8")
             )
         except Exception as invoke_ex:
             error = str(invoke_ex)
             logger.info(event=AWSLogEvents.RunAccountScanLambdaError, error=error)
             raise Exception(
-                f"Error while invoking {lambda_name} with event {event}: {error}"
+                f"Error while invoking {lambda_name} with event {account_scan_lambda_event.json()}: {error}"
             ) from invoke_ex
         payload: bytes = resp["Payload"].read()
         if resp.get("FunctionError", None):
             function_error = payload.decode()
             logger.info(event=AWSLogEvents.RunAccountScanLambdaError, error=function_error)
-            raise Exception(f"Function error in {lambda_name} with event {event}: {function_error}")
+            raise Exception(
+                f"Function error in {lambda_name} with event {account_scan_lambda_event.json()}: {function_error}"
+            )
         payload_dict = json.loads(payload)
         logger.info(event=AWSLogEvents.RunAccountScanLambdaEnd)
         return payload_dict

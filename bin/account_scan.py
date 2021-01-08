@@ -4,19 +4,8 @@ import logging
 from typing import Any, Dict, Tuple
 
 from altimeter.core.artifact_io.writer import ArtifactWriter
-from altimeter.core.base_model import BaseImmutableModel
 from altimeter.aws.scan.account_scanner import AccountScanner
-from altimeter.aws.scan.scan_plan import AccountScanPlan
-from altimeter.core.json_encoder import json_encoder
-
-
-class AccountScanInput(BaseImmutableModel):
-    account_scan_plan: AccountScanPlan
-    scan_id: str
-    artifact_path: str
-    max_svc_scan_threads: int
-    preferred_account_scan_regions: Tuple[str, ...]
-    scan_sub_accounts: bool
+from altimeter.aws.scan.muxer.lambda_muxer import AccountScanLambdaEvent
 
 
 def lambda_handler(event: Dict[str, Any], _: Any) -> Dict[str, Any]:
@@ -26,7 +15,7 @@ def lambda_handler(event: Dict[str, Any], _: Any) -> Dict[str, Any]:
         for handler in root.handlers:
             root.removeHandler(handler)
 
-    account_scan_input = AccountScanInput(**event)
+    account_scan_input = AccountScanLambdaEvent(**event)
 
     artifact_writer = ArtifactWriter.from_artifact_path(
         artifact_path=account_scan_input.artifact_path, scan_id=account_scan_input.scan_id
