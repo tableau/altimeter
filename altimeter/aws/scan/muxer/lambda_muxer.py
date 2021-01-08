@@ -3,12 +3,13 @@ from concurrent.futures import Future, ThreadPoolExecutor
 from configparser import ConfigParser
 import json
 from pathlib import Path
-from typing import Any, Dict, List, Tuple
+from typing import Tuple
 
 import boto3
 import botocore
 
 from altimeter.aws.log_events import AWSLogEvents
+from altimeter.aws.scan.account_scanner import AccountScanResult
 from altimeter.aws.scan.muxer import AWSScanMuxer
 from altimeter.aws.scan.scan_plan import AccountScanPlan
 from altimeter.core.base_model import BaseImmutableModel
@@ -77,8 +78,8 @@ class LambdaAWSScanMuxer(AWSScanMuxer):
 
 def invoke_lambda(
     lambda_name: str, lambda_timeout: int, account_scan_lambda_event: AccountScanLambdaEvent
-) -> List[Dict[str, Any]]:
-    """Invoke an AWS Lambda function
+) -> AccountScanResult:
+    """Invoke the AccountScan AWS Lambda function
 
     Args:
         lambda_name: name of lambda
@@ -87,7 +88,7 @@ def invoke_lambda(
         account_scan_lambda_event: AccountScanLambdaEvent object to serialize to json and send to the lambda
 
     Returns:
-        lambda response payload
+        AccountScanResult
 
     Raises:
         Exception if there was an error invoking the lambda.
@@ -119,5 +120,6 @@ def invoke_lambda(
                 f"Function error in {lambda_name} with event {account_scan_lambda_event.json()}: {function_error}"
             )
         payload_dict = json.loads(payload)
+        account_scan_result = AccountScanResult(**payload_dict)
         logger.info(event=AWSLogEvents.RunAccountScanLambdaEnd)
-        return payload_dict
+        return account_scan_result
