@@ -7,9 +7,7 @@ from altimeter.aws.resource.account import AccountResourceSpec
 from altimeter.aws.scan.aws_accessor import AWSAccessor
 from altimeter.core.graph.links import (
     LinkCollection,
-    ResourceLink,
     SimpleLink,
-    TransientResourceLink,
 )
 from altimeter.core.multilevel_counter import MultilevelCounter
 from altimeter.core.resource.resource import Resource

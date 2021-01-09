@@ -26,13 +26,18 @@ class EC2InstanceResourceSpec(EC2ResourceSpec):
 
     type_name = "instance"
     schema = Schema(
+        ScalarField("Name", optional=True),
         TransientResourceLinkField("ImageId", EC2ImageResourceSpec),
+        ScalarField("KeyName", optional=True),
+        AnonymousDictField("Placement", ScalarField("AvailabilityZone"), ScalarField("Tenancy")),
         ScalarField("InstanceType"),
         ScalarField("LaunchTime"),
         AnonymousDictField("State", ScalarField("Name", "state")),
         ScalarField("Platform", optional=True),
         ScalarField("PrivateIpAddress", optional=True),
+        ScalarField("PrivateDnsName", optional=True),
         ScalarField("PublicIpAddress", optional=True),
+        ScalarField("PublicDnsName", optional=True),
         ResourceLinkField("VpcId", VPCResourceSpec, optional=True),
         ResourceLinkField("SubnetId", SubnetResourceSpec, optional=True),
         AnonymousListField(
@@ -69,4 +74,8 @@ class EC2InstanceResourceSpec(EC2ResourceSpec):
                         account_id=account_id, region=region, resource_id=instance["InstanceId"]
                     )
                     instances[resource_arn] = instance
+                    for tag in instance.get("Tags", []):
+                        if tag["Key"].lower() == "name":
+                            instance["Name"] = tag["Value"]
+                            break
         return ListFromAWSResult(resources=instances)
