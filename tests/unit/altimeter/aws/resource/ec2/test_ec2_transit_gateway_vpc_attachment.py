@@ -45,7 +45,7 @@ class TestTransitGatewayVpcAttachmentSchema(unittest.TestCase):
                     ),
                     SimpleLink(pred="transit_gateway_id", obj="tgw-086b599bebfee5d40"),
                     SimpleLink(pred="vpc_id", obj="vpc-01e8457e8c00c40a7"),
-                    SimpleLink(pred="vpc_owner_id", obj=123456789012),
+                    SimpleLink(pred="vpc_owner_id", obj="123456789012"),
                     SimpleLink(pred="state", obj="available"),
                     SimpleLink(
                         pred="creation_time",

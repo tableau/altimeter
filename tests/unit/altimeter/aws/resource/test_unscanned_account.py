@@ -20,7 +20,7 @@ class TestUnscannedAccountMultipleErrors(TestCase):
         self.assertEqual(len(resource.link_collection.simple_links), 2)
         self.assertEqual(
             resource.link_collection.simple_links[0],
-            SimpleLink(pred="account_id", obj=12345678901),
+            SimpleLink(pred="account_id", obj="012345678901"),
         )
         self.assertEqual(resource.link_collection.simple_links[1].pred, "error")
         self.assertTrue(resource.link_collection.simple_links[1].obj.startswith("foo\nboo - "))

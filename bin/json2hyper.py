@@ -4,17 +4,27 @@ import abc
 import argparse
 from collections import defaultdict
 from dataclasses import dataclass
-from datetime import datetime
 from operator import attrgetter
 from pathlib import Path
 import sys
-from typing import DefaultDict, Dict, Iterable, List, Mapping, Optional, Set, Tuple, Type, Union
+from typing import (
+    Any,
+    DefaultDict,
+    Dict,
+    Iterable,
+    List,
+    Mapping,
+    Optional,
+    Set,
+    Tuple,
+    Type,
+    Union,
+)
 from types import MappingProxyType
 import uuid
 
 import tableauhyperapi
 
-from altimeter.core.graph import Scalar
 from altimeter.core.graph.graph_set import GraphSet
 from altimeter.core.graph.links import (
     LinkCollection,
@@ -116,9 +126,9 @@ def normalize_name(name: str) -> str:
 
 def build_table_defns(graph_sets: Iterable[GraphSet]) -> Mapping[str, Tuple[Column, ...]]:
     # discover simple link obj types - generally str, bool or int
-    table_names_simple_obj_types: DefaultDict[
-        str, DefaultDict[str, Set[Type[Scalar]]]
-    ] = defaultdict(lambda: defaultdict(set))
+    table_names_simple_obj_types: DefaultDict[str, DefaultDict[str, Set[Type[Any]]]] = defaultdict(
+        lambda: defaultdict(set)
+    )
     for graph_set in graph_sets:
         for resource in graph_set.resources:
             table_name = normalize_name(resource.type)
@@ -155,7 +165,7 @@ def build_table_defns_helper(
     link_collection: LinkCollection,
     table_name: str,
     table_names_columns: Dict[str, Set[Column]],
-    simple_obj_types: Mapping[str, Set[Type[Scalar]]],
+    simple_obj_types: Mapping[str, Set[Type[Any]]],
 ) -> None:
     if link_collection.simple_links:
         for simple_link in link_collection.simple_links:
@@ -192,13 +202,13 @@ def build_table_defns_helper(
 
 def build_data(
     graph_sets: Iterable[GraphSet], table_defns: Mapping[str, Tuple[Column, ...]],
-) -> Mapping[str, List[Tuple[Optional[Scalar], ...]]]:
+) -> Mapping[str, List[Tuple[Optional[Any], ...]]]:
     pk_counters: DefaultDict[str, int] = defaultdict(int)
     arns_pks: Dict[str, int] = {}
-    table_names_datas: DefaultDict[str, List[Tuple[Optional[Scalar], ...]]] = defaultdict(list)
+    table_names_datas: DefaultDict[str, List[Tuple[Optional[Any], ...]]] = defaultdict(list)
     for graph_set in graph_sets:
         for resource in graph_set.resources:
-            resource_data: List[Optional[Scalar]] = []
+            resource_data: List[Optional[Any]] = []
             table_name = normalize_name(resource.type)
             arn = resource.resource_id
             # build a primary key for this resource
@@ -281,14 +291,14 @@ def build_data(
 def build_multilink_data(
     pk_counters: Dict[str, int],
     arns_pks: Dict[str, int],
-    table_names_datas: DefaultDict[str, List[Tuple[Optional[Scalar], ...]]],
+    table_names_datas: DefaultDict[str, List[Tuple[Optional[Any], ...]]],
     table_defns: Mapping[str, Tuple[Column, ...]],
     parent_table_name: str,
     parent_pk: int,
     multi_link: MultiLink,
 ) -> None:
     table_name = f"_{parent_table_name}_{multi_link.pred}"
-    resource_data: List[Optional[Scalar]] = []
+    resource_data: List[Optional[Any]] = []
     columns = table_defns[table_name]
     # assign a pk. MultiLinks don't really have arns so we create a uuid
     arn = str(uuid.uuid4())

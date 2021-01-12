@@ -140,7 +140,9 @@ class TestGraphSetWithValidDataNoMerging(TestCase):
             Resource(
                 resource_id="abc",
                 type="test:b",
-                link_collection=LinkCollection(simple_links=(SimpleLink(pred="has-a", obj=123),),),
+                link_collection=LinkCollection(
+                    simple_links=(SimpleLink(pred="has-a", obj="123"),),
+                ),
             ),
             Resource(
                 resource_id="def",
@@ -363,7 +365,9 @@ class TestGraphSetFromGraphSets(TestCase):
             Resource(
                 resource_id="abc",
                 type="test:b",
-                link_collection=LinkCollection(simple_links=(SimpleLink(pred="has-a", obj=123),),),
+                link_collection=LinkCollection(
+                    simple_links=(SimpleLink(pred="has-a", obj="123"),),
+                ),
             ),
             Resource(
                 resource_id="def",

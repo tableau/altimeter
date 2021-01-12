@@ -28,7 +28,7 @@ class TestEBSVolumeResourceSpec(TestCase):
                 resource_id="arn:aws::::account/123456789012",
                 type="aws:account",
                 link_collection=LinkCollection(
-                    simple_links=(SimpleLink(pred="account_id", obj=123456789012),),
+                    simple_links=(SimpleLink(pred="account_id", obj="123456789012"),),
                 ),
             )
         ]

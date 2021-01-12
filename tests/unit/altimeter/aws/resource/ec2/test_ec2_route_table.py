@@ -58,17 +58,13 @@ class TestRouteTableSchema(unittest.TestCase):
             link_collection=link_collection,
         )
 
-        print("*" * 80)
-        print(resource)
-        print("*" * 80)
-
         expected_alti_resource = Resource(
             resource_id="arn:aws:ec2:us-east-2:111122223333:route-table/rtb-099c7b032f2bbddda",
             type="route-table",
             link_collection=LinkCollection(
                 simple_links=(
                     SimpleLink(pred="route_table_id", obj="rtb-099c7b032f2bbddda"),
-                    SimpleLink(pred="owner_id", obj=210554966933),
+                    SimpleLink(pred="owner_id", obj="210554966933"),
                 ),
                 multi_links=(
                     MultiLink(

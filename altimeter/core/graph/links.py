@@ -3,10 +3,11 @@ import abc
 import uuid
 from typing import Any, Dict, Iterable, List, Optional, Tuple, Type, Union
 
+from pydantic import validator
 from rdflib import BNode, Graph, Literal, Namespace, RDF, URIRef, XSD
 
 from altimeter.core.base_model import BaseImmutableModel
-from altimeter.core.graph import Scalar
+from altimeter.core.graph import SCALAR_TYPES
 from altimeter.core.graph.node_cache import NodeCache
 
 
@@ -45,7 +46,16 @@ class SimpleLink(BaseLink):
     in the graph."""
 
     pred: str
-    obj: Scalar
+    obj: Any
+
+    # pylint: disable=no-self-argument,no-self-use
+    @validator("obj")
+    def obj_is_scalar(cls, val: Any) -> Any:
+        if not isinstance(val, SCALAR_TYPES):
+            raise ValueError(
+                (f"Expected data to be one of {SCALAR_TYPES}, is " f"{type(val)}: {val}")
+            )
+        return val
 
     def to_rdf(
         self, subj: BNode, namespace: Namespace, graph: Graph, node_cache: NodeCache
