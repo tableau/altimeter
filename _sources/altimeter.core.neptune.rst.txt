@@ -1,0 +1,45 @@
+altimeter.core.neptune package
+==============================
+
+Submodules
+----------
+
+altimeter.core.neptune.client module
+------------------------------------
+
+.. automodule:: altimeter.core.neptune.client
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+altimeter.core.neptune.exceptions module
+----------------------------------------
+
+.. automodule:: altimeter.core.neptune.exceptions
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+altimeter.core.neptune.results module
+-------------------------------------
+
+.. automodule:: altimeter.core.neptune.results
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+altimeter.core.neptune.sparql module
+------------------------------------
+
+.. automodule:: altimeter.core.neptune.sparql
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: altimeter.core.neptune
+   :members:
+   :undoc-members:
+   :show-inheritance:

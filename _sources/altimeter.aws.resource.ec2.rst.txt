@@ -1,0 +1,149 @@
+altimeter.aws.resource.ec2 package
+==================================
+
+Submodules
+----------
+
+altimeter.aws.resource.ec2.flow\_log module
+-------------------------------------------
+
+.. automodule:: altimeter.aws.resource.ec2.flow_log
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+altimeter.aws.resource.ec2.image module
+---------------------------------------
+
+.. automodule:: altimeter.aws.resource.ec2.image
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+altimeter.aws.resource.ec2.instance module
+------------------------------------------
+
+.. automodule:: altimeter.aws.resource.ec2.instance
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+altimeter.aws.resource.ec2.internet\_gateway module
+---------------------------------------------------
+
+.. automodule:: altimeter.aws.resource.ec2.internet_gateway
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+altimeter.aws.resource.ec2.network\_interface module
+----------------------------------------------------
+
+.. automodule:: altimeter.aws.resource.ec2.network_interface
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+altimeter.aws.resource.ec2.region module
+----------------------------------------
+
+.. automodule:: altimeter.aws.resource.ec2.region
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+altimeter.aws.resource.ec2.route\_table module
+----------------------------------------------
+
+.. automodule:: altimeter.aws.resource.ec2.route_table
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+altimeter.aws.resource.ec2.security\_group module
+-------------------------------------------------
+
+.. automodule:: altimeter.aws.resource.ec2.security_group
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+altimeter.aws.resource.ec2.snapshot module
+------------------------------------------
+
+.. automodule:: altimeter.aws.resource.ec2.snapshot
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+altimeter.aws.resource.ec2.subnet module
+----------------------------------------
+
+.. automodule:: altimeter.aws.resource.ec2.subnet
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+altimeter.aws.resource.ec2.transit\_gateway module
+--------------------------------------------------
+
+.. automodule:: altimeter.aws.resource.ec2.transit_gateway
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+altimeter.aws.resource.ec2.transit\_gateway\_vpc\_attachment module
+-------------------------------------------------------------------
+
+.. automodule:: altimeter.aws.resource.ec2.transit_gateway_vpc_attachment
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+altimeter.aws.resource.ec2.volume module
+----------------------------------------
+
+.. automodule:: altimeter.aws.resource.ec2.volume
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+altimeter.aws.resource.ec2.vpc module
+-------------------------------------
+
+.. automodule:: altimeter.aws.resource.ec2.vpc
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+altimeter.aws.resource.ec2.vpc\_endpoint module
+-----------------------------------------------
+
+.. automodule:: altimeter.aws.resource.ec2.vpc_endpoint
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+altimeter.aws.resource.ec2.vpc\_endpoint\_service module
+--------------------------------------------------------
+
+.. automodule:: altimeter.aws.resource.ec2.vpc_endpoint_service
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+altimeter.aws.resource.ec2.vpc\_peering\_connection module
+----------------------------------------------------------
+
+.. automodule:: altimeter.aws.resource.ec2.vpc_peering_connection
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: altimeter.aws.resource.ec2
+   :members:
+   :undoc-members:
+   :show-inheritance:

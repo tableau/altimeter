@@ -1,0 +1,82 @@
+altimeter.qj package
+====================
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   altimeter.qj.api
+   altimeter.qj.crud
+   altimeter.qj.db
+   altimeter.qj.lambdas
+   altimeter.qj.models
+   altimeter.qj.schemas
+
+Submodules
+----------
+
+altimeter.qj.client module
+--------------------------
+
+.. automodule:: altimeter.qj.client
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+altimeter.qj.config module
+--------------------------
+
+.. automodule:: altimeter.qj.config
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+altimeter.qj.exceptions module
+------------------------------
+
+.. automodule:: altimeter.qj.exceptions
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+altimeter.qj.log module
+-----------------------
+
+.. automodule:: altimeter.qj.log
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+altimeter.qj.middleware module
+------------------------------
+
+.. automodule:: altimeter.qj.middleware
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+altimeter.qj.security module
+----------------------------
+
+.. automodule:: altimeter.qj.security
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+altimeter.qj.settings module
+----------------------------
+
+.. automodule:: altimeter.qj.settings
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: altimeter.qj
+   :members:
+   :undoc-members:
+   :show-inheritance:

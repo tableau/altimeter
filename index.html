@@ -1,0 +1,152 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Altimeter &#8212; Altimeter  documentation</title>
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Quickstart" href="user/quickstart.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="altimeter">
+<h1>Altimeter<a class="headerlink" href="#altimeter" title="Permalink to this headline">¶</a></h1>
+<p>Altimeter is a system to scan AWS resources across multiple AWS
+Organizations and Accounts and link resources together in a graph
+which can be queried to discover security and compliance issues.</p>
+<p>Altimeter outputs RDF files which can be loaded into a triplestore
+such as AWS Neptune and Blazegraph.</p>
+<p>This documentation is divided into 3 parts:</p>
+<p><a class="reference internal" href="#user-documentation">User Documentation</a> - How to use Altimeter to scan your AWS accounts and query relationships.</p>
+<p><a class="reference internal" href="#developer-documentation">Developer Documentation</a> - Documentation for developers who are interested in extending Altimeter’s capabilities,
+specifically graphing additional AWS resource types or additonal fields on existing resource types.</p>
+<p><a class="reference internal" href="#api-documentation">API Documentation</a> - auto-generated API documentation.</p>
+<div class="section" id="user-documentation">
+<h2>User Documentation<a class="headerlink" href="#user-documentation" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+</div>
+<p><a class="reference internal" href="user/quickstart.html"><span class="doc">Quickstart</span></a> - Introductory guide to graphing a single AWS account.</p>
+</div>
+<div class="section" id="developer-documentation">
+<h2>Developer Documentation<a class="headerlink" href="#developer-documentation" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+</div>
+<p><a class="reference internal" href="dev/devguide.html"><span class="doc">Developer’s Guide</span></a> - Start here.</p>
+<p><a class="reference internal" href="dev/extending.html"><span class="doc">Extending Altimeter</span></a> - How to extend Altimeter’s capabilities to collect and graph more data.</p>
+</div>
+<div class="section" id="api-documentation">
+<h2>API Documentation<a class="headerlink" href="#api-documentation" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+</div>
+<p>Altimeter is divided into two packages - <cite>aws</cite> and <cite>core</cite>.</p>
+<p>The <a class="reference internal" href="altimeter.aws.html"><span class="doc">aws</span></a> package contains AWS-specific access and scanning code for AWS-specific
+resources.</p>
+<p>The <a class="reference internal" href="altimeter.core.html"><span class="doc">core</span></a> package contains generic graphing code which is used by the <cite>aws</cite> package but could be
+used by other graph-generating systems.</p>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="#">Altimeter</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">User Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="user/quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user/local_blazegraph.html">Local Querying with Blazegraph</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user/sample_queries.html">Sample Queries</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Developer Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="dev/devguide.html">Developer’s Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dev/extending.html">Extending Altimeter</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">altimeter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="altimeter.aws.html">altimeter.aws package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="altimeter.core.html">altimeter.core package</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="#">Documentation overview</a><ul>
+      <li>Next: <a href="user/quickstart.html" title="next chapter">Quickstart</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, Tableau.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.4.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/index.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

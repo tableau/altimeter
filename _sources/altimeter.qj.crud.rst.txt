@@ -1,0 +1,29 @@
+altimeter.qj.crud package
+=========================
+
+Submodules
+----------
+
+altimeter.qj.crud.crud\_job module
+----------------------------------
+
+.. automodule:: altimeter.qj.crud.crud_job
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+altimeter.qj.crud.crud\_result\_set module
+------------------------------------------
+
+.. automodule:: altimeter.qj.crud.crud_result_set
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: altimeter.qj.crud
+   :members:
+   :undoc-members:
+   :show-inheritance:

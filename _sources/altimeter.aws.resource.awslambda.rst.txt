@@ -1,0 +1,21 @@
+altimeter.aws.resource.awslambda package
+========================================
+
+Submodules
+----------
+
+altimeter.aws.resource.awslambda.function module
+------------------------------------------------
+
+.. automodule:: altimeter.aws.resource.awslambda.function
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: altimeter.aws.resource.awslambda
+   :members:
+   :undoc-members:
+   :show-inheritance:

@@ -1,0 +1,29 @@
+altimeter.qj.api.base.endpoints package
+=======================================
+
+Submodules
+----------
+
+altimeter.qj.api.base.endpoints.auth module
+-------------------------------------------
+
+.. automodule:: altimeter.qj.api.base.endpoints.auth
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+altimeter.qj.api.base.endpoints.status module
+---------------------------------------------
+
+.. automodule:: altimeter.qj.api.base.endpoints.status
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: altimeter.qj.api.base.endpoints
+   :members:
+   :undoc-members:
+   :show-inheritance:

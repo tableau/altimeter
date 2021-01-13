@@ -1,0 +1,325 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>altimeter.qj.crud package &#8212; Altimeter  documentation</title>
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="altimeter.qj.db package" href="altimeter.qj.db.html" />
+    <link rel="prev" title="altimeter.qj.api.v1.endpoints package" href="altimeter.qj.api.v1.endpoints.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="altimeter-qj-crud-package">
+<h1>altimeter.qj.crud package<a class="headerlink" href="#altimeter-qj-crud-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-altimeter.qj.crud.crud_job">
+<span id="altimeter-qj-crud-crud-job-module"></span><h2>altimeter.qj.crud.crud_job module<a class="headerlink" href="#module-altimeter.qj.crud.crud_job" title="Permalink to this headline">¶</a></h2>
+<p>CRUD for Jobs</p>
+<dl class="py class">
+<dt id="altimeter.qj.crud.crud_job.CRUDJob">
+<em class="property">class </em><code class="sig-name descname">CRUDJob</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">db_ro_user</span></em>, <em class="sig-param"><span class="n">result_expiration_sec_default</span></em>, <em class="sig-param"><span class="n">result_expiration_sec_limit</span></em>, <em class="sig-param"><span class="n">max_graph_age_sec_default</span></em>, <em class="sig-param"><span class="n">max_graph_age_sec_limit</span></em>, <em class="sig-param"><span class="n">max_result_age_sec_default</span></em>, <em class="sig-param"><span class="n">max_result_age_sec_limit</span></em>, <em class="sig-param"><span class="n">account_id_key</span></em><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.qj.crud.crud_job.CRUDJob" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>CRUD for Jobs</p>
+<dl class="py method">
+<dt id="altimeter.qj.crud.crud_job.CRUDJob.create">
+<code class="sig-name descname">create</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">db_session</span></em>, <em class="sig-param"><span class="n">job_create_in</span></em><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.qj.crud.crud_job.CRUDJob.create" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a Job</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="altimeter.qj.models.html#altimeter.qj.models.job.Job" title="altimeter.qj.models.job.Job"><code class="xref py py-class docutils literal notranslate"><span class="pre">Job</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="altimeter.qj.crud.crud_job.CRUDJob.delete">
+<code class="sig-name descname">delete</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">db_session</span></em>, <em class="sig-param"><span class="n">job_name</span></em><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.qj.crud.crud_job.CRUDJob.delete" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete a Job</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="altimeter.qj.crud.crud_job.CRUDJob.get_active">
+<code class="sig-name descname">get_active</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">db_session</span></em>, <em class="sig-param"><span class="n">job_name</span></em><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.qj.crud.crud_job.CRUDJob.get_active" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the active version of a Job</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="altimeter.qj.models.html#altimeter.qj.models.job.Job" title="altimeter.qj.models.job.Job"><code class="xref py py-class docutils literal notranslate"><span class="pre">Job</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="altimeter.qj.crud.crud_job.CRUDJob.get_multi">
+<code class="sig-name descname">get_multi</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">db_session</span></em>, <em class="sig-param"><span class="n">active_only</span></em><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.qj.crud.crud_job.CRUDJob.get_multi" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get all Jobs, optionally only active</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<a class="reference internal" href="altimeter.qj.models.html#altimeter.qj.models.job.Job" title="altimeter.qj.models.job.Job"><code class="xref py py-class docutils literal notranslate"><span class="pre">Job</span></code></a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="altimeter.qj.crud.crud_job.CRUDJob.get_version">
+<code class="sig-name descname">get_version</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">db_session</span></em>, <em class="sig-param"><span class="n">job_name</span></em>, <em class="sig-param"><span class="n">created</span></em><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.qj.crud.crud_job.CRUDJob.get_version" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a specific version of a Job by created timestamp</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="altimeter.qj.models.html#altimeter.qj.models.job.Job" title="altimeter.qj.models.job.Job"><code class="xref py py-class docutils literal notranslate"><span class="pre">Job</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="altimeter.qj.crud.crud_job.CRUDJob.get_versions">
+<code class="sig-name descname">get_versions</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">db_session</span></em>, <em class="sig-param"><span class="n">job_name</span></em><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.qj.crud.crud_job.CRUDJob.get_versions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get all versions of a Job</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<a class="reference internal" href="altimeter.qj.models.html#altimeter.qj.models.job.Job" title="altimeter.qj.models.job.Job"><code class="xref py py-class docutils literal notranslate"><span class="pre">Job</span></code></a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="altimeter.qj.crud.crud_job.CRUDJob.update_version">
+<code class="sig-name descname">update_version</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">db_session</span></em>, <em class="sig-param"><span class="n">job_name</span></em>, <em class="sig-param"><span class="n">created</span></em>, <em class="sig-param"><span class="n">job_update</span></em><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.qj.crud.crud_job.CRUDJob.update_version" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update a Job</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="altimeter.qj.models.html#altimeter.qj.models.job.Job" title="altimeter.qj.models.job.Job"><code class="xref py py-class docutils literal notranslate"><span class="pre">Job</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-altimeter.qj.crud.crud_result_set">
+<span id="altimeter-qj-crud-crud-result-set-module"></span><h2>altimeter.qj.crud.crud_result_set module<a class="headerlink" href="#module-altimeter.qj.crud.crud_result_set" title="Permalink to this headline">¶</a></h2>
+<p>CRUD for ResultSets</p>
+<dl class="py class">
+<dt id="altimeter.qj.crud.crud_result_set.CRUDResultSet">
+<em class="property">class </em><code class="sig-name descname">CRUDResultSet</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">max_result_set_results</span></em>, <em class="sig-param"><span class="n">max_result_size_bytes</span></em>, <em class="sig-param"><span class="n">job_crud</span></em><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.qj.crud.crud_result_set.CRUDResultSet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>CRUD for ResultSets</p>
+<dl class="py method">
+<dt id="altimeter.qj.crud.crud_result_set.CRUDResultSet.create">
+<code class="sig-name descname">create</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">db_session</span></em>, <em class="sig-param"><span class="n">obj_in</span></em><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.qj.crud.crud_result_set.CRUDResultSet.create" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a ResultSet</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="altimeter.qj.models.html#altimeter.qj.models.result_set.ResultSet" title="altimeter.qj.models.result_set.ResultSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">ResultSet</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="altimeter.qj.crud.crud_result_set.CRUDResultSet.delete_expired">
+<code class="sig-name descname">delete_expired</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">db_session</span></em><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.qj.crud.crud_result_set.CRUDResultSet.delete_expired" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete all expired ResultSets, return the number of deleted ResultSet</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="altimeter.qj.crud.crud_result_set.CRUDResultSet.get">
+<code class="sig-name descname">get</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">db_session</span></em>, <em class="sig-param"><span class="n">result_set_id</span></em><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.qj.crud.crud_result_set.CRUDResultSet.get" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a ResultSet by id</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="altimeter.qj.models.html#altimeter.qj.models.result_set.ResultSet" title="altimeter.qj.models.result_set.ResultSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">ResultSet</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="altimeter.qj.crud.crud_result_set.CRUDResultSet.get_expired">
+<code class="sig-name descname">get_expired</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">db_session</span></em><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.qj.crud.crud_result_set.CRUDResultSet.get_expired" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get all expired ResultSets</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<a class="reference internal" href="altimeter.qj.models.html#altimeter.qj.models.result_set.ResultSet" title="altimeter.qj.models.result_set.ResultSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">ResultSet</span></code></a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="altimeter.qj.crud.crud_result_set.CRUDResultSet.get_latest_for_active_job">
+<code class="sig-name descname">get_latest_for_active_job</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">db_session</span></em>, <em class="sig-param"><span class="n">job_name</span></em><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.qj.crud.crud_result_set.CRUDResultSet.get_latest_for_active_job" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the latest ResultSet for the active version of a Job</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="altimeter.qj.models.html#altimeter.qj.models.result_set.ResultSet" title="altimeter.qj.models.result_set.ResultSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">ResultSet</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-altimeter.qj.crud">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-altimeter.qj.crud" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">Altimeter</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">User Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="user/quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user/local_blazegraph.html">Local Querying with Blazegraph</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user/sample_queries.html">Sample Queries</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Developer Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="dev/devguide.html">Developer’s Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dev/extending.html">Extending Altimeter</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">altimeter</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="altimeter.html">altimeter package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="altimeter.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="altimeter.aws.html">altimeter.aws package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="altimeter.core.html">altimeter.core package</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="altimeter.qj.html">altimeter.qj package</a><ul class="current">
+<li class="toctree-l5 current"><a class="reference internal" href="altimeter.qj.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l6"><a class="reference internal" href="altimeter.qj.api.html">altimeter.qj.api package</a></li>
+<li class="toctree-l6 current"><a class="current reference internal" href="#">altimeter.qj.crud package</a><ul>
+<li class="toctree-l7"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l7"><a class="reference internal" href="#module-altimeter.qj.crud.crud_job">altimeter.qj.crud.crud_job module</a></li>
+<li class="toctree-l7"><a class="reference internal" href="#module-altimeter.qj.crud.crud_result_set">altimeter.qj.crud.crud_result_set module</a></li>
+<li class="toctree-l7"><a class="reference internal" href="#module-altimeter.qj.crud">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l6"><a class="reference internal" href="altimeter.qj.db.html">altimeter.qj.db package</a></li>
+<li class="toctree-l6"><a class="reference internal" href="altimeter.qj.lambdas.html">altimeter.qj.lambdas package</a></li>
+<li class="toctree-l6"><a class="reference internal" href="altimeter.qj.models.html">altimeter.qj.models package</a></li>
+<li class="toctree-l6"><a class="reference internal" href="altimeter.qj.schemas.html">altimeter.qj.schemas package</a></li>
+</ul>
+</li>
+<li class="toctree-l5"><a class="reference internal" href="altimeter.qj.html#submodules">Submodules</a></li>
+<li class="toctree-l5"><a class="reference internal" href="altimeter.qj.html#module-altimeter.qj.client">altimeter.qj.client module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="altimeter.qj.html#module-altimeter.qj.config">altimeter.qj.config module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="altimeter.qj.html#module-altimeter.qj.exceptions">altimeter.qj.exceptions module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="altimeter.qj.html#module-altimeter.qj.log">altimeter.qj.log module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="altimeter.qj.html#module-altimeter.qj.middleware">altimeter.qj.middleware module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="altimeter.qj.html#module-altimeter.qj.security">altimeter.qj.security module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="altimeter.qj.html#module-altimeter.qj.settings">altimeter.qj.settings module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="altimeter.qj.html#module-altimeter.qj">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="altimeter.html#module-altimeter">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="altimeter.aws.html">altimeter.aws package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="altimeter.core.html">altimeter.core package</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="modules.html">altimeter</a><ul>
+  <li><a href="altimeter.html">altimeter package</a><ul>
+  <li><a href="altimeter.qj.html">altimeter.qj package</a><ul>
+      <li>Previous: <a href="altimeter.qj.api.v1.endpoints.html" title="previous chapter">altimeter.qj.api.v1.endpoints package</a></li>
+      <li>Next: <a href="altimeter.qj.db.html" title="next chapter">altimeter.qj.db package</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, Tableau.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.4.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/altimeter.qj.crud.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,166 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quickstart &#8212; Altimeter  documentation</title>
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Local Querying with Blazegraph" href="local_blazegraph.html" />
+    <link rel="prev" title="Altimeter" href="../index.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="quickstart">
+<h1>Quickstart<a class="headerlink" href="#quickstart" title="Permalink to this headline">¶</a></h1>
+<p>This quickstart guide demonstrates how to generate a graph for a single account.</p>
+<div class="section" id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">altimeter</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="configuration">
+<h2>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h2>
+<p>Altimeter’s behavior is driven by a toml configuration file.  A few sample
+configuration files are included in the <cite>conf/</cite> directory:</p>
+<ul class="simple">
+<li><p><cite>current_single_account.toml</cite> - scans the current account - this is the account
+for which the environment’s currently configured AWS CLI credentials are.</p></li>
+<li><p><cite>current_master_multi_account.toml</cite> - scans the current account and attempts to
+scan all organizational subaccounts - this configuration should be used if you
+are scanning  all accounts in an organization.  To do this the currently
+configured AWS CLI credentials should be pointing to an AWS Organizations
+master account.</p></li>
+</ul>
+<p>To scan a subset of regions, set the region list parameter <cite>regions</cite> in the <cite>scan</cite>
+section to a list of region names.</p>
+</div>
+<div class="section" id="generating-the-graph">
+<h2>Generating the Graph<a class="headerlink" href="#generating-the-graph" title="Permalink to this headline">¶</a></h2>
+<p>Assuming you have configured AWS CLI credentials
+(see &lt;<a class="reference external" href="https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html">https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html</a>&gt;),
+run:</p>
+<blockquote>
+<div><p>altimeter &lt;path-to-config&gt;</p>
+</div></blockquote>
+<p>This will scan all resources in regions specified in the config file.</p>
+<p>The full path to the generated RDF file will printed, for example:</p>
+<blockquote>
+<div><p>Created /tmp/altimeter/20191018/1571425383/graph.rdf</p>
+</div></blockquote>
+<p>This RDF file can then be loaded into a triplestore such as Neptune or Blazegraph for querying.</p>
+<p>Tooling is included for loading into a local Blazegraph instance, see
+<a class="reference internal" href="local_blazegraph.html"><span class="doc">Local Querying with Blazegraph</span></a></p>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Altimeter</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">User Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Quickstart</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#installation">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#configuration">Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#generating-the-graph">Generating the Graph</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="local_blazegraph.html">Local Querying with Blazegraph</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sample_queries.html">Sample Queries</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Developer Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../dev/devguide.html">Developer’s Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev/extending.html">Extending Altimeter</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../modules.html">altimeter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../altimeter.aws.html">altimeter.aws package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../altimeter.core.html">altimeter.core package</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="../index.html" title="previous chapter">Altimeter</a></li>
+      <li>Next: <a href="local_blazegraph.html" title="next chapter">Local Querying with Blazegraph</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, Tableau.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.4.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/user/quickstart.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

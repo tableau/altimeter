@@ -1,0 +1,37 @@
+altimeter.aws.resource.organizations package
+============================================
+
+Submodules
+----------
+
+altimeter.aws.resource.organizations.account module
+---------------------------------------------------
+
+.. automodule:: altimeter.aws.resource.organizations.account
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+altimeter.aws.resource.organizations.org module
+-----------------------------------------------
+
+.. automodule:: altimeter.aws.resource.organizations.org
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+altimeter.aws.resource.organizations.ou module
+----------------------------------------------
+
+.. automodule:: altimeter.aws.resource.organizations.ou
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: altimeter.aws.resource.organizations
+   :members:
+   :undoc-members:
+   :show-inheritance:

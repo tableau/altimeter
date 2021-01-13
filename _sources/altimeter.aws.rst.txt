@@ -1,0 +1,39 @@
+altimeter.aws package
+=====================
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   altimeter.aws.auth
+   altimeter.aws.resource
+   altimeter.aws.scan
+
+Submodules
+----------
+
+altimeter.aws.log\_events module
+--------------------------------
+
+.. automodule:: altimeter.aws.log_events
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+altimeter.aws.settings module
+-----------------------------
+
+.. automodule:: altimeter.aws.settings
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: altimeter.aws
+   :members:
+   :undoc-members:
+   :show-inheritance:

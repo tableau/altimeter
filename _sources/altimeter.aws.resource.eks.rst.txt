@@ -1,0 +1,21 @@
+altimeter.aws.resource.eks package
+==================================
+
+Submodules
+----------
+
+altimeter.aws.resource.eks.cluster module
+-----------------------------------------
+
+.. automodule:: altimeter.aws.resource.eks.cluster
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: altimeter.aws.resource.eks
+   :members:
+   :undoc-members:
+   :show-inheritance:

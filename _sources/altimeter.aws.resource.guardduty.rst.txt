@@ -1,0 +1,21 @@
+altimeter.aws.resource.guardduty package
+========================================
+
+Submodules
+----------
+
+altimeter.aws.resource.guardduty.detector module
+------------------------------------------------
+
+.. automodule:: altimeter.aws.resource.guardduty.detector
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: altimeter.aws.resource.guardduty
+   :members:
+   :undoc-members:
+   :show-inheritance:

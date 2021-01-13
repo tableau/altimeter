@@ -1,0 +1,313 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>altimeter.aws.scan.muxer package &#8212; Altimeter  documentation</title>
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="altimeter.core package" href="altimeter.core.html" />
+    <link rel="prev" title="altimeter.aws.scan package" href="altimeter.aws.scan.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="altimeter-aws-scan-muxer-package">
+<h1>altimeter.aws.scan.muxer package<a class="headerlink" href="#altimeter-aws-scan-muxer-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-altimeter.aws.scan.muxer.lambda_muxer">
+<span id="altimeter-aws-scan-muxer-lambda-muxer-module"></span><h2>altimeter.aws.scan.muxer.lambda_muxer module<a class="headerlink" href="#module-altimeter.aws.scan.muxer.lambda_muxer" title="Permalink to this headline">¶</a></h2>
+<p>AWSScanMuxer that runs account scans one-per-lambda</p>
+<dl class="py class">
+<dt id="altimeter.aws.scan.muxer.lambda_muxer.AccountScanLambdaEvent">
+<em class="property">class </em><code class="sig-name descname">AccountScanLambdaEvent</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">data</span></em><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.aws.scan.muxer.lambda_muxer.AccountScanLambdaEvent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="altimeter.core.html#altimeter.core.base_model.BaseImmutableModel" title="altimeter.core.base_model.BaseImmutableModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">altimeter.core.base_model.BaseImmutableModel</span></code></a></p>
+<dl class="py attribute">
+<dt id="altimeter.aws.scan.muxer.lambda_muxer.AccountScanLambdaEvent.account_scan_plan">
+<code class="sig-name descname">account_scan_plan</code><em class="property">: <a class="reference internal" href="altimeter.aws.scan.html#altimeter.aws.scan.scan_plan.AccountScanPlan" title="altimeter.aws.scan.scan_plan.AccountScanPlan">altimeter.aws.scan.scan_plan.AccountScanPlan</a></em><a class="headerlink" href="#altimeter.aws.scan.muxer.lambda_muxer.AccountScanLambdaEvent.account_scan_plan" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="altimeter.aws.scan.muxer.lambda_muxer.AccountScanLambdaEvent.artifact_path">
+<code class="sig-name descname">artifact_path</code><em class="property">: str</em><a class="headerlink" href="#altimeter.aws.scan.muxer.lambda_muxer.AccountScanLambdaEvent.artifact_path" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="altimeter.aws.scan.muxer.lambda_muxer.AccountScanLambdaEvent.max_svc_scan_threads">
+<code class="sig-name descname">max_svc_scan_threads</code><em class="property">: int</em><a class="headerlink" href="#altimeter.aws.scan.muxer.lambda_muxer.AccountScanLambdaEvent.max_svc_scan_threads" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="altimeter.aws.scan.muxer.lambda_muxer.AccountScanLambdaEvent.preferred_account_scan_regions">
+<code class="sig-name descname">preferred_account_scan_regions</code><em class="property">: Tuple<span class="p">[</span>str<span class="p">, </span><span class="p">…</span><span class="p">]</span></em><a class="headerlink" href="#altimeter.aws.scan.muxer.lambda_muxer.AccountScanLambdaEvent.preferred_account_scan_regions" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="altimeter.aws.scan.muxer.lambda_muxer.AccountScanLambdaEvent.scan_id">
+<code class="sig-name descname">scan_id</code><em class="property">: str</em><a class="headerlink" href="#altimeter.aws.scan.muxer.lambda_muxer.AccountScanLambdaEvent.scan_id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="altimeter.aws.scan.muxer.lambda_muxer.AccountScanLambdaEvent.scan_sub_accounts">
+<code class="sig-name descname">scan_sub_accounts</code><em class="property">: bool</em><a class="headerlink" href="#altimeter.aws.scan.muxer.lambda_muxer.AccountScanLambdaEvent.scan_sub_accounts" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="altimeter.aws.scan.muxer.lambda_muxer.LambdaAWSScanMuxer">
+<em class="property">class </em><code class="sig-name descname">LambdaAWSScanMuxer</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">scan_id</span></em>, <em class="sig-param"><span class="n">account_scan_lambda_name</span></em>, <em class="sig-param"><span class="n">account_scan_lambda_timeout</span></em>, <em class="sig-param"><span class="n">config</span></em><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.aws.scan.muxer.lambda_muxer.LambdaAWSScanMuxer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#altimeter.aws.scan.muxer.AWSScanMuxer" title="altimeter.aws.scan.muxer.AWSScanMuxer"><code class="xref py py-class docutils literal notranslate"><span class="pre">altimeter.aws.scan.muxer.AWSScanMuxer</span></code></a></p>
+<p>AWSScanMuxer that runs account scans in AccountScan lambdas</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>scan_id</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – unique scan identifier</p></li>
+<li><p><strong>account_scan_lambda_name</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – name of the AccountScan lambda</p></li>
+<li><p><strong>account_scan_lambda_timeout</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – timeout for the AccountScan lambda</p></li>
+<li><p><strong>config</strong> (<a class="reference internal" href="altimeter.core.html#altimeter.core.config.Config" title="altimeter.core.config.Config"><code class="xref py py-class docutils literal notranslate"><span class="pre">Config</span></code></a>) – Config object</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="altimeter.aws.scan.muxer.lambda_muxer.invoke_lambda">
+<code class="sig-name descname">invoke_lambda</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">lambda_name</span></em>, <em class="sig-param"><span class="n">lambda_timeout</span></em>, <em class="sig-param"><span class="n">account_scan_lambda_event</span></em><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.aws.scan.muxer.lambda_muxer.invoke_lambda" title="Permalink to this definition">¶</a></dt>
+<dd><p>Invoke the AccountScan AWS Lambda function</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lambda_name</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – name of lambda</p></li>
+<li><p><strong>lambda_timeout</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – timeout of the lambda. Used to tell the boto3 lambda client to wait
+at least this long for a response before timing out.</p></li>
+<li><p><strong>account_scan_lambda_event</strong> (<a class="reference internal" href="#altimeter.aws.scan.muxer.lambda_muxer.AccountScanLambdaEvent" title="altimeter.aws.scan.muxer.lambda_muxer.AccountScanLambdaEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">AccountScanLambdaEvent</span></code></a>) – AccountScanLambdaEvent object to serialize to json and send to the lambda</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="altimeter.aws.scan.html#altimeter.aws.scan.account_scanner.AccountScanResult" title="altimeter.aws.scan.account_scanner.AccountScanResult"><code class="xref py py-class docutils literal notranslate"><span class="pre">AccountScanResult</span></code></a></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>AccountScanResult</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>Exception if there was an error invoking the lambda.</strong> – </p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-altimeter.aws.scan.muxer.local_muxer">
+<span id="altimeter-aws-scan-muxer-local-muxer-module"></span><h2>altimeter.aws.scan.muxer.local_muxer module<a class="headerlink" href="#module-altimeter.aws.scan.muxer.local_muxer" title="Permalink to this headline">¶</a></h2>
+<p>AWSScanMuxer that runs account scans one-per-thread</p>
+<dl class="py class">
+<dt id="altimeter.aws.scan.muxer.local_muxer.LocalAWSScanMuxer">
+<em class="property">class </em><code class="sig-name descname">LocalAWSScanMuxer</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">scan_id</span></em>, <em class="sig-param"><span class="n">config</span></em><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.aws.scan.muxer.local_muxer.LocalAWSScanMuxer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#altimeter.aws.scan.muxer.AWSScanMuxer" title="altimeter.aws.scan.muxer.AWSScanMuxer"><code class="xref py py-class docutils literal notranslate"><span class="pre">altimeter.aws.scan.muxer.AWSScanMuxer</span></code></a></p>
+<p>AWSScanMuxer that runs account scans batches of accounts using local os threads</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="altimeter.aws.scan.muxer.local_muxer.local_account_scan">
+<code class="sig-name descname">local_account_scan</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">scan_id</span></em>, <em class="sig-param"><span class="n">account_scan_plan</span></em>, <em class="sig-param"><span class="n">config</span></em><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.aws.scan.muxer.local_muxer.local_account_scan" title="Permalink to this definition">¶</a></dt>
+<dd><p>Scan a set of accounts.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>account_scan_plan_dict</strong> – AccountScanPlan defining the scan</p></li>
+<li><p><strong>config</strong> (<a class="reference internal" href="altimeter.core.html#altimeter.core.config.Config" title="altimeter.core.config.Config"><code class="xref py py-class docutils literal notranslate"><span class="pre">Config</span></code></a>) – Config object</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="altimeter.aws.scan.html#altimeter.aws.scan.account_scanner.AccountScanResult" title="altimeter.aws.scan.account_scanner.AccountScanResult"><code class="xref py py-class docutils literal notranslate"><span class="pre">AccountScanResult</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-altimeter.aws.scan.muxer">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-altimeter.aws.scan.muxer" title="Permalink to this headline">¶</a></h2>
+<p>Abstract base class for AWSScanMuxers.</p>
+<dl class="py class">
+<dt id="altimeter.aws.scan.muxer.AWSScanMuxer">
+<em class="property">class </em><code class="sig-name descname">AWSScanMuxer</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">scan_id</span></em>, <em class="sig-param"><span class="n">config</span></em><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.aws.scan.muxer.AWSScanMuxer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code></p>
+<p>Abstract base class for AWSScanMuxers.  AWSScanMuxers coordinate multi-account scans
+across a pool of threads which either call account scan code locally in the case of
+a local run or invoke a Lambda-per-account in the case of Altimeter running on AWS Lambda.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>scan_id</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – unique scan identifier</p></li>
+<li><p><strong>config</strong> (<a class="reference internal" href="altimeter.core.html#altimeter.core.config.Config" title="altimeter.core.config.Config"><code class="xref py py-class docutils literal notranslate"><span class="pre">Config</span></code></a>) – Config object</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="altimeter.aws.scan.muxer.AWSScanMuxer.scan">
+<code class="sig-name descname">scan</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">scan_plan</span></em><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.aws.scan.muxer.AWSScanMuxer.scan" title="Permalink to this definition">¶</a></dt>
+<dd><p>Scan accounts. Return a list of AccountScanManifest objects.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>account_scan_plan</strong> – AccountScanPlan defining this scan op</p>
+</dd>
+<dt class="field-even">Yields</dt>
+<dd class="field-even"><p>AccountScanManifest objects</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Generator</span></code>[<a class="reference internal" href="altimeter.aws.scan.html#altimeter.aws.scan.account_scan_manifest.AccountScanManifest" title="altimeter.aws.scan.account_scan_manifest.AccountScanManifest"><code class="xref py py-class docutils literal notranslate"><span class="pre">AccountScanManifest</span></code></a>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">Altimeter</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">User Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="user/quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user/local_blazegraph.html">Local Querying with Blazegraph</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user/sample_queries.html">Sample Queries</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Developer Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="dev/devguide.html">Developer’s Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dev/extending.html">Extending Altimeter</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="modules.html">altimeter</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="altimeter.aws.html">altimeter.aws package</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="altimeter.aws.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="altimeter.aws.auth.html">altimeter.aws.auth package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="altimeter.aws.resource.html">altimeter.aws.resource package</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="altimeter.aws.scan.html">altimeter.aws.scan package</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="altimeter.aws.scan.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l5 current"><a class="current reference internal" href="#">altimeter.aws.scan.muxer package</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l6"><a class="reference internal" href="#module-altimeter.aws.scan.muxer.lambda_muxer">altimeter.aws.scan.muxer.lambda_muxer module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="#module-altimeter.aws.scan.muxer.local_muxer">altimeter.aws.scan.muxer.local_muxer module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="#module-altimeter.aws.scan.muxer">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="altimeter.aws.scan.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="altimeter.aws.scan.html#module-altimeter.aws.scan.account_scan_manifest">altimeter.aws.scan.account_scan_manifest module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="altimeter.aws.scan.html#module-altimeter.aws.scan.account_scanner">altimeter.aws.scan.account_scanner module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="altimeter.aws.scan.html#module-altimeter.aws.scan.aws_accessor">altimeter.aws.scan.aws_accessor module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="altimeter.aws.scan.html#module-altimeter.aws.scan.scan">altimeter.aws.scan.scan module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="altimeter.aws.scan.html#module-altimeter.aws.scan.scan_manifest">altimeter.aws.scan.scan_manifest module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="altimeter.aws.scan.html#module-altimeter.aws.scan.scan_plan">altimeter.aws.scan.scan_plan module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="altimeter.aws.scan.html#module-altimeter.aws.scan.settings">altimeter.aws.scan.settings module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="altimeter.aws.scan.html#module-altimeter.aws.scan">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="altimeter.aws.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="altimeter.aws.html#module-altimeter.aws.log_events">altimeter.aws.log_events module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="altimeter.aws.html#module-altimeter.aws.settings">altimeter.aws.settings module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="altimeter.aws.html#module-altimeter.aws">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="altimeter.core.html">altimeter.core package</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="modules.html">altimeter</a><ul>
+  <li><a href="altimeter.html">altimeter package</a><ul>
+  <li><a href="altimeter.aws.html">altimeter.aws package</a><ul>
+  <li><a href="altimeter.aws.scan.html">altimeter.aws.scan package</a><ul>
+      <li>Previous: <a href="altimeter.aws.scan.html" title="previous chapter">altimeter.aws.scan package</a></li>
+      <li>Next: <a href="altimeter.core.html" title="next chapter">altimeter.core package</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, Tableau.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.4.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/altimeter.aws.scan.muxer.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

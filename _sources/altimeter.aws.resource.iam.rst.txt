@@ -1,0 +1,69 @@
+altimeter.aws.resource.iam package
+==================================
+
+Submodules
+----------
+
+altimeter.aws.resource.iam.account\_password\_policy module
+-----------------------------------------------------------
+
+.. automodule:: altimeter.aws.resource.iam.account_password_policy
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+altimeter.aws.resource.iam.group module
+---------------------------------------
+
+.. automodule:: altimeter.aws.resource.iam.group
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+altimeter.aws.resource.iam.iam\_saml\_provider module
+-----------------------------------------------------
+
+.. automodule:: altimeter.aws.resource.iam.iam_saml_provider
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+altimeter.aws.resource.iam.instance\_profile module
+---------------------------------------------------
+
+.. automodule:: altimeter.aws.resource.iam.instance_profile
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+altimeter.aws.resource.iam.policy module
+----------------------------------------
+
+.. automodule:: altimeter.aws.resource.iam.policy
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+altimeter.aws.resource.iam.role module
+--------------------------------------
+
+.. automodule:: altimeter.aws.resource.iam.role
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+altimeter.aws.resource.iam.user module
+--------------------------------------
+
+.. automodule:: altimeter.aws.resource.iam.user
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: altimeter.aws.resource.iam
+   :members:
+   :undoc-members:
+   :show-inheritance:

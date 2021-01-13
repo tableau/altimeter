@@ -1,0 +1,72 @@
+altimeter.core package
+======================
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   altimeter.core.artifact_io
+   altimeter.core.graph
+   altimeter.core.neptune
+   altimeter.core.resource
+
+Submodules
+----------
+
+altimeter.core.base\_model module
+---------------------------------
+
+.. automodule:: altimeter.core.base_model
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+altimeter.core.config module
+----------------------------
+
+.. automodule:: altimeter.core.config
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+altimeter.core.exceptions module
+--------------------------------
+
+.. automodule:: altimeter.core.exceptions
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+altimeter.core.json\_encoder module
+-----------------------------------
+
+.. automodule:: altimeter.core.json_encoder
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+altimeter.core.log module
+-------------------------
+
+.. automodule:: altimeter.core.log
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+altimeter.core.log\_events module
+---------------------------------
+
+.. automodule:: altimeter.core.log_events
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: altimeter.core
+   :members:
+   :undoc-members:
+   :show-inheritance:

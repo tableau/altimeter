@@ -1,0 +1,280 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>altimeter.qj.api package &#8212; Altimeter  documentation</title>
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="altimeter.qj.api.base package" href="altimeter.qj.api.base.html" />
+    <link rel="prev" title="altimeter.qj package" href="altimeter.qj.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="altimeter-qj-api-package">
+<h1>altimeter.qj.api package<a class="headerlink" href="#altimeter-qj-api-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="altimeter.qj.api.base.html">altimeter.qj.api.base package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="altimeter.qj.api.base.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="altimeter.qj.api.base.endpoints.html">altimeter.qj.api.base.endpoints package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="altimeter.qj.api.base.endpoints.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="altimeter.qj.api.base.endpoints.html#module-altimeter.qj.api.base.endpoints.auth">altimeter.qj.api.base.endpoints.auth module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="altimeter.qj.api.base.endpoints.html#module-altimeter.qj.api.base.endpoints.status">altimeter.qj.api.base.endpoints.status module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="altimeter.qj.api.base.endpoints.html#module-altimeter.qj.api.base.endpoints">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="altimeter.qj.api.base.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="altimeter.qj.api.base.html#module-altimeter.qj.api.base.api">altimeter.qj.api.base.api module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="altimeter.qj.api.base.html#module-altimeter.qj.api.base">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="altimeter.qj.api.v1.html">altimeter.qj.api.v1 package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="altimeter.qj.api.v1.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="altimeter.qj.api.v1.endpoints.html">altimeter.qj.api.v1.endpoints package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="altimeter.qj.api.v1.endpoints.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="altimeter.qj.api.v1.endpoints.html#module-altimeter.qj.api.v1.endpoints.jobs">altimeter.qj.api.v1.endpoints.jobs module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="altimeter.qj.api.v1.endpoints.html#module-altimeter.qj.api.v1.endpoints.result_sets">altimeter.qj.api.v1.endpoints.result_sets module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="altimeter.qj.api.v1.endpoints.html#module-altimeter.qj.api.v1.endpoints">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="altimeter.qj.api.v1.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="altimeter.qj.api.v1.html#module-altimeter.qj.api.v1.api">altimeter.qj.api.v1.api module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="altimeter.qj.api.v1.html#module-altimeter.qj.api.v1">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-altimeter.qj.api.deps">
+<span id="altimeter-qj-api-deps-module"></span><h2>altimeter.qj.api.deps module<a class="headerlink" href="#module-altimeter.qj.api.deps" title="Permalink to this headline">¶</a></h2>
+<p>FastAPI dependencies</p>
+<dl class="py class">
+<dt id="altimeter.qj.api.deps.SessionGenerator">
+<em class="property">class </em><code class="sig-name descname">SessionGenerator</code><a class="headerlink" href="#altimeter.qj.api.deps.SessionGenerator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Singleton class for generating db sesssions</p>
+<dl class="py method">
+<dt id="altimeter.qj.api.deps.SessionGenerator.get_session">
+<code class="sig-name descname">get_session</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.qj.api.deps.SessionGenerator.get_session" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a db session object</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Session</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt id="altimeter.qj.api.deps.api_key">
+<code class="sig-name descname">api_key</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">key</span><span class="o">=</span><span class="default_value">Depends(APIKeyHeader)</span></em><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.qj.api.deps.api_key" title="Permalink to this definition">¶</a></dt>
+<dd><p>Validate an api key string matches the value currently in SecretsManager</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="altimeter.qj.api.deps.db_session">
+<code class="sig-name descname">db_session</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.qj.api.deps.db_session" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a db session</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Generator</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Session</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="altimeter.qj.api.deps.job_crud">
+<code class="sig-name descname">job_crud</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.qj.api.deps.job_crud" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a CRUDJob object</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="altimeter.qj.crud.html#altimeter.qj.crud.crud_job.CRUDJob" title="altimeter.qj.crud.crud_job.CRUDJob"><code class="xref py py-class docutils literal notranslate"><span class="pre">CRUDJob</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="altimeter.qj.api.deps.result_set_crud">
+<code class="sig-name descname">result_set_crud</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.qj.api.deps.result_set_crud" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a CRUDResultSet object</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="altimeter.qj.crud.html#altimeter.qj.crud.crud_result_set.CRUDResultSet" title="altimeter.qj.crud.crud_result_set.CRUDResultSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">CRUDResultSet</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-altimeter.qj.api">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-altimeter.qj.api" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">Altimeter</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">User Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="user/quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user/local_blazegraph.html">Local Querying with Blazegraph</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user/sample_queries.html">Sample Queries</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Developer Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="dev/devguide.html">Developer’s Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dev/extending.html">Extending Altimeter</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">altimeter</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="altimeter.html">altimeter package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="altimeter.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="altimeter.aws.html">altimeter.aws package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="altimeter.core.html">altimeter.core package</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="altimeter.qj.html">altimeter.qj package</a><ul class="current">
+<li class="toctree-l5 current"><a class="reference internal" href="altimeter.qj.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l6 current"><a class="current reference internal" href="#">altimeter.qj.api package</a><ul>
+<li class="toctree-l7"><a class="reference internal" href="#subpackages">Subpackages</a><ul>
+<li class="toctree-l8"><a class="reference internal" href="altimeter.qj.api.base.html">altimeter.qj.api.base package</a></li>
+<li class="toctree-l8"><a class="reference internal" href="altimeter.qj.api.v1.html">altimeter.qj.api.v1 package</a></li>
+</ul>
+</li>
+<li class="toctree-l7"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l7"><a class="reference internal" href="#module-altimeter.qj.api.deps">altimeter.qj.api.deps module</a></li>
+<li class="toctree-l7"><a class="reference internal" href="#module-altimeter.qj.api">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l6"><a class="reference internal" href="altimeter.qj.crud.html">altimeter.qj.crud package</a></li>
+<li class="toctree-l6"><a class="reference internal" href="altimeter.qj.db.html">altimeter.qj.db package</a></li>
+<li class="toctree-l6"><a class="reference internal" href="altimeter.qj.lambdas.html">altimeter.qj.lambdas package</a></li>
+<li class="toctree-l6"><a class="reference internal" href="altimeter.qj.models.html">altimeter.qj.models package</a></li>
+<li class="toctree-l6"><a class="reference internal" href="altimeter.qj.schemas.html">altimeter.qj.schemas package</a></li>
+</ul>
+</li>
+<li class="toctree-l5"><a class="reference internal" href="altimeter.qj.html#submodules">Submodules</a></li>
+<li class="toctree-l5"><a class="reference internal" href="altimeter.qj.html#module-altimeter.qj.client">altimeter.qj.client module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="altimeter.qj.html#module-altimeter.qj.config">altimeter.qj.config module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="altimeter.qj.html#module-altimeter.qj.exceptions">altimeter.qj.exceptions module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="altimeter.qj.html#module-altimeter.qj.log">altimeter.qj.log module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="altimeter.qj.html#module-altimeter.qj.middleware">altimeter.qj.middleware module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="altimeter.qj.html#module-altimeter.qj.security">altimeter.qj.security module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="altimeter.qj.html#module-altimeter.qj.settings">altimeter.qj.settings module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="altimeter.qj.html#module-altimeter.qj">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="altimeter.html#module-altimeter">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="altimeter.aws.html">altimeter.aws package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="altimeter.core.html">altimeter.core package</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="modules.html">altimeter</a><ul>
+  <li><a href="altimeter.html">altimeter package</a><ul>
+  <li><a href="altimeter.qj.html">altimeter.qj package</a><ul>
+      <li>Previous: <a href="altimeter.qj.html" title="previous chapter">altimeter.qj package</a></li>
+      <li>Next: <a href="altimeter.qj.api.base.html" title="next chapter">altimeter.qj.api.base package</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, Tableau.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.4.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/altimeter.qj.api.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

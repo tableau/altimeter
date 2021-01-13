@@ -1,0 +1,37 @@
+altimeter.core.resource package
+===============================
+
+Submodules
+----------
+
+altimeter.core.resource.exceptions module
+-----------------------------------------
+
+.. automodule:: altimeter.core.resource.exceptions
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+altimeter.core.resource.resource module
+---------------------------------------
+
+.. automodule:: altimeter.core.resource.resource
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+altimeter.core.resource.resource\_spec module
+---------------------------------------------
+
+.. automodule:: altimeter.core.resource.resource_spec
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: altimeter.core.resource
+   :members:
+   :undoc-members:
+   :show-inheritance:

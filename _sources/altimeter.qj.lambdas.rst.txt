@@ -1,0 +1,37 @@
+altimeter.qj.lambdas package
+============================
+
+Submodules
+----------
+
+altimeter.qj.lambdas.executor module
+------------------------------------
+
+.. automodule:: altimeter.qj.lambdas.executor
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+altimeter.qj.lambdas.pruner module
+----------------------------------
+
+.. automodule:: altimeter.qj.lambdas.pruner
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+altimeter.qj.lambdas.query module
+---------------------------------
+
+.. automodule:: altimeter.qj.lambdas.query
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: altimeter.qj.lambdas
+   :members:
+   :undoc-members:
+   :show-inheritance:

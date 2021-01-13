@@ -1,0 +1,186 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sample Queries &#8212; Altimeter  documentation</title>
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Developer’s Guide" href="../dev/devguide.html" />
+    <link rel="prev" title="Local Querying with Blazegraph" href="local_blazegraph.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="sample-queries">
+<h1>Sample Queries<a class="headerlink" href="#sample-queries" title="Permalink to this headline">¶</a></h1>
+<p>Find old IAM user access keys</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>select ?account_id ?iam_user_name ?access_key_id ?access_key_create_date ?access_key_status where
+{
+    ?iam_user   a                  &lt;alti:aws:iam:user&gt; ;
+                &lt;alti:name&gt;        ?iam_user_name ;
+                &lt;alti:account&gt;     ?account .
+    ?account    &lt;alti:account_id&gt;  ?account_id
+
+    optional {
+        ?iam_user   &lt;alti:access_key&gt;    ?access_key .
+        ?access_key &lt;alti:access_key_id&gt; ?access_key_id ;
+                    &lt;alti:create_date&gt;   ?access_key_create_date ;
+                    &lt;alti:status&gt;        ?access_key_status
+    }
+}
+order by ?access_key_create_date
+</pre></div>
+</div>
+<p>Locate vpcs with no ec2 instances, rds instances lambdas or ENIs attached.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>select ?account_id ?region_name ?vpc_id
+where {
+    ?vpc        a                          &lt;alti:aws:ec2:vpc&gt; ;
+                &lt;alti:account&gt;             ?account ;
+                &lt;alti:region&gt;              ?region ;
+                &lt;alti:id&gt;                  ?vpc_id ;
+                &lt;alti:is_default&gt;          ?is_default .
+
+    ?region     &lt;alti:name&gt;                ?region_name .
+
+    ?account    &lt;alti:account_id&gt;          ?account_id .
+
+    FILTER NOT EXISTS { ?resource   &lt;alti:aws:ec2:vpc&gt; ?vpc .
+                        ?resource   a                   ?resource_type .
+                        FILTER ( ?resource_type = &lt;alti:aws:ec2:instance&gt; ||
+                                 ?resource_type = &lt;alti:aws:rds:db&gt; ||
+                                 ?resource_type = &lt;alti:aws:lambda:function&gt; ||
+                                 ?resource_type = &lt;alti:aws:ec2:network-interface&gt; ) }
+}
+order by ?account_id ?region_name ?vpc_id
+</pre></div>
+</div>
+<p>Locate EC2 instances which are running, have a public IP and have security groups which
+allow tcp port 22, ordered by uptime.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>select ?launch_time ?ec2_instance_id ?sg_id ?public_ip_address ?from_port ?to_port
+where {
+        ?ec2_instance     a                                &lt;alti:aws:ec2:instance&gt; ;
+                          &lt;alti:id&gt;                        ?ec2_instance_id ;
+                          &lt;alti:account&gt;                   ?account ;
+                          &lt;alti:public_ip_address&gt;         ?public_ip_address ;
+                          &lt;alti:state&gt;                     &#39;running&#39; ;
+                          &lt;alti:launch_time&gt;               ?launch_time ;
+                          &lt;alti:security-group&gt;            ?sg .
+
+        ?sg               &lt;alti:id&gt;                        ?sg_id ;
+                          &lt;alti:ingress_rule&gt;              ?ingress_rule .
+
+        ?ingress_rule     &lt;alti:ip_protocol&gt;               &#39;tcp&#39; ;
+                          &lt;alti:from_port&gt;                 ?from_port ;
+                          &lt;alti:to_port&gt;                   ?to_port
+
+        FILTER (?from_port &lt;= 22 &amp;&amp; ?to_port &gt;= 22)
+
+} order by desc(?launch_time)
+</pre></div>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Altimeter</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">User Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="local_blazegraph.html">Local Querying with Blazegraph</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Sample Queries</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Developer Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../dev/devguide.html">Developer’s Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev/extending.html">Extending Altimeter</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../modules.html">altimeter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../altimeter.aws.html">altimeter.aws package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../altimeter.core.html">altimeter.core package</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="local_blazegraph.html" title="previous chapter">Local Querying with Blazegraph</a></li>
+      <li>Next: <a href="../dev/devguide.html" title="next chapter">Developer’s Guide</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, Tableau.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.4.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/user/sample_queries.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

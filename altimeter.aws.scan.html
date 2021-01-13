@@ -1,0 +1,578 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>altimeter.aws.scan package &#8212; Altimeter  documentation</title>
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="altimeter.aws.scan.muxer package" href="altimeter.aws.scan.muxer.html" />
+    <link rel="prev" title="altimeter.aws.resource.support package" href="altimeter.aws.resource.support.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="altimeter-aws-scan-package">
+<h1>altimeter.aws.scan package<a class="headerlink" href="#altimeter-aws-scan-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="altimeter.aws.scan.muxer.html">altimeter.aws.scan.muxer package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="altimeter.aws.scan.muxer.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="altimeter.aws.scan.muxer.html#module-altimeter.aws.scan.muxer.lambda_muxer">altimeter.aws.scan.muxer.lambda_muxer module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="altimeter.aws.scan.muxer.html#module-altimeter.aws.scan.muxer.local_muxer">altimeter.aws.scan.muxer.local_muxer module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="altimeter.aws.scan.muxer.html#module-altimeter.aws.scan.muxer">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-altimeter.aws.scan.account_scan_manifest">
+<span id="altimeter-aws-scan-account-scan-manifest-module"></span><h2>altimeter.aws.scan.account_scan_manifest module<a class="headerlink" href="#module-altimeter.aws.scan.account_scan_manifest" title="Permalink to this headline">¶</a></h2>
+<p>An AccountScanManifest defines the output of an account scan.</p>
+<dl class="py class">
+<dt id="altimeter.aws.scan.account_scan_manifest.AccountScanManifest">
+<em class="property">class </em><code class="sig-name descname">AccountScanManifest</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">account_id</span></em>, <em class="sig-param"><span class="n">artifacts</span></em>, <em class="sig-param"><span class="n">errors</span></em><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.aws.scan.account_scan_manifest.AccountScanManifest" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>An AccountScanManifest defines the output of an account scan. It contains pointers to the
+scan result artifacts and summaries of what was scanned and errors which occurred.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>account_id</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – account id</p></li>
+<li><p><strong>artifacts</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – list of scan artifacts</p></li>
+<li><p><strong>errors</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – list of error strings</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt id="altimeter.aws.scan.account_scan_manifest.AccountScanManifest.account_id">
+<code class="sig-name descname">account_id</code><em class="property">: str</em><a class="headerlink" href="#altimeter.aws.scan.account_scan_manifest.AccountScanManifest.account_id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="altimeter.aws.scan.account_scan_manifest.AccountScanManifest.artifacts">
+<code class="sig-name descname">artifacts</code><em class="property">: List<span class="p">[</span>str<span class="p">]</span></em><a class="headerlink" href="#altimeter.aws.scan.account_scan_manifest.AccountScanManifest.artifacts" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="altimeter.aws.scan.account_scan_manifest.AccountScanManifest.errors">
+<code class="sig-name descname">errors</code><em class="property">: List<span class="p">[</span>str<span class="p">]</span></em><a class="headerlink" href="#altimeter.aws.scan.account_scan_manifest.AccountScanManifest.errors" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-altimeter.aws.scan.account_scanner">
+<span id="altimeter-aws-scan-account-scanner-module"></span><h2>altimeter.aws.scan.account_scanner module<a class="headerlink" href="#module-altimeter.aws.scan.account_scanner" title="Permalink to this headline">¶</a></h2>
+<p>An AccountScanner scans a set of accounts using an AccountScanPlan to define scan
+parameters</p>
+<dl class="py class">
+<dt id="altimeter.aws.scan.account_scanner.AccountScanResult">
+<em class="property">class </em><code class="sig-name descname">AccountScanResult</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">data</span></em><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.aws.scan.account_scanner.AccountScanResult" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="altimeter.core.html#altimeter.core.base_model.BaseImmutableModel" title="altimeter.core.base_model.BaseImmutableModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">altimeter.core.base_model.BaseImmutableModel</span></code></a></p>
+<p>pydantic model representing account scan results</p>
+<dl class="py attribute">
+<dt id="altimeter.aws.scan.account_scanner.AccountScanResult.account_id">
+<code class="sig-name descname">account_id</code><em class="property">: str</em><a class="headerlink" href="#altimeter.aws.scan.account_scanner.AccountScanResult.account_id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="altimeter.aws.scan.account_scanner.AccountScanResult.artifacts">
+<code class="sig-name descname">artifacts</code><em class="property">: List<span class="p">[</span>str<span class="p">]</span></em><a class="headerlink" href="#altimeter.aws.scan.account_scanner.AccountScanResult.artifacts" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="altimeter.aws.scan.account_scanner.AccountScanResult.errors">
+<code class="sig-name descname">errors</code><em class="property">: List<span class="p">[</span>str<span class="p">]</span></em><a class="headerlink" href="#altimeter.aws.scan.account_scanner.AccountScanResult.errors" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="altimeter.aws.scan.account_scanner.AccountScanner">
+<em class="property">class </em><code class="sig-name descname">AccountScanner</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">account_scan_plan</span></em>, <em class="sig-param"><span class="n">artifact_writer</span></em>, <em class="sig-param"><span class="n">max_svc_scan_threads</span></em>, <em class="sig-param"><span class="n">preferred_account_scan_regions</span></em>, <em class="sig-param"><span class="n">scan_sub_accounts</span></em>, <em class="sig-param"><span class="n">graph_name</span><span class="o">=</span><span class="default_value">'alti'</span></em>, <em class="sig-param"><span class="n">graph_version</span><span class="o">=</span><span class="default_value">'2'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.aws.scan.account_scanner.AccountScanner" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>An AccountScanner scans a set of accounts using an AccountScanPlan to define scan
+parameters</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>account_scan_plan</strong> (<a class="reference internal" href="#altimeter.aws.scan.scan_plan.AccountScanPlan" title="altimeter.aws.scan.scan_plan.AccountScanPlan"><code class="xref py py-class docutils literal notranslate"><span class="pre">AccountScanPlan</span></code></a>) – AccountScanPlan describing scan targets</p></li>
+<li><p><strong>artifact_writer</strong> (<a class="reference internal" href="altimeter.core.artifact_io.html#altimeter.core.artifact_io.writer.ArtifactWriter" title="altimeter.core.artifact_io.writer.ArtifactWriter"><code class="xref py py-class docutils literal notranslate"><span class="pre">ArtifactWriter</span></code></a>) – ArtifactWriter for writing out artifacts</p></li>
+<li><p><strong>graph_name</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – name of graph</p></li>
+<li><p><strong>graph_version</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – version string for graph</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="altimeter.aws.scan.account_scanner.AccountScanner.scan">
+<code class="sig-name descname">scan</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.aws.scan.account_scanner.AccountScanner.scan" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#altimeter.aws.scan.account_scanner.AccountScanResult" title="altimeter.aws.scan.account_scanner.AccountScanResult"><code class="xref py py-class docutils literal notranslate"><span class="pre">AccountScanResult</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="altimeter.aws.scan.account_scanner.ScanUnit">
+<em class="property">class </em><code class="sig-name descname">ScanUnit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">graph_name</span></em>, <em class="sig-param"><span class="n">graph_version</span></em>, <em class="sig-param"><span class="n">account_id</span></em>, <em class="sig-param"><span class="n">region_name</span></em>, <em class="sig-param"><span class="n">service</span></em>, <em class="sig-param"><span class="n">access_key</span></em>, <em class="sig-param"><span class="n">secret_key</span></em>, <em class="sig-param"><span class="n">token</span></em>, <em class="sig-param"><span class="n">resource_spec_classes</span></em><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.aws.scan.account_scanner.ScanUnit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Represents a single unit of scan which can be performed concurrently alongside any other
+ScanUnit - in general ScanUnits should be organized to avoid API limits</p>
+<dl class="py attribute">
+<dt id="altimeter.aws.scan.account_scanner.ScanUnit.access_key">
+<code class="sig-name descname">access_key</code><em class="property">: str</em><a class="headerlink" href="#altimeter.aws.scan.account_scanner.ScanUnit.access_key" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="altimeter.aws.scan.account_scanner.ScanUnit.account_id">
+<code class="sig-name descname">account_id</code><em class="property">: str</em><a class="headerlink" href="#altimeter.aws.scan.account_scanner.ScanUnit.account_id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="altimeter.aws.scan.account_scanner.ScanUnit.graph_name">
+<code class="sig-name descname">graph_name</code><em class="property">: str</em><a class="headerlink" href="#altimeter.aws.scan.account_scanner.ScanUnit.graph_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="altimeter.aws.scan.account_scanner.ScanUnit.graph_version">
+<code class="sig-name descname">graph_version</code><em class="property">: str</em><a class="headerlink" href="#altimeter.aws.scan.account_scanner.ScanUnit.graph_version" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="altimeter.aws.scan.account_scanner.ScanUnit.region_name">
+<code class="sig-name descname">region_name</code><em class="property">: str</em><a class="headerlink" href="#altimeter.aws.scan.account_scanner.ScanUnit.region_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="altimeter.aws.scan.account_scanner.ScanUnit.resource_spec_classes">
+<code class="sig-name descname">resource_spec_classes</code><em class="property">: Tuple<span class="p">[</span>Type<span class="p">[</span><a class="reference internal" href="altimeter.aws.resource.html#altimeter.aws.resource.resource_spec.AWSResourceSpec" title="altimeter.aws.resource.resource_spec.AWSResourceSpec">altimeter.aws.resource.resource_spec.AWSResourceSpec</a><span class="p">]</span><span class="p">, </span><span class="p">…</span><span class="p">]</span></em><a class="headerlink" href="#altimeter.aws.scan.account_scanner.ScanUnit.resource_spec_classes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="altimeter.aws.scan.account_scanner.ScanUnit.secret_key">
+<code class="sig-name descname">secret_key</code><em class="property">: str</em><a class="headerlink" href="#altimeter.aws.scan.account_scanner.ScanUnit.secret_key" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="altimeter.aws.scan.account_scanner.ScanUnit.service">
+<code class="sig-name descname">service</code><em class="property">: str</em><a class="headerlink" href="#altimeter.aws.scan.account_scanner.ScanUnit.service" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="altimeter.aws.scan.account_scanner.ScanUnit.token">
+<code class="sig-name descname">token</code><em class="property">: str</em><a class="headerlink" href="#altimeter.aws.scan.account_scanner.ScanUnit.token" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt id="altimeter.aws.scan.account_scanner.get_all_enabled_regions">
+<code class="sig-name descname">get_all_enabled_regions</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">session</span></em><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.aws.scan.account_scanner.get_all_enabled_regions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get all enabled regions -  which are either opted-in or are opt-in-not-required - for
+a given session.
+:type session: <code class="xref py py-class docutils literal notranslate"><span class="pre">Session</span></code>
+:param session: boto3 Session</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, …]</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>tuple of enabled regions in the given session.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="altimeter.aws.scan.account_scanner.scan_scan_unit">
+<code class="sig-name descname">scan_scan_unit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">scan_unit</span></em><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.aws.scan.account_scanner.scan_scan_unit" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="altimeter.core.graph.html#altimeter.core.graph.graph_set.GraphSet" title="altimeter.core.graph.graph_set.GraphSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">GraphSet</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="altimeter.aws.scan.account_scanner.schedule_scan">
+<code class="sig-name descname">schedule_scan</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">executor</span></em>, <em class="sig-param"><span class="n">graph_name</span></em>, <em class="sig-param"><span class="n">graph_version</span></em>, <em class="sig-param"><span class="n">account_id</span></em>, <em class="sig-param"><span class="n">region_name</span></em>, <em class="sig-param"><span class="n">service</span></em>, <em class="sig-param"><span class="n">access_key</span></em>, <em class="sig-param"><span class="n">secret_key</span></em>, <em class="sig-param"><span class="n">token</span></em>, <em class="sig-param"><span class="n">resource_spec_classes</span></em><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.aws.scan.account_scanner.schedule_scan" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Future</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-altimeter.aws.scan.aws_accessor">
+<span id="altimeter-aws-scan-aws-accessor-module"></span><h2>altimeter.aws.scan.aws_accessor module<a class="headerlink" href="#module-altimeter.aws.scan.aws_accessor" title="Permalink to this headline">¶</a></h2>
+<p>AWSAccessor is a wrapper around a boto3 client which provides protection against
+non-Get/List/Describe API calls occurring.</p>
+<dl class="py class">
+<dt id="altimeter.aws.scan.aws_accessor.AWSAccessor">
+<em class="property">class </em><code class="sig-name descname">AWSAccessor</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">session</span></em>, <em class="sig-param"><span class="n">account_id</span></em>, <em class="sig-param"><span class="n">region_name</span></em>, <em class="sig-param"><span class="n">readonly</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.aws.scan.aws_accessor.AWSAccessor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>AWSAccessor is a wrapper around a boto3 client which provides protection against
+non-Get/List/Describe API calls occurring as well as api call statistic tracking.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>session</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Session</span></code>) – boto3 Session</p></li>
+<li><p><strong>account_id</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – aws account id</p></li>
+<li><p><strong>region_name</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – aws region</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="altimeter.aws.scan.aws_accessor.AWSAccessor.client">
+<code class="sig-name descname">client</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">service_name</span></em><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.aws.scan.aws_accessor.AWSAccessor.client" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a boto3 client for a given AWS service_name.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>service_name</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – AWS service name</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseClient</span></code></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>boto3 client</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt id="altimeter.aws.scan.aws_accessor.on_request_created">
+<code class="sig-name descname">on_request_created</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">account_id</span></em>, <em class="sig-param"><span class="n">region_name</span></em>, <em class="sig-param"><span class="n">service_name</span></em>, <em class="sig-param"><span class="n">readonly</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.aws.scan.aws_accessor.on_request_created" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called when a boto3 request is created.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>account_id</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – request account id</p></li>
+<li><p><strong>region_name</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – request region</p></li>
+<li><p><strong>service_name</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – request service</p></li>
+<li><p><strong>readonly</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – if True only allow readonly calls</p></li>
+<li><p><strong>kwargs</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>) – kwargs which are passed through by the boto event callback.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-altimeter.aws.scan.scan">
+<span id="altimeter-aws-scan-scan-module"></span><h2>altimeter.aws.scan.scan module<a class="headerlink" href="#module-altimeter.aws.scan.scan" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="altimeter.aws.scan.scan.get_sub_account_ids">
+<code class="sig-name descname">get_sub_account_ids</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">account_ids</span></em>, <em class="sig-param"><span class="n">accessor</span></em><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.aws.scan.scan.get_sub_account_ids" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, …]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="altimeter.aws.scan.scan.run_scan">
+<code class="sig-name descname">run_scan</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">muxer</span></em>, <em class="sig-param"><span class="n">config</span></em>, <em class="sig-param"><span class="n">artifact_writer</span></em>, <em class="sig-param"><span class="n">artifact_reader</span></em><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.aws.scan.scan.run_scan" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<a class="reference internal" href="#altimeter.aws.scan.scan_manifest.ScanManifest" title="altimeter.aws.scan.scan_manifest.ScanManifest"><code class="xref py py-class docutils literal notranslate"><span class="pre">ScanManifest</span></code></a>, <a class="reference internal" href="altimeter.core.graph.html#altimeter.core.graph.graph_set.ValidatedGraphSet" title="altimeter.core.graph.graph_set.ValidatedGraphSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">ValidatedGraphSet</span></code></a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-altimeter.aws.scan.scan_manifest">
+<span id="altimeter-aws-scan-scan-manifest-module"></span><h2>altimeter.aws.scan.scan_manifest module<a class="headerlink" href="#module-altimeter.aws.scan.scan_manifest" title="Permalink to this headline">¶</a></h2>
+<p>A ScanManifest defines the output of a complete scan.</p>
+<dl class="py class">
+<dt id="altimeter.aws.scan.scan_manifest.ScanManifest">
+<em class="property">class </em><code class="sig-name descname">ScanManifest</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">data</span></em><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.aws.scan.scan_manifest.ScanManifest" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="altimeter.core.html#altimeter.core.base_model.BaseImmutableModel" title="altimeter.core.base_model.BaseImmutableModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">altimeter.core.base_model.BaseImmutableModel</span></code></a></p>
+<p>A ScanManifest defines the output of a complete scan. It contains pointers to the
+per-account scan result artifacts and summaries of what was scanned, errors which occurred,
+scan datetime and api call statistics.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>scanned_accounts</strong> – List of account ids which were scanned</p></li>
+<li><p><strong>master_artifact</strong> – artifact containing complete graph json</p></li>
+<li><p><strong>artifacts</strong> – list of artifacts, one per account</p></li>
+<li><p><strong>errors</strong> – Dict of account_ids to list of errors encountered during scan</p></li>
+<li><p><strong>unscanned_accounts</strong> – List of account ids which were not scanned</p></li>
+<li><p><strong>start_time</strong> – epoch timestamp of scan start time</p></li>
+<li><p><strong>end_time</strong> – epoch timestamp of scan end time</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt id="altimeter.aws.scan.scan_manifest.ScanManifest.artifacts">
+<code class="sig-name descname">artifacts</code><em class="property">: List<span class="p">[</span>str<span class="p">]</span></em><a class="headerlink" href="#altimeter.aws.scan.scan_manifest.ScanManifest.artifacts" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="altimeter.aws.scan.scan_manifest.ScanManifest.end_time">
+<code class="sig-name descname">end_time</code><em class="property">: int</em><a class="headerlink" href="#altimeter.aws.scan.scan_manifest.ScanManifest.end_time" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="altimeter.aws.scan.scan_manifest.ScanManifest.errors">
+<code class="sig-name descname">errors</code><em class="property">: Dict<span class="p">[</span>str<span class="p">, </span>List<span class="p">[</span>str<span class="p">]</span><span class="p">]</span></em><a class="headerlink" href="#altimeter.aws.scan.scan_manifest.ScanManifest.errors" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="altimeter.aws.scan.scan_manifest.ScanManifest.master_artifact">
+<code class="sig-name descname">master_artifact</code><em class="property">: Optional<span class="p">[</span>str<span class="p">]</span></em><a class="headerlink" href="#altimeter.aws.scan.scan_manifest.ScanManifest.master_artifact" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="altimeter.aws.scan.scan_manifest.ScanManifest.scanned_accounts">
+<code class="sig-name descname">scanned_accounts</code><em class="property">: List<span class="p">[</span>str<span class="p">]</span></em><a class="headerlink" href="#altimeter.aws.scan.scan_manifest.ScanManifest.scanned_accounts" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="altimeter.aws.scan.scan_manifest.ScanManifest.start_time">
+<code class="sig-name descname">start_time</code><em class="property">: int</em><a class="headerlink" href="#altimeter.aws.scan.scan_manifest.ScanManifest.start_time" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="altimeter.aws.scan.scan_manifest.ScanManifest.unscanned_accounts">
+<code class="sig-name descname">unscanned_accounts</code><em class="property">: List<span class="p">[</span>str<span class="p">]</span></em><a class="headerlink" href="#altimeter.aws.scan.scan_manifest.ScanManifest.unscanned_accounts" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-altimeter.aws.scan.scan_plan">
+<span id="altimeter-aws-scan-scan-plan-module"></span><h2>altimeter.aws.scan.scan_plan module<a class="headerlink" href="#module-altimeter.aws.scan.scan_plan" title="Permalink to this headline">¶</a></h2>
+<p>A ScanPlan defines how to scan a set of accounts.</p>
+<dl class="py class">
+<dt id="altimeter.aws.scan.scan_plan.AccountScanPlan">
+<em class="property">class </em><code class="sig-name descname">AccountScanPlan</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">data</span></em><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.aws.scan.scan_plan.AccountScanPlan" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="altimeter.core.html#altimeter.core.base_model.BaseImmutableModel" title="altimeter.core.base_model.BaseImmutableModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">altimeter.core.base_model.BaseImmutableModel</span></code></a></p>
+<p>An AccountScanPlan defines how to scan an account.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>account_id</strong> – account id to scan</p></li>
+<li><p><strong>regions</strong> – regions to scan</p></li>
+<li><p><strong>accessor</strong> – Accessor to use to access the accounts</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt id="altimeter.aws.scan.scan_plan.AccountScanPlan.accessor">
+<code class="sig-name descname">accessor</code><em class="property">: <a class="reference internal" href="altimeter.aws.auth.html#altimeter.aws.auth.accessor.Accessor" title="altimeter.aws.auth.accessor.Accessor">altimeter.aws.auth.accessor.Accessor</a></em><a class="headerlink" href="#altimeter.aws.scan.scan_plan.AccountScanPlan.accessor" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="altimeter.aws.scan.scan_plan.AccountScanPlan.account_id">
+<code class="sig-name descname">account_id</code><em class="property">: str</em><a class="headerlink" href="#altimeter.aws.scan.scan_plan.AccountScanPlan.account_id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="altimeter.aws.scan.scan_plan.AccountScanPlan.regions">
+<code class="sig-name descname">regions</code><em class="property">: Tuple<span class="p">[</span>str<span class="p">, </span><span class="p">…</span><span class="p">]</span></em><a class="headerlink" href="#altimeter.aws.scan.scan_plan.AccountScanPlan.regions" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="altimeter.aws.scan.scan_plan.ScanPlan">
+<em class="property">class </em><code class="sig-name descname">ScanPlan</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">data</span></em><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.aws.scan.scan_plan.ScanPlan" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="altimeter.core.html#altimeter.core.base_model.BaseImmutableModel" title="altimeter.core.base_model.BaseImmutableModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">altimeter.core.base_model.BaseImmutableModel</span></code></a></p>
+<p>A ScanPlan defines how to scan a set of accounts.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>account_ids</strong> – account ids to scan</p></li>
+<li><p><strong>regions</strong> – regions to scan</p></li>
+<li><p><strong>accessor</strong> – Accessor to use to access the accounts</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt id="altimeter.aws.scan.scan_plan.ScanPlan.accessor">
+<code class="sig-name descname">accessor</code><em class="property">: <a class="reference internal" href="altimeter.aws.auth.html#altimeter.aws.auth.accessor.Accessor" title="altimeter.aws.auth.accessor.Accessor">altimeter.aws.auth.accessor.Accessor</a></em><a class="headerlink" href="#altimeter.aws.scan.scan_plan.ScanPlan.accessor" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="altimeter.aws.scan.scan_plan.ScanPlan.account_ids">
+<code class="sig-name descname">account_ids</code><em class="property">: Tuple<span class="p">[</span>str<span class="p">, </span><span class="p">…</span><span class="p">]</span></em><a class="headerlink" href="#altimeter.aws.scan.scan_plan.ScanPlan.account_ids" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="altimeter.aws.scan.scan_plan.ScanPlan.build_account_scan_plans">
+<code class="sig-name descname">build_account_scan_plans</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.aws.scan.scan_plan.ScanPlan.build_account_scan_plans" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<a class="reference internal" href="#altimeter.aws.scan.scan_plan.AccountScanPlan" title="altimeter.aws.scan.scan_plan.AccountScanPlan"><code class="xref py py-class docutils literal notranslate"><span class="pre">AccountScanPlan</span></code></a>, …]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="altimeter.aws.scan.scan_plan.ScanPlan.regions">
+<code class="sig-name descname">regions</code><em class="property">: Tuple<span class="p">[</span>str<span class="p">, </span><span class="p">…</span><span class="p">]</span></em><a class="headerlink" href="#altimeter.aws.scan.scan_plan.ScanPlan.regions" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-altimeter.aws.scan.settings">
+<span id="altimeter-aws-scan-settings-module"></span><h2>altimeter.aws.scan.settings module<a class="headerlink" href="#module-altimeter.aws.scan.settings" title="Permalink to this headline">¶</a></h2>
+<p>AWS Resource classes.</p>
+</div>
+<div class="section" id="module-altimeter.aws.scan">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-altimeter.aws.scan" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">Altimeter</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">User Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="user/quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user/local_blazegraph.html">Local Querying with Blazegraph</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user/sample_queries.html">Sample Queries</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Developer Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="dev/devguide.html">Developer’s Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dev/extending.html">Extending Altimeter</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="modules.html">altimeter</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="altimeter.aws.html">altimeter.aws package</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="altimeter.aws.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="altimeter.aws.auth.html">altimeter.aws.auth package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="altimeter.aws.resource.html">altimeter.aws.resource package</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">altimeter.aws.scan package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#subpackages">Subpackages</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="altimeter.aws.scan.muxer.html">altimeter.aws.scan.muxer package</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-altimeter.aws.scan.account_scan_manifest">altimeter.aws.scan.account_scan_manifest module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-altimeter.aws.scan.account_scanner">altimeter.aws.scan.account_scanner module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-altimeter.aws.scan.aws_accessor">altimeter.aws.scan.aws_accessor module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-altimeter.aws.scan.scan">altimeter.aws.scan.scan module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-altimeter.aws.scan.scan_manifest">altimeter.aws.scan.scan_manifest module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-altimeter.aws.scan.scan_plan">altimeter.aws.scan.scan_plan module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-altimeter.aws.scan.settings">altimeter.aws.scan.settings module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-altimeter.aws.scan">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="altimeter.aws.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="altimeter.aws.html#module-altimeter.aws.log_events">altimeter.aws.log_events module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="altimeter.aws.html#module-altimeter.aws.settings">altimeter.aws.settings module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="altimeter.aws.html#module-altimeter.aws">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="altimeter.core.html">altimeter.core package</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="modules.html">altimeter</a><ul>
+  <li><a href="altimeter.html">altimeter package</a><ul>
+  <li><a href="altimeter.aws.html">altimeter.aws package</a><ul>
+      <li>Previous: <a href="altimeter.aws.resource.support.html" title="previous chapter">altimeter.aws.resource.support package</a></li>
+      <li>Next: <a href="altimeter.aws.scan.muxer.html" title="next chapter">altimeter.aws.scan.muxer package</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, Tableau.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.4.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/altimeter.aws.scan.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

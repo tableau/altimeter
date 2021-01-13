@@ -1,0 +1,231 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>altimeter.aws.resource.eks package &#8212; Altimeter  documentation</title>
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="altimeter.aws.resource.elbv1 package" href="altimeter.aws.resource.elbv1.html" />
+    <link rel="prev" title="altimeter.aws.resource.ec2 package" href="altimeter.aws.resource.ec2.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="altimeter-aws-resource-eks-package">
+<h1>altimeter.aws.resource.eks package<a class="headerlink" href="#altimeter-aws-resource-eks-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-altimeter.aws.resource.eks.cluster">
+<span id="altimeter-aws-resource-eks-cluster-module"></span><h2>altimeter.aws.resource.eks.cluster module<a class="headerlink" href="#module-altimeter.aws.resource.eks.cluster" title="Permalink to this headline">¶</a></h2>
+<p>Resource for Clusters</p>
+<dl class="py class">
+<dt id="altimeter.aws.resource.eks.cluster.EKSClusterResourceSpec">
+<em class="property">class </em><code class="sig-name descname">EKSClusterResourceSpec</code><a class="headerlink" href="#altimeter.aws.resource.eks.cluster.EKSClusterResourceSpec" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#altimeter.aws.resource.eks.EKSResourceSpec" title="altimeter.aws.resource.eks.EKSResourceSpec"><code class="xref py py-class docutils literal notranslate"><span class="pre">altimeter.aws.resource.eks.EKSResourceSpec</span></code></a></p>
+<p>Resource for Clusters</p>
+<dl class="py method">
+<dt id="altimeter.aws.resource.eks.cluster.EKSClusterResourceSpec.list_from_aws">
+<em class="property">classmethod </em><code class="sig-name descname">list_from_aws</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">client</span></em>, <em class="sig-param"><span class="n">account_id</span></em>, <em class="sig-param"><span class="n">region</span></em><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.aws.resource.eks.cluster.EKSClusterResourceSpec.list_from_aws" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a dict of dicts of the format:</p>
+<blockquote>
+<div><dl class="simple">
+<dt>{‘cluster_1_arn’: {cluster_1_dict},</dt><dd><p>‘cluster_2_arn’: {cluster_2_dict},
+…}</p>
+</dd>
+</dl>
+</div></blockquote>
+<p>Where the dicts represent results from list_clusters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="altimeter.aws.resource.html#altimeter.aws.resource.resource_spec.ListFromAWSResult" title="altimeter.aws.resource.resource_spec.ListFromAWSResult"><code class="xref py py-class docutils literal notranslate"><span class="pre">ListFromAWSResult</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="altimeter.aws.resource.eks.cluster.EKSClusterResourceSpec.schema">
+<code class="sig-name descname">schema</code><em class="property">: Schema</em><em class="property"> = &lt;altimeter.core.graph.schema.Schema object&gt;</em><a class="headerlink" href="#altimeter.aws.resource.eks.cluster.EKSClusterResourceSpec.schema" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="altimeter.aws.resource.eks.cluster.EKSClusterResourceSpec.type_name">
+<code class="sig-name descname">type_name</code><em class="property">: str</em><em class="property"> = 'cluster'</em><a class="headerlink" href="#altimeter.aws.resource.eks.cluster.EKSClusterResourceSpec.type_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-altimeter.aws.resource.eks">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-altimeter.aws.resource.eks" title="Permalink to this headline">¶</a></h2>
+<p>AWSResourceSpec subclass for eks resources.</p>
+<dl class="py class">
+<dt id="altimeter.aws.resource.eks.EKSResourceSpec">
+<em class="property">class </em><code class="sig-name descname">EKSResourceSpec</code><a class="headerlink" href="#altimeter.aws.resource.eks.EKSResourceSpec" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="altimeter.aws.resource.html#altimeter.aws.resource.resource_spec.AWSResourceSpec" title="altimeter.aws.resource.resource_spec.AWSResourceSpec"><code class="xref py py-class docutils literal notranslate"><span class="pre">altimeter.aws.resource.resource_spec.AWSResourceSpec</span></code></a></p>
+<p>AWSResourceSpec subclass for eks resources.</p>
+<dl class="py attribute">
+<dt id="altimeter.aws.resource.eks.EKSResourceSpec.service_name">
+<code class="sig-name descname">service_name</code><em class="property">: str</em><em class="property"> = 'eks'</em><a class="headerlink" href="#altimeter.aws.resource.eks.EKSResourceSpec.service_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">Altimeter</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">User Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="user/quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user/local_blazegraph.html">Local Querying with Blazegraph</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user/sample_queries.html">Sample Queries</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Developer Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="dev/devguide.html">Developer’s Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dev/extending.html">Extending Altimeter</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="modules.html">altimeter</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="altimeter.aws.html">altimeter.aws package</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="altimeter.aws.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="altimeter.aws.auth.html">altimeter.aws.auth package</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="altimeter.aws.resource.html">altimeter.aws.resource package</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="altimeter.aws.resource.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l5"><a class="reference internal" href="altimeter.aws.resource.awslambda.html">altimeter.aws.resource.awslambda package</a></li>
+<li class="toctree-l5"><a class="reference internal" href="altimeter.aws.resource.cloudtrail.html">altimeter.aws.resource.cloudtrail package</a></li>
+<li class="toctree-l5"><a class="reference internal" href="altimeter.aws.resource.dynamodb.html">altimeter.aws.resource.dynamodb package</a></li>
+<li class="toctree-l5"><a class="reference internal" href="altimeter.aws.resource.ec2.html">altimeter.aws.resource.ec2 package</a></li>
+<li class="toctree-l5 current"><a class="current reference internal" href="#">altimeter.aws.resource.eks package</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l6"><a class="reference internal" href="#module-altimeter.aws.resource.eks.cluster">altimeter.aws.resource.eks.cluster module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="#module-altimeter.aws.resource.eks">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l5"><a class="reference internal" href="altimeter.aws.resource.elbv1.html">altimeter.aws.resource.elbv1 package</a></li>
+<li class="toctree-l5"><a class="reference internal" href="altimeter.aws.resource.elbv2.html">altimeter.aws.resource.elbv2 package</a></li>
+<li class="toctree-l5"><a class="reference internal" href="altimeter.aws.resource.events.html">altimeter.aws.resource.events package</a></li>
+<li class="toctree-l5"><a class="reference internal" href="altimeter.aws.resource.guardduty.html">altimeter.aws.resource.guardduty package</a></li>
+<li class="toctree-l5"><a class="reference internal" href="altimeter.aws.resource.iam.html">altimeter.aws.resource.iam package</a></li>
+<li class="toctree-l5"><a class="reference internal" href="altimeter.aws.resource.kms.html">altimeter.aws.resource.kms package</a></li>
+<li class="toctree-l5"><a class="reference internal" href="altimeter.aws.resource.organizations.html">altimeter.aws.resource.organizations package</a></li>
+<li class="toctree-l5"><a class="reference internal" href="altimeter.aws.resource.rds.html">altimeter.aws.resource.rds package</a></li>
+<li class="toctree-l5"><a class="reference internal" href="altimeter.aws.resource.s3.html">altimeter.aws.resource.s3 package</a></li>
+<li class="toctree-l5"><a class="reference internal" href="altimeter.aws.resource.support.html">altimeter.aws.resource.support package</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="altimeter.aws.resource.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="altimeter.aws.resource.html#module-altimeter.aws.resource.account">altimeter.aws.resource.account module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="altimeter.aws.resource.html#module-altimeter.aws.resource.resource_spec">altimeter.aws.resource.resource_spec module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="altimeter.aws.resource.html#module-altimeter.aws.resource.unscanned_account">altimeter.aws.resource.unscanned_account module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="altimeter.aws.resource.html#module-altimeter.aws.resource.util">altimeter.aws.resource.util module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="altimeter.aws.resource.html#module-altimeter.aws.resource">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="altimeter.aws.scan.html">altimeter.aws.scan package</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="altimeter.aws.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="altimeter.aws.html#module-altimeter.aws.log_events">altimeter.aws.log_events module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="altimeter.aws.html#module-altimeter.aws.settings">altimeter.aws.settings module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="altimeter.aws.html#module-altimeter.aws">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="altimeter.core.html">altimeter.core package</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="modules.html">altimeter</a><ul>
+  <li><a href="altimeter.html">altimeter package</a><ul>
+  <li><a href="altimeter.aws.html">altimeter.aws package</a><ul>
+  <li><a href="altimeter.aws.resource.html">altimeter.aws.resource package</a><ul>
+      <li>Previous: <a href="altimeter.aws.resource.ec2.html" title="previous chapter">altimeter.aws.resource.ec2 package</a></li>
+      <li>Next: <a href="altimeter.aws.resource.elbv1.html" title="next chapter">altimeter.aws.resource.elbv1 package</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, Tableau.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.4.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/altimeter.aws.resource.eks.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

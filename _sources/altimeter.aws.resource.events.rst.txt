@@ -1,0 +1,29 @@
+altimeter.aws.resource.events package
+=====================================
+
+Submodules
+----------
+
+altimeter.aws.resource.events.cloudwatchevents\_rule module
+-----------------------------------------------------------
+
+.. automodule:: altimeter.aws.resource.events.cloudwatchevents_rule
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+altimeter.aws.resource.events.event\_bus module
+-----------------------------------------------
+
+.. automodule:: altimeter.aws.resource.events.event_bus
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: altimeter.aws.resource.events
+   :members:
+   :undoc-members:
+   :show-inheritance:

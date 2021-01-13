@@ -1,0 +1,29 @@
+altimeter.qj.models package
+===========================
+
+Submodules
+----------
+
+altimeter.qj.models.job module
+------------------------------
+
+.. automodule:: altimeter.qj.models.job
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+altimeter.qj.models.result\_set module
+--------------------------------------
+
+.. automodule:: altimeter.qj.models.result_set
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: altimeter.qj.models
+   :members:
+   :undoc-members:
+   :show-inheritance:

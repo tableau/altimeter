@@ -1,0 +1,7 @@
+altimeter
+=========
+
+.. toctree::
+   :maxdepth: 4
+
+   altimeter

@@ -1,0 +1,20 @@
+altimeter package
+=================
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   altimeter.aws
+   altimeter.core
+   altimeter.qj
+
+Module contents
+---------------
+
+.. automodule:: altimeter
+   :members:
+   :undoc-members:
+   :show-inheritance:

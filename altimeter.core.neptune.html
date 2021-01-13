@@ -1,0 +1,863 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>altimeter.core.neptune package &#8212; Altimeter  documentation</title>
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="altimeter.core.resource package" href="altimeter.core.resource.html" />
+    <link rel="prev" title="altimeter.core.graph.field package" href="altimeter.core.graph.field.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="altimeter-core-neptune-package">
+<h1>altimeter.core.neptune package<a class="headerlink" href="#altimeter-core-neptune-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-altimeter.core.neptune.client">
+<span id="altimeter-core-neptune-client-module"></span><h2>altimeter.core.neptune.client module<a class="headerlink" href="#module-altimeter.core.neptune.client" title="Permalink to this headline">¶</a></h2>
+<p>Client for loading and accessing Altimeter generated data in Neptune</p>
+<dl class="py class">
+<dt id="altimeter.core.neptune.client.AltimeterNeptuneClient">
+<em class="property">class </em><code class="sig-name descname">AltimeterNeptuneClient</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">max_age_min</span></em>, <em class="sig-param"><span class="n">neptune_endpoint</span></em><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.core.neptune.client.AltimeterNeptuneClient" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Client to run sparql queries against a neptune instance using graph name conventions to
+determine most recent graph.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>max_age_min</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – maximum acceptable age in minutes of graphs.  Only graphs which are found
+that meet this critera will be queried.</p></li>
+<li><p><strong>neptune_endpoint</strong> (<a class="reference internal" href="#altimeter.core.neptune.client.NeptuneEndpoint" title="altimeter.core.neptune.client.NeptuneEndpoint"><code class="xref py py-class docutils literal notranslate"><span class="pre">NeptuneEndpoint</span></code></a>) – NeptuneEndpoint object for this client</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="altimeter.core.neptune.client.AltimeterNeptuneClient.clear_graph_data">
+<code class="sig-name descname">clear_graph_data</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">uri</span></em><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.core.neptune.client.AltimeterNeptuneClient.clear_graph_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Clear a graph in Neptune</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="altimeter.core.neptune.client.AltimeterNeptuneClient.clear_graph_metadata">
+<code class="sig-name descname">clear_graph_metadata</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">uri</span></em><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.core.neptune.client.AltimeterNeptuneClient.clear_graph_metadata" title="Permalink to this definition">¶</a></dt>
+<dd><p>Clear a graph metadata entry</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="altimeter.core.neptune.client.AltimeterNeptuneClient.clear_registered_graph">
+<code class="sig-name descname">clear_registered_graph</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">uri</span></em><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.core.neptune.client.AltimeterNeptuneClient.clear_registered_graph" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove data and metadata for a graph by uri</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – graph name</p></li>
+<li><p><strong>uri</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – graph uri</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>NeptuneUpdateGraphException if an error occurred during clearing</strong> – </p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="altimeter.core.neptune.client.AltimeterNeptuneClient.connect_to_gremlin">
+<code class="sig-name descname">connect_to_gremlin</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.core.neptune.client.AltimeterNeptuneClient.connect_to_gremlin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the Gremlin traversal and connection for the Neptune endpoint
+:rtype: <code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">traversal</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">DriverRemoteConnection</span></code>]
+:return: The Traversal object</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="altimeter.core.neptune.client.AltimeterNeptuneClient.get_graph_metadatas">
+<code class="sig-name descname">get_graph_metadatas</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">version</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.core.neptune.client.AltimeterNeptuneClient.get_graph_metadatas" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return all graph metadatas for a given name/version. These represent fully loaded
+graphs in the Neptune database.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – graph name</p></li>
+<li><p><strong>version</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – graph version</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<a class="reference internal" href="#altimeter.core.neptune.client.GraphMetadata" title="altimeter.core.neptune.client.GraphMetadata"><code class="xref py py-class docutils literal notranslate"><span class="pre">GraphMetadata</span></code></a>]</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>list of GraphMetadata objects for the given graph name/version</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="altimeter.core.neptune.client.AltimeterNeptuneClient.get_graph_uris">
+<code class="sig-name descname">get_graph_uris</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.core.neptune.client.AltimeterNeptuneClient.get_graph_uris" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return all graph uris regardless of whether they have corresponding metadata entries</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>name</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – graph name</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>list of graph uris</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="altimeter.core.neptune.client.AltimeterNeptuneClient.load_graph">
+<code class="sig-name descname">load_graph</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">bucket</span></em>, <em class="sig-param"><span class="n">key</span></em>, <em class="sig-param"><span class="n">load_iam_role_arn</span></em><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.core.neptune.client.AltimeterNeptuneClient.load_graph" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load a graph into Neptune.
+:type bucket: <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>
+:param bucket: s3 bucket of graph rdf
+:type key: <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>
+:param key: s3 key of graph rdf
+:type load_iam_role_arn: <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>
+:param load_iam_role_arn: arn of iam role used to load the graph</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#altimeter.core.neptune.client.GraphMetadata" title="altimeter.core.neptune.client.GraphMetadata"><code class="xref py py-class docutils literal notranslate"><span class="pre">GraphMetadata</span></code></a></p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>GraphMetadata object describing loaded graph</p>
+</dd>
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><p><strong>NeptuneLoadGraphException if errors occur during graph load</strong> – </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="altimeter.core.neptune.client.AltimeterNeptuneClient.parse_arn">
+<em class="property">static </em><code class="sig-name descname">parse_arn</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">arn</span></em><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.core.neptune.client.AltimeterNeptuneClient.parse_arn" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parses an ARN into the component pieces
+:type arn: <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>
+:param arn: The arn to parse
+:rtype: <code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>
+:return: A dictionary of the arn pieces</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="altimeter.core.neptune.client.AltimeterNeptuneClient.prepare_request">
+<code class="sig-name descname">prepare_request</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">method</span><span class="o">=</span><span class="default_value">'GET'</span></em>, <em class="sig-param"><span class="n">payload</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">querystring</span><span class="o">=</span><span class="default_value">{}</span></em><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.core.neptune.client.AltimeterNeptuneClient.prepare_request" title="Permalink to this definition">¶</a></dt>
+<dd><p>This prepares the request for sigv4signing.  This is heavily influenced by the code here:
+<a class="reference external" href="https://github.com/awslabs/amazon-neptune-tools/tree/master/neptune-python-utils">https://github.com/awslabs/amazon-neptune-tools/tree/master/neptune-python-utils</a>
+:type method: <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>
+:param method: The method name
+:type payload: <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>
+:param payload: The request payload
+:type querystring: <code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>
+:param querystring: The request querystring
+:rtype: <a class="reference internal" href="#altimeter.core.neptune.client.RequestParameters" title="altimeter.core.neptune.client.RequestParameters"><code class="xref py py-class docutils literal notranslate"><span class="pre">RequestParameters</span></code></a>
+:return: The request parameters</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="altimeter.core.neptune.client.AltimeterNeptuneClient.run_query">
+<code class="sig-name descname">run_query</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">graph_names</span></em>, <em class="sig-param"><span class="n">query</span></em><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.core.neptune.client.AltimeterNeptuneClient.run_query" title="Permalink to this definition">¶</a></dt>
+<dd><p>Runs a SPARQL query against the latest available graphs given a list of
+graph names.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>graph_names</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Set</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – list of graph names to query</p></li>
+<li><p><strong>query</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – query string. This query string should not include any ‘from’ clause;
+the graph_names param will be used to inject the correct graph uris
+by locating the latest acceptable (based on <cite>max_age_min</cite>) graph.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#altimeter.core.neptune.results.QueryResult" title="altimeter.core.neptune.results.QueryResult"><code class="xref py py-class docutils literal notranslate"><span class="pre">QueryResult</span></code></a></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>QueryResult object</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="altimeter.core.neptune.client.AltimeterNeptuneClient.run_raw_query">
+<code class="sig-name descname">run_raw_query</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">query</span></em><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.core.neptune.client.AltimeterNeptuneClient.run_raw_query" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run a query against a neptune instance, return a dict of results. Generally this
+should be called from <cite>run_query</cite></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>query</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – complete query to run</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#altimeter.core.neptune.results.QueryResultSet" title="altimeter.core.neptune.results.QueryResultSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">QueryResultSet</span></code></a></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>QueryResultSet object</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>NeptuneQueryException if an error occurred running the query</strong> – </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="altimeter.core.neptune.client.AltimeterNeptuneClient.write_to_neptune_lpg">
+<code class="sig-name descname">write_to_neptune_lpg</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">graph</span></em>, <em class="sig-param"><span class="n">scan_id</span></em><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.core.neptune.client.AltimeterNeptuneClient.write_to_neptune_lpg" title="Permalink to this definition">¶</a></dt>
+<dd><p>Writes the graph to a labeled property graph
+:type scan_id: <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>
+:param scan_id: The unique string representing the scan
+:type graph: <code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>
+:param graph: The graph to write
+:rtype: <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>
+:return: None</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="altimeter.core.neptune.client.AltimeterNeptuneClient.write_to_neptune_rdf">
+<code class="sig-name descname">write_to_neptune_rdf</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">graph</span></em><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.core.neptune.client.AltimeterNeptuneClient.write_to_neptune_rdf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Writes the graph to an RDF graph
+:type graph: <code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>
+:param graph: The graph to write
+:rtype: <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>
+:return: None</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="altimeter.core.neptune.client.GraphMetadata">
+<em class="property">class </em><code class="sig-name descname">GraphMetadata</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">uri</span></em>, <em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">version</span></em>, <em class="sig-param"><span class="n">start_time</span></em>, <em class="sig-param"><span class="n">end_time</span></em><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.core.neptune.client.GraphMetadata" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A GraphMetadata represents the details of a graph.
+These details are stored in a metadata graph in Neptune and used by clients
+to find the latest available successfuly loaded graph.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>uri</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – graph uri</p></li>
+<li><p><strong>name</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – graph name</p></li>
+<li><p><strong>version</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – graph version</p></li>
+<li><p><strong>start_time</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – epoch timestamp of graph start time</p></li>
+<li><p><strong>end_time</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – epoch timestamp of graph end time</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt id="altimeter.core.neptune.client.GraphMetadata.end_time">
+<code class="sig-name descname">end_time</code><em class="property">: int</em><a class="headerlink" href="#altimeter.core.neptune.client.GraphMetadata.end_time" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="altimeter.core.neptune.client.GraphMetadata.name">
+<code class="sig-name descname">name</code><em class="property">: str</em><a class="headerlink" href="#altimeter.core.neptune.client.GraphMetadata.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="altimeter.core.neptune.client.GraphMetadata.start_time">
+<code class="sig-name descname">start_time</code><em class="property">: int</em><a class="headerlink" href="#altimeter.core.neptune.client.GraphMetadata.start_time" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="altimeter.core.neptune.client.GraphMetadata.uri">
+<code class="sig-name descname">uri</code><em class="property">: str</em><a class="headerlink" href="#altimeter.core.neptune.client.GraphMetadata.uri" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="altimeter.core.neptune.client.GraphMetadata.version">
+<code class="sig-name descname">version</code><em class="property">: str</em><a class="headerlink" href="#altimeter.core.neptune.client.GraphMetadata.version" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="altimeter.core.neptune.client.NeptuneEndpoint">
+<em class="property">class </em><code class="sig-name descname">NeptuneEndpoint</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">host</span></em>, <em class="sig-param"><span class="n">port</span></em>, <em class="sig-param"><span class="n">region</span></em>, <em class="sig-param"><span class="n">ssl</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">auth_mode</span><span class="o">=</span><span class="default_value">'DEFAULT'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.core.neptune.client.NeptuneEndpoint" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Represents an AWS Neptune endpoint.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>host</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – neptune host</p></li>
+<li><p><strong>port</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – neptune port</p></li>
+<li><p><strong>region</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – neptune region</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt id="altimeter.core.neptune.client.NeptuneEndpoint.auth_mode">
+<code class="sig-name descname">auth_mode</code><em class="property">: str</em><em class="property"> = 'DEFAULT'</em><a class="headerlink" href="#altimeter.core.neptune.client.NeptuneEndpoint.auth_mode" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="altimeter.core.neptune.client.NeptuneEndpoint.get_endpoint_str">
+<code class="sig-name descname">get_endpoint_str</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.core.neptune.client.NeptuneEndpoint.get_endpoint_str" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the endpoint as a string in host:port format</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>endpoint string</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="altimeter.core.neptune.client.NeptuneEndpoint.get_gremlin_endpoint">
+<code class="sig-name descname">get_gremlin_endpoint</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ssl</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.core.neptune.client.NeptuneEndpoint.get_gremlin_endpoint" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the loader url for this Neptune endpoint</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>loader endpoint url</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="altimeter.core.neptune.client.NeptuneEndpoint.get_loader_endpoint">
+<code class="sig-name descname">get_loader_endpoint</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ssl</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.core.neptune.client.NeptuneEndpoint.get_loader_endpoint" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the loader url for this Neptune endpoint</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>loader endpoint url</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="altimeter.core.neptune.client.NeptuneEndpoint.get_sparql_endpoint">
+<code class="sig-name descname">get_sparql_endpoint</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ssl</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.core.neptune.client.NeptuneEndpoint.get_sparql_endpoint" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the sparql query url for this Neptune endpoint</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>sparql query endpoint url</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="altimeter.core.neptune.client.NeptuneEndpoint.host">
+<code class="sig-name descname">host</code><em class="property">: str</em><a class="headerlink" href="#altimeter.core.neptune.client.NeptuneEndpoint.host" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="altimeter.core.neptune.client.NeptuneEndpoint.port">
+<code class="sig-name descname">port</code><em class="property">: int</em><a class="headerlink" href="#altimeter.core.neptune.client.NeptuneEndpoint.port" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="altimeter.core.neptune.client.NeptuneEndpoint.region">
+<code class="sig-name descname">region</code><em class="property">: str</em><a class="headerlink" href="#altimeter.core.neptune.client.NeptuneEndpoint.region" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="altimeter.core.neptune.client.NeptuneEndpoint.ssl">
+<code class="sig-name descname">ssl</code><em class="property">: bool</em><em class="property"> = True</em><a class="headerlink" href="#altimeter.core.neptune.client.NeptuneEndpoint.ssl" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="altimeter.core.neptune.client.RequestParameters">
+<em class="property">class </em><code class="sig-name descname">RequestParameters</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">uri</span></em>, <em class="sig-param"><span class="n">querystring</span></em>, <em class="sig-param"><span class="n">headers</span></em><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.core.neptune.client.RequestParameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Holds the request parameters for Sigv4Signing</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="altimeter.core.neptune.client.discover_neptune_endpoint">
+<code class="sig-name descname">discover_neptune_endpoint</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.core.neptune.client.discover_neptune_endpoint" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find a Neptune</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#altimeter.core.neptune.client.NeptuneEndpoint" title="altimeter.core.neptune.client.NeptuneEndpoint"><code class="xref py py-class docutils literal notranslate"><span class="pre">NeptuneEndpoint</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="altimeter.core.neptune.client.get_required_tag_value">
+<code class="sig-name descname">get_required_tag_value</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">tag_set</span></em>, <em class="sig-param"><span class="n">key</span></em><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.core.neptune.client.get_required_tag_value" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a tag value from a TagSet. Raise ValueError if the key is not present.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tag_set</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]) – list of dicts, each of which contains keys ‘Key’ and ‘Value’.</p></li>
+<li><p><strong>key</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – tag key string</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>tag value string</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>ValueError if key is not present in tag_set</strong> – </p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-altimeter.core.neptune.exceptions">
+<span id="altimeter-core-neptune-exceptions-module"></span><h2>altimeter.core.neptune.exceptions module<a class="headerlink" href="#module-altimeter.core.neptune.exceptions" title="Permalink to this headline">¶</a></h2>
+<p>Neptune errors</p>
+<dl class="py exception">
+<dt id="altimeter.core.neptune.exceptions.InvalidQueryException">
+<em class="property">exception </em><code class="sig-name descname">InvalidQueryException</code><a class="headerlink" href="#altimeter.core.neptune.exceptions.InvalidQueryException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#altimeter.core.neptune.exceptions.NeptuneClientException" title="altimeter.core.neptune.exceptions.NeptuneClientException"><code class="xref py py-class docutils literal notranslate"><span class="pre">altimeter.core.neptune.exceptions.NeptuneClientException</span></code></a></p>
+<p>A statically detected error with a query was found.</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt id="altimeter.core.neptune.exceptions.NeptuneClearGraphException">
+<em class="property">exception </em><code class="sig-name descname">NeptuneClearGraphException</code><a class="headerlink" href="#altimeter.core.neptune.exceptions.NeptuneClearGraphException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#altimeter.core.neptune.exceptions.NeptuneClientException" title="altimeter.core.neptune.exceptions.NeptuneClientException"><code class="xref py py-class docutils literal notranslate"><span class="pre">altimeter.core.neptune.exceptions.NeptuneClientException</span></code></a></p>
+<p>An error occurred while clearing a graph.</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt id="altimeter.core.neptune.exceptions.NeptuneClientException">
+<em class="property">exception </em><code class="sig-name descname">NeptuneClientException</code><a class="headerlink" href="#altimeter.core.neptune.exceptions.NeptuneClientException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="altimeter.core.html#altimeter.core.exceptions.AltimeterException" title="altimeter.core.exceptions.AltimeterException"><code class="xref py py-class docutils literal notranslate"><span class="pre">altimeter.core.exceptions.AltimeterException</span></code></a></p>
+<p>Base exception class for Neptune client exceptions.</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt id="altimeter.core.neptune.exceptions.NeptuneLoadGraphException">
+<em class="property">exception </em><code class="sig-name descname">NeptuneLoadGraphException</code><a class="headerlink" href="#altimeter.core.neptune.exceptions.NeptuneLoadGraphException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#altimeter.core.neptune.exceptions.NeptuneClientException" title="altimeter.core.neptune.exceptions.NeptuneClientException"><code class="xref py py-class docutils literal notranslate"><span class="pre">altimeter.core.neptune.exceptions.NeptuneClientException</span></code></a></p>
+<p>An error occurred while loading a graph.</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt id="altimeter.core.neptune.exceptions.NeptuneNoFreshGraphFoundException">
+<em class="property">exception </em><code class="sig-name descname">NeptuneNoFreshGraphFoundException</code><a class="headerlink" href="#altimeter.core.neptune.exceptions.NeptuneNoFreshGraphFoundException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#altimeter.core.neptune.exceptions.NeptuneClientException" title="altimeter.core.neptune.exceptions.NeptuneClientException"><code class="xref py py-class docutils literal notranslate"><span class="pre">altimeter.core.neptune.exceptions.NeptuneClientException</span></code></a></p>
+<p>No acceptably recent graph could be found in Neptune.</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt id="altimeter.core.neptune.exceptions.NeptuneNoGraphsFoundException">
+<em class="property">exception </em><code class="sig-name descname">NeptuneNoGraphsFoundException</code><a class="headerlink" href="#altimeter.core.neptune.exceptions.NeptuneNoGraphsFoundException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#altimeter.core.neptune.exceptions.NeptuneClientException" title="altimeter.core.neptune.exceptions.NeptuneClientException"><code class="xref py py-class docutils literal notranslate"><span class="pre">altimeter.core.neptune.exceptions.NeptuneClientException</span></code></a></p>
+<p>No graphs were found in Neptune.</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt id="altimeter.core.neptune.exceptions.NeptuneQueryException">
+<em class="property">exception </em><code class="sig-name descname">NeptuneQueryException</code><a class="headerlink" href="#altimeter.core.neptune.exceptions.NeptuneQueryException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#altimeter.core.neptune.exceptions.NeptuneClientException" title="altimeter.core.neptune.exceptions.NeptuneClientException"><code class="xref py py-class docutils literal notranslate"><span class="pre">altimeter.core.neptune.exceptions.NeptuneClientException</span></code></a></p>
+<p>A server-side error occurred during a Neptune query execution.</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt id="altimeter.core.neptune.exceptions.NeptuneUpdateGraphException">
+<em class="property">exception </em><code class="sig-name descname">NeptuneUpdateGraphException</code><a class="headerlink" href="#altimeter.core.neptune.exceptions.NeptuneUpdateGraphException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#altimeter.core.neptune.exceptions.NeptuneClientException" title="altimeter.core.neptune.exceptions.NeptuneClientException"><code class="xref py py-class docutils literal notranslate"><span class="pre">altimeter.core.neptune.exceptions.NeptuneClientException</span></code></a></p>
+<p>An error occurred while updating a graph.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-altimeter.core.neptune.results">
+<span id="altimeter-core-neptune-results-module"></span><h2>altimeter.core.neptune.results module<a class="headerlink" href="#module-altimeter.core.neptune.results" title="Permalink to this headline">¶</a></h2>
+<p>Classes for representing query results</p>
+<dl class="py class">
+<dt id="altimeter.core.neptune.results.QueryResult">
+<em class="property">class </em><code class="sig-name descname">QueryResult</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">graph_uris_load_times</span></em>, <em class="sig-param"><span class="n">query_result_set</span></em><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.core.neptune.results.QueryResult" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Represents the results of a SPARQL query and includes the
+graph uris from which results were pulled.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>graph_uris_load_times</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]) – Dict with keys which are the graph uris which were used in this
+query and values which are the load end times for the graph.</p></li>
+<li><p><strong>query_result_set</strong> (<a class="reference internal" href="#altimeter.core.neptune.results.QueryResultSet" title="altimeter.core.neptune.results.QueryResultSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">QueryResultSet</span></code></a>) – QueryResultSet containing results</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="altimeter.core.neptune.results.QueryResult.get_length">
+<code class="sig-name descname">get_length</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.core.neptune.results.QueryResult.get_length" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the length of this result.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>int length</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="altimeter.core.neptune.results.QueryResult.get_stats">
+<code class="sig-name descname">get_stats</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">field_keys</span></em><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.core.neptune.results.QueryResult.get_stats" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a Counter representing statistics about this result set keyed by a user
+specified list of field keys (e.g. account_id and account_name)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>field_keys</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – list of field names to use as stat keys</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Counter</span></code></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Counter containing result stats.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="altimeter.core.neptune.results.QueryResult.to_csv">
+<code class="sig-name descname">to_csv</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.core.neptune.results.QueryResult.to_csv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a CSV representation of this QueryResult.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>csv as a str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="altimeter.core.neptune.results.QueryResult.to_dict">
+<code class="sig-name descname">to_dict</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.core.neptune.results.QueryResult.to_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate a dict representing this QueryResult</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>], <code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]]]</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>dict representation of this QueryResult</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="altimeter.core.neptune.results.QueryResult.to_list">
+<code class="sig-name descname">to_list</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.core.neptune.results.QueryResult.to_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate a list representing this QueryResult</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]]</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>List of dicts representing this QueryResult</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="altimeter.core.neptune.results.QueryResult.to_ndjson">
+<code class="sig-name descname">to_ndjson</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.core.neptune.results.QueryResult.to_ndjson" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create an NDJSON representation of this QueryResult.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>NDJSON as a str</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="altimeter.core.neptune.results.QueryResultSet">
+<em class="property">class </em><code class="sig-name descname">QueryResultSet</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">fields</span></em>, <em class="sig-param"><span class="n">values</span></em><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.core.neptune.results.QueryResultSet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Represents the results of a SPARQL query.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fields</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – List of field names</p></li>
+<li><p><strong>values</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]]) – list of value dicts as returned from neptune’s query api.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="altimeter.core.neptune.results.QueryResultSet.from_dict">
+<em class="property">classmethod </em><code class="sig-name descname">from_dict</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.core.neptune.results.QueryResultSet.from_dict" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#altimeter.core.neptune.results.QueryResultSet" title="altimeter.core.neptune.results.QueryResultSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">QueryResultSet</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="altimeter.core.neptune.results.QueryResultSet.from_sparql_endpoint_json">
+<em class="property">classmethod </em><code class="sig-name descname">from_sparql_endpoint_json</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">resp</span></em><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.core.neptune.results.QueryResultSet.from_sparql_endpoint_json" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build a QueryResultSet object from the returned data
+of a sparql endpoint json query (has top level field ‘head’ and
+results’)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>resp</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]) – response dict from neptune’s query api</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#altimeter.core.neptune.results.QueryResultSet" title="altimeter.core.neptune.results.QueryResultSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">QueryResultSet</span></code></a></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>QueryResultSet object</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="altimeter.core.neptune.results.QueryResultSet.get_stats">
+<code class="sig-name descname">get_stats</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">field_keys</span></em><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.core.neptune.results.QueryResultSet.get_stats" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a Counter representing statistics about this result set keyed by a user
+specified list of field keys (e.g. account_id and account_name)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>field_keys</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – list of field names to use as stat keys</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Counter</span></code></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Counter containing result stats.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="altimeter.core.neptune.results.QueryResultSet.to_csv">
+<code class="sig-name descname">to_csv</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.core.neptune.results.QueryResultSet.to_csv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a CSV representation of this QueryResultSet.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>csv as a str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="altimeter.core.neptune.results.QueryResultSet.to_list">
+<code class="sig-name descname">to_list</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.core.neptune.results.QueryResultSet.to_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a list of dicts representing these results, each dict
+is an individual result row.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]]</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>List of dicts representing this QueryResultSet.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="altimeter.core.neptune.results.QueryResultSet.to_ndjson">
+<code class="sig-name descname">to_ndjson</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.core.neptune.results.QueryResultSet.to_ndjson" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create an NDJSON representation of this QueryResult.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>NDJSON as a str</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-altimeter.core.neptune.sparql">
+<span id="altimeter-core-neptune-sparql-module"></span><h2>altimeter.core.neptune.sparql module<a class="headerlink" href="#module-altimeter.core.neptune.sparql" title="Permalink to this headline">¶</a></h2>
+<p>SPARQL related functions.</p>
+<dl class="py function">
+<dt id="altimeter.core.neptune.sparql.finalize_query">
+<code class="sig-name descname">finalize_query</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">query</span></em>, <em class="sig-param"><span class="n">graph_uris</span></em><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.core.neptune.sparql.finalize_query" title="Permalink to this definition">¶</a></dt>
+<dd><p>Finalize a generic sparql query - specifically add a FROM clause
+containing graph uris for this query.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>query</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – query string</p></li>
+<li><p><strong>graph_uris</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – list of graph uris</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>finalized query string</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-altimeter.core.neptune">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-altimeter.core.neptune" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">Altimeter</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">User Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="user/quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user/local_blazegraph.html">Local Querying with Blazegraph</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user/sample_queries.html">Sample Queries</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Developer Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="dev/devguide.html">Developer’s Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dev/extending.html">Extending Altimeter</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="modules.html">altimeter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="altimeter.aws.html">altimeter.aws package</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="altimeter.core.html">altimeter.core package</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="altimeter.core.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="altimeter.core.artifact_io.html">altimeter.core.artifact_io package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="altimeter.core.graph.html">altimeter.core.graph package</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">altimeter.core.neptune package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-altimeter.core.neptune.client">altimeter.core.neptune.client module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-altimeter.core.neptune.exceptions">altimeter.core.neptune.exceptions module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-altimeter.core.neptune.results">altimeter.core.neptune.results module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-altimeter.core.neptune.sparql">altimeter.core.neptune.sparql module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-altimeter.core.neptune">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="altimeter.core.resource.html">altimeter.core.resource package</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="altimeter.core.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="altimeter.core.html#module-altimeter.core.base_model">altimeter.core.base_model module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="altimeter.core.html#module-altimeter.core.config">altimeter.core.config module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="altimeter.core.html#module-altimeter.core.exceptions">altimeter.core.exceptions module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="altimeter.core.html#module-altimeter.core.json_encoder">altimeter.core.json_encoder module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="altimeter.core.html#module-altimeter.core.log">altimeter.core.log module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="altimeter.core.html#module-altimeter.core.log_events">altimeter.core.log_events module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="altimeter.core.html#module-altimeter.core">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="modules.html">altimeter</a><ul>
+  <li><a href="altimeter.html">altimeter package</a><ul>
+  <li><a href="altimeter.core.html">altimeter.core package</a><ul>
+      <li>Previous: <a href="altimeter.core.graph.field.html" title="previous chapter">altimeter.core.graph.field package</a></li>
+      <li>Next: <a href="altimeter.core.resource.html" title="next chapter">altimeter.core.resource package</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, Tableau.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.4.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/altimeter.core.neptune.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

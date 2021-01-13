@@ -1,0 +1,67 @@
+altimeter.aws.resource package
+==============================
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   altimeter.aws.resource.awslambda
+   altimeter.aws.resource.cloudtrail
+   altimeter.aws.resource.dynamodb
+   altimeter.aws.resource.ec2
+   altimeter.aws.resource.eks
+   altimeter.aws.resource.elbv1
+   altimeter.aws.resource.elbv2
+   altimeter.aws.resource.events
+   altimeter.aws.resource.guardduty
+   altimeter.aws.resource.iam
+   altimeter.aws.resource.kms
+   altimeter.aws.resource.organizations
+   altimeter.aws.resource.rds
+   altimeter.aws.resource.s3
+   altimeter.aws.resource.support
+
+Submodules
+----------
+
+altimeter.aws.resource.account module
+-------------------------------------
+
+.. automodule:: altimeter.aws.resource.account
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+altimeter.aws.resource.resource\_spec module
+--------------------------------------------
+
+.. automodule:: altimeter.aws.resource.resource_spec
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+altimeter.aws.resource.unscanned\_account module
+------------------------------------------------
+
+.. automodule:: altimeter.aws.resource.unscanned_account
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+altimeter.aws.resource.util module
+----------------------------------
+
+.. automodule:: altimeter.aws.resource.util
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: altimeter.aws.resource
+   :members:
+   :undoc-members:
+   :show-inheritance:

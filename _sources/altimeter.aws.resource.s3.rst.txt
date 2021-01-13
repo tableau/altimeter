@@ -1,0 +1,21 @@
+altimeter.aws.resource.s3 package
+=================================
+
+Submodules
+----------
+
+altimeter.aws.resource.s3.bucket module
+---------------------------------------
+
+.. automodule:: altimeter.aws.resource.s3.bucket
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: altimeter.aws.resource.s3
+   :members:
+   :undoc-members:
+   :show-inheritance:

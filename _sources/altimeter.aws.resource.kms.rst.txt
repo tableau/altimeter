@@ -1,0 +1,21 @@
+altimeter.aws.resource.kms package
+==================================
+
+Submodules
+----------
+
+altimeter.aws.resource.kms.key module
+-------------------------------------
+
+.. automodule:: altimeter.aws.resource.kms.key
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: altimeter.aws.resource.kms
+   :members:
+   :undoc-members:
+   :show-inheritance:

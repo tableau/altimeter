@@ -1,0 +1,21 @@
+altimeter.aws.resource.cloudtrail package
+=========================================
+
+Submodules
+----------
+
+altimeter.aws.resource.cloudtrail.trail module
+----------------------------------------------
+
+.. automodule:: altimeter.aws.resource.cloudtrail.trail
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: altimeter.aws.resource.cloudtrail
+   :members:
+   :undoc-members:
+   :show-inheritance:

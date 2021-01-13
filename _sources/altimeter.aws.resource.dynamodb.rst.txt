@@ -1,0 +1,21 @@
+altimeter.aws.resource.dynamodb package
+=======================================
+
+Submodules
+----------
+
+altimeter.aws.resource.dynamodb.dynamodb\_table module
+------------------------------------------------------
+
+.. automodule:: altimeter.aws.resource.dynamodb.dynamodb_table
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: altimeter.aws.resource.dynamodb
+   :members:
+   :undoc-members:
+   :show-inheritance:

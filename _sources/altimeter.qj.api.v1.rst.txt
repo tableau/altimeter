@@ -1,0 +1,29 @@
+altimeter.qj.api.v1 package
+===========================
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   altimeter.qj.api.v1.endpoints
+
+Submodules
+----------
+
+altimeter.qj.api.v1.api module
+------------------------------
+
+.. automodule:: altimeter.qj.api.v1.api
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: altimeter.qj.api.v1
+   :members:
+   :undoc-members:
+   :show-inheritance:

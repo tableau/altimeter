@@ -1,0 +1,29 @@
+altimeter.aws.resource.rds package
+==================================
+
+Submodules
+----------
+
+altimeter.aws.resource.rds.instance module
+------------------------------------------
+
+.. automodule:: altimeter.aws.resource.rds.instance
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+altimeter.aws.resource.rds.snapshot module
+------------------------------------------
+
+.. automodule:: altimeter.aws.resource.rds.snapshot
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: altimeter.aws.resource.rds
+   :members:
+   :undoc-members:
+   :show-inheritance:

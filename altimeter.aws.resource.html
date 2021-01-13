@@ -1,0 +1,727 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>altimeter.aws.resource package &#8212; Altimeter  documentation</title>
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="altimeter.aws.resource.awslambda package" href="altimeter.aws.resource.awslambda.html" />
+    <link rel="prev" title="altimeter.aws.auth package" href="altimeter.aws.auth.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="altimeter-aws-resource-package">
+<h1>altimeter.aws.resource package<a class="headerlink" href="#altimeter-aws-resource-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="altimeter.aws.resource.awslambda.html">altimeter.aws.resource.awslambda package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="altimeter.aws.resource.awslambda.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="altimeter.aws.resource.awslambda.html#module-altimeter.aws.resource.awslambda.function">altimeter.aws.resource.awslambda.function module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="altimeter.aws.resource.awslambda.html#module-altimeter.aws.resource.awslambda">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="altimeter.aws.resource.cloudtrail.html">altimeter.aws.resource.cloudtrail package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="altimeter.aws.resource.cloudtrail.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="altimeter.aws.resource.cloudtrail.html#module-altimeter.aws.resource.cloudtrail.trail">altimeter.aws.resource.cloudtrail.trail module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="altimeter.aws.resource.cloudtrail.html#module-altimeter.aws.resource.cloudtrail">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="altimeter.aws.resource.dynamodb.html">altimeter.aws.resource.dynamodb package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="altimeter.aws.resource.dynamodb.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="altimeter.aws.resource.dynamodb.html#module-altimeter.aws.resource.dynamodb.dynamodb_table">altimeter.aws.resource.dynamodb.dynamodb_table module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="altimeter.aws.resource.dynamodb.html#module-altimeter.aws.resource.dynamodb">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="altimeter.aws.resource.ec2.html">altimeter.aws.resource.ec2 package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="altimeter.aws.resource.ec2.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="altimeter.aws.resource.ec2.html#module-altimeter.aws.resource.ec2.flow_log">altimeter.aws.resource.ec2.flow_log module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="altimeter.aws.resource.ec2.html#module-altimeter.aws.resource.ec2.image">altimeter.aws.resource.ec2.image module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="altimeter.aws.resource.ec2.html#module-altimeter.aws.resource.ec2.instance">altimeter.aws.resource.ec2.instance module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="altimeter.aws.resource.ec2.html#module-altimeter.aws.resource.ec2.internet_gateway">altimeter.aws.resource.ec2.internet_gateway module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="altimeter.aws.resource.ec2.html#module-altimeter.aws.resource.ec2.network_interface">altimeter.aws.resource.ec2.network_interface module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="altimeter.aws.resource.ec2.html#module-altimeter.aws.resource.ec2.region">altimeter.aws.resource.ec2.region module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="altimeter.aws.resource.ec2.html#module-altimeter.aws.resource.ec2.route_table">altimeter.aws.resource.ec2.route_table module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="altimeter.aws.resource.ec2.html#module-altimeter.aws.resource.ec2.security_group">altimeter.aws.resource.ec2.security_group module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="altimeter.aws.resource.ec2.html#module-altimeter.aws.resource.ec2.snapshot">altimeter.aws.resource.ec2.snapshot module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="altimeter.aws.resource.ec2.html#module-altimeter.aws.resource.ec2.subnet">altimeter.aws.resource.ec2.subnet module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="altimeter.aws.resource.ec2.html#module-altimeter.aws.resource.ec2.transit_gateway">altimeter.aws.resource.ec2.transit_gateway module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="altimeter.aws.resource.ec2.html#module-altimeter.aws.resource.ec2.transit_gateway_vpc_attachment">altimeter.aws.resource.ec2.transit_gateway_vpc_attachment module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="altimeter.aws.resource.ec2.html#module-altimeter.aws.resource.ec2.volume">altimeter.aws.resource.ec2.volume module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="altimeter.aws.resource.ec2.html#module-altimeter.aws.resource.ec2.vpc">altimeter.aws.resource.ec2.vpc module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="altimeter.aws.resource.ec2.html#module-altimeter.aws.resource.ec2.vpc_endpoint">altimeter.aws.resource.ec2.vpc_endpoint module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="altimeter.aws.resource.ec2.html#module-altimeter.aws.resource.ec2.vpc_endpoint_service">altimeter.aws.resource.ec2.vpc_endpoint_service module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="altimeter.aws.resource.ec2.html#module-altimeter.aws.resource.ec2.vpc_peering_connection">altimeter.aws.resource.ec2.vpc_peering_connection module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="altimeter.aws.resource.ec2.html#module-altimeter.aws.resource.ec2">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="altimeter.aws.resource.eks.html">altimeter.aws.resource.eks package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="altimeter.aws.resource.eks.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="altimeter.aws.resource.eks.html#module-altimeter.aws.resource.eks.cluster">altimeter.aws.resource.eks.cluster module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="altimeter.aws.resource.eks.html#module-altimeter.aws.resource.eks">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="altimeter.aws.resource.elbv1.html">altimeter.aws.resource.elbv1 package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="altimeter.aws.resource.elbv1.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="altimeter.aws.resource.elbv1.html#module-altimeter.aws.resource.elbv1.load_balancer">altimeter.aws.resource.elbv1.load_balancer module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="altimeter.aws.resource.elbv1.html#module-altimeter.aws.resource.elbv1">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="altimeter.aws.resource.elbv2.html">altimeter.aws.resource.elbv2 package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="altimeter.aws.resource.elbv2.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="altimeter.aws.resource.elbv2.html#module-altimeter.aws.resource.elbv2.load_balancer">altimeter.aws.resource.elbv2.load_balancer module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="altimeter.aws.resource.elbv2.html#module-altimeter.aws.resource.elbv2.target_group">altimeter.aws.resource.elbv2.target_group module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="altimeter.aws.resource.elbv2.html#module-altimeter.aws.resource.elbv2">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="altimeter.aws.resource.events.html">altimeter.aws.resource.events package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="altimeter.aws.resource.events.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="altimeter.aws.resource.events.html#module-altimeter.aws.resource.events.cloudwatchevents_rule">altimeter.aws.resource.events.cloudwatchevents_rule module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="altimeter.aws.resource.events.html#module-altimeter.aws.resource.events.event_bus">altimeter.aws.resource.events.event_bus module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="altimeter.aws.resource.events.html#module-altimeter.aws.resource.events">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="altimeter.aws.resource.guardduty.html">altimeter.aws.resource.guardduty package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="altimeter.aws.resource.guardduty.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="altimeter.aws.resource.guardduty.html#module-altimeter.aws.resource.guardduty.detector">altimeter.aws.resource.guardduty.detector module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="altimeter.aws.resource.guardduty.html#module-altimeter.aws.resource.guardduty">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="altimeter.aws.resource.iam.html">altimeter.aws.resource.iam package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="altimeter.aws.resource.iam.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="altimeter.aws.resource.iam.html#module-altimeter.aws.resource.iam.account_password_policy">altimeter.aws.resource.iam.account_password_policy module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="altimeter.aws.resource.iam.html#module-altimeter.aws.resource.iam.group">altimeter.aws.resource.iam.group module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="altimeter.aws.resource.iam.html#module-altimeter.aws.resource.iam.iam_saml_provider">altimeter.aws.resource.iam.iam_saml_provider module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="altimeter.aws.resource.iam.html#module-altimeter.aws.resource.iam.instance_profile">altimeter.aws.resource.iam.instance_profile module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="altimeter.aws.resource.iam.html#module-altimeter.aws.resource.iam.policy">altimeter.aws.resource.iam.policy module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="altimeter.aws.resource.iam.html#module-altimeter.aws.resource.iam.role">altimeter.aws.resource.iam.role module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="altimeter.aws.resource.iam.html#module-altimeter.aws.resource.iam.user">altimeter.aws.resource.iam.user module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="altimeter.aws.resource.iam.html#module-altimeter.aws.resource.iam">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="altimeter.aws.resource.kms.html">altimeter.aws.resource.kms package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="altimeter.aws.resource.kms.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="altimeter.aws.resource.kms.html#module-altimeter.aws.resource.kms.key">altimeter.aws.resource.kms.key module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="altimeter.aws.resource.kms.html#module-altimeter.aws.resource.kms">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="altimeter.aws.resource.organizations.html">altimeter.aws.resource.organizations package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="altimeter.aws.resource.organizations.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="altimeter.aws.resource.organizations.html#module-altimeter.aws.resource.organizations.account">altimeter.aws.resource.organizations.account module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="altimeter.aws.resource.organizations.html#module-altimeter.aws.resource.organizations.org">altimeter.aws.resource.organizations.org module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="altimeter.aws.resource.organizations.html#module-altimeter.aws.resource.organizations.ou">altimeter.aws.resource.organizations.ou module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="altimeter.aws.resource.organizations.html#module-altimeter.aws.resource.organizations">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="altimeter.aws.resource.rds.html">altimeter.aws.resource.rds package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="altimeter.aws.resource.rds.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="altimeter.aws.resource.rds.html#module-altimeter.aws.resource.rds.instance">altimeter.aws.resource.rds.instance module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="altimeter.aws.resource.rds.html#module-altimeter.aws.resource.rds.snapshot">altimeter.aws.resource.rds.snapshot module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="altimeter.aws.resource.rds.html#module-altimeter.aws.resource.rds">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="altimeter.aws.resource.s3.html">altimeter.aws.resource.s3 package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="altimeter.aws.resource.s3.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="altimeter.aws.resource.s3.html#module-altimeter.aws.resource.s3.bucket">altimeter.aws.resource.s3.bucket module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="altimeter.aws.resource.s3.html#module-altimeter.aws.resource.s3">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="altimeter.aws.resource.support.html">altimeter.aws.resource.support package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="altimeter.aws.resource.support.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="altimeter.aws.resource.support.html#module-altimeter.aws.resource.support.severity_level">altimeter.aws.resource.support.severity_level module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="altimeter.aws.resource.support.html#module-altimeter.aws.resource.support">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-altimeter.aws.resource.account">
+<span id="altimeter-aws-resource-account-module"></span><h2>altimeter.aws.resource.account module<a class="headerlink" href="#module-altimeter.aws.resource.account" title="Permalink to this headline">¶</a></h2>
+<p>Resource representing an AWS Account</p>
+<dl class="py class">
+<dt id="altimeter.aws.resource.account.AccountResourceSpec">
+<em class="property">class </em><code class="sig-name descname">AccountResourceSpec</code><a class="headerlink" href="#altimeter.aws.resource.account.AccountResourceSpec" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#altimeter.aws.resource.resource_spec.AWSResourceSpec" title="altimeter.aws.resource.resource_spec.AWSResourceSpec"><code class="xref py py-class docutils literal notranslate"><span class="pre">altimeter.aws.resource.resource_spec.AWSResourceSpec</span></code></a></p>
+<p>Resource representing an AWS Account</p>
+<dl class="py attribute">
+<dt id="altimeter.aws.resource.account.AccountResourceSpec.allow_clobber">
+<code class="sig-name descname">allow_clobber</code><em class="property">: List<span class="p">[</span>Type<span class="p">[</span><a class="reference internal" href="altimeter.core.resource.html#altimeter.core.resource.resource_spec.ResourceSpec" title="altimeter.core.resource.resource_spec.ResourceSpec">altimeter.core.resource.resource_spec.ResourceSpec</a><span class="p">]</span><span class="p">]</span></em><em class="property"> = [&lt;class 'altimeter.aws.resource.unscanned_account.UnscannedAccountResourceSpec'&gt;]</em><a class="headerlink" href="#altimeter.aws.resource.account.AccountResourceSpec.allow_clobber" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="altimeter.aws.resource.account.AccountResourceSpec.generate_arn">
+<em class="property">classmethod </em><code class="sig-name descname">generate_arn</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">resource_id</span></em>, <em class="sig-param"><span class="n">account_id</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">region</span><span class="o">=</span><span class="default_value">''</span></em><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.aws.resource.account.AccountResourceSpec.generate_arn" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate an ARN for this resource</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="altimeter.aws.resource.account.AccountResourceSpec.get_full_type_name">
+<em class="property">classmethod </em><code class="sig-name descname">get_full_type_name</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.aws.resource.account.AccountResourceSpec.get_full_type_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the fully qualified type name for this class, generally something like
+aws:ec2:instance, aws:iam:role, etc.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>ec2:instance”</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>string of full type name, generally something like “aws</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="altimeter.aws.resource.account.AccountResourceSpec.list_from_aws">
+<em class="property">classmethod </em><code class="sig-name descname">list_from_aws</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">client</span></em>, <em class="sig-param"><span class="n">account_id</span></em>, <em class="sig-param"><span class="n">region</span></em><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.aws.resource.account.AccountResourceSpec.list_from_aws" title="Permalink to this definition">¶</a></dt>
+<dd><p>This resource is somewhat synthetic, this method simply returns a dict of form
+{‘account_arn’: {account_dict}</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#altimeter.aws.resource.resource_spec.ListFromAWSResult" title="altimeter.aws.resource.resource_spec.ListFromAWSResult"><code class="xref py py-class docutils literal notranslate"><span class="pre">ListFromAWSResult</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="altimeter.aws.resource.account.AccountResourceSpec.scan_granularity">
+<code class="sig-name descname">scan_granularity</code><em class="property">: ScanGranularity</em><em class="property"> = 2</em><a class="headerlink" href="#altimeter.aws.resource.account.AccountResourceSpec.scan_granularity" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="altimeter.aws.resource.account.AccountResourceSpec.schema">
+<code class="sig-name descname">schema</code><em class="property">: Schema</em><em class="property"> = &lt;altimeter.core.graph.schema.Schema object&gt;</em><a class="headerlink" href="#altimeter.aws.resource.account.AccountResourceSpec.schema" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="altimeter.aws.resource.account.AccountResourceSpec.service_name">
+<code class="sig-name descname">service_name</code><em class="property">: str</em><em class="property"> = 'sts'</em><a class="headerlink" href="#altimeter.aws.resource.account.AccountResourceSpec.service_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="altimeter.aws.resource.account.AccountResourceSpec.type_name">
+<code class="sig-name descname">type_name</code><em class="property">: str</em><em class="property"> = 'account'</em><a class="headerlink" href="#altimeter.aws.resource.account.AccountResourceSpec.type_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-altimeter.aws.resource.resource_spec">
+<span id="altimeter-aws-resource-resource-spec-module"></span><h2>altimeter.aws.resource.resource_spec module<a class="headerlink" href="#module-altimeter.aws.resource.resource_spec" title="Permalink to this headline">¶</a></h2>
+<p>AWSResourceSpec is a subclass of ResourceSpec which is used to define
+ResourceSpecs for AWS resources</p>
+<dl class="py class">
+<dt id="altimeter.aws.resource.resource_spec.AWSResourceSpec">
+<em class="property">class </em><code class="sig-name descname">AWSResourceSpec</code><a class="headerlink" href="#altimeter.aws.resource.resource_spec.AWSResourceSpec" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="altimeter.core.resource.html#altimeter.core.resource.resource_spec.ResourceSpec" title="altimeter.core.resource.resource_spec.ResourceSpec"><code class="xref py py-class docutils literal notranslate"><span class="pre">altimeter.core.resource.resource_spec.ResourceSpec</span></code></a></p>
+<p>AWSResourceSpec is a subclass of ResourceSpec which is used to define
+ResourceSpecs for AWS resources</p>
+<dl class="py method">
+<dt id="altimeter.aws.resource.resource_spec.AWSResourceSpec.generate_arn">
+<em class="property">classmethod </em><code class="sig-name descname">generate_arn</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">resource_id</span></em>, <em class="sig-param"><span class="n">account_id</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">region</span><span class="o">=</span><span class="default_value">''</span></em><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.aws.resource.resource_spec.AWSResourceSpec.generate_arn" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate an ARN for this resource</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>account_id</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – resource account id</p></li>
+<li><p><strong>region</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – resource region</p></li>
+<li><p><strong>resource_id</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – resource id</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>string containing resource arn.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="altimeter.aws.resource.resource_spec.AWSResourceSpec.generate_id">
+<em class="property">classmethod </em><code class="sig-name descname">generate_id</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">short_resource_id</span></em>, <em class="sig-param"><span class="n">context</span></em><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.aws.resource.resource_spec.AWSResourceSpec.generate_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate a full id (arn) given a short resource id.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>short_resource_id</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – last portion of an aws arn - e.g. i-1234, ami-abcd, etc.</p></li>
+<li><p><strong>context</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]) – dict containing account_id, region</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>string containing resource arn.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="altimeter.aws.resource.resource_spec.AWSResourceSpec.get_client_name">
+<em class="property">classmethod </em><code class="sig-name descname">get_client_name</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.aws.resource.resource_spec.AWSResourceSpec.get_client_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the boto3 client name to be used for scanning resources of this type.
+Generally this is the same as cls.service_name but in some cases it is not.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>string of boto3 client name for cls.service</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="altimeter.aws.resource.resource_spec.AWSResourceSpec.get_full_type_name">
+<em class="property">classmethod </em><code class="sig-name descname">get_full_type_name</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.aws.resource.resource_spec.AWSResourceSpec.get_full_type_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the fully qualified type name for this class, generally something like
+aws:ec2:instance, aws:iam:role, etc.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>ec2:instance”</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>string of full type name, generally something like “aws</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="altimeter.aws.resource.resource_spec.AWSResourceSpec.list_from_aws">
+<em class="property">abstract classmethod </em><code class="sig-name descname">list_from_aws</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">client</span></em>, <em class="sig-param"><span class="n">account_id</span></em>, <em class="sig-param"><span class="n">region</span></em><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.aws.resource.resource_spec.AWSResourceSpec.list_from_aws" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a ListFromAWSResult object by calling the appropriate
+AWS API calls to list/describe the resource represented by this class.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>client</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">BaseClient</span></code>) – boto3 Client</p></li>
+<li><p><strong>account_id</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – aws account id</p></li>
+<li><p><strong>region</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – aws region</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#altimeter.aws.resource.resource_spec.ListFromAWSResult" title="altimeter.aws.resource.resource_spec.ListFromAWSResult"><code class="xref py py-class docutils literal notranslate"><span class="pre">ListFromAWSResult</span></code></a></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>ListFromAWSResult object</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="altimeter.aws.resource.resource_spec.AWSResourceSpec.parallel_scan">
+<code class="sig-name descname">parallel_scan</code><em class="property">: bool</em><em class="property"> = False</em><a class="headerlink" href="#altimeter.aws.resource.resource_spec.AWSResourceSpec.parallel_scan" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="altimeter.aws.resource.resource_spec.AWSResourceSpec.provider_name">
+<code class="sig-name descname">provider_name</code><em class="property">: str</em><em class="property"> = 'aws'</em><a class="headerlink" href="#altimeter.aws.resource.resource_spec.AWSResourceSpec.provider_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="altimeter.aws.resource.resource_spec.AWSResourceSpec.region_whitelist">
+<code class="sig-name descname">region_whitelist</code><em class="property">: Tuple<span class="p">[</span>str<span class="p">, </span><span class="p">…</span><span class="p">]</span></em><em class="property"> = ()</em><a class="headerlink" href="#altimeter.aws.resource.resource_spec.AWSResourceSpec.region_whitelist" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="altimeter.aws.resource.resource_spec.AWSResourceSpec.scan">
+<em class="property">classmethod </em><code class="sig-name descname">scan</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">scan_accessor</span></em><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.aws.resource.resource_spec.AWSResourceSpec.scan" title="Permalink to this definition">¶</a></dt>
+<dd><p>Scan this ResourceSpec</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>scan_accessor</strong> (<a class="reference internal" href="altimeter.aws.scan.html#altimeter.aws.scan.aws_accessor.AWSAccessor" title="altimeter.aws.scan.aws_accessor.AWSAccessor"><code class="xref py py-class docutils literal notranslate"><span class="pre">AWSAccessor</span></code></a>) – <p>AWSAccessor object to use for api access</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>List of Resource objects</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<a class="reference internal" href="altimeter.core.resource.html#altimeter.core.resource.resource.Resource" title="altimeter.core.resource.resource.Resource"><code class="xref py py-class docutils literal notranslate"><span class="pre">Resource</span></code></a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="altimeter.aws.resource.resource_spec.AWSResourceSpec.scan_granularity">
+<code class="sig-name descname">scan_granularity</code><em class="property">: <a class="reference internal" href="#altimeter.aws.resource.resource_spec.ScanGranularity" title="altimeter.aws.resource.resource_spec.ScanGranularity">altimeter.aws.resource.resource_spec.ScanGranularity</a></em><em class="property"> = 1</em><a class="headerlink" href="#altimeter.aws.resource.resource_spec.AWSResourceSpec.scan_granularity" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="altimeter.aws.resource.resource_spec.AWSResourceSpec.service_name">
+<code class="sig-name descname">service_name</code><em class="property">: str</em><em class="property"> = ''</em><a class="headerlink" href="#altimeter.aws.resource.resource_spec.AWSResourceSpec.service_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="altimeter.aws.resource.resource_spec.AWSResourceSpec.skip_resource_scan">
+<em class="property">classmethod </em><code class="sig-name descname">skip_resource_scan</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">client</span></em>, <em class="sig-param"><span class="n">account_id</span></em>, <em class="sig-param"><span class="n">region</span></em><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.aws.resource.resource_spec.AWSResourceSpec.skip_resource_scan" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a bool indicating whether this resource class scan should be skipped.
+:type client: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseClient</span></code>
+:param client: boto3 client
+:type account_id: <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>
+:param account_id: account id
+:type region: <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>
+:param region: aws region</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>True if this resource should be skipped.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="altimeter.aws.resource.resource_spec.ListFromAWSResult">
+<em class="property">class </em><code class="sig-name descname">ListFromAWSResult</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">resources</span></em><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.aws.resource.resource_spec.ListFromAWSResult" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Result of a list_from_aws call. Contains a list of resources represented as a dict
+of arns to resource details</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>resources</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]]) – Dict of resource ids to resource dicts</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt id="altimeter.aws.resource.resource_spec.ListFromAWSResult.resources">
+<code class="sig-name descname">resources</code><em class="property">: Dict<span class="p">[</span>str<span class="p">, </span>Dict<span class="p">[</span>str<span class="p">, </span>Any<span class="p">]</span><span class="p">]</span></em><a class="headerlink" href="#altimeter.aws.resource.resource_spec.ListFromAWSResult.resources" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="altimeter.aws.resource.resource_spec.ScanGranularity">
+<em class="property">class </em><code class="sig-name descname">ScanGranularity</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.aws.resource.resource_spec.ScanGranularity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></p>
+<p>ScanGranularities are attached to AWSResourceSpecs and define how resources are scanned.</p>
+<dl class="py attribute">
+<dt id="altimeter.aws.resource.resource_spec.ScanGranularity.ACCOUNT">
+<code class="sig-name descname">ACCOUNT</code><em class="property"> = 2</em><a class="headerlink" href="#altimeter.aws.resource.resource_spec.ScanGranularity.ACCOUNT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="altimeter.aws.resource.resource_spec.ScanGranularity.REGION">
+<code class="sig-name descname">REGION</code><em class="property"> = 1</em><a class="headerlink" href="#altimeter.aws.resource.resource_spec.ScanGranularity.REGION" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-altimeter.aws.resource.unscanned_account">
+<span id="altimeter-aws-resource-unscanned-account-module"></span><h2>altimeter.aws.resource.unscanned_account module<a class="headerlink" href="#module-altimeter.aws.resource.unscanned_account" title="Permalink to this headline">¶</a></h2>
+<p>Resource representing an unscanned AWS Account</p>
+<dl class="py class">
+<dt id="altimeter.aws.resource.unscanned_account.UnscannedAccountResourceSpec">
+<em class="property">class </em><code class="sig-name descname">UnscannedAccountResourceSpec</code><a class="headerlink" href="#altimeter.aws.resource.unscanned_account.UnscannedAccountResourceSpec" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#altimeter.aws.resource.resource_spec.AWSResourceSpec" title="altimeter.aws.resource.resource_spec.AWSResourceSpec"><code class="xref py py-class docutils literal notranslate"><span class="pre">altimeter.aws.resource.resource_spec.AWSResourceSpec</span></code></a></p>
+<p>Resource representing an unscanned AWS Account</p>
+<dl class="py method">
+<dt id="altimeter.aws.resource.unscanned_account.UnscannedAccountResourceSpec.create_resource">
+<em class="property">classmethod </em><code class="sig-name descname">create_resource</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">account_id</span></em>, <em class="sig-param"><span class="n">errors</span></em><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.aws.resource.unscanned_account.UnscannedAccountResourceSpec.create_resource" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="altimeter.core.resource.html#altimeter.core.resource.resource.Resource" title="altimeter.core.resource.resource.Resource"><code class="xref py py-class docutils literal notranslate"><span class="pre">Resource</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="altimeter.aws.resource.unscanned_account.UnscannedAccountResourceSpec.generate_arn">
+<em class="property">classmethod </em><code class="sig-name descname">generate_arn</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">resource_id</span></em>, <em class="sig-param"><span class="n">account_id</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">region</span><span class="o">=</span><span class="default_value">''</span></em><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.aws.resource.unscanned_account.UnscannedAccountResourceSpec.generate_arn" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate an ARN for this resource</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="altimeter.aws.resource.unscanned_account.UnscannedAccountResourceSpec.get_full_type_name">
+<em class="property">classmethod </em><code class="sig-name descname">get_full_type_name</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.aws.resource.unscanned_account.UnscannedAccountResourceSpec.get_full_type_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the fully qualified type name for this class, generally something like
+aws:ec2:instance, aws:iam:role, etc.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>ec2:instance”</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>string of full type name, generally something like “aws</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="altimeter.aws.resource.unscanned_account.UnscannedAccountResourceSpec.list_from_aws">
+<em class="property">classmethod </em><code class="sig-name descname">list_from_aws</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">client</span></em>, <em class="sig-param"><span class="n">account_id</span></em>, <em class="sig-param"><span class="n">region</span></em><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.aws.resource.unscanned_account.UnscannedAccountResourceSpec.list_from_aws" title="Permalink to this definition">¶</a></dt>
+<dd><p>List resources from AWS using client.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#altimeter.aws.resource.resource_spec.ListFromAWSResult" title="altimeter.aws.resource.resource_spec.ListFromAWSResult"><code class="xref py py-class docutils literal notranslate"><span class="pre">ListFromAWSResult</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="altimeter.aws.resource.unscanned_account.UnscannedAccountResourceSpec.scan">
+<em class="property">classmethod </em><code class="sig-name descname">scan</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">scan_accessor</span></em><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.aws.resource.unscanned_account.UnscannedAccountResourceSpec.scan" title="Permalink to this definition">¶</a></dt>
+<dd><p>Scan this ResourceSpec</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>scan_accessor</strong> (<a class="reference internal" href="altimeter.aws.scan.html#altimeter.aws.scan.aws_accessor.AWSAccessor" title="altimeter.aws.scan.aws_accessor.AWSAccessor"><code class="xref py py-class docutils literal notranslate"><span class="pre">AWSAccessor</span></code></a>) – <p>AWSAccessor object to use for api access</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>List of Resource objects</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<a class="reference internal" href="altimeter.core.resource.html#altimeter.core.resource.resource.Resource" title="altimeter.core.resource.resource.Resource"><code class="xref py py-class docutils literal notranslate"><span class="pre">Resource</span></code></a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="altimeter.aws.resource.unscanned_account.UnscannedAccountResourceSpec.scan_granularity">
+<code class="sig-name descname">scan_granularity</code><em class="property">: <a class="reference internal" href="#altimeter.aws.resource.resource_spec.ScanGranularity" title="altimeter.aws.resource.resource_spec.ScanGranularity">altimeter.aws.resource.resource_spec.ScanGranularity</a></em><em class="property"> = 2</em><a class="headerlink" href="#altimeter.aws.resource.unscanned_account.UnscannedAccountResourceSpec.scan_granularity" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="altimeter.aws.resource.unscanned_account.UnscannedAccountResourceSpec.schema">
+<code class="sig-name descname">schema</code><em class="property">: Schema</em><em class="property"> = &lt;altimeter.core.graph.schema.Schema object&gt;</em><a class="headerlink" href="#altimeter.aws.resource.unscanned_account.UnscannedAccountResourceSpec.schema" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="altimeter.aws.resource.unscanned_account.UnscannedAccountResourceSpec.service_name">
+<code class="sig-name descname">service_name</code><em class="property">: str</em><em class="property"> = 'null'</em><a class="headerlink" href="#altimeter.aws.resource.unscanned_account.UnscannedAccountResourceSpec.service_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="altimeter.aws.resource.unscanned_account.UnscannedAccountResourceSpec.type_name">
+<code class="sig-name descname">type_name</code><em class="property">: str</em><em class="property"> = 'unscanned-account'</em><a class="headerlink" href="#altimeter.aws.resource.unscanned_account.UnscannedAccountResourceSpec.type_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-altimeter.aws.resource.util">
+<span id="altimeter-aws-resource-util-module"></span><h2>altimeter.aws.resource.util module<a class="headerlink" href="#module-altimeter.aws.resource.util" title="Permalink to this headline">¶</a></h2>
+<p>Utilty grab-bag</p>
+<dl class="py function">
+<dt id="altimeter.aws.resource.util.deep_sort_dict">
+<code class="sig-name descname">deep_sort_dict</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dct</span></em><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.aws.resource.util.deep_sort_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Recursively sort a dictionary and additionally sort any embedded lists.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>dct</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>) – dict to sort</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Recursively sorted dict, with any embedded lists also sorted.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="altimeter.aws.resource.util.deep_sort_list">
+<code class="sig-name descname">deep_sort_list</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">lst</span></em><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.aws.resource.util.deep_sort_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Recursively sort a list and additionally sort any embedded dicts.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>lst</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>) – list to sort</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Recursively sorted list, with any embedded dicts also sorted.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="altimeter.aws.resource.util.policy_doc_dict_to_sorted_str">
+<code class="sig-name descname">policy_doc_dict_to_sorted_str</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">policy_doc</span></em><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.aws.resource.util.policy_doc_dict_to_sorted_str" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate a string representation of an IAM Policy document which is recursively sorted such
+that policies can be compared without order diffs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>policy_doc</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]) – policy document</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Recursively sorted string representation of the policy document.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-altimeter.aws.resource">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-altimeter.aws.resource" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">Altimeter</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">User Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="user/quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user/local_blazegraph.html">Local Querying with Blazegraph</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user/sample_queries.html">Sample Queries</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Developer Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="dev/devguide.html">Developer’s Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dev/extending.html">Extending Altimeter</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="modules.html">altimeter</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="altimeter.aws.html">altimeter.aws package</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="altimeter.aws.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="altimeter.aws.auth.html">altimeter.aws.auth package</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">altimeter.aws.resource package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#subpackages">Subpackages</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="altimeter.aws.resource.awslambda.html">altimeter.aws.resource.awslambda package</a></li>
+<li class="toctree-l5"><a class="reference internal" href="altimeter.aws.resource.cloudtrail.html">altimeter.aws.resource.cloudtrail package</a></li>
+<li class="toctree-l5"><a class="reference internal" href="altimeter.aws.resource.dynamodb.html">altimeter.aws.resource.dynamodb package</a></li>
+<li class="toctree-l5"><a class="reference internal" href="altimeter.aws.resource.ec2.html">altimeter.aws.resource.ec2 package</a></li>
+<li class="toctree-l5"><a class="reference internal" href="altimeter.aws.resource.eks.html">altimeter.aws.resource.eks package</a></li>
+<li class="toctree-l5"><a class="reference internal" href="altimeter.aws.resource.elbv1.html">altimeter.aws.resource.elbv1 package</a></li>
+<li class="toctree-l5"><a class="reference internal" href="altimeter.aws.resource.elbv2.html">altimeter.aws.resource.elbv2 package</a></li>
+<li class="toctree-l5"><a class="reference internal" href="altimeter.aws.resource.events.html">altimeter.aws.resource.events package</a></li>
+<li class="toctree-l5"><a class="reference internal" href="altimeter.aws.resource.guardduty.html">altimeter.aws.resource.guardduty package</a></li>
+<li class="toctree-l5"><a class="reference internal" href="altimeter.aws.resource.iam.html">altimeter.aws.resource.iam package</a></li>
+<li class="toctree-l5"><a class="reference internal" href="altimeter.aws.resource.kms.html">altimeter.aws.resource.kms package</a></li>
+<li class="toctree-l5"><a class="reference internal" href="altimeter.aws.resource.organizations.html">altimeter.aws.resource.organizations package</a></li>
+<li class="toctree-l5"><a class="reference internal" href="altimeter.aws.resource.rds.html">altimeter.aws.resource.rds package</a></li>
+<li class="toctree-l5"><a class="reference internal" href="altimeter.aws.resource.s3.html">altimeter.aws.resource.s3 package</a></li>
+<li class="toctree-l5"><a class="reference internal" href="altimeter.aws.resource.support.html">altimeter.aws.resource.support package</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-altimeter.aws.resource.account">altimeter.aws.resource.account module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-altimeter.aws.resource.resource_spec">altimeter.aws.resource.resource_spec module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-altimeter.aws.resource.unscanned_account">altimeter.aws.resource.unscanned_account module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-altimeter.aws.resource.util">altimeter.aws.resource.util module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-altimeter.aws.resource">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="altimeter.aws.scan.html">altimeter.aws.scan package</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="altimeter.aws.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="altimeter.aws.html#module-altimeter.aws.log_events">altimeter.aws.log_events module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="altimeter.aws.html#module-altimeter.aws.settings">altimeter.aws.settings module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="altimeter.aws.html#module-altimeter.aws">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="altimeter.core.html">altimeter.core package</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="modules.html">altimeter</a><ul>
+  <li><a href="altimeter.html">altimeter package</a><ul>
+  <li><a href="altimeter.aws.html">altimeter.aws package</a><ul>
+      <li>Previous: <a href="altimeter.aws.auth.html" title="previous chapter">altimeter.aws.auth package</a></li>
+      <li>Next: <a href="altimeter.aws.resource.awslambda.html" title="next chapter">altimeter.aws.resource.awslambda package</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, Tableau.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.4.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/altimeter.aws.resource.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,45 @@
+altimeter.aws.auth package
+==========================
+
+Submodules
+----------
+
+altimeter.aws.auth.accessor module
+----------------------------------
+
+.. automodule:: altimeter.aws.auth.accessor
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+altimeter.aws.auth.cache module
+-------------------------------
+
+.. automodule:: altimeter.aws.auth.cache
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+altimeter.aws.auth.exceptions module
+------------------------------------
+
+.. automodule:: altimeter.aws.auth.exceptions
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+altimeter.aws.auth.multi\_hop\_accessor module
+----------------------------------------------
+
+.. automodule:: altimeter.aws.auth.multi_hop_accessor
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: altimeter.aws.auth
+   :members:
+   :undoc-members:
+   :show-inheritance:

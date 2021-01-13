@@ -1,0 +1,1020 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>altimeter.core.graph.field package &#8212; Altimeter  documentation</title>
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="altimeter.core.neptune package" href="altimeter.core.neptune.html" />
+    <link rel="prev" title="altimeter.core.graph package" href="altimeter.core.graph.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="altimeter-core-graph-field-package">
+<h1>altimeter.core.graph.field package<a class="headerlink" href="#altimeter-core-graph-field-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-altimeter.core.graph.field.base">
+<span id="altimeter-core-graph-field-base-module"></span><h2>altimeter.core.graph.field.base module<a class="headerlink" href="#module-altimeter.core.graph.field.base" title="Permalink to this headline">¶</a></h2>
+<p>Base classes for Fields.  Fields define how individual elements of input JSON are parsed
+into a LinkCollection.</p>
+<dl class="py class">
+<dt id="altimeter.core.graph.field.base.Field">
+<em class="property">class </em><code class="sig-name descname">Field</code><a class="headerlink" href="#altimeter.core.graph.field.base.Field" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code></p>
+<p>Abstract base class for all fields</p>
+<dl class="py method">
+<dt id="altimeter.core.graph.field.base.Field.parse">
+<em class="property">abstract </em><code class="sig-name descname">parse</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">context</span></em><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.core.graph.field.base.Field.parse" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse data into a LinkCollection using this field’s definition.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="altimeter.core.graph.html#altimeter.core.graph.links.LinkCollection" title="altimeter.core.graph.links.LinkCollection"><code class="xref py py-class docutils literal notranslate"><span class="pre">LinkCollection</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="altimeter.core.graph.field.base.SubField">
+<em class="property">class </em><code class="sig-name descname">SubField</code><a class="headerlink" href="#altimeter.core.graph.field.base.SubField" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#altimeter.core.graph.field.base.Field" title="altimeter.core.graph.field.base.Field"><code class="xref py py-class docutils literal notranslate"><span class="pre">altimeter.core.graph.field.base.Field</span></code></a></p>
+<p>SubFields are fields which must have a non-anonymous parent Field.</p>
+<dl class="py method">
+<dt id="altimeter.core.graph.field.base.SubField.get_parent_alti_key">
+<code class="sig-name descname">get_parent_alti_key</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">context</span></em><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.core.graph.field.base.SubField.get_parent_alti_key" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the alti_key of the parent of this SubField.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>) – field data</p></li>
+<li><p><strong>context</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]) – <p>contains auxiliary information which can be passed through the parse process.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>alti_key of parent of this SubField</p>
+</dd>
+</dl>
+</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-altimeter.core.graph.field.dict_field">
+<span id="altimeter-core-graph-field-dict-field-module"></span><h2>altimeter.core.graph.field.dict_field module<a class="headerlink" href="#module-altimeter.core.graph.field.dict_field" title="Permalink to this headline">¶</a></h2>
+<p>Dict Fields represent fields which consist of dict-like data.</p>
+<dl class="py class">
+<dt id="altimeter.core.graph.field.dict_field.AnonymousDictField">
+<em class="property">class </em><code class="sig-name descname">AnonymousDictField</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">source_key</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">fields</span></em>, <em class="sig-param"><span class="n">optional</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">nullable</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.core.graph.field.dict_field.AnonymousDictField" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#altimeter.core.graph.field.base.Field" title="altimeter.core.graph.field.base.Field"><code class="xref py py-class docutils literal notranslate"><span class="pre">altimeter.core.graph.field.base.Field</span></code></a></p>
+<p>An AnonymousDictField is a DictField where the source_key of the field is discarded
+and not used as a name in the resulting graph. See Examples below for more clarity.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>source_key</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Name of the key in the input JSON</p></li>
+<li><p><strong>fields</strong> (<a class="reference internal" href="#altimeter.core.graph.field.base.Field" title="altimeter.core.graph.field.base.Field"><code class="xref py py-class docutils literal notranslate"><span class="pre">Field</span></code></a>) – fields inside this DictField</p></li>
+<li><p><strong>optional</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Whether this key is optional. Defaults to False.</p></li>
+<li><p><strong>nullable</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Whether this field’s value can be null.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<dl>
+<dt>A dict containing 3 ScalarFields</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">altimeter.core.graph.field.scalar_field</span> <span class="kn">import</span> <span class="n">ScalarField</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">input</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;Person&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;FirstName&quot;</span><span class="p">:</span> <span class="s2">&quot;Bob&quot;</span><span class="p">,</span> <span class="s2">&quot;LastName&quot;</span><span class="p">:</span> <span class="s2">&quot;Smith&quot;</span><span class="p">}}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">field</span> <span class="o">=</span> <span class="n">AnonymousDictField</span><span class="p">(</span><span class="s2">&quot;Person&quot;</span><span class="p">,</span> <span class="n">ScalarField</span><span class="p">(</span><span class="s2">&quot;FirstName&quot;</span><span class="p">),</span> <span class="n">ScalarField</span><span class="p">(</span><span class="s2">&quot;LastName&quot;</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">link_collection</span> <span class="o">=</span> <span class="n">field</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="nb">input</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="p">{})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">link_collection</span><span class="o">.</span><span class="n">dict</span><span class="p">(</span><span class="n">exclude_unset</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+<span class="go">{&#39;simple_links&#39;: ({&#39;pred&#39;: &#39;first_name&#39;, &#39;obj&#39;: &#39;Bob&#39;}, {&#39;pred&#39;: &#39;last_name&#39;, &#39;obj&#39;: &#39;Smith&#39;})}</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="altimeter.core.graph.field.dict_field.AnonymousDictField.parse">
+<code class="sig-name descname">parse</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">context</span></em><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.core.graph.field.dict_field.AnonymousDictField.parse" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse this field and return a LinkCollection.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]) – dictionary of data to parse</p></li>
+<li><p><strong>context</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]) – <p>context dict containing data from higher level parsing code.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>LinkCollection</p>
+</dd>
+<dt>Raises:</dt><dd><p>DictFieldSourceKeyNotFoundException if self.source_key is not in data.
+DictFieldValueNotADictException if the data does not appear to represent a dict.</p>
+</dd>
+</dl>
+</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="altimeter.core.graph.html#altimeter.core.graph.links.LinkCollection" title="altimeter.core.graph.links.LinkCollection"><code class="xref py py-class docutils literal notranslate"><span class="pre">LinkCollection</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="altimeter.core.graph.field.dict_field.AnonymousEmbeddedDictField">
+<em class="property">class </em><code class="sig-name descname">AnonymousEmbeddedDictField</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">fields</span></em><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.core.graph.field.dict_field.AnonymousEmbeddedDictField" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#altimeter.core.graph.field.base.Field" title="altimeter.core.graph.field.base.Field"><code class="xref py py-class docutils literal notranslate"><span class="pre">altimeter.core.graph.field.base.Field</span></code></a></p>
+<p>An AnonymousEmbeddedDictField is a EmbeddedDictField where the source_key of the parent
+field is discarded and not used as a name in the resulting graph. See Examples below for more
+clarity.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>fields</strong> (<a class="reference internal" href="#altimeter.core.graph.field.base.Field" title="altimeter.core.graph.field.base.Field"><code class="xref py py-class docutils literal notranslate"><span class="pre">Field</span></code></a>) – fields inside this DictField</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<dl>
+<dt>A ListField containing an AnonymousEmbeddedDictField with two ScalarFields:</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">altimeter.core.graph.field.list_field</span> <span class="kn">import</span> <span class="n">ListField</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">altimeter.core.graph.field.scalar_field</span> <span class="kn">import</span> <span class="n">ScalarField</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">input</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;People&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;FirstName&quot;</span><span class="p">:</span> <span class="s2">&quot;Bob&quot;</span><span class="p">,</span> <span class="s2">&quot;LastName&quot;</span><span class="p">:</span> <span class="s2">&quot;Smith&quot;</span><span class="p">},</span>                         <span class="p">{</span><span class="s2">&quot;FirstName&quot;</span><span class="p">:</span> <span class="s2">&quot;Alice&quot;</span><span class="p">,</span> <span class="s2">&quot;LastName&quot;</span><span class="p">:</span> <span class="s2">&quot;Smith&quot;</span><span class="p">}]}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">field</span> <span class="o">=</span> <span class="n">ListField</span><span class="p">(</span><span class="s2">&quot;People&quot;</span><span class="p">,</span> <span class="n">AnonymousEmbeddedDictField</span><span class="p">(</span><span class="n">ScalarField</span><span class="p">(</span><span class="s2">&quot;FirstName&quot;</span><span class="p">),</span>                                  <span class="n">ScalarField</span><span class="p">(</span><span class="s2">&quot;LastName&quot;</span><span class="p">)))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">link_collection</span> <span class="o">=</span> <span class="n">field</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="nb">input</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="p">{})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">link_collection</span><span class="o">.</span><span class="n">dict</span><span class="p">(</span><span class="n">exclude_unset</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+<span class="go">{&#39;simple_links&#39;: ({&#39;pred&#39;: &#39;first_name&#39;, &#39;obj&#39;: &#39;Bob&#39;}, {&#39;pred&#39;: &#39;last_name&#39;, &#39;obj&#39;: &#39;Smith&#39;}, {&#39;pred&#39;: &#39;first_name&#39;, &#39;obj&#39;: &#39;Alice&#39;}, {&#39;pred&#39;: &#39;last_name&#39;, &#39;obj&#39;: &#39;Smith&#39;})}</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="altimeter.core.graph.field.dict_field.AnonymousEmbeddedDictField.parse">
+<code class="sig-name descname">parse</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">context</span></em><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.core.graph.field.dict_field.AnonymousEmbeddedDictField.parse" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse this field and return a list of Links.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]) – dictionary of data to parse</p></li>
+<li><p><strong>context</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]) – context dict containing data from higher level parsing code.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="altimeter.core.graph.html#altimeter.core.graph.links.LinkCollection" title="altimeter.core.graph.links.LinkCollection"><code class="xref py py-class docutils literal notranslate"><span class="pre">LinkCollection</span></code></a></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>LinkCollection</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>DictFieldValueNotADictException if the data does not appear to represent a dict.</strong> – </p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="altimeter.core.graph.field.dict_field.DictField">
+<em class="property">class </em><code class="sig-name descname">DictField</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">source_key</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">fields</span></em>, <em class="sig-param"><span class="n">alti_key</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">optional</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.core.graph.field.dict_field.DictField" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#altimeter.core.graph.field.base.Field" title="altimeter.core.graph.field.base.Field"><code class="xref py py-class docutils literal notranslate"><span class="pre">altimeter.core.graph.field.base.Field</span></code></a></p>
+<p>A DictField is a field where the input is a JSON object containing a key (source_key)
+where the corresponding value is a dictionary.</p>
+<p class="rubric">Examples</p>
+<dl>
+<dt>A dictionary containing two ScalarFields:</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">altimeter.core.graph.field.scalar_field</span> <span class="kn">import</span> <span class="n">ScalarField</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">input</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;Person&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;FirstName&quot;</span><span class="p">:</span> <span class="s2">&quot;Bob&quot;</span><span class="p">,</span> <span class="s2">&quot;LastName&quot;</span><span class="p">:</span> <span class="s2">&quot;Smith&quot;</span><span class="p">}}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">field</span> <span class="o">=</span> <span class="n">DictField</span><span class="p">(</span><span class="s2">&quot;Person&quot;</span><span class="p">,</span> <span class="n">ScalarField</span><span class="p">(</span><span class="s2">&quot;FirstName&quot;</span><span class="p">),</span> <span class="n">ScalarField</span><span class="p">(</span><span class="s2">&quot;LastName&quot;</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">link_collection</span> <span class="o">=</span> <span class="n">field</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="nb">input</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="p">{})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">link_collection</span><span class="o">.</span><span class="n">dict</span><span class="p">(</span><span class="n">exclude_unset</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+<span class="go">{&#39;multi_links&#39;: ({&#39;pred&#39;: &#39;person&#39;, &#39;obj&#39;: {&#39;simple_links&#39;: ({&#39;pred&#39;: &#39;first_name&#39;, &#39;obj&#39;: &#39;Bob&#39;}, {&#39;pred&#39;: &#39;last_name&#39;, &#39;obj&#39;: &#39;Smith&#39;})}},)}</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>source_key</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Name of the key in the input JSON</p></li>
+<li><p><strong>fields</strong> (<a class="reference internal" href="#altimeter.core.graph.field.base.Field" title="altimeter.core.graph.field.base.Field"><code class="xref py py-class docutils literal notranslate"><span class="pre">Field</span></code></a>) – fields inside this DictField</p></li>
+<li><p><strong>alti_key</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – Optional key name to be used in the graph. By default
+this is set to the source key converted to snake case.</p></li>
+<li><p><strong>optional</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Whether this key is optional. Defaults to False.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="altimeter.core.graph.field.dict_field.DictField.parse">
+<code class="sig-name descname">parse</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">context</span></em><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.core.graph.field.dict_field.DictField.parse" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse this field and return a LinkCollection.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]) – dictionary of data to parse</p></li>
+<li><p><strong>context</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]) – <p>context dict containing data from higher level parsing code.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>LinkCollection</p>
+</dd>
+<dt>Raises:</dt><dd><p>DictFieldSourceKeyNotFoundException if self.source_key is not in data.
+DictFieldValueNotADictException if the data does not appear to represent a dict.</p>
+</dd>
+</dl>
+</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="altimeter.core.graph.html#altimeter.core.graph.links.LinkCollection" title="altimeter.core.graph.links.LinkCollection"><code class="xref py py-class docutils literal notranslate"><span class="pre">LinkCollection</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="altimeter.core.graph.field.dict_field.EmbeddedDictField">
+<em class="property">class </em><code class="sig-name descname">EmbeddedDictField</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">fields</span></em><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.core.graph.field.dict_field.EmbeddedDictField" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#altimeter.core.graph.field.base.SubField" title="altimeter.core.graph.field.base.SubField"><code class="xref py py-class docutils literal notranslate"><span class="pre">altimeter.core.graph.field.base.SubField</span></code></a></p>
+<p>An EmbeddedDictField is a field where the input is a JSON object.  Generally this field
+is used inside a ListField.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>fields</strong> (<a class="reference internal" href="#altimeter.core.graph.field.base.Field" title="altimeter.core.graph.field.base.Field"><code class="xref py py-class docutils literal notranslate"><span class="pre">Field</span></code></a>) – fields inside this DictField</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<dl>
+<dt>A ListField containing an EmbeddedDictField with two ScalarFields:</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">altimeter.core.graph.field.list_field</span> <span class="kn">import</span> <span class="n">ListField</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">altimeter.core.graph.field.scalar_field</span> <span class="kn">import</span> <span class="n">ScalarField</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">input</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;People&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;FirstName&quot;</span><span class="p">:</span> <span class="s2">&quot;Bob&quot;</span><span class="p">,</span> <span class="s2">&quot;LastName&quot;</span><span class="p">:</span> <span class="s2">&quot;Smith&quot;</span><span class="p">},</span>                         <span class="p">{</span><span class="s2">&quot;FirstName&quot;</span><span class="p">:</span> <span class="s2">&quot;Alice&quot;</span><span class="p">,</span> <span class="s2">&quot;LastName&quot;</span><span class="p">:</span> <span class="s2">&quot;Smith&quot;</span><span class="p">}]}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">field</span> <span class="o">=</span> <span class="n">ListField</span><span class="p">(</span><span class="s2">&quot;People&quot;</span><span class="p">,</span> <span class="n">EmbeddedDictField</span><span class="p">(</span><span class="n">ScalarField</span><span class="p">(</span><span class="s2">&quot;FirstName&quot;</span><span class="p">),</span>                                  <span class="n">ScalarField</span><span class="p">(</span><span class="s2">&quot;LastName&quot;</span><span class="p">)))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">link_collection</span> <span class="o">=</span> <span class="n">field</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="nb">input</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="p">{})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">link_collection</span><span class="o">.</span><span class="n">dict</span><span class="p">(</span><span class="n">exclude_unset</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+<span class="go">{&#39;multi_links&#39;: ({&#39;pred&#39;: &#39;people&#39;, &#39;obj&#39;: {&#39;simple_links&#39;: ({&#39;pred&#39;: &#39;first_name&#39;, &#39;obj&#39;: &#39;Bob&#39;}, {&#39;pred&#39;: &#39;last_name&#39;, &#39;obj&#39;: &#39;Smith&#39;})}}, {&#39;pred&#39;: &#39;people&#39;, &#39;obj&#39;: {&#39;simple_links&#39;: ({&#39;pred&#39;: &#39;first_name&#39;, &#39;obj&#39;: &#39;Alice&#39;}, {&#39;pred&#39;: &#39;last_name&#39;, &#39;obj&#39;: &#39;Smith&#39;})}})}</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="altimeter.core.graph.field.dict_field.EmbeddedDictField.parse">
+<code class="sig-name descname">parse</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">context</span></em><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.core.graph.field.dict_field.EmbeddedDictField.parse" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse this field and return a LinkCollection.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]) – dictionary of data to parse</p></li>
+<li><p><strong>context</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]) – context dict containing data from higher level parsing code.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="altimeter.core.graph.html#altimeter.core.graph.links.LinkCollection" title="altimeter.core.graph.links.LinkCollection"><code class="xref py py-class docutils literal notranslate"><span class="pre">LinkCollection</span></code></a></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>LinkCollection</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>DictFieldSourceKeyNotFoundException if self.source_key is not in data.</strong> – </p></li>
+<li><p><strong>DictFieldValueNotADictException if the data does not appear to represent a dict.</strong> – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-altimeter.core.graph.field.exceptions">
+<span id="altimeter-core-graph-field-exceptions-module"></span><h2>altimeter.core.graph.field.exceptions module<a class="headerlink" href="#module-altimeter.core.graph.field.exceptions" title="Permalink to this headline">¶</a></h2>
+<p>Field parsing related exceptions.</p>
+<dl class="py exception">
+<dt id="altimeter.core.graph.field.exceptions.DictFieldSourceKeyNotFoundException">
+<em class="property">exception </em><code class="sig-name descname">DictFieldSourceKeyNotFoundException</code><a class="headerlink" href="#altimeter.core.graph.field.exceptions.DictFieldSourceKeyNotFoundException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="altimeter.core.html#altimeter.core.exceptions.AltimeterException" title="altimeter.core.exceptions.AltimeterException"><code class="xref py py-class docutils literal notranslate"><span class="pre">altimeter.core.exceptions.AltimeterException</span></code></a></p>
+<p>The source_key of a DictField was not found</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt id="altimeter.core.graph.field.exceptions.DictFieldValueIsNullException">
+<em class="property">exception </em><code class="sig-name descname">DictFieldValueIsNullException</code><a class="headerlink" href="#altimeter.core.graph.field.exceptions.DictFieldValueIsNullException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="altimeter.core.html#altimeter.core.exceptions.AltimeterException" title="altimeter.core.exceptions.AltimeterException"><code class="xref py py-class docutils literal notranslate"><span class="pre">altimeter.core.exceptions.AltimeterException</span></code></a></p>
+<p>The value of a non-nullable DictField was null</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt id="altimeter.core.graph.field.exceptions.DictFieldValueNotADictException">
+<em class="property">exception </em><code class="sig-name descname">DictFieldValueNotADictException</code><a class="headerlink" href="#altimeter.core.graph.field.exceptions.DictFieldValueNotADictException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="altimeter.core.html#altimeter.core.exceptions.AltimeterException" title="altimeter.core.exceptions.AltimeterException"><code class="xref py py-class docutils literal notranslate"><span class="pre">altimeter.core.exceptions.AltimeterException</span></code></a></p>
+<p>A DictField does not contain a dict.</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt id="altimeter.core.graph.field.exceptions.InvalidParentKeyException">
+<em class="property">exception </em><code class="sig-name descname">InvalidParentKeyException</code><a class="headerlink" href="#altimeter.core.graph.field.exceptions.InvalidParentKeyException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="altimeter.core.html#altimeter.core.exceptions.AltimeterException" title="altimeter.core.exceptions.AltimeterException"><code class="xref py py-class docutils literal notranslate"><span class="pre">altimeter.core.exceptions.AltimeterException</span></code></a></p>
+<p>A ParentKey is invalid.</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt id="altimeter.core.graph.field.exceptions.ParentKeyMissingException">
+<em class="property">exception </em><code class="sig-name descname">ParentKeyMissingException</code><a class="headerlink" href="#altimeter.core.graph.field.exceptions.ParentKeyMissingException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="altimeter.core.html#altimeter.core.exceptions.AltimeterException" title="altimeter.core.exceptions.AltimeterException"><code class="xref py py-class docutils literal notranslate"><span class="pre">altimeter.core.exceptions.AltimeterException</span></code></a></p>
+<p>A required ParentKey is missing.</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt id="altimeter.core.graph.field.exceptions.ResourceLinkFieldSourceKeyNotFoundException">
+<em class="property">exception </em><code class="sig-name descname">ResourceLinkFieldSourceKeyNotFoundException</code><a class="headerlink" href="#altimeter.core.graph.field.exceptions.ResourceLinkFieldSourceKeyNotFoundException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="altimeter.core.html#altimeter.core.exceptions.AltimeterException" title="altimeter.core.exceptions.AltimeterException"><code class="xref py py-class docutils literal notranslate"><span class="pre">altimeter.core.exceptions.AltimeterException</span></code></a></p>
+<p>The source_key of a ResourceLinkField is not found</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt id="altimeter.core.graph.field.exceptions.ResourceLinkFieldValueNotAStringException">
+<em class="property">exception </em><code class="sig-name descname">ResourceLinkFieldValueNotAStringException</code><a class="headerlink" href="#altimeter.core.graph.field.exceptions.ResourceLinkFieldValueNotAStringException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="altimeter.core.html#altimeter.core.exceptions.AltimeterException" title="altimeter.core.exceptions.AltimeterException"><code class="xref py py-class docutils literal notranslate"><span class="pre">altimeter.core.exceptions.AltimeterException</span></code></a></p>
+<p>The value of a ResourceLinkField is not a string.</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt id="altimeter.core.graph.field.exceptions.ScalarFieldSourceKeyNotFoundException">
+<em class="property">exception </em><code class="sig-name descname">ScalarFieldSourceKeyNotFoundException</code><a class="headerlink" href="#altimeter.core.graph.field.exceptions.ScalarFieldSourceKeyNotFoundException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="altimeter.core.html#altimeter.core.exceptions.AltimeterException" title="altimeter.core.exceptions.AltimeterException"><code class="xref py py-class docutils literal notranslate"><span class="pre">altimeter.core.exceptions.AltimeterException</span></code></a></p>
+<p>The source_key of a ScalarField is not found</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt id="altimeter.core.graph.field.exceptions.ScalarFieldValueNotAScalarException">
+<em class="property">exception </em><code class="sig-name descname">ScalarFieldValueNotAScalarException</code><a class="headerlink" href="#altimeter.core.graph.field.exceptions.ScalarFieldValueNotAScalarException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="altimeter.core.html#altimeter.core.exceptions.AltimeterException" title="altimeter.core.exceptions.AltimeterException"><code class="xref py py-class docutils literal notranslate"><span class="pre">altimeter.core.exceptions.AltimeterException</span></code></a></p>
+<p>The value of a ScalarField is not a string, bool, int or float.</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt id="altimeter.core.graph.field.exceptions.TagsFieldMissingTagsKeyException">
+<em class="property">exception </em><code class="sig-name descname">TagsFieldMissingTagsKeyException</code><a class="headerlink" href="#altimeter.core.graph.field.exceptions.TagsFieldMissingTagsKeyException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="altimeter.core.html#altimeter.core.exceptions.AltimeterException" title="altimeter.core.exceptions.AltimeterException"><code class="xref py py-class docutils literal notranslate"><span class="pre">altimeter.core.exceptions.AltimeterException</span></code></a></p>
+<p>A TagsField data is missing key ‘Tags’</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-altimeter.core.graph.field.list_field">
+<span id="altimeter-core-graph-field-list-field-module"></span><h2>altimeter.core.graph.field.list_field module<a class="headerlink" href="#module-altimeter.core.graph.field.list_field" title="Permalink to this headline">¶</a></h2>
+<p>List Fields represent fields which consist of list data.</p>
+<dl class="py class">
+<dt id="altimeter.core.graph.field.list_field.AnonymousListField">
+<em class="property">class </em><code class="sig-name descname">AnonymousListField</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">source_key</span></em>, <em class="sig-param"><span class="n">field</span></em>, <em class="sig-param"><span class="n">optional</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">allow_scalar</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.core.graph.field.list_field.AnonymousListField" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#altimeter.core.graph.field.base.Field" title="altimeter.core.graph.field.base.Field"><code class="xref py py-class docutils literal notranslate"><span class="pre">altimeter.core.graph.field.base.Field</span></code></a></p>
+<p>An AnonymousListField is a ListField where the source_key of the field is discarded
+and not used as a name in the resulting graph. See Examples below for more clarity.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>source_key</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Name of the key in the input JSON</p></li>
+<li><p><strong>field</strong> (<a class="reference internal" href="#altimeter.core.graph.field.base.Field" title="altimeter.core.graph.field.base.Field"><code class="xref py py-class docutils literal notranslate"><span class="pre">Field</span></code></a>) – Field object representing the type that is contained in this list.</p></li>
+<li><p><strong>optional</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Whether this key is optional. Defaults to False.</p></li>
+<li><p><strong>allow_scalar</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Whether this field can sometimes contain a scalar rather than a list - if
+this is set to True the scalar will be treated as a list of one. Defaults to False.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<dl>
+<dt>A DictField containing an AnonymousListField:</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">altimeter.core.graph.field.dict_field</span> <span class="kn">import</span> <span class="n">DictField</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">altimeter.core.graph.field.scalar_field</span> <span class="kn">import</span> <span class="n">EmbeddedScalarField</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">input</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;Biota&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;Animals&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;cow&quot;</span><span class="p">,</span> <span class="s2">&quot;pig&quot;</span><span class="p">,</span> <span class="s2">&quot;human&quot;</span><span class="p">],</span>                                   <span class="s2">&quot;Plants&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;tree&quot;</span><span class="p">,</span> <span class="s2">&quot;fern&quot;</span><span class="p">]}}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">field</span> <span class="o">=</span> <span class="n">DictField</span><span class="p">(</span><span class="s2">&quot;Biota&quot;</span><span class="p">,</span> <span class="n">AnonymousListField</span><span class="p">(</span><span class="s2">&quot;Animals&quot;</span><span class="p">,</span> <span class="n">EmbeddedScalarField</span><span class="p">()))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">link_collection</span> <span class="o">=</span> <span class="n">field</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="nb">input</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="p">{})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">link_collection</span><span class="o">.</span><span class="n">dict</span><span class="p">(</span><span class="n">exclude_unset</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+<span class="go">{&#39;multi_links&#39;: ({&#39;pred&#39;: &#39;biota&#39;, &#39;obj&#39;: {&#39;simple_links&#39;: ({&#39;pred&#39;: &#39;biota&#39;, &#39;obj&#39;: &#39;cow&#39;}, {&#39;pred&#39;: &#39;biota&#39;, &#39;obj&#39;: &#39;pig&#39;}, {&#39;pred&#39;: &#39;biota&#39;, &#39;obj&#39;: &#39;human&#39;})}},)}</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="altimeter.core.graph.field.list_field.AnonymousListField.parse">
+<code class="sig-name descname">parse</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">context</span></em><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.core.graph.field.list_field.AnonymousListField.parse" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse this field and return a list of Links.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]) – dictionary of data to parse</p></li>
+<li><p><strong>context</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]) – <p>context dict containing data from higher level parsing code.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>LinkCollection</p>
+</dd>
+<dt>Raises:</dt><dd><p>ListFieldSourceKeyNotFoundException if self.source_key is not in data.
+ListFieldValueNotAListException if the data does not appear to represent a list.</p>
+</dd>
+</dl>
+</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="altimeter.core.graph.html#altimeter.core.graph.links.LinkCollection" title="altimeter.core.graph.links.LinkCollection"><code class="xref py py-class docutils literal notranslate"><span class="pre">LinkCollection</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="altimeter.core.graph.field.list_field.ListField">
+<em class="property">class </em><code class="sig-name descname">ListField</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">source_key</span></em>, <em class="sig-param"><span class="n">sub_field</span></em>, <em class="sig-param"><span class="n">alti_key</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">optional</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">allow_scalar</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.core.graph.field.list_field.ListField" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#altimeter.core.graph.field.base.Field" title="altimeter.core.graph.field.base.Field"><code class="xref py py-class docutils literal notranslate"><span class="pre">altimeter.core.graph.field.base.Field</span></code></a></p>
+<p>A ListField is a field where the input is a JSON object containing a key (source_key)
+where the corresponding value is a list of homogeneous items.</p>
+<p class="rubric">Examples</p>
+<dl>
+<dt>A list of strings:</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">altimeter.core.graph.field.scalar_field</span> <span class="kn">import</span> <span class="n">EmbeddedScalarField</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">input</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;Animals&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;cow&quot;</span><span class="p">,</span> <span class="s2">&quot;pig&quot;</span><span class="p">,</span> <span class="s2">&quot;human&quot;</span><span class="p">]}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">field</span> <span class="o">=</span> <span class="n">ListField</span><span class="p">(</span><span class="s2">&quot;Animals&quot;</span><span class="p">,</span> <span class="n">EmbeddedScalarField</span><span class="p">())</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">link_collection</span> <span class="o">=</span> <span class="n">field</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="nb">input</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="p">{})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">link_collection</span><span class="o">.</span><span class="n">dict</span><span class="p">(</span><span class="n">exclude_unset</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+<span class="go">{&#39;simple_links&#39;: ({&#39;pred&#39;: &#39;animals&#39;, &#39;obj&#39;: &#39;cow&#39;}, {&#39;pred&#39;: &#39;animals&#39;, &#39;obj&#39;: &#39;pig&#39;}, {&#39;pred&#39;: &#39;animals&#39;, &#39;obj&#39;: &#39;human&#39;})}</span>
+</pre></div>
+</div>
+</dd>
+<dt>A list of dicts:</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">altimeter.core.graph.field.dict_field</span> <span class="kn">import</span> <span class="n">EmbeddedDictField</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">altimeter.core.graph.field.scalar_field</span> <span class="kn">import</span> <span class="n">ScalarField</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">input</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;People&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;Name&quot;</span><span class="p">:</span> <span class="s2">&quot;Bob&quot;</span><span class="p">,</span> <span class="s2">&quot;Age&quot;</span><span class="p">:</span> <span class="mi">49</span><span class="p">},</span> <span class="p">{</span><span class="s2">&quot;Name&quot;</span><span class="p">:</span> <span class="s2">&quot;Sue&quot;</span><span class="p">,</span> <span class="s2">&quot;Age&quot;</span><span class="p">:</span> <span class="mi">42</span><span class="p">}]}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">field</span> <span class="o">=</span> <span class="n">ListField</span><span class="p">(</span><span class="s2">&quot;People&quot;</span><span class="p">,</span> <span class="n">EmbeddedDictField</span><span class="p">(</span><span class="n">ScalarField</span><span class="p">(</span><span class="s2">&quot;Name&quot;</span><span class="p">),</span>                                  <span class="n">ScalarField</span><span class="p">(</span><span class="s2">&quot;Age&quot;</span><span class="p">)))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">link_collection</span> <span class="o">=</span> <span class="n">field</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="nb">input</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="p">{})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">link_collection</span><span class="o">.</span><span class="n">dict</span><span class="p">(</span><span class="n">exclude_unset</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+<span class="go">{&#39;multi_links&#39;: ({&#39;pred&#39;: &#39;people&#39;, &#39;obj&#39;: {&#39;simple_links&#39;: ({&#39;pred&#39;: &#39;name&#39;, &#39;obj&#39;: &#39;Bob&#39;}, {&#39;pred&#39;: &#39;age&#39;, &#39;obj&#39;: 49})}}, {&#39;pred&#39;: &#39;people&#39;, &#39;obj&#39;: {&#39;simple_links&#39;: ({&#39;pred&#39;: &#39;name&#39;, &#39;obj&#39;: &#39;Sue&#39;}, {&#39;pred&#39;: &#39;age&#39;, &#39;obj&#39;: 42})}})}</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>source_key</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Name of the key in the input JSON</p></li>
+<li><p><strong>sub_field</strong> (<a class="reference internal" href="#altimeter.core.graph.field.base.SubField" title="altimeter.core.graph.field.base.SubField"><code class="xref py py-class docutils literal notranslate"><span class="pre">SubField</span></code></a>) – SubField object representing the type that is contained in this list.</p></li>
+<li><p><strong>alti_key</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – Optional key name to be used in the graph. By default
+this is set to the source key converted to snake case.</p></li>
+<li><p><strong>optional</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Whether this key is optional. Defaults to False.</p></li>
+<li><p><strong>allow_scalar</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Whether this field can sometimes contain a scalar rather
+than a list - if this is set to True the scalar will be treated as a
+list of one. Defaults to False.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="altimeter.core.graph.field.list_field.ListField.parse">
+<code class="sig-name descname">parse</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">context</span></em><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.core.graph.field.list_field.ListField.parse" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse this field and return a LinkCollection</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]) – dictionary of data to parse</p></li>
+<li><p><strong>context</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]) – <p>context dict containing data from higher level parsing code.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>LinkCollection</p>
+</dd>
+<dt>Raises:</dt><dd><p>ListFieldSourceKeyNotFoundException if self.source_key is not in data.
+ListFieldValueNotAListException if the data does not appear to represent a list.</p>
+</dd>
+</dl>
+</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="altimeter.core.graph.html#altimeter.core.graph.links.LinkCollection" title="altimeter.core.graph.links.LinkCollection"><code class="xref py py-class docutils literal notranslate"><span class="pre">LinkCollection</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-altimeter.core.graph.field.resource_link_field">
+<span id="altimeter-core-graph-field-resource-link-field-module"></span><h2>altimeter.core.graph.field.resource_link_field module<a class="headerlink" href="#module-altimeter.core.graph.field.resource_link_field" title="Permalink to this headline">¶</a></h2>
+<p>Resource Link Fields represent field containing ids of other top level resources in the graph.
+For example, an EC2 instance has a ResourceLinkField with source_key ‘VpcId’ pointing to a VPC.</p>
+<dl class="py class">
+<dt id="altimeter.core.graph.field.resource_link_field.EmbeddedResourceLinkField">
+<em class="property">class </em><code class="sig-name descname">EmbeddedResourceLinkField</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">resource_spec_class</span></em>, <em class="sig-param"><span class="n">alti_key</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">optional</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">value_is_id</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.core.graph.field.resource_link_field.EmbeddedResourceLinkField" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#altimeter.core.graph.field.base.SubField" title="altimeter.core.graph.field.base.SubField"><code class="xref py py-class docutils literal notranslate"><span class="pre">altimeter.core.graph.field.base.SubField</span></code></a></p>
+<p>An EmbeddedResourceLinkField is a ResourceLinkField where the input is the resource id
+only, not a key/value where the value is a resource id.</p>
+<p class="rubric">Examples</p>
+<dl>
+<dt>A link to a TestResourceSpec resource::</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">altimeter.core.graph.field.list_field</span> <span class="kn">import</span> <span class="n">ListField</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">altimeter.core.resource.resource_spec</span> <span class="kn">import</span> <span class="n">ResourceSpec</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">TestResourceSpec</span><span class="p">(</span><span class="n">ResourceSpec</span><span class="p">):</span> <span class="n">type_name</span><span class="o">=</span><span class="s2">&quot;thing&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">input</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;Thing&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;123&quot;</span><span class="p">,</span> <span class="s2">&quot;456&quot;</span><span class="p">]}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">field</span> <span class="o">=</span> <span class="n">ListField</span><span class="p">(</span><span class="s2">&quot;Thing&quot;</span><span class="p">,</span> <span class="n">EmbeddedResourceLinkField</span><span class="p">(</span><span class="n">TestResourceSpec</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">link_collection</span> <span class="o">=</span> <span class="n">field</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="nb">input</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="p">{})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">link_collection</span><span class="o">.</span><span class="n">dict</span><span class="p">(</span><span class="n">exclude_unset</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+<span class="go">{&#39;resource_links&#39;: ({&#39;pred&#39;: &#39;thing&#39;, &#39;obj&#39;: &#39;thing:123&#39;}, {&#39;pred&#39;: &#39;thing&#39;, &#39;obj&#39;: &#39;thing:456&#39;})}</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>resource_spec_class</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code>[<a class="reference internal" href="altimeter.core.resource.html#altimeter.core.resource.resource_spec.ResourceSpec" title="altimeter.core.resource.resource_spec.ResourceSpec"><code class="xref py py-class docutils literal notranslate"><span class="pre">ResourceSpec</span></code></a>], <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – The name of the ResourceSpec class or the ResourceSpec class which
+this link represents.</p></li>
+<li><p><strong>optional</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Whether this key is optional. Defaults to False.</p></li>
+<li><p><strong>value_is_id</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Whether the value for this key contains the entire resource id. For AWS
+resources set this to True if the value is a complete arn.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="altimeter.core.graph.field.resource_link_field.EmbeddedResourceLinkField.parse">
+<code class="sig-name descname">parse</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">context</span></em><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.core.graph.field.resource_link_field.EmbeddedResourceLinkField.parse" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse this field and return a LinkCollection.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – data to parse</p></li>
+<li><p><strong>context</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]) – contains data from higher level parsing code.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="altimeter.core.graph.html#altimeter.core.graph.links.LinkCollection" title="altimeter.core.graph.links.LinkCollection"><code class="xref py py-class docutils literal notranslate"><span class="pre">LinkCollection</span></code></a></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>LinkCollection</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="altimeter.core.graph.field.resource_link_field.ResourceLinkField">
+<em class="property">class </em><code class="sig-name descname">ResourceLinkField</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">source_key</span></em>, <em class="sig-param"><span class="n">resource_spec_class</span></em>, <em class="sig-param"><span class="n">alti_key</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">optional</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">value_is_id</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.core.graph.field.resource_link_field.ResourceLinkField" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#altimeter.core.graph.field.base.Field" title="altimeter.core.graph.field.base.Field"><code class="xref py py-class docutils literal notranslate"><span class="pre">altimeter.core.graph.field.base.Field</span></code></a></p>
+<p>A ResourceLinkField represents a field containing ids of other top level resources in the
+graph. For example, an EC2 instance has a ResourceLinkField with source_key ‘VpcId’ pointing to
+a VPC.</p>
+<p class="rubric">Examples</p>
+<dl>
+<dt>A link to a TestResourceSpec resource::</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">altimeter.core.resource.resource_spec</span> <span class="kn">import</span> <span class="n">ResourceSpec</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">TestResourceSpec</span><span class="p">(</span><span class="n">ResourceSpec</span><span class="p">):</span> <span class="n">type_name</span><span class="o">=</span><span class="s2">&quot;thing&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">input</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;ThingId&quot;</span><span class="p">:</span> <span class="s2">&quot;123&quot;</span><span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">field</span> <span class="o">=</span> <span class="n">ResourceLinkField</span><span class="p">(</span><span class="s2">&quot;ThingId&quot;</span><span class="p">,</span> <span class="n">TestResourceSpec</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">link_collection</span> <span class="o">=</span> <span class="n">field</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="nb">input</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="p">{})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">link_collection</span><span class="o">.</span><span class="n">dict</span><span class="p">(</span><span class="n">exclude_unset</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+<span class="go">{&#39;resource_links&#39;: ({&#39;pred&#39;: &#39;thing&#39;, &#39;obj&#39;: &#39;thing:123&#39;},)}</span>
+</pre></div>
+</div>
+</dd>
+<dt>A link to a TestResourceSpec resource using value_is_id::</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">altimeter.core.resource.resource_spec</span> <span class="kn">import</span> <span class="n">ResourceSpec</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">TestResourceSpec</span><span class="p">(</span><span class="n">ResourceSpec</span><span class="p">):</span> <span class="n">type_name</span><span class="o">=</span><span class="s2">&quot;thing&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">input</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;ThingId&quot;</span><span class="p">:</span> <span class="s2">&quot;thing:123&quot;</span><span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">field</span> <span class="o">=</span> <span class="n">ResourceLinkField</span><span class="p">(</span><span class="s2">&quot;ThingId&quot;</span><span class="p">,</span> <span class="n">TestResourceSpec</span><span class="p">,</span> <span class="n">value_is_id</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">link_collection</span> <span class="o">=</span> <span class="n">field</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="nb">input</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="p">{})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">link_collection</span><span class="o">.</span><span class="n">dict</span><span class="p">(</span><span class="n">exclude_unset</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+<span class="go">{&#39;resource_links&#39;: ({&#39;pred&#39;: &#39;thing&#39;, &#39;obj&#39;: &#39;thing:123&#39;},)}</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>source_key</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Name of the key in the input JSON</p></li>
+<li><p><strong>resource_spec_class</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code>[<a class="reference internal" href="altimeter.core.resource.html#altimeter.core.resource.resource_spec.ResourceSpec" title="altimeter.core.resource.resource_spec.ResourceSpec"><code class="xref py py-class docutils literal notranslate"><span class="pre">ResourceSpec</span></code></a>], <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – The name of the ResourceSpec class or the ResourceSpec class which this
+link represents.</p></li>
+<li><p><strong>alti_key</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – Optional key name to be used in the graph. By default this is set to the
+resource_spec_class’ type_name attribute.</p></li>
+<li><p><strong>optional</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Whether this key is optional. Defaults to False.</p></li>
+<li><p><strong>value_is_id</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Whether the value for this key contains the entire resource id. For AWS
+resources set this to True if the value is a complete arn.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="altimeter.core.graph.field.resource_link_field.ResourceLinkField.parse">
+<code class="sig-name descname">parse</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">context</span></em><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.core.graph.field.resource_link_field.ResourceLinkField.parse" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse this field and return a LinkCollection</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]) – data to parse</p></li>
+<li><p><strong>context</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]) – contains data from higher level parsing code.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="altimeter.core.graph.html#altimeter.core.graph.links.LinkCollection" title="altimeter.core.graph.links.LinkCollection"><code class="xref py py-class docutils literal notranslate"><span class="pre">LinkCollection</span></code></a></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>LinkCollection</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="altimeter.core.graph.field.resource_link_field.TransientResourceLinkField">
+<em class="property">class </em><code class="sig-name descname">TransientResourceLinkField</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">source_key</span></em>, <em class="sig-param"><span class="n">resource_spec_class</span></em>, <em class="sig-param"><span class="n">alti_key</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">optional</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">value_is_id</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.core.graph.field.resource_link_field.TransientResourceLinkField" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#altimeter.core.graph.field.base.Field" title="altimeter.core.graph.field.base.Field"><code class="xref py py-class docutils literal notranslate"><span class="pre">altimeter.core.graph.field.base.Field</span></code></a></p>
+<p>Transient Resource Link Fields represent field containing ids of other top level resources in
+the graph which may not exist. For example, a Lambda can refer to a VPC however VPCs can be
+deleted from lambdas.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>source_key</strong> (<em>str</em>) – Name of the key in the input JSON</p></li>
+<li><p><strong>resource_spec_class</strong> (<em>str|Type</em><em>[</em><a class="reference internal" href="altimeter.core.resource.html#altimeter.core.resource.resource_spec.ResourceSpec" title="altimeter.core.resource.resource_spec.ResourceSpec"><em>ResourceSpec</em></a><em>]</em>) – The name of the ResourceSpec class or the
+ResourceSpec class which this link represents.</p></li>
+<li><p><strong>alti_key</strong> (<em>str</em>) – Optional key name to be used in the graph. By default
+this is set to the resource_spec_class’ type_name attribute.</p></li>
+<li><p><strong>optional</strong> (<em>bool</em>) – Whether this key is optional. Defaults to False.</p></li>
+<li><p><strong>value_is_id</strong> (<em>bool</em>) – Whether the value for this key contains the entire resource id.
+For AWS resources set this to True if the value is a complete arn.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<dl>
+<dt>A link to a TestResourceSpec resource::</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">altimeter.core.resource.resource_spec</span> <span class="kn">import</span> <span class="n">ResourceSpec</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">TestResourceSpec</span><span class="p">(</span><span class="n">ResourceSpec</span><span class="p">):</span> <span class="n">type_name</span><span class="o">=</span><span class="s2">&quot;thing&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">input</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;ThingId&quot;</span><span class="p">:</span> <span class="s2">&quot;123&quot;</span><span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">field</span> <span class="o">=</span> <span class="n">TransientResourceLinkField</span><span class="p">(</span><span class="s2">&quot;ThingId&quot;</span><span class="p">,</span> <span class="n">TestResourceSpec</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">link_collection</span> <span class="o">=</span> <span class="n">field</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="nb">input</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="p">{})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">link_collection</span><span class="o">.</span><span class="n">dict</span><span class="p">(</span><span class="n">exclude_unset</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+<span class="go">{&#39;transient_resource_links&#39;: ({&#39;pred&#39;: &#39;thing&#39;, &#39;obj&#39;: &#39;thing:123&#39;},)}</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="altimeter.core.graph.field.resource_link_field.TransientResourceLinkField.parse">
+<code class="sig-name descname">parse</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">context</span></em><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.core.graph.field.resource_link_field.TransientResourceLinkField.parse" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse this field and return a LinkCollection.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]) – data to parse</p></li>
+<li><p><strong>context</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]) – contains data from higher level parsing code.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="altimeter.core.graph.html#altimeter.core.graph.links.LinkCollection" title="altimeter.core.graph.links.LinkCollection"><code class="xref py py-class docutils literal notranslate"><span class="pre">LinkCollection</span></code></a></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>LinkCollection</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-altimeter.core.graph.field.scalar_field">
+<span id="altimeter-core-graph-field-scalar-field-module"></span><h2>altimeter.core.graph.field.scalar_field module<a class="headerlink" href="#module-altimeter.core.graph.field.scalar_field" title="Permalink to this headline">¶</a></h2>
+<p>Scalar Fields represent field that contain strings, bools or numbers.</p>
+<dl class="py class">
+<dt id="altimeter.core.graph.field.scalar_field.EmbeddedScalarField">
+<em class="property">class </em><code class="sig-name descname">EmbeddedScalarField</code><a class="headerlink" href="#altimeter.core.graph.field.scalar_field.EmbeddedScalarField" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#altimeter.core.graph.field.base.SubField" title="altimeter.core.graph.field.base.SubField"><code class="xref py py-class docutils literal notranslate"><span class="pre">altimeter.core.graph.field.base.SubField</span></code></a></p>
+<p>An EmbeddedScalarField is a field where the input is a string, number or bool.
+An EmbeddedScalarField assumes the key of the enclosing field.</p>
+<p class="rubric">Examples</p>
+<dl>
+<dt>An EmbeddedScalarField inside a ListField::</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">altimeter.core.graph.field.list_field</span> <span class="kn">import</span> <span class="n">ListField</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">input</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;Animal&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;Value1&quot;</span><span class="p">,</span> <span class="s2">&quot;Value2&quot;</span><span class="p">]}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">field</span> <span class="o">=</span> <span class="n">ListField</span><span class="p">(</span><span class="s2">&quot;Animal&quot;</span><span class="p">,</span> <span class="n">EmbeddedScalarField</span><span class="p">())</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">link_collection</span> <span class="o">=</span> <span class="n">field</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="nb">input</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="p">{})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">link_collection</span><span class="o">.</span><span class="n">dict</span><span class="p">(</span><span class="n">exclude_unset</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+<span class="go">{&#39;simple_links&#39;: ({&#39;pred&#39;: &#39;animal&#39;, &#39;obj&#39;: &#39;Value1&#39;}, {&#39;pred&#39;: &#39;animal&#39;, &#39;obj&#39;: &#39;Value2&#39;})}</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="altimeter.core.graph.field.scalar_field.EmbeddedScalarField.parse">
+<code class="sig-name descname">parse</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">context</span></em><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.core.graph.field.scalar_field.EmbeddedScalarField.parse" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse this field and return a LinkCollection.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]) – scalar value</p></li>
+<li><p><strong>context</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]) – context dict containing data from higher level parsing code.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="altimeter.core.graph.html#altimeter.core.graph.links.LinkCollection" title="altimeter.core.graph.links.LinkCollection"><code class="xref py py-class docutils literal notranslate"><span class="pre">LinkCollection</span></code></a></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>LinkCollection</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="altimeter.core.graph.field.scalar_field.ScalarField">
+<em class="property">class </em><code class="sig-name descname">ScalarField</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">source_key</span></em>, <em class="sig-param"><span class="n">alti_key</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">optional</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">default_value</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.core.graph.field.scalar_field.ScalarField" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#altimeter.core.graph.field.base.Field" title="altimeter.core.graph.field.base.Field"><code class="xref py py-class docutils literal notranslate"><span class="pre">altimeter.core.graph.field.base.Field</span></code></a></p>
+<p>A ScalarField is a field where the input is a JSON object and the corresponding value is a
+string, number or bool.</p>
+<p class="rubric">Examples</p>
+<dl>
+<dt>A ScalarField with a string value::</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">input</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;FieldName&quot;</span><span class="p">:</span> <span class="s2">&quot;Value&quot;</span><span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">field</span> <span class="o">=</span> <span class="n">ScalarField</span><span class="p">(</span><span class="s2">&quot;FieldName&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">link_collection</span> <span class="o">=</span> <span class="n">field</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="nb">input</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="p">{})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">link_collection</span><span class="o">.</span><span class="n">dict</span><span class="p">(</span><span class="n">exclude_unset</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+<span class="go">{&#39;simple_links&#39;: ({&#39;pred&#39;: &#39;field_name&#39;, &#39;obj&#39;: &#39;Value&#39;},)}</span>
+</pre></div>
+</div>
+</dd>
+<dt>A ScalarField with a string value and an alti_key specified::</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">input</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;FieldName&quot;</span><span class="p">:</span> <span class="s2">&quot;Value&quot;</span><span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">field</span> <span class="o">=</span> <span class="n">ScalarField</span><span class="p">(</span><span class="s2">&quot;FieldName&quot;</span><span class="p">,</span> <span class="n">alti_key</span><span class="o">=</span><span class="s2">&quot;custom_name&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">link_collection</span> <span class="o">=</span> <span class="n">field</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="nb">input</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="p">{})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">link_collection</span><span class="o">.</span><span class="n">dict</span><span class="p">(</span><span class="n">exclude_unset</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+<span class="go">{&#39;simple_links&#39;: ({&#39;pred&#39;: &#39;custom_name&#39;, &#39;obj&#39;: &#39;Value&#39;},)}</span>
+</pre></div>
+</div>
+</dd>
+<dt>An optional ScalarField with no default value::</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">input</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;SomeOtherFieldName&quot;</span><span class="p">:</span> <span class="s2">&quot;Value&quot;</span><span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">field</span> <span class="o">=</span> <span class="n">ScalarField</span><span class="p">(</span><span class="s2">&quot;FieldName&quot;</span><span class="p">,</span> <span class="n">optional</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">link_collection</span> <span class="o">=</span> <span class="n">field</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="nb">input</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="p">{})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">link_collection</span><span class="o">.</span><span class="n">dict</span><span class="p">(</span><span class="n">exclude_unset</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+<span class="go">{}</span>
+</pre></div>
+</div>
+</dd>
+<dt>An optional ScalarField with a default value::</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">input</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;SomeOtherFieldName&quot;</span><span class="p">:</span> <span class="s2">&quot;Value&quot;</span><span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">field</span> <span class="o">=</span> <span class="n">ScalarField</span><span class="p">(</span><span class="s2">&quot;FieldName&quot;</span><span class="p">,</span> <span class="n">optional</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">default_value</span><span class="o">=</span><span class="s2">&quot;DefaultValue&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">link_collection</span> <span class="o">=</span> <span class="n">field</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="nb">input</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="p">{})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">link_collection</span><span class="o">.</span><span class="n">dict</span><span class="p">(</span><span class="n">exclude_unset</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+<span class="go">{&#39;simple_links&#39;: ({&#39;pred&#39;: &#39;field_name&#39;, &#39;obj&#39;: &#39;DefaultValue&#39;},)}</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>source_key</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Name of the key in the input JSON</p></li>
+<li><p><strong>alti_key</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – Optional key name to be used in the graph. By default this is set to the source
+key converted to snake case.</p></li>
+<li><p><strong>optional</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Whether this key is optional. Defaults to False.</p></li>
+<li><p><strong>default_value</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>]) – A default value to use if the source_key is not present.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="altimeter.core.graph.field.scalar_field.ScalarField.parse">
+<code class="sig-name descname">parse</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">context</span></em><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.core.graph.field.scalar_field.ScalarField.parse" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse this field and return a LinkCollection</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]) – dictionary of data to parse</p></li>
+<li><p><strong>context</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]) – <p>context dict containing data from higher level parsing code.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>LinkCollection</p>
+</dd>
+</dl>
+</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="altimeter.core.graph.html#altimeter.core.graph.links.LinkCollection" title="altimeter.core.graph.links.LinkCollection"><code class="xref py py-class docutils literal notranslate"><span class="pre">LinkCollection</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-altimeter.core.graph.field.tags_field">
+<span id="altimeter-core-graph-field-tags-field-module"></span><h2>altimeter.core.graph.field.tags_field module<a class="headerlink" href="#module-altimeter.core.graph.field.tags_field" title="Permalink to this headline">¶</a></h2>
+<p>Tags Fields represent AWS Tags.</p>
+<dl class="py class">
+<dt id="altimeter.core.graph.field.tags_field.TagsField">
+<em class="property">class </em><code class="sig-name descname">TagsField</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">optional</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.core.graph.field.tags_field.TagsField" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#altimeter.core.graph.field.base.Field" title="altimeter.core.graph.field.base.Field"><code class="xref py py-class docutils literal notranslate"><span class="pre">altimeter.core.graph.field.base.Field</span></code></a></p>
+<p>A TagsField is a field used to parse data in the form</p>
+<blockquote>
+<div><p>{‘Tags’: [{‘Key’: ‘tag_key’, ‘Value’: ‘tag_value’}, …]}</p>
+</div></blockquote>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">input</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;Tags&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;Key&quot;</span><span class="p">:</span> <span class="s2">&quot;Name&quot;</span><span class="p">,</span> <span class="s2">&quot;Value&quot;</span><span class="p">:</span> <span class="s2">&quot;Jerry&quot;</span><span class="p">},</span>                               <span class="p">{</span><span class="s2">&quot;Key&quot;</span><span class="p">:</span> <span class="s2">&quot;DOB&quot;</span><span class="p">,</span> <span class="s2">&quot;Value&quot;</span><span class="p">:</span> <span class="s2">&quot;1942-08-01&quot;</span><span class="p">}]}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">field</span> <span class="o">=</span> <span class="n">TagsField</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">link_collection</span> <span class="o">=</span> <span class="n">field</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="nb">input</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="p">{})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">link_collection</span><span class="o">.</span><span class="n">dict</span><span class="p">(</span><span class="n">exclude_unset</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+<span class="go">{&#39;tag_links&#39;: ({&#39;pred&#39;: &#39;Name&#39;, &#39;obj&#39;: &#39;Jerry&#39;}, {&#39;pred&#39;: &#39;DOB&#39;, &#39;obj&#39;: &#39;1942-08-01&#39;})}</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>optional</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Whether this key is optional. Defaults to False.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="altimeter.core.graph.field.tags_field.TagsField.parse">
+<code class="sig-name descname">parse</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">context</span></em><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.core.graph.field.tags_field.TagsField.parse" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse this field and return a list of Links.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]) – dictionary of data to parse</p></li>
+<li><p><strong>context</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]) – <p>context dict containing data from higher level parsing code.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>List of TagLink objects, one for each tag.</p>
+</dd>
+</dl>
+</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="altimeter.core.graph.html#altimeter.core.graph.links.LinkCollection" title="altimeter.core.graph.links.LinkCollection"><code class="xref py py-class docutils literal notranslate"><span class="pre">LinkCollection</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-altimeter.core.graph.field.util">
+<span id="altimeter-core-graph-field-util-module"></span><h2>altimeter.core.graph.field.util module<a class="headerlink" href="#module-altimeter.core.graph.field.util" title="Permalink to this headline">¶</a></h2>
+<p>Grab-bag functions for Field parsing</p>
+<dl class="py function">
+<dt id="altimeter.core.graph.field.util.camel_case_to_snake_case">
+<code class="sig-name descname">camel_case_to_snake_case</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em><span class="sig-paren">)</span><a class="headerlink" href="#altimeter.core.graph.field.util.camel_case_to_snake_case" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert a string from CamelCase into snake_case.
+:type name: <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>
+:param name: string to convert</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>snake cased string</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-altimeter.core.graph.field">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-altimeter.core.graph.field" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">Altimeter</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">User Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="user/quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user/local_blazegraph.html">Local Querying with Blazegraph</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user/sample_queries.html">Sample Queries</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Developer Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="dev/devguide.html">Developer’s Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dev/extending.html">Extending Altimeter</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="modules.html">altimeter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="altimeter.aws.html">altimeter.aws package</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="altimeter.core.html">altimeter.core package</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="altimeter.core.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="altimeter.core.artifact_io.html">altimeter.core.artifact_io package</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="altimeter.core.graph.html">altimeter.core.graph package</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="altimeter.core.graph.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l5 current"><a class="current reference internal" href="#">altimeter.core.graph.field package</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l6"><a class="reference internal" href="#module-altimeter.core.graph.field.base">altimeter.core.graph.field.base module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="#module-altimeter.core.graph.field.dict_field">altimeter.core.graph.field.dict_field module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="#module-altimeter.core.graph.field.exceptions">altimeter.core.graph.field.exceptions module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="#module-altimeter.core.graph.field.list_field">altimeter.core.graph.field.list_field module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="#module-altimeter.core.graph.field.resource_link_field">altimeter.core.graph.field.resource_link_field module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="#module-altimeter.core.graph.field.scalar_field">altimeter.core.graph.field.scalar_field module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="#module-altimeter.core.graph.field.tags_field">altimeter.core.graph.field.tags_field module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="#module-altimeter.core.graph.field.util">altimeter.core.graph.field.util module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="#module-altimeter.core.graph.field">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="altimeter.core.graph.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="altimeter.core.graph.html#module-altimeter.core.graph.exceptions">altimeter.core.graph.exceptions module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="altimeter.core.graph.html#module-altimeter.core.graph.graph_set">altimeter.core.graph.graph_set module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="altimeter.core.graph.html#module-altimeter.core.graph.graph_spec">altimeter.core.graph.graph_spec module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="altimeter.core.graph.html#module-altimeter.core.graph.links">altimeter.core.graph.links module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="altimeter.core.graph.html#module-altimeter.core.graph.node_cache">altimeter.core.graph.node_cache module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="altimeter.core.graph.html#module-altimeter.core.graph.schema">altimeter.core.graph.schema module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="altimeter.core.graph.html#module-altimeter.core.graph">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="altimeter.core.neptune.html">altimeter.core.neptune package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="altimeter.core.resource.html">altimeter.core.resource package</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="altimeter.core.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="altimeter.core.html#module-altimeter.core.base_model">altimeter.core.base_model module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="altimeter.core.html#module-altimeter.core.config">altimeter.core.config module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="altimeter.core.html#module-altimeter.core.exceptions">altimeter.core.exceptions module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="altimeter.core.html#module-altimeter.core.json_encoder">altimeter.core.json_encoder module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="altimeter.core.html#module-altimeter.core.log">altimeter.core.log module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="altimeter.core.html#module-altimeter.core.log_events">altimeter.core.log_events module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="altimeter.core.html#module-altimeter.core">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="modules.html">altimeter</a><ul>
+  <li><a href="altimeter.html">altimeter package</a><ul>
+  <li><a href="altimeter.core.html">altimeter.core package</a><ul>
+  <li><a href="altimeter.core.graph.html">altimeter.core.graph package</a><ul>
+      <li>Previous: <a href="altimeter.core.graph.html" title="previous chapter">altimeter.core.graph package</a></li>
+      <li>Next: <a href="altimeter.core.neptune.html" title="next chapter">altimeter.core.neptune package</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, Tableau.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.4.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/altimeter.core.graph.field.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
