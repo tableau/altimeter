@@ -46,14 +46,6 @@ class LambdaAWSScanMuxer(AWSScanMuxer):
         super().__init__(scan_id=scan_id, config=config)
         self.account_scan_lambda_name = account_scan_lambda_name
         self.account_scan_lambda_timeout = account_scan_lambda_timeout
-        if self.config.scan.scan_lambda_tcp_keepalive:
-            config_file = ConfigParser()
-            config_file["default"] = {"tcp_keepalive": "true"}
-            config_dir = Path.home().joinpath(".aws")
-            config_dir.mkdir(exist_ok=True)
-            config_filepath = config_dir.joinpath("config")
-            with config_filepath.open("w") as config_fp:
-                config_file.write(config_fp)
 
     def _schedule_account_scan(
         self, executor: ThreadPoolExecutor, account_scan_plan: AccountScanPlan
