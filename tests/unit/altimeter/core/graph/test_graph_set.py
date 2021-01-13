@@ -8,7 +8,6 @@ from altimeter.core.graph.exceptions import (
 )
 from altimeter.core.graph.graph_set import GraphSet, ValidatedGraphSet
 from altimeter.core.graph.links import LinkCollection, ResourceLink, SimpleLink
-from altimeter.core.multilevel_counter import MultilevelCounter
 from altimeter.core.resource.resource import Resource
 from altimeter.core.resource.resource_spec import ResourceSpec
 from altimeter.core.resource.exceptions import ResourceSpecClassNotFoundException
@@ -68,7 +67,6 @@ class TestGraphSetWithValidDataNoMerging(TestCase):
             end_time=4567,
             resources=resources,
             errors=["test err 1", "test err 2"],
-            stats=MultilevelCounter(),
         )
 
     def test_rdf_a_type(self):
@@ -185,7 +183,6 @@ class TestGraphSetWithValidDataMerging(TestCase):
             end_time=4567,
             resources=resources,
             errors=["test err 1", "test err 2"],
-            stats=MultilevelCounter(),
         )
 
     def test_rdf_a_type(self):
@@ -221,7 +218,6 @@ class TestGraphSetWithInValidData(TestCase):
                 end_time=4567,
                 resources=resources,
                 errors=[],
-                stats=MultilevelCounter(),
             )
 
     def test_invalid_resources_dupes_same_class_conflicting_types_no_allow_clobber(self):
@@ -237,7 +233,6 @@ class TestGraphSetWithInValidData(TestCase):
                 end_time=4567,
                 resources=resources,
                 errors=[],
-                stats=MultilevelCounter(),
             )
 
     def test_orphaned_ref(self):
@@ -259,7 +254,6 @@ class TestGraphSetWithInValidData(TestCase):
             end_time=4567,
             resources=resources,
             errors=["test err 1", "test err 2"],
-            stats=MultilevelCounter(),
         )
         with self.assertRaises(GraphSetOrphanedReferencesException):
             ValidatedGraphSet.from_graph_set(graph_set)
@@ -268,44 +262,20 @@ class TestGraphSetWithInValidData(TestCase):
 class TestGraphSetFromGraphSets(TestCase):
     def test_invalid_diff_names(self):
         graph_set_1 = GraphSet(
-            name="graph-1",
-            version="1",
-            start_time=10,
-            end_time=20,
-            resources=[],
-            errors=[],
-            stats=MultilevelCounter(),
+            name="graph-1", version="1", start_time=10, end_time=20, resources=[], errors=[],
         )
         graph_set_2 = GraphSet(
-            name="graph-2",
-            version="1",
-            start_time=15,
-            end_time=25,
-            resources=[],
-            errors=[],
-            stats=MultilevelCounter(),
+            name="graph-2", version="1", start_time=15, end_time=25, resources=[], errors=[],
         )
         with self.assertRaises(UnmergableGraphSetsException):
             GraphSet.from_graph_sets([graph_set_1, graph_set_2])
 
     def test_invalid_diff_versions(self):
         graph_set_1 = GraphSet(
-            name="graph-1",
-            version="1",
-            start_time=10,
-            end_time=20,
-            resources=[],
-            errors=[],
-            stats=MultilevelCounter(),
+            name="graph-1", version="1", start_time=10, end_time=20, resources=[], errors=[],
         )
         graph_set_2 = GraphSet(
-            name="graph-1",
-            version="2",
-            start_time=15,
-            end_time=25,
-            resources=[],
-            errors=[],
-            stats=MultilevelCounter(),
+            name="graph-1", version="2", start_time=15, end_time=25, resources=[], errors=[],
         )
         with self.assertRaises(UnmergableGraphSetsException):
             GraphSet.from_graph_sets([graph_set_1, graph_set_2])
@@ -334,7 +304,6 @@ class TestGraphSetFromGraphSets(TestCase):
             end_time=20,
             resources=[resource_a1, resource_a2],
             errors=["errora1", "errora2"],
-            stats=MultilevelCounter(),
         )
         graph_set_2 = GraphSet(
             name="graph-1",
@@ -343,7 +312,6 @@ class TestGraphSetFromGraphSets(TestCase):
             end_time=25,
             resources=[resource_b1, resource_b2],
             errors=["errorb1", "errorb2"],
-            stats=MultilevelCounter(),
         )
         merged_graph_set = ValidatedGraphSet.from_graph_sets([graph_set_1, graph_set_2])
 

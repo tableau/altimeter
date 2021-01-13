@@ -8,7 +8,6 @@ from altimeter.core.graph.field.exceptions import (
 )
 from altimeter.core.graph.schema import Schema
 from altimeter.core.graph.links import LinkCollection, ResourceLink
-from altimeter.core.multilevel_counter import MultilevelCounter
 from altimeter.core.resource.resource import Resource
 from altimeter.core.resource.resource_spec import ResourceSpec
 

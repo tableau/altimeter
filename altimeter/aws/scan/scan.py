@@ -12,7 +12,6 @@ from altimeter.core.artifact_io.writer import ArtifactWriter
 from altimeter.core.config import Config
 from altimeter.core.graph.graph_set import GraphSet, ValidatedGraphSet
 from altimeter.core.log import Logger
-from altimeter.core.multilevel_counter import MultilevelCounter
 
 
 def get_sub_account_ids(account_ids: Tuple[str, ...], accessor: Accessor) -> Tuple[str, ...]:
@@ -61,7 +60,6 @@ def run_scan(
     artifacts: List[str] = []
     errors: Dict[str, List[str]] = {}
     unscanned_accounts: Set[str] = set()
-    stats = MultilevelCounter()
     graph_sets: List[GraphSet] = []
 
     for account_scan_manifest in muxer.scan(scan_plan=scan_plan):
@@ -77,8 +75,6 @@ def run_scan(
             scanned_accounts.append(account_id)
         else:
             unscanned_accounts.add(account_id)
-        account_stats = MultilevelCounter.parse_obj(account_scan_manifest.api_call_stats)
-        stats.merge(account_stats)
     if not graph_sets:
         raise Exception("BUG: No graph_sets generated.")
     validated_graph_set = ValidatedGraphSet.from_graph_set(GraphSet.from_graph_sets(graph_sets))
@@ -94,7 +90,6 @@ def run_scan(
         artifacts=artifacts,
         errors=errors,
         unscanned_accounts=list(unscanned_accounts),
-        api_call_stats=stats,
         start_time=start_time,
         end_time=end_time,
     )

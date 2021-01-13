@@ -29,7 +29,6 @@ from altimeter.core.base_model import BaseImmutableModel
 from altimeter.core.graph.graph_set import GraphSet
 from altimeter.core.graph.graph_spec import GraphSpec
 from altimeter.core.log import Logger
-from altimeter.core.multilevel_counter import MultilevelCounter
 from altimeter.core.resource.resource import Resource
 
 
@@ -39,7 +38,6 @@ class AccountScanResult(BaseImmutableModel):
     account_id: str
     artifacts: List[str]
     errors: List[str]
-    api_call_stats: MultilevelCounter
 
 
 def get_all_enabled_regions(session: boto3.Session) -> Tuple[str, ...]:
@@ -250,17 +248,13 @@ class AccountScanner:
                     end_time=now,
                     resources=[unscanned_account_resource],
                     errors=prescan_errors,
-                    stats=MultilevelCounter(),
                 )
                 output_artifact = self.artifact_writer.write_json(
                     name=account_id, data=account_graph_set,
                 )
                 logger.info(event=AWSLogEvents.ScanAWSAccountEnd)
                 return AccountScanResult(
-                    account_id=account_id,
-                    artifacts=[output_artifact],
-                    errors=prescan_errors,
-                    api_call_stats=account_graph_set.stats,
+                    account_id=account_id, artifacts=[output_artifact], errors=prescan_errors,
                 )
             # if there are any errors whatsoever we generate an empty graph with errors only
             errors = []
@@ -277,7 +271,6 @@ class AccountScanner:
                     end_time=now,
                     resources=[unscanned_account_resource],
                     errors=errors,
-                    stats=MultilevelCounter(),  # ENHANCHMENT: could technically get partial stats.
                 )
             else:
                 account_graph_set = GraphSet.from_graph_sets(graph_sets)
@@ -286,10 +279,7 @@ class AccountScanner:
             )
             logger.info(event=AWSLogEvents.ScanAWSAccountEnd)
             return AccountScanResult(
-                account_id=account_id,
-                artifacts=[output_artifact],
-                errors=errors,
-                api_call_stats=account_graph_set.stats,
+                account_id=account_id, artifacts=[output_artifact], errors=errors,
             )
 
 
@@ -344,7 +334,6 @@ def scan_scan_unit(scan_unit: ScanUnit) -> GraphSet:
             end_time=end_time,
             resources=resources,
             errors=errors,
-            stats=scan_accessor.api_call_stats,
         )
         end_t = time.time()
         elapsed_sec = end_t - start_t

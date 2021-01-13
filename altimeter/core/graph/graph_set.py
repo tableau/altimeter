@@ -16,7 +16,6 @@ from altimeter.core.graph.exceptions import (
 )
 from altimeter.core.graph.exceptions import DuplicateResourceIdsFoundException
 from altimeter.core.graph.node_cache import NodeCache
-from altimeter.core.multilevel_counter import MultilevelCounter
 from altimeter.core.resource.resource import Resource
 from altimeter.core.resource.resource_spec import ResourceSpec
 
@@ -33,7 +32,6 @@ class GraphSet(BaseImmutableModel):
         end_time: epoch scan end time
         resources: Resource objects
         errors: Errors encountered during scan
-        stats: Scan statistics, generally API call stats.
     """
 
     name: str
@@ -42,7 +40,6 @@ class GraphSet(BaseImmutableModel):
     end_time: int
     resources: Tuple[Resource, ...]
     errors: List[str]
-    stats: MultilevelCounter
 
     @classmethod
     def from_json_file(cls: Type["GraphSet"], path: Path) -> "GraphSet":
@@ -71,9 +68,6 @@ class GraphSet(BaseImmutableModel):
             itertools.chain.from_iterable([graph_set.resources for graph_set in graph_sets])
         )
         errors = list(itertools.chain.from_iterable([graph_set.errors for graph_set in graph_sets]))
-        stats = MultilevelCounter()
-        for graph_set in graph_sets:
-            stats.merge(graph_set.stats)
         return cls(
             name=name,
             version=version,
@@ -81,7 +75,6 @@ class GraphSet(BaseImmutableModel):
             end_time=end_time,
             resources=resources,
             errors=errors,
-            stats=stats,
         )
 
 
@@ -127,7 +120,6 @@ class ValidatedGraphSet(GraphSet):
             end_time=graph_set.end_time,
             resources=graph_set.resources,
             errors=graph_set.errors,
-            stats=graph_set.stats,
         )
 
     def to_neptune_lpg(self, scan_id: str) -> Dict:

@@ -3,7 +3,6 @@ from unittest import TestCase
 
 from altimeter.core.graph.graph_spec import GraphSpec
 from altimeter.core.graph.links import LinkCollection
-from altimeter.core.multilevel_counter import MultilevelCounter
 from altimeter.core.resource.resource import Resource
 from altimeter.core.resource.resource_spec import ResourceSpec
 
@@ -41,7 +40,7 @@ class TestResourceSpecB(ResourceSpec):
 
 
 class TestScanAccessor:
-    api_call_stats: MultilevelCounter = MultilevelCounter()
+    pass
 
 
 class TestGraphSpec(TestCase):

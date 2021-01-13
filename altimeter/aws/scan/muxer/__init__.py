@@ -61,7 +61,6 @@ class AWSScanMuxer(abc.ABC):
                         account_id=account_scan_result.account_id,
                         artifacts=account_scan_result.artifacts,
                         errors=account_scan_result.errors,
-                        api_call_stats=account_scan_result.api_call_stats,
                     )
                     yield account_scan_manifest
                     processed_accounts += 1

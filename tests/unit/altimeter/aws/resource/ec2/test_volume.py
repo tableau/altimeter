@@ -6,7 +6,6 @@ from moto import mock_ec2
 from altimeter.aws.resource.ec2.volume import EBSVolumeResourceSpec
 from altimeter.aws.scan.aws_accessor import AWSAccessor
 from altimeter.core.graph.links import LinkCollection, ResourceLink, SimpleLink
-from altimeter.core.multilevel_counter import MultilevelCounter
 from altimeter.core.resource.resource import Resource
 
 
@@ -47,29 +46,4 @@ class TestEBSVolumeResourceSpec(TestCase):
                 ),
             )
         ]
-        expected_api_call_stats = MultilevelCounter(
-            count=1,
-            multilevel_counters={
-                "123456789012": MultilevelCounter(
-                    count=1,
-                    multilevel_counters={
-                        "us-east-1": MultilevelCounter(
-                            count=1,
-                            multilevel_counters={
-                                "ec2": MultilevelCounter(
-                                    count=1,
-                                    multilevel_counters={
-                                        "DescribeVolumes": MultilevelCounter(
-                                            count=1, multilevel_counters={}
-                                        )
-                                    },
-                                )
-                            },
-                        )
-                    },
-                )
-            },
-        )
-
         self.assertEqual(resources, expected_resources)
-        self.assertEqual(scan_accessor.api_call_stats, expected_api_call_stats)
