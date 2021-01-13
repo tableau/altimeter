@@ -3,7 +3,6 @@ from unittest import TestCase
 
 from altimeter.aws.auth.cache import (
     AWSCredentials,
-    AWSCredentialsCacheKey,
     AWSCredentialsCache,
 )
 
@@ -67,29 +66,17 @@ class TestAWSCredentials(TestCase):
             "session_token": "testst",
             "expiration": in_five_min_epoch,
         }
-        aws_credentials_from_dict = AWSCredentials.from_dict(data=data)
+        aws_credentials_from_dict = AWSCredentials(**data)
         self.assertEqual(aws_credentials, aws_credentials_from_dict)
 
 
-class TestAWSCredentialsCacheKey(TestCase):
-    def test_to_str(self):
-        key = AWSCredentialsCacheKey(
+class TestBuildAWSCredentialsCacheKey(TestCase):
+    def test(self):
+        key = AWSCredentialsCache.build_cache_key(
             account_id="1234", role_name="test_role", role_session_name="test_role_session"
         )
         expected_str = "1234:test_role:test_role_session"
         self.assertEqual(str(key), expected_str)
-
-    def test_from_str(self):
-        str = "1234:test_role:test_role_session"
-        expected_key = AWSCredentialsCacheKey(
-            account_id="1234", role_name="test_role", role_session_name="test_role_session"
-        )
-        key = AWSCredentialsCacheKey.from_str(str)
-        self.assertEqual(expected_key, key)
-
-    def test_from_str_to_str(self):
-        key_str = "1234:test_role:test_role_session"
-        self.assertEqual(key_str, str(AWSCredentialsCacheKey.from_str(key_str)))
 
 
 class TestAWSCredentialsCache(TestCase):
@@ -114,7 +101,7 @@ class TestAWSCredentialsCache(TestCase):
         for key, value in keys_values:
             self.assertEqual(
                 key,
-                AWSCredentialsCacheKey(
+                AWSCredentialsCache.build_cache_key(
                     account_id="123456789012", role_name="test_rn", role_session_name="test_rsn"
                 ),
             )
@@ -261,7 +248,7 @@ class TestAWSCredentialsCache(TestCase):
             role_session_name="test_rsn2",
         )
         self.assertDictEqual(
-            cache.to_dict(),
+            cache.dict(),
             {
                 "cache": {
                     "123456789012:test_rn:test_rsn": {
@@ -325,7 +312,7 @@ class TestAWSCredentialsCache(TestCase):
                 },
             }
         }
-        from_data_cache = AWSCredentialsCache.from_dict(data)
+        from_data_cache = AWSCredentialsCache(**data)
         self.assertEqual(from_data_cache, cache)
 
     @mock_sts
@@ -347,4 +334,4 @@ class TestAWSCredentialsCache(TestCase):
                 },
             }
         }
-        self.assertDictEqual(data, AWSCredentialsCache.from_dict(data).to_dict())
+        self.assertDictEqual(data, AWSCredentialsCache(**data).dict())

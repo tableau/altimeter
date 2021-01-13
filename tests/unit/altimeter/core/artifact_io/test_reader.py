@@ -19,6 +19,7 @@ class TestArtifactReader(unittest.TestCase):
         reader = ArtifactReader.from_artifact_path("/file/path")
         self.assertIsInstance(reader, FileArtifactReader)
 
+
 class TestFileArtifactReader(unittest.TestCase):
     def test_with_valid_file(self):
         data = {"foo": "boo"}

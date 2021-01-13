@@ -12,7 +12,7 @@ from altimeter.core.graph.schema import Schema
 class EventBusResourceSpec(EventsResourceSpec):
     """Resource for CloudWatchEvents EventBus"""
 
-    type_name = "rule"
+    type_name = "event-bus"
     schema = Schema(ScalarField("Name"), ScalarField("Arn"), ScalarField("Policy", optional=True),)
 
     @classmethod

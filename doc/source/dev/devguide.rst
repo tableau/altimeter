@@ -18,7 +18,8 @@ Pre-Commit Check
 ----------------
 
 A pre-commit script is included (`git/pre-commit.sh`) which performs static analysis
-using mypy_ and pylint_, code autoformat checking using black_ and runs tests.
+using mypy_ and pylint_, code autoformat checking using black_ and runs tests all via
+tox.
 
 This script is run as a part of Altimeter's CI and must pass for contributions
 to be merged.
@@ -29,28 +30,11 @@ To configure this as a pre-commit hook, from the base repository directory:
 
     ln -s ../../git/pre-commit.sh .git/hooks/pre-commit
 
-Running these parts in isolation is described below.
-
-Static Analysis and Code Formatting
------------------------------------
-
-To run mypy_, pylint_ and black_ checks:
+This can be run by hand by running tox:
 
 ::
 
-    ci/static_checks.sh altimeter
-
-Note that mypy_ is ran with the `--disallow-untyped-defs` option which
-actively requires type definitions in functions.
-
-Running Tests
--------------
-
-Run tests using the provided helper script:
-
-::
-
-    ci/tests.sh
+    tox
 
 *Next Steps*
 

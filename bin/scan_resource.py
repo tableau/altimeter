@@ -51,7 +51,7 @@ def main(argv: Optional[List[str]] = None) -> int:
     resource_scan_result = resource_spec_class.scan(aws_accessor)
     resource_dicts = []
     for resource in resource_scan_result:
-        resource_dicts.append(resource.to_dict())
+        resource_dicts.append(resource.dict())
     resource_scan_result_json = json.dumps(resource_dicts, indent=2, default=json_encoder)
     print(resource_scan_result_json)
     return 0

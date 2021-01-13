@@ -4,8 +4,9 @@ from concurrent.futures import as_completed, Future, ThreadPoolExecutor
 from typing import Generator
 
 from altimeter.aws.log_events import AWSLogEvents
-from altimeter.aws.scan.account_scan_plan import AccountScanPlan
+from altimeter.aws.scan.scan_plan import AccountScanPlan, ScanPlan
 from altimeter.aws.scan.account_scan_manifest import AccountScanManifest
+from altimeter.aws.scan.account_scanner import AccountScanResult
 from altimeter.core.config import Config
 from altimeter.core.log import Logger
 
@@ -24,9 +25,7 @@ class AWSScanMuxer(abc.ABC):
         self.scan_id = scan_id
         self.config = config
 
-    def scan(
-        self, account_scan_plan: AccountScanPlan
-    ) -> Generator[AccountScanManifest, None, None]:
+    def scan(self, scan_plan: ScanPlan) -> Generator[AccountScanManifest, None, None]:
         """Scan accounts. Return a list of AccountScanManifest objects.
 
         Args:
@@ -35,18 +34,14 @@ class AWSScanMuxer(abc.ABC):
         Yields:
             AccountScanManifest objects
         """
-        num_total_accounts = len(account_scan_plan.account_ids)
+        num_total_accounts = len(scan_plan.account_ids)
         scanned_account_ids = set()
-        unscanned_account_ids = set(account_scan_plan.account_ids)
-        account_scan_plans = account_scan_plan.to_batches(
-            max_accounts=self.config.concurrency.max_accounts_per_thread
-        )
-        num_account_batches = len(account_scan_plans)
-        num_threads = min(num_account_batches, self.config.concurrency.max_account_scan_threads)
+        unscanned_account_ids = set(scan_plan.account_ids)
+        account_scan_plans = scan_plan.build_account_scan_plans()
+        num_threads = self.config.concurrency.max_account_scan_threads
         logger = Logger()
         with logger.bind(
             num_total_accounts=num_total_accounts,
-            num_account_batches=num_account_batches,
             muxer=self.__class__.__name__,
             num_muxer_threads=num_threads,
         ):
@@ -54,33 +49,23 @@ class AWSScanMuxer(abc.ABC):
             with ThreadPoolExecutor(max_workers=num_threads) as executor:
                 processed_accounts = 0
                 futures = []
-                for sub_account_scan_plan in account_scan_plans:
-                    account_scan_future = self._schedule_account_scan(
-                        executor, sub_account_scan_plan
-                    )
+                for account_scan_plan in account_scan_plans:
+                    account_scan_future = self._schedule_account_scan(executor, account_scan_plan)
                     futures.append(account_scan_future)
                     logger.info(
-                        event=AWSLogEvents.MuxerQueueScan,
-                        account_ids=",".join(sub_account_scan_plan.account_ids),
+                        event=AWSLogEvents.MuxerQueueScan, account_id=account_scan_plan.account_id,
                     )
                 for future in as_completed(futures):
-                    scan_results_dicts = future.result()
-                    for scan_results_dict in scan_results_dicts:
-                        account_id = scan_results_dict["account_id"]
-                        output_artifact = scan_results_dict["output_artifact"]
-                        account_errors = scan_results_dict["errors"]
-                        api_call_stats = scan_results_dict["api_call_stats"]
-                        artifacts = [output_artifact] if output_artifact else []
-                        account_scan_result = AccountScanManifest(
-                            account_id=account_id,
-                            artifacts=artifacts,
-                            errors=account_errors,
-                            api_call_stats=api_call_stats,
-                        )
-                        yield account_scan_result
-                        processed_accounts += 1
-                        scanned_account_ids.add(account_id)
-                        unscanned_account_ids.remove(account_id)
+                    account_scan_result = future.result()
+                    account_scan_manifest = AccountScanManifest(
+                        account_id=account_scan_result.account_id,
+                        artifacts=account_scan_result.artifacts,
+                        errors=account_scan_result.errors,
+                    )
+                    yield account_scan_manifest
+                    processed_accounts += 1
+                    scanned_account_ids.add(account_scan_result.account_id)
+                    unscanned_account_ids.remove(account_scan_result.account_id)
                     logger.info(
                         event=AWSLogEvents.MuxerStat,
                         num_scanned=processed_accounts,

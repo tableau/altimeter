@@ -6,11 +6,11 @@ from altimeter.core.graph.field.exceptions import (
     ParentKeyMissingException,
     InvalidParentKeyException,
 )
-from altimeter.core.graph.link.base import Link
+from altimeter.core.graph.links import BaseLink
 
 
 class TestField(SubField):
-    def parse(self, data: Any, context: Dict[str, Any]) -> List[Link]:
+    def parse(self, data: Any, context: Dict[str, Any]) -> List[BaseLink]:
         raise NotImplementedError()
 
 

@@ -1,16 +1,17 @@
-from typing import Tuple, Set, List, Dict
+from typing import Dict, List, Optional, Set, Tuple
+
+import boto3
 
 from altimeter.aws.auth.accessor import Accessor
 from altimeter.aws.log_events import AWSLogEvents
-from altimeter.aws.scan.account_scan_plan import AccountScanPlan
+from altimeter.aws.scan.scan_plan import ScanPlan
 from altimeter.aws.scan.muxer import AWSScanMuxer
 from altimeter.aws.scan.scan_manifest import ScanManifest
 from altimeter.core.artifact_io.reader import ArtifactReader
 from altimeter.core.artifact_io.writer import ArtifactWriter
 from altimeter.core.config import Config
-from altimeter.core.graph.graph_set import GraphSet
+from altimeter.core.graph.graph_set import GraphSet, ValidatedGraphSet
 from altimeter.core.log import Logger
-from altimeter.core.multilevel_counter import MultilevelCounter
 
 
 def get_sub_account_ids(account_ids: Tuple[str, ...], accessor: Accessor) -> Tuple[str, ...]:
@@ -38,13 +39,19 @@ def run_scan(
     config: Config,
     artifact_writer: ArtifactWriter,
     artifact_reader: ArtifactReader,
-) -> Tuple[ScanManifest, GraphSet]:
-    if config.scan.scan_sub_accounts:
-        account_ids = get_sub_account_ids(config.scan.accounts, config.access.accessor)
+) -> Tuple[ScanManifest, ValidatedGraphSet]:
+    if config.scan.accounts:
+        scan_account_ids = config.scan.accounts
     else:
-        account_ids = config.scan.accounts
-    account_scan_plan = AccountScanPlan(
-        account_ids=account_ids, regions=config.scan.regions, accessor=config.access.accessor
+        sts_client = boto3.client("sts")
+        scan_account_id = sts_client.get_caller_identity()["Account"]
+        scan_account_ids = (scan_account_id,)
+    if config.scan.scan_sub_accounts:
+        account_ids = get_sub_account_ids(scan_account_ids, config.accessor)
+    else:
+        account_ids = scan_account_ids
+    scan_plan = ScanPlan(
+        account_ids=account_ids, regions=config.scan.regions, accessor=config.accessor
     )
     logger = Logger()
     logger.info(event=AWSLogEvents.ScanAWSAccountsStart)
@@ -53,10 +60,9 @@ def run_scan(
     artifacts: List[str] = []
     errors: Dict[str, List[str]] = {}
     unscanned_accounts: Set[str] = set()
-    stats = MultilevelCounter()
-    graph_set = None
+    graph_sets: List[GraphSet] = []
 
-    for account_scan_manifest in muxer.scan(account_scan_plan=account_scan_plan):
+    for account_scan_manifest in muxer.scan(scan_plan=scan_plan):
         account_id = account_scan_manifest.account_id
         if account_scan_manifest.errors:
             errors[account_id] = account_scan_manifest.errors
@@ -65,32 +71,27 @@ def run_scan(
             for account_scan_artifact in account_scan_manifest.artifacts:
                 artifacts.append(account_scan_artifact)
                 artifact_graph_set_dict = artifact_reader.read_json(account_scan_artifact)
-                artifact_graph_set = GraphSet.from_dict(artifact_graph_set_dict)
-                if graph_set is None:
-                    graph_set = artifact_graph_set
-                else:
-                    graph_set.merge(artifact_graph_set)
-            else:
-                scanned_accounts.append(account_id)
+                graph_sets.append(GraphSet.parse_obj(artifact_graph_set_dict))
+            scanned_accounts.append(account_id)
         else:
             unscanned_accounts.add(account_id)
-        account_stats = MultilevelCounter.from_dict(account_scan_manifest.api_call_stats)
-        stats.merge(account_stats)
-    if graph_set is None:
-        raise Exception("BUG: No graph_set generated.")
-    master_artifact_path = artifact_writer.write_json(name="master", data=graph_set.to_dict())
+    if not graph_sets:
+        raise Exception("BUG: No graph_sets generated.")
+    validated_graph_set = ValidatedGraphSet.from_graph_set(GraphSet.from_graph_sets(graph_sets))
+    master_artifact_path: Optional[str] = None
+    if config.write_master_json:
+        master_artifact_path = artifact_writer.write_json(name="master", data=validated_graph_set)
     logger.info(event=AWSLogEvents.ScanAWSAccountsEnd)
-    start_time = graph_set.start_time
-    end_time = graph_set.end_time
+    start_time = validated_graph_set.start_time
+    end_time = validated_graph_set.end_time
     scan_manifest = ScanManifest(
         scanned_accounts=scanned_accounts,
         master_artifact=master_artifact_path,
         artifacts=artifacts,
         errors=errors,
         unscanned_accounts=list(unscanned_accounts),
-        api_call_stats=stats.to_dict(),
         start_time=start_time,
         end_time=end_time,
     )
-    artifact_writer.write_json("manifest", data=scan_manifest.to_dict())
-    return scan_manifest, graph_set
+    artifact_writer.write_json("manifest", data=scan_manifest)
+    return scan_manifest, validated_graph_set

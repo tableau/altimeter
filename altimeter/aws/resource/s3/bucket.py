@@ -120,11 +120,11 @@ def get_s3_bucket_region(client: BaseClient, bucket_name: str) -> str:
         if error_code == "AccessDenied":
             raise S3BucketAccessDeniedException(
                 f"Error getting region for {bucket_name}: {response_error}", c_e
-            )
+            ) from c_e
         if error_code == "NoSuchBucket":
             raise S3BucketDoesNotExistException(
                 f"Error getting region for {bucket_name}: {response_error}", c_e
-            )
+            ) from c_e
         raise c_e
 
 
@@ -141,11 +141,11 @@ def get_s3_bucket_tags(client: BaseClient, bucket_name: str) -> List[Dict[str, s
         if error_code == "AccessDenied":
             raise S3BucketAccessDeniedException(
                 f"Error getting tags for {bucket_name}: {response_error}", c_e
-            )
+            ) from c_e
         if error_code == "NoSuchBucket":
             raise S3BucketDoesNotExistException(
                 f"Error getting tags for {bucket_name}: {response_error}", c_e
-            )
+            ) from c_e
         raise c_e
 
 
@@ -167,11 +167,11 @@ def get_s3_bucket_encryption(
         if error_code == "AccessDenied":
             raise S3BucketAccessDeniedException(
                 f"Error getting encryption configuration for {bucket_name}: {response_error}", c_e
-            )
+            ) from c_e
         if error_code == "NoSuchBucket":
             raise S3BucketDoesNotExistException(
                 f"Error getting encryption configuration for {bucket_name}: {response_error}", c_e
-            )
+            ) from c_e
         if error_code == "ServerSideEncryptionConfigurationNotFoundError":
             return {"Rules": []}
         raise c_e

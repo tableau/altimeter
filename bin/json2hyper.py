@@ -4,27 +4,37 @@ import abc
 import argparse
 from collections import defaultdict
 from dataclasses import dataclass
-from datetime import datetime
 from operator import attrgetter
 from pathlib import Path
 import sys
-from typing import DefaultDict, Dict, Iterable, List, Mapping, Optional, Set, Tuple, Type, Union
+from typing import (
+    Any,
+    DefaultDict,
+    Dict,
+    Iterable,
+    List,
+    Mapping,
+    Optional,
+    Set,
+    Tuple,
+    Type,
+    Union,
+)
 from types import MappingProxyType
 import uuid
 
 import tableauhyperapi
 
 from altimeter.core.graph.graph_set import GraphSet
-from altimeter.core.graph.link.base import Link
-from altimeter.core.graph.link.links import (
-    SimpleLink,
-    ResourceLinkLink,
-    TagLink,
+from altimeter.core.graph.links import (
+    LinkCollection,
     MultiLink,
-    TransientResourceLinkLink,
+    ResourceLink,
+    SimpleLink,
+    TagLink,
+    TransientResourceLink,
 )
 
-Primitive = Union[int, bool, str, datetime, None]
 TAG_TABLE_NAME = "tag"
 
 # see https://github.com/python/mypy/issues/5374
@@ -116,27 +126,26 @@ def normalize_name(name: str) -> str:
 
 def build_table_defns(graph_sets: Iterable[GraphSet]) -> Mapping[str, Tuple[Column, ...]]:
     # discover simple link obj types - generally str, bool or int
-    table_names_simple_obj_types: DefaultDict[
-        str, DefaultDict[str, Set[Type[Primitive]]]
-    ] = defaultdict(lambda: defaultdict(set))
+    table_names_simple_obj_types: DefaultDict[str, DefaultDict[str, Set[Type[Any]]]] = defaultdict(
+        lambda: defaultdict(set)
+    )
     for graph_set in graph_sets:
         for resource in graph_set.resources:
-            table_name = normalize_name(resource.type_name)
-            for link in resource.links:
-                if isinstance(link, SimpleLink):
+            table_name = normalize_name(resource.type)
+            if resource.link_collection.simple_links:
+                for link in resource.link_collection.simple_links:
                     table_names_simple_obj_types[table_name][link.pred].add(type(link.obj))
     table_names_columns: DefaultDict[str, Set[Column]] = defaultdict(set)
     for graph_set in graph_sets:
         for resource in graph_set.resources:
-            table_name = normalize_name(resource.type_name)
+            table_name = normalize_name(resource.type)
             # all top level types have an id column
             table_names_columns[table_name].add(PKColumn(f"_{table_name}_id"))
             # all top level types have an arn
             table_names_columns[table_name].add(TextColumn(f"{table_name}_arn"))
-            links = resource.links
             simple_obj_types = MappingProxyType(table_names_simple_obj_types[table_name])
             build_table_defns_helper(
-                links, table_name, table_names_columns, simple_obj_types,
+                resource.link_collection, table_name, table_names_columns, simple_obj_types,
             )
     table_defns = {
         table_name: tuple(sorted(columns, key=attrgetter("name")))
@@ -153,50 +162,54 @@ def build_table_defns(graph_sets: Iterable[GraphSet]) -> Mapping[str, Tuple[Colu
 
 
 def build_table_defns_helper(
-    links: Iterable[Link],
+    link_collection: LinkCollection,
     table_name: str,
     table_names_columns: Dict[str, Set[Column]],
-    simple_obj_types: Mapping[str, Set[Type[Primitive]]],
+    simple_obj_types: Mapping[str, Set[Type[Any]]],
 ) -> None:
-    for link in links:
-        if isinstance(link, SimpleLink):
+    if link_collection.simple_links:
+        for simple_link in link_collection.simple_links:
             simple_column: Union[IntColumn, BoolColumn, TextColumn]
-            if simple_obj_types[link.pred] == set((int,)):
-                simple_column = IntColumn(name=link.pred,)
-            elif simple_obj_types[link.pred] == set((bool,)):
-                simple_column = BoolColumn(name=link.pred,)
+            if simple_obj_types[simple_link.pred] == set((int,)):
+                simple_column = IntColumn(name=simple_link.pred,)
+            elif simple_obj_types[simple_link.pred] == set((bool,)):
+                simple_column = BoolColumn(name=simple_link.pred,)
             else:
-                simple_column = TextColumn(name=link.pred,)
+                simple_column = TextColumn(name=simple_link.pred,)
             table_names_columns[table_name].add(simple_column)
-        elif type(link) in (ResourceLinkLink, TransientResourceLinkLink):
-            table_names_columns[table_name].add(FKColumn(name=f"_{link.pred}_id",))
-        elif isinstance(link, MultiLink):
-            multilink_table_name = f"_{table_name}_{link.pred}"
+    if link_collection.resource_links:
+        for resource_link in link_collection.resource_links:
+            table_names_columns[table_name].add(FKColumn(name=f"_{resource_link.pred}_id",))
+    if link_collection.transient_resource_links:
+        for transient_resource_link in link_collection.transient_resource_links:
+            table_names_columns[table_name].add(
+                FKColumn(name=f"_{transient_resource_link.pred}_id",)
+            )
+    if link_collection.multi_links:
+        for multi_link in link_collection.multi_links:
+            multilink_table_name = f"_{table_name}_{multi_link.pred}"
             # multilink tables have a pk id column and a fk to the parent
             table_names_columns[multilink_table_name].add(PKColumn(f"_{multilink_table_name}_id",))
             table_names_columns[multilink_table_name].add(FKColumn(name=f"_{table_name}_id",))
             build_table_defns_helper(
-                links=link.obj,
+                link_collection=multi_link.obj,
                 table_name=multilink_table_name,
                 table_names_columns=table_names_columns,
                 simple_obj_types=simple_obj_types,
             )
-        elif isinstance(link, TagLink):
-            pass  # a single Tags table is built in build_table_defns
-        else:
-            raise NotImplementedError(f"Link type {type(link)} is not implemented")
+    # Note: a single Tags table is built in build_table_defns
 
 
 def build_data(
     graph_sets: Iterable[GraphSet], table_defns: Mapping[str, Tuple[Column, ...]],
-) -> Mapping[str, List[Tuple[Primitive, ...]]]:
+) -> Mapping[str, List[Tuple[Optional[Any], ...]]]:
     pk_counters: DefaultDict[str, int] = defaultdict(int)
     arns_pks: Dict[str, int] = {}
-    table_names_datas: DefaultDict[str, List[Tuple[Primitive, ...]]] = defaultdict(list)
+    table_names_datas: DefaultDict[str, List[Tuple[Optional[Any], ...]]] = defaultdict(list)
     for graph_set in graph_sets:
         for resource in graph_set.resources:
-            resource_data: List[Primitive] = []
-            table_name = normalize_name(resource.type_name)
+            resource_data: List[Optional[Any]] = []
+            table_name = normalize_name(resource.type)
             arn = resource.resource_id
             # build a primary key for this resource
             pk = arns_pks.get(arn)
@@ -205,8 +218,8 @@ def build_data(
                 pk = pk_counters[table_name]
                 arns_pks[arn] = pk
             # add tag data
-            for link in resource.links:
-                if isinstance(link, TagLink):
+            if resource.link_collection.tag_links:
+                for link in resource.link_collection.tag_links:
                     tag_key, tag_value = link.pred, link.obj
                     table_names_datas[TAG_TABLE_NAME].append((pk, tag_key, tag_value))
             # iterate over the columns we expect the corresponding resource for this
@@ -221,33 +234,38 @@ def build_data(
                 elif isinstance(column, FKColumn):
                     column_link_name = column.name.lstrip("_")[:-3]  # strip leading _, and _id
                     fk = None
-                    for candidate_fk_link in resource.links:
-                        if type(candidate_fk_link) in (ResourceLinkLink, TransientResourceLinkLink):
-                            if candidate_fk_link.pred == column_link_name:
-                                f_table_name = normalize_name(candidate_fk_link.pred)
-                                f_arn = candidate_fk_link.obj
-                                fk = arns_pks.get(f_arn)
-                                if fk is None:
-                                    pk_counters[f_table_name] += 1
-                                    fk = pk_counters[f_table_name]
-                                    arns_pks[f_arn] = fk
-                                break
+                    for candidate_fk_link in (
+                        resource.link_collection.resource_links
+                        if resource.link_collection.resource_links
+                        else () + resource.link_collection.transient_resource_links
+                        if resource.link_collection.transient_resource_links
+                        else ()
+                    ):
+                        if candidate_fk_link.pred == column_link_name:
+                            f_table_name = normalize_name(candidate_fk_link.pred)
+                            f_arn = candidate_fk_link.obj
+                            fk = arns_pks.get(f_arn)
+                            if fk is None:
+                                pk_counters[f_table_name] += 1
+                                fk = pk_counters[f_table_name]
+                                arns_pks[f_arn] = fk
+                            break
                     resource_data.append(fk)
                 elif isinstance(column, TextColumn):
                     text_data = None
                     if column.name == "arn":
                         text_data = resource.resource_id
                     else:
-                        for candidate_simple_link in resource.links:
-                            if isinstance(candidate_simple_link, SimpleLink):
+                        if resource.link_collection.simple_links:
+                            for candidate_simple_link in resource.link_collection.simple_links:
                                 if candidate_simple_link.pred == column.name:
                                     text_data = str(candidate_simple_link.obj)
                                     break
                     resource_data.append(text_data)
                 elif type(column) in (IntColumn, BoolColumn, TimestampColumn):
                     bool_or_int_or_timestamp_data = None
-                    for candidate_simple_link in resource.links:
-                        if isinstance(candidate_simple_link, SimpleLink):
+                    if resource.link_collection.simple_links:
+                        for candidate_simple_link in resource.link_collection.simple_links:
                             if candidate_simple_link.pred == column.name:
                                 bool_or_int_or_timestamp_data = candidate_simple_link.obj
                                 break
@@ -256,14 +274,14 @@ def build_data(
                     raise NotImplementedError(f"Column type {type(column)} not implemented")
             table_names_datas[table_name].append(tuple(resource_data))
             # now look for MultiLinks in this resource.  Each of these represent a table
-            for link in resource.links:
-                if isinstance(link, MultiLink):
+            if resource.link_collection.multi_links:
+                for multi_link in resource.link_collection.multi_links:
                     build_multilink_data(
                         pk_counters=pk_counters,
                         arns_pks=arns_pks,
                         table_names_datas=table_names_datas,
                         table_defns=table_defns,
-                        multi_link=link,
+                        multi_link=multi_link,
                         parent_table_name=table_name,
                         parent_pk=pk,
                     )
@@ -273,14 +291,14 @@ def build_data(
 def build_multilink_data(
     pk_counters: Dict[str, int],
     arns_pks: Dict[str, int],
-    table_names_datas: DefaultDict[str, List[Tuple[Primitive, ...]]],
+    table_names_datas: DefaultDict[str, List[Tuple[Optional[Any], ...]]],
     table_defns: Mapping[str, Tuple[Column, ...]],
     parent_table_name: str,
     parent_pk: int,
     multi_link: MultiLink,
 ) -> None:
     table_name = f"_{parent_table_name}_{multi_link.pred}"
-    resource_data: List[Primitive] = []
+    resource_data: List[Optional[Any]] = []
     columns = table_defns[table_name]
     # assign a pk. MultiLinks don't really have arns so we create a uuid
     arn = str(uuid.uuid4())
@@ -295,21 +313,26 @@ def build_multilink_data(
     for column in columns[2:]:  # skip the primary key and parent fk
         if isinstance(column, FKColumn):
             fk = None
-            for candidate_resource_link in multi_link.obj:
-                if type(candidate_resource_link) in (ResourceLinkLink, TransientResourceLinkLink):
-                    pred = f"_{candidate_resource_link.pred}_id"
-                    if pred == column.name:
-                        f_arn = candidate_resource_link.obj
-                        f_arn_parts = f_arn.split(":")
-                        f_arn_svc = f_arn_parts[2]
-                        f_arn_type = f_arn_parts[5].split("/")[0]
-                        fk = arns_pks.get(f_arn)
-                        if fk is None:
-                            f_table_name = "_".join((f_arn_svc, f_arn_type))
-                            pk_counters[f_table_name] += 1
-                            fk = pk_counters[f_table_name]
-                            arns_pks[f_arn] = fk
-                        break
+            for candidate_resource_link in (
+                multi_link.obj.resource_links
+                if multi_link.obj.resource_links
+                else () + multi_link.obj.transient_resource_links
+                if multi_link.obj.transient_resource_links
+                else ()
+            ):
+                pred = f"_{candidate_resource_link.pred}_id"
+                if pred == column.name:
+                    f_arn = candidate_resource_link.obj
+                    f_arn_parts = f_arn.split(":")
+                    f_arn_svc = f_arn_parts[2]
+                    f_arn_type = f_arn_parts[5].split("/")[0]
+                    fk = arns_pks.get(f_arn)
+                    if fk is None:
+                        f_table_name = "_".join((f_arn_svc, f_arn_type))
+                        pk_counters[f_table_name] += 1
+                        fk = pk_counters[f_table_name]
+                        arns_pks[f_arn] = fk
+                    break
             resource_data.append(fk)
         elif isinstance(column, TextColumn):
             text_data = None
@@ -329,7 +352,6 @@ def build_multilink_data(
             resource_data.append(bool_or_int_data)
         else:
             raise NotImplementedError(f"Column type {type(column)} not implemented")
-
     # now recurse
     for link in multi_link.obj:
         if isinstance(link, MultiLink):
@@ -342,7 +364,6 @@ def build_multilink_data(
                 parent_pk=pk,
                 multi_link=link,
             )
-
     table_names_datas[table_name].append(tuple(resource_data))
 
 

@@ -1,29 +1,22 @@
 """AWSAccessor is a wrapper around a boto3 client which provides protection against
-non-Get/List/Describe API calls occurring as well as api call statistic tracking."""
+non-Get/List/Describe API calls occurring."""
 import re
 from typing import Any, Dict
 
 from botocore.client import BaseClient
 import boto3
 
-from altimeter.core.multilevel_counter import MultilevelCounter
 
 _PERMITTED_OPERATION_NAMES_STR = "^(Get|List|Describe).*"
 _PERMITTED_OPERATION_NAMES_RE = re.compile(_PERMITTED_OPERATION_NAMES_STR)
 
 
 def on_request_created(
-    api_call_stats: MultilevelCounter,
-    account_id: str,
-    region_name: str,
-    service_name: str,
-    readonly: bool,
-    **kwargs: Any,
+    account_id: str, region_name: str, service_name: str, readonly: bool, **kwargs: Any,
 ) -> None:
-    """Called when a boto3 request is created. This handles api call statistics tracking.
+    """Called when a boto3 request is created.
 
     Args:
-        api_call_stats: MultilevelCounter to increment
         account_id: request account id
         region_name: request region
         service_name: request service
@@ -36,7 +29,6 @@ def on_request_created(
             raise Exception(
                 f"Operation name {operation_name} did not match {_PERMITTED_OPERATION_NAMES_STR}"
             )
-    api_call_stats.increment(account_id, region_name, service_name, operation_name)
 
 
 class AWSAccessor:
@@ -55,7 +47,6 @@ class AWSAccessor:
         self.session = session
         self.account_id = account_id
         self.region = region_name
-        self.api_call_stats = MultilevelCounter()
         self.client_cache: Dict[str, Any] = {}
         self.readonly = readonly
 
@@ -73,7 +64,6 @@ class AWSAccessor:
             return cached_client
         client = self.session.client(service_name=service_name, region_name=self.region)
         create_handler = lambda **kwargs: on_request_created(
-            api_call_stats=self.api_call_stats,
             account_id=self.account_id,
             region_name=self.region,
             service_name=service_name,

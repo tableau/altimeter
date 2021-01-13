@@ -95,5 +95,5 @@ def get_target_group_health(client: BaseClient, target_group_arn: str) -> List[D
             raise TargetGroupAccessDeniedException(
                 f"Error getting encryption configuration for {target_group_arn}: {response_error}",
                 c_e,
-            )
+            ) from c_e
         raise c_e

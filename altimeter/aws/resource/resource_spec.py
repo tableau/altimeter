@@ -11,7 +11,7 @@ from botocore.exceptions import ClientError
 
 from altimeter.aws.scan.aws_accessor import AWSAccessor
 from altimeter.core.graph.exceptions import SchemaParseException
-from altimeter.core.graph.link.links import ResourceLinkLink
+from altimeter.core.graph.links import LinkCollection, ResourceLink
 from altimeter.core.resource.resource import Resource
 from altimeter.core.resource.resource_spec import ResourceSpec
 
@@ -199,28 +199,35 @@ class AWSResourceSpec(ResourceSpec):
         resources: List[Resource] = []
         for arn, resource_dict in list_from_aws_result.resources.items():
             try:
-                links = cls.schema.parse(resource_dict, context)
+                partial_resource_link_collection = cls.schema.parse(resource_dict, context)
             except Exception as ex:
                 raise SchemaParseException(
                     (
                         f"Error parsing {cls.__name__} : "
                         f"{arn}:\n\nData: {resource_dict}\n\nError: {ex}"
                     )
-                )
+                ) from ex
             resource_account_id = arn.split(":")[4]
+            account_region_links = []
             if resource_account_id:
                 if resource_account_id != "aws":
-                    account_link = ResourceLinkLink(
+                    account_link = ResourceLink(
                         pred="account", obj=f"arn:aws::::account/{resource_account_id}"
                     )
-                    links.append(account_link)
+                    account_region_links.append(account_link)
                     resource_region_name = arn.split(":")[3]
                     if resource_region_name:
-                        region_link = ResourceLinkLink(
+                        region_link = ResourceLink(
                             pred="region",
                             obj=f"arn:aws:::{resource_account_id}:region/{resource_region_name}",
                         )
-                        links.append(region_link)
-            resource = Resource(resource_id=arn, type_name=cls.get_full_type_name(), links=links)
+                        account_region_links.append(region_link)
+            link_collection = partial_resource_link_collection + LinkCollection.from_links(
+                account_region_links
+            )
+
+            resource = Resource(
+                resource_id=arn, type=cls.get_full_type_name(), link_collection=link_collection,
+            )
             resources.append(resource)
         return resources

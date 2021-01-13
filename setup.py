@@ -20,6 +20,7 @@ setup(
         "structlog>=20.1.0,<21",
         "boto3>=1.9.130,<2",
         "jinja2>=2.11.1,<3",
+        "pydantic>=1.6.1,<2",
         "toml>=0.10.0,<1",
         "gremlinpython>=3.4.3"
     ],
@@ -28,7 +29,6 @@ setup(
             "alembic==1.4.2",
             "fastapi>=0.60.1,<1",
             "psycopg2-binary>=2.8.5,<3",
-            "pydantic>=1.6.1,<2",
             "sqlalchemy>=1.3.16,<2",
             "uvicorn>=0.11.5,<2",
         ],

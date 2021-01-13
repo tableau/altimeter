@@ -6,4 +6,4 @@ Attributes:
 """
 
 GRAPH_NAME: str = "alti"
-GRAPH_VERSION: str = "1"
+GRAPH_VERSION: str = "2"

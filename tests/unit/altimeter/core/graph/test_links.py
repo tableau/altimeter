@@ -3,79 +3,15 @@ import unittest
 from rdflib import BNode, Graph, Literal, Namespace
 from rdflib.term import URIRef
 
-from altimeter.core.graph.exceptions import LinkParseException
-from altimeter.core.graph.link.links import (
+from altimeter.core.graph.links import (
+    LinkCollection,
     MultiLink,
-    ResourceLinkLink,
+    ResourceLink,
     SimpleLink,
     TagLink,
-    TransientResourceLinkLink,
-    link_from_dict,
+    TransientResourceLink,
 )
-from altimeter.core.graph.link.base import Link
 from altimeter.core.graph.node_cache import NodeCache
-
-
-class TestLinkFromDict(unittest.TestCase):
-    def testMissingType(self):
-        with self.assertRaises(LinkParseException):
-            link_from_dict({})
-
-    def testMissingPred(self):
-        with self.assertRaises(LinkParseException):
-            link_from_dict({"type": "simple"})
-
-    def testMissingObj(self):
-        with self.assertRaises(LinkParseException):
-            link_from_dict({"type": "simple", "pred": "test-pred"})
-
-    def testUnknownType(self):
-        with self.assertRaises(LinkParseException):
-            link_from_dict({"type": "fake-type", "pred": "test-pred", "obj": "test-obj"})
-
-    def testSimpleType(self):
-        link = link_from_dict({"type": "simple", "pred": "test-pred", "obj": "test-obj"})
-        self.assertIsInstance(link, SimpleLink)
-
-    def testTagType(self):
-        link = link_from_dict({"type": "tag", "pred": "test-pred", "obj": "test-obj"})
-        self.assertIsInstance(link, TagLink)
-
-    def testResourceLinkType(self):
-        link = link_from_dict({"type": "resource_link", "pred": "test-pred", "obj": "test-obj"})
-        self.assertIsInstance(link, ResourceLinkLink)
-
-    def testTransientResourceLinkType(self):
-        link = link_from_dict(
-            {"type": "transient_resource_link", "pred": "test-pred", "obj": "test-obj"}
-        )
-        self.assertIsInstance(link, TransientResourceLinkLink)
-
-    def testMultiType(self):
-        link = link_from_dict(
-            {
-                "type": "multi",
-                "pred": "test-pred",
-                "obj": [{"type": "simple", "pred": "test-int-pred", "obj": "test-int-obj"}],
-            }
-        )
-        self.assertIsInstance(link, MultiLink)
-
-
-class TestLinkSubclassing(unittest.TestCase):
-    def testInitConcreteSubclass(self):
-        with self.assertRaises(TypeError):
-
-            class LinkSubClass(Link):
-                def to_rdf(self, subj, namespace, graph, node_cache):
-                    pass
-
-                def to_lpg(self, subj, namespace, graph, node_cache):
-                    pass
-
-    def testInitAbstractSubclass(self):
-        class LinkSubClass(Link):
-            pass
 
 
 class TestSimpleLink(unittest.TestCase):
@@ -83,8 +19,8 @@ class TestSimpleLink(unittest.TestCase):
         pred = "test-pred"
         obj = "test-obj"
         link = SimpleLink(pred=pred, obj=obj)
-        expected_link_dict = {"type": "simple", "pred": pred, "obj": obj}
-        link_dict = link.to_dict()
+        expected_link_dict = {"pred": pred, "obj": obj}
+        link_dict = link.dict()
         self.assertDictEqual(expected_link_dict, link_dict)
 
     def testToRdf(self):
@@ -184,31 +120,37 @@ class TestSimpleLink(unittest.TestCase):
 class TestMultiLink(unittest.TestCase):
     def testToJson(self):
         pred = "test-multi-pred"
-        obj = [
-            SimpleLink(pred="test-simple-pred-1", obj="test-simple-obj-1"),
-            SimpleLink(pred="test-simple-pred-1", obj="test-simple-obj-2"),
-            SimpleLink(pred="test-simple-pred-2", obj="test-simple-obj-3"),
-        ]
+        obj = LinkCollection(
+            simple_links=(
+                SimpleLink(pred="test-simple-pred-1", obj="test-simple-obj-1"),
+                SimpleLink(pred="test-simple-pred-1", obj="test-simple-obj-2"),
+                SimpleLink(pred="test-simple-pred-2", obj="test-simple-obj-3"),
+            ),
+        )
         link = MultiLink(pred=pred, obj=obj)
+        link_dict = link.dict(exclude_unset=True)
+
         expected_link_dict = {
             "pred": "test-multi-pred",
-            "obj": [
-                {"pred": "test-simple-pred-1", "obj": "test-simple-obj-1", "type": "simple"},
-                {"pred": "test-simple-pred-1", "obj": "test-simple-obj-2", "type": "simple"},
-                {"pred": "test-simple-pred-2", "obj": "test-simple-obj-3", "type": "simple"},
-            ],
-            "type": "multi",
+            "obj": {
+                "simple_links": (
+                    {"pred": "test-simple-pred-1", "obj": "test-simple-obj-1"},
+                    {"pred": "test-simple-pred-1", "obj": "test-simple-obj-2"},
+                    {"pred": "test-simple-pred-2", "obj": "test-simple-obj-3"},
+                ),
+            },
         }
-        link_dict = link.to_dict()
         self.assertDictEqual(expected_link_dict, link_dict)
 
     def testToRdf(self):
         pred = "test-multi-pred"
-        obj = [
-            SimpleLink(pred="test-simple-pred-1", obj="test-simple-obj-1"),
-            SimpleLink(pred="test-simple-pred-2", obj="test-simple-obj-2"),
-            SimpleLink(pred="test-simple-pred-3", obj="test-simple-obj-3"),
-        ]
+        obj = LinkCollection(
+            simple_links=(
+                SimpleLink(pred="test-simple-pred-1", obj="test-simple-obj-1"),
+                SimpleLink(pred="test-simple-pred-2", obj="test-simple-obj-2"),
+                SimpleLink(pred="test-simple-pred-3", obj="test-simple-obj-3"),
+            ),
+        )
         link = MultiLink(pred=pred, obj=obj)
         bnode = BNode()
         graph = Graph()
@@ -232,16 +174,19 @@ class TestMultiLink(unittest.TestCase):
 
     def testToLpg(self):
         pred = "test-multi-pred"
-        obj = [
-            SimpleLink(pred="test-simple-pred-1", obj="test-simple-obj-1"),
-            SimpleLink(pred="test-simple-pred-2", obj="test-simple-obj-2"),
-            SimpleLink(pred="test-simple-pred-3", obj="test-simple-obj-3"),
-        ]
+        obj = LinkCollection(
+            simple_links=(
+                SimpleLink(pred="test-simple-pred-1", obj="test-simple-obj-1"),
+                SimpleLink(pred="test-simple-pred-2", obj="test-simple-obj-2"),
+                SimpleLink(pred="test-simple-pred-3", obj="test-simple-obj-3"),
+            ),
+        )
         link = MultiLink(pred=pred, obj=obj)
-        expected_link_dict = {"test-multi-pred.test-simple-pred-1": "test-simple-obj-1",
-                              "test-multi-pred.test-simple-pred-2": "test-simple-obj-2",
-                              "test-multi-pred.test-simple-pred-3": "test-simple-obj-3",
-                              }
+        expected_link_dict = {
+            "test-multi-pred.test-simple-pred-1": "test-simple-obj-1",
+            "test-multi-pred.test-simple-pred-2": "test-simple-obj-2",
+            "test-multi-pred.test-simple-pred-3": "test-simple-obj-3",
+        }
         parent = {}
         vertices = []
         edges = []
@@ -253,13 +198,13 @@ class TestResourceLink(unittest.TestCase):
     def testToJson(self):
         pred = "test-pred"
         obj = "test-obj"
-        link = ResourceLinkLink(pred=pred, obj=obj)
-        self.assertDictEqual(link.to_dict(), {"type": "resource_link", "pred": pred, "obj": obj})
+        link = ResourceLink(pred=pred, obj=obj)
+        self.assertDictEqual(link.dict(), {"pred": pred, "obj": obj})
 
     def testToRdf(self):
         pred = "test-pred"
         obj = "test-obj"
-        link = ResourceLinkLink(pred=pred, obj=obj)
+        link = ResourceLink(pred=pred, obj=obj)
         bnode = BNode()
         graph = Graph()
         namespace = Namespace("test:")
@@ -277,7 +222,7 @@ class TestResourceLink(unittest.TestCase):
     def testToLpg(self):
         pred = "test-pred"
         obj = "test-obj"
-        link = ResourceLinkLink(pred=pred, obj=obj)
+        link = ResourceLink(pred=pred, obj=obj)
         parent = {"~id": "123"}
         vertices = []
         edges = []
@@ -292,15 +237,13 @@ class TestTransientResourceLink(unittest.TestCase):
     def testToJson(self):
         pred = "test-pred"
         obj = "test-obj"
-        link = TransientResourceLinkLink(pred=pred, obj=obj)
-        self.assertDictEqual(
-            link.to_dict(), {"type": "transient_resource_link", "pred": pred, "obj": obj}
-        )
+        link = TransientResourceLink(pred=pred, obj=obj)
+        self.assertDictEqual(link.dict(), {"pred": pred, "obj": obj})
 
     def testToRdf(self):
         pred = "test-pred"
         obj = "test-obj"
-        link = TransientResourceLinkLink(pred=pred, obj=obj)
+        link = TransientResourceLink(pred=pred, obj=obj)
         bnode = BNode()
         graph = Graph()
         namespace = Namespace("test:")
@@ -315,11 +258,10 @@ class TestTransientResourceLink(unittest.TestCase):
             self.assertEqual(str(p), "test:test-pred")
             self.assertEqual(o, obj_bnode)
 
-
     def testToLpg(self):
         pred = "test-pred"
         obj = "test-obj"
-        link = TransientResourceLinkLink(pred=pred, obj=obj)
+        link = TransientResourceLink(pred=pred, obj=obj)
         parent = {"~id": "123"}
         vertices = []
         edges = []
@@ -335,8 +277,8 @@ class TestTagLink(unittest.TestCase):
         pred = "test-pred"
         obj = "test-obj"
         link = TagLink(pred=pred, obj=obj)
-        expected_link_dict = {"type": "tag", "pred": pred, "obj": obj}
-        link_dict = link.to_dict()
+        expected_link_dict = {"pred": pred, "obj": obj}
+        link_dict = link.dict()
         self.assertDictEqual(expected_link_dict, link_dict)
 
     def testToRdf(self):

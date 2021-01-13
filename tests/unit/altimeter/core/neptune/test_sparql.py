@@ -33,7 +33,9 @@ class TestFinalizeQuerySingleGraph(TestCase):
         query = "select ?s ?p ?o where {?s ?p ?o} limit 100"
         graph_uris = ["http://graph/1"]
 
-        expected_finalized_query = "select ?s ?p ?o FROM <http://graph/1> where {?s ?p ?o} limit 100"
+        expected_finalized_query = (
+            "select ?s ?p ?o FROM <http://graph/1> where {?s ?p ?o} limit 100"
+        )
         finalized_query = finalize_query(query=query, graph_uris=graph_uris)
 
         self.assertEqual(finalized_query, expected_finalized_query)

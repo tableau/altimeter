@@ -11,7 +11,7 @@ from altimeter.core.resource.exceptions import (
     ResourceSpecClassNotFoundException,
 )
 from altimeter.core.graph.exceptions import UnmergableDuplicateResourceIdsFoundException
-from altimeter.core.graph.link.base import Link
+from altimeter.core.graph.links import Link, LinkCollection
 from altimeter.core.graph.schema import Schema
 from altimeter.core.resource.resource import Resource
 
@@ -152,7 +152,7 @@ class ResourceSpec(abc.ABC):
         Raises:
             UnmergableDuplicateResourceIdsFoundException if resources could not be merged.
         """
-        full_type_names = {resource.type_name for resource in resources}
+        full_type_names = {resource.type for resource in resources}
         if len(full_type_names) > 1:
             # in this case conflicting resources have different full_type_names, this
             # can be a permissible if allow_clobber is used. Here we determine this by
@@ -168,7 +168,7 @@ class ResourceSpec(abc.ABC):
                 Type[ResourceSpec], Set[Type[ResourceSpec]]
             ] = defaultdict(set)
             for resource in resources:
-                full_type_name = resource.type_name
+                full_type_name = resource.type
                 spec_classes: List[Type[ResourceSpec]] = ResourceSpec.get_by_full_type_name(
                     full_type_name
                 )
@@ -186,20 +186,20 @@ class ResourceSpec(abc.ABC):
                     (
                         f"Multiple resources for {resource_id} with "
                         f"different types that aren't clobberable: "
-                        f"{[resource.to_dict() for resource in resources]}"
+                        f"{[resource.dict() for resource in resources]}"
                     )
                 )
             resources = spec_classes_resources[winning_class]
-        full_type_names = {resource.type_name for resource in resources}
+        full_type_names = {resource.type for resource in resources}
         merged_resource_type_name = full_type_names.pop()
         merged_link_keys_links: Dict[str, Link] = {}
         for duplicate_resource in resources:
-            for link in duplicate_resource.links:
+            for link in duplicate_resource.link_collection.get_links():
                 duplicate_link = merged_link_keys_links.get(link.pred)
                 if duplicate_link:
-                    if duplicate_link.field_type != link.field_type:
+                    if type(duplicate_link) != type(link):
                         raise UnmergableDuplicateResourceIdsFoundException(
-                            f"Conflicting link types {link.field_type}, {duplicate_link.field_type} found in duplicate #s {resources}"
+                            f"Conflicting link types {type(link)}, {type(duplicate_link)} found in duplicate #s {resources}"
                         )
                     if duplicate_link.obj != link.obj:
                         raise UnmergableDuplicateResourceIdsFoundException(
@@ -208,8 +208,12 @@ class ResourceSpec(abc.ABC):
                 else:
                     merged_link_keys_links[link.pred] = link
         merged_links = list(merged_link_keys_links.values())
+        link_collection = LinkCollection.from_links(merged_links)
+
         return Resource(
-            resource_id=resource_id, type_name=merged_resource_type_name, links=merged_links
+            resource_id=resource_id,
+            type=merged_resource_type_name,
+            link_collection=link_collection,
         )
 
 

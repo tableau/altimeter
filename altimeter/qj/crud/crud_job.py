@@ -73,7 +73,7 @@ class CRUDJob:
         try:
             query = rdflib.Graph().query(job_create_in.query)
         except Exception as ex:
-            raise JobQueryInvalid(f"Invalid query {job_create_in.query}: {str(ex)}")
+            raise JobQueryInvalid(f"Invalid query {job_create_in.query}: {str(ex)}") from ex
         query_fields = [str(query_var) for query_var in query.vars]
         if self._account_id_key not in query_fields:
             raise JobQueryMissingAccountId(

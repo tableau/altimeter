@@ -5,6 +5,11 @@ from moto import mock_sts
 
 from altimeter.aws.resource.account import AccountResourceSpec
 from altimeter.aws.scan.aws_accessor import AWSAccessor
+from altimeter.core.graph.links import (
+    LinkCollection,
+    SimpleLink,
+)
+from altimeter.core.resource.resource import Resource
 
 
 class TestEBSVolumeResourceSpec(TestCase):
@@ -18,23 +23,16 @@ class TestEBSVolumeResourceSpec(TestCase):
         resources = AccountResourceSpec.scan(scan_accessor=scan_accessor)
 
         expected_resources = [
-            {
-                "type": "aws:account",
-                "links": [{"pred": "account_id", "obj": "123456789012", "type": "simple"}],
-            }
+            Resource(
+                resource_id="arn:aws::::account/123456789012",
+                type="aws:account",
+                link_collection=LinkCollection(
+                    simple_links=(SimpleLink(pred="account_id", obj="123456789012"),),
+                ),
+            )
         ]
-        expected_api_call_stats = {
-            "count": 1,
-            "123456789012": {
-                "count": 1,
-                "us-east-1": {
-                    "count": 1,
-                    "sts": {"count": 1, "GetCallerIdentity": {"count": 1}},
-                },
-            },
-        }
-        self.assertListEqual([resource.to_dict() for resource in resources], expected_resources)
-        self.assertDictEqual(scan_accessor.api_call_stats.to_dict(), expected_api_call_stats)
+
+        self.assertEqual(resources, expected_resources)
 
     @mock_sts
     def test_detect_account_id_session_mismatch(self):

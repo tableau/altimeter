@@ -1,11 +1,9 @@
-import json
 from unittest import TestCase
 
 import boto3
 from moto import mock_s3
 
 from altimeter.aws.resource.s3.bucket import (
-    S3BucketResourceSpec,
     get_s3_bucket_encryption,
     get_s3_bucket_region,
     get_s3_bucket_tags,

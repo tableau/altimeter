@@ -1,13 +1,14 @@
 """Classes for caching AWS credentials"""
-from dataclasses import asdict, dataclass, field
 import time
-from typing import Any, Dict, Optional, Type
+from typing import Dict, Optional
 
 import boto3
+from pydantic import Field
+
+from altimeter.core.base_model import BaseImmutableModel
 
 
-@dataclass(frozen=True)
-class AWSCredentials:
+class AWSCredentials(BaseImmutableModel):
     """Represents a set of AWS Credentials
 
     Args:
@@ -39,43 +40,18 @@ class AWSCredentials:
             region_name=region_name,
         )
 
-    @classmethod
-    def from_dict(cls: Type["AWSCredentials"], data: Dict[str, Any]) -> "AWSCredentials":
-        """Build an AWSCredentials object from a dictionary"""
-        return cls(**data)
 
-
-@dataclass(frozen=True)
-class AWSCredentialsCacheKey:
-    """Represents a credential cache key
-
-    Args:
-        account_id: session account id
-        role_name: session role name
-        role_session_name: session role session name
-    """
-
-    account_id: str
-    role_name: str
-    role_session_name: str
-
-    def __str__(self) -> str:
-        return ":".join((self.account_id, self.role_name, self.role_session_name))
-
-    @classmethod
-    def from_str(cls: Type["AWSCredentialsCacheKey"], key: str) -> "AWSCredentialsCacheKey":
-        account_id, role_name, role_session_name = key.split(":")
-        return cls(account_id=account_id, role_name=role_name, role_session_name=role_session_name)
-
-
-@dataclass(frozen=True)
-class AWSCredentialsCache:
+class AWSCredentialsCache(BaseImmutableModel):
     """An AWSCredentialsCache is a cache for AWSCredentials."""
 
     # https://github.com/PyCQA/pylint/issues/2698
     # pylint: disable=unsupported-assignment-operation,no-member,unsupported-delete-operation,unsubscriptable-object
 
-    cache: Dict[AWSCredentialsCacheKey, AWSCredentials] = field(default_factory=dict)
+    cache: Dict[str, AWSCredentials] = Field(default_factory=dict)
+
+    @staticmethod
+    def build_cache_key(account_id: str, role_name: str, role_session_name: str) -> str:
+        return ":".join((account_id, role_name, role_session_name))
 
     def put(
         self, credentials: AWSCredentials, account_id: str, role_name: str, role_session_name: str
@@ -99,7 +75,7 @@ class AWSCredentialsCache:
                     f"{account_id} - they are for {caller_id['Account']}"
                 )
             )
-        cache_key = AWSCredentialsCacheKey(account_id, role_name, role_session_name)
+        cache_key = AWSCredentialsCache.build_cache_key(account_id, role_name, role_session_name)
         self.cache[cache_key] = credentials
 
     def get(
@@ -121,7 +97,7 @@ class AWSCredentialsCache:
         Returns:
             boto3.Session from credentials if cached, else None.
         """
-        cache_key = AWSCredentialsCacheKey(account_id, role_name, role_session_name)
+        cache_key = AWSCredentialsCache.build_cache_key(account_id, role_name, role_session_name)
         cache_val = self.cache.get(cache_key)
         if cache_val is not None:
             if cache_val.is_expired():
@@ -129,14 +105,3 @@ class AWSCredentialsCache:
             else:
                 return self.cache[cache_key].get_session(region_name=region_name)
         return None
-
-    def to_dict(self) -> Dict[str, Any]:
-        return {"cache": {str(key): asdict(val) for key, val in self.cache.items()}}
-
-    @classmethod
-    def from_dict(cls: Type["AWSCredentialsCache"], data: Dict[str, Any]) -> "AWSCredentialsCache":
-        cache = {
-            AWSCredentialsCacheKey.from_str(key=key): AWSCredentials.from_dict(data=val)
-            for key, val in data["cache"].items()
-        }
-        return cls(cache=cache)

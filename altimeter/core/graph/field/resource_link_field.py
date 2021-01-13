@@ -1,14 +1,13 @@
 """Resource Link Fields represent field containing ids of other top level resources in the graph.
 For example, an EC2 instance has a ResourceLinkField with source_key 'VpcId' pointing to a VPC."""
-from typing import Dict, Any, List, Type, Union
+from typing import Dict, Any, Type, Union
 
 from altimeter.core.graph.field.exceptions import (
     ResourceLinkFieldSourceKeyNotFoundException,
     ResourceLinkFieldValueNotAStringException,
 )
 from altimeter.core.graph.field.base import Field, SubField
-from altimeter.core.graph.link.links import ResourceLinkLink, TransientResourceLinkLink
-from altimeter.core.graph.link.base import Link
+from altimeter.core.graph.links import LinkCollection, ResourceLink, TransientResourceLink
 from altimeter.core.resource.resource_spec import ResourceSpec
 
 
@@ -23,18 +22,18 @@ class ResourceLinkField(Field):
             >>> class TestResourceSpec(ResourceSpec): type_name="thing"
             >>> input = {"ThingId": "123"}
             >>> field = ResourceLinkField("ThingId", TestResourceSpec)
-            >>> links = field.parse(data=input, context={})
-            >>> print([link.to_dict() for link in links])
-            [{'pred': 'thing', 'obj': 'thing:123', 'type': 'resource_link'}]
+            >>> link_collection = field.parse(data=input, context={})
+            >>> print(link_collection.dict(exclude_unset=True))
+            {'resource_links': ({'pred': 'thing', 'obj': 'thing:123'},)}
 
         A link to a TestResourceSpec resource using value_is_id::
             >>> from altimeter.core.resource.resource_spec import ResourceSpec
             >>> class TestResourceSpec(ResourceSpec): type_name="thing"
             >>> input = {"ThingId": "thing:123"}
             >>> field = ResourceLinkField("ThingId", TestResourceSpec, value_is_id=True)
-            >>> links = field.parse(data=input, context={})
-            >>> print([link.to_dict() for link in links])
-            [{'pred': 'thing', 'obj': 'thing:123', 'type': 'resource_link'}]
+            >>> link_collection = field.parse(data=input, context={})
+            >>> print(link_collection.dict(exclude_unset=True))
+            {'resource_links': ({'pred': 'thing', 'obj': 'thing:123'},)}
 
     Args:
         source_key: Name of the key in the input JSON
@@ -61,15 +60,15 @@ class ResourceLinkField(Field):
         self.optional = optional
         self.value_is_id = value_is_id
 
-    def parse(self, data: Dict[str, Any], context: Dict[str, Any]) -> List[Link]:
-        """Parse this field and return a list of Links.
+    def parse(self, data: Dict[str, Any], context: Dict[str, Any]) -> LinkCollection:
+        """Parse this field and return a LinkCollection
 
         Args:
             data: data to parse
             context: contains data from higher level parsing code.
 
         Returns:
-             List of Link objects. At most one link will be returned.
+             LinkCollection
         """
         if isinstance(self._resource_spec_class, str):
             resource_spec_class: Type[ResourceSpec] = ResourceSpec.get_by_class_name(
@@ -82,7 +81,7 @@ class ResourceLinkField(Field):
         short_resource_id = data.get(self.source_key)
         if not short_resource_id:
             if self.optional:
-                return []
+                return LinkCollection()
             raise ResourceLinkFieldSourceKeyNotFoundException(
                 f"Expected key '{self.source_key}' with non-empty/zero value in {data}"
             )
@@ -97,7 +96,7 @@ class ResourceLinkField(Field):
             resource_id = short_resource_id
         else:
             resource_id = resource_spec_class.generate_id(short_resource_id, context)
-        return [ResourceLinkLink(pred=self.alti_key, obj=resource_id)]
+        return LinkCollection(resource_links=[ResourceLink(pred=self.alti_key, obj=resource_id)],)
 
 
 class EmbeddedResourceLinkField(SubField):
@@ -111,9 +110,9 @@ class EmbeddedResourceLinkField(SubField):
             >>> class TestResourceSpec(ResourceSpec): type_name="thing"
             >>> input = {"Thing": ["123", "456"]}
             >>> field = ListField("Thing", EmbeddedResourceLinkField(TestResourceSpec))
-            >>> links = field.parse(data=input, context={})
-            >>> print([link.to_dict() for link in links])
-            [{'pred': 'thing', 'obj': 'thing:123', 'type': 'resource_link'}, {'pred': 'thing', 'obj': 'thing:456', 'type': 'resource_link'}]
+            >>> link_collection = field.parse(data=input, context={})
+            >>> print(link_collection.dict(exclude_unset=True))
+            {'resource_links': ({'pred': 'thing', 'obj': 'thing:123'}, {'pred': 'thing', 'obj': 'thing:456'})}
 
     Args:
         resource_spec_class: The name of the ResourceSpec class or the ResourceSpec class which
@@ -135,15 +134,15 @@ class EmbeddedResourceLinkField(SubField):
         self.optional = optional
         self.value_is_id = value_is_id
 
-    def parse(self, data: str, context: Dict[str, Any]) -> List[Link]:
-        """Parse this field and return a list of Links.
+    def parse(self, data: str, context: Dict[str, Any]) -> LinkCollection:
+        """Parse this field and return a LinkCollection.
 
         Args:
             data: data to parse
             context: contains data from higher level parsing code.
 
         Returns:
-            List of Link objects. At most one link will be returned.
+            LinkCollection
         """
         if isinstance(self._resource_spec_class, str):
             resource_spec_class: Type[ResourceSpec] = ResourceSpec.get_by_class_name(
@@ -159,7 +158,7 @@ class EmbeddedResourceLinkField(SubField):
             resource_id = short_resource_id
         else:
             resource_id = resource_spec_class.generate_id(short_resource_id, context)
-        return [ResourceLinkLink(pred=self.alti_key, obj=resource_id)]
+        return LinkCollection(resource_links=[ResourceLink(pred=self.alti_key, obj=resource_id)],)
 
 
 class TransientResourceLinkField(Field):
@@ -184,9 +183,9 @@ class TransientResourceLinkField(Field):
             >>> class TestResourceSpec(ResourceSpec): type_name="thing"
             >>> input = {"ThingId": "123"}
             >>> field = TransientResourceLinkField("ThingId", TestResourceSpec)
-            >>> links = field.parse(data=input, context={})
-            >>> print([link.to_dict() for link in links])
-            [{'pred': 'thing', 'obj': 'thing:123', 'type': 'transient_resource_link'}]
+            >>> link_collection = field.parse(data=input, context={})
+            >>> print(link_collection.dict(exclude_unset=True))
+            {'transient_resource_links': ({'pred': 'thing', 'obj': 'thing:123'},)}
     """
 
     def __init__(
@@ -203,15 +202,15 @@ class TransientResourceLinkField(Field):
         self.optional = optional
         self.value_is_id = value_is_id
 
-    def parse(self, data: Dict[str, Any], context: Dict[str, Any]) -> List[Link]:
-        """Parse this field and return a list of Links.
+    def parse(self, data: Dict[str, Any], context: Dict[str, Any]) -> LinkCollection:
+        """Parse this field and return a LinkCollection.
 
         Args:
             data: data to parse
             context: contains data from higher level parsing code.
 
         Returns:
-            List of Link objects. At most one link will be returned.
+            LinkCollection
         """
         if isinstance(self._resource_spec_class, str):
             resource_spec_class: Type[ResourceSpec] = ResourceSpec.get_by_class_name(
@@ -224,7 +223,7 @@ class TransientResourceLinkField(Field):
         short_resource_id = data.get(self.source_key)
         if not short_resource_id:
             if self.optional:
-                return []
+                return LinkCollection()
             raise ResourceLinkFieldSourceKeyNotFoundException(
                 f"Expected key '{self.source_key}' with non-empty/zero value in {data}"
             )
@@ -232,4 +231,6 @@ class TransientResourceLinkField(Field):
             resource_id = short_resource_id
         else:
             resource_id = resource_spec_class.generate_id(short_resource_id, context)
-        return [TransientResourceLinkLink(pred=self.alti_key, obj=resource_id)]
+        return LinkCollection(
+            transient_resource_links=[TransientResourceLink(pred=self.alti_key, obj=resource_id)],
+        )

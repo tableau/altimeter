@@ -29,7 +29,7 @@ def get_result_set(
     try:
         return result_set_crud.get(db_session, result_set_id=result_set_id)
     except ResultSetNotFound as ex:
-        raise HTTPException(status_code=HTTP_404_NOT_FOUND, detail=str(ex))
+        raise HTTPException(status_code=HTTP_404_NOT_FOUND, detail=str(ex)) from ex
 
 
 @RESULT_SETS_ROUTER.post(
@@ -48,7 +48,7 @@ def create_result_set(
     try:
         return result_set_crud.create(db_session, obj_in=result_set_in)
     except (JobVersionNotFound, ResultSetResultsLimitExceeded, ResultSizeExceeded) as ex:
-        raise HTTPException(status_code=HTTP_400_BAD_REQUEST, detail=str(ex))
+        raise HTTPException(status_code=HTTP_400_BAD_REQUEST, detail=str(ex)) from ex
 
 
 @RESULT_SETS_ROUTER.get(

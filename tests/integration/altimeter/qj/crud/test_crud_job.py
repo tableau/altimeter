@@ -17,6 +17,7 @@ from altimeter.qj.schemas import ResultSetCreate
 
 from tests.dbutil import temp_db_session
 
+
 class TestGetActiveJob(unittest.TestCase):
     def test_get_active_job(self):
         db_ro_user = "test_ro"

@@ -4,8 +4,7 @@ import uuid
 
 from botocore.client import BaseClient
 
-from altimeter.core.graph.link.links import SimpleLink
-from altimeter.core.graph.link.base import Link
+from altimeter.core.graph.links import LinkCollection, SimpleLink
 from altimeter.core.graph.schema import Schema
 from altimeter.aws.resource.resource_spec import ScanGranularity, ListFromAWSResult, AWSResourceSpec
 from altimeter.core.resource.resource import Resource
@@ -24,15 +23,15 @@ class UnscannedAccountResourceSpec(AWSResourceSpec):
     def create_resource(
         cls: Type["UnscannedAccountResourceSpec"], account_id: str, errors: List[str]
     ) -> Resource:
-        links: List[Link] = []
-        links.append(SimpleLink(pred="account_id", obj=account_id))
+        simple_links: List[SimpleLink] = []
+        simple_links.append(SimpleLink(pred="account_id", obj=account_id))
         if errors:
             error = "\n".join(errors)
-            links.append(SimpleLink(pred="error", obj=f"{error} - {uuid.uuid4()}"))
+            simple_links.append(SimpleLink(pred="error", obj=f"{error} - {uuid.uuid4()}"))
         return Resource(
             resource_id=cls.generate_arn(resource_id=account_id),
-            type_name=cls.get_full_type_name(),
-            links=links,
+            type=cls.get_full_type_name(),
+            link_collection=LinkCollection(simple_links=simple_links),
         )
 
     @classmethod

@@ -1,6 +1,6 @@
 """Dict Fields represent fields which consist of dict-like data."""
 from copy import deepcopy
-from typing import Dict, Any, List
+from typing import Dict, Any
 
 from altimeter.core.graph.field.exceptions import (
     DictFieldValueNotADictException,
@@ -9,8 +9,7 @@ from altimeter.core.graph.field.exceptions import (
 )
 from altimeter.core.graph.field.base import Field, SubField
 from altimeter.core.graph.field.util import camel_case_to_snake_case
-from altimeter.core.graph.link.links import MultiLink
-from altimeter.core.graph.link.base import Link
+from altimeter.core.graph.links import LinkCollection, MultiLink
 
 
 class DictField(Field):
@@ -22,9 +21,9 @@ class DictField(Field):
             >>> from altimeter.core.graph.field.scalar_field import ScalarField
             >>> input = {"Person": {"FirstName": "Bob", "LastName": "Smith"}}
             >>> field = DictField("Person", ScalarField("FirstName"), ScalarField("LastName"))
-            >>> links = field.parse(data=input, context={})
-            >>> print([link.to_dict() for link in links])
-            [{'pred': 'person', 'obj': [{'pred': 'first_name', 'obj': 'Bob', 'type': 'simple'}, {'pred': 'last_name', 'obj': 'Smith', 'type': 'simple'}], 'type': 'multi'}]
+            >>> link_collection = field.parse(data=input, context={})
+            >>> print(link_collection.dict(exclude_unset=True))
+            {'multi_links': ({'pred': 'person', 'obj': {'simple_links': ({'pred': 'first_name', 'obj': 'Bob'}, {'pred': 'last_name', 'obj': 'Smith'})}},)}
 
     Args:
         source_key: Name of the key in the input JSON
@@ -42,15 +41,15 @@ class DictField(Field):
         self.optional = optional
         self.fields = fields
 
-    def parse(self, data: Dict[str, Any], context: Dict[str, Any]) -> List[Link]:
-        """Parse this field and return a list of Links.
+    def parse(self, data: Dict[str, Any], context: Dict[str, Any]) -> LinkCollection:
+        """Parse this field and return a LinkCollection.
 
        Args:
            data: dictionary of data to parse
            context: context dict containing data from higher level parsing code.
 
         Returns:
-            List of MultiLink objects.
+            LinkCollection
 
         Raises:
             DictFieldSourceKeyNotFoundException if self.source_key is not in data.
@@ -58,7 +57,7 @@ class DictField(Field):
         """
         if self.source_key not in data:
             if self.optional:
-                return []
+                return LinkCollection()
             raise DictFieldSourceKeyNotFoundException(
                 f"Expected key '{self.source_key}' in data, present keys: {', '.join(data.keys())}"
             )
@@ -71,13 +70,14 @@ class DictField(Field):
                     f"({type(field_data)})"
                 )
             )
-        links: List[Link] = []
         updated_context = deepcopy(context)
         updated_context.update({"parent_alti_key": self.alti_key})
+        multi_link_object_link_collection = LinkCollection()
         for field in self.fields:
-            sub_links = field.parse(field_data, updated_context)
-            links += sub_links
-        return [MultiLink(pred=self.alti_key, obj=links)]
+            multi_link_object_link_collection += field.parse(field_data, updated_context)
+        return LinkCollection(
+            multi_links=[MultiLink(pred=self.alti_key, obj=multi_link_object_link_collection)]
+        )
 
 
 class AnonymousDictField(Field):
@@ -95,10 +95,9 @@ class AnonymousDictField(Field):
             >>> from altimeter.core.graph.field.scalar_field import ScalarField
             >>> input = {"Person": {"FirstName": "Bob", "LastName": "Smith"}}
             >>> field = AnonymousDictField("Person", ScalarField("FirstName"), ScalarField("LastName"))
-            >>> links = field.parse(data=input, context={})
-            >>> for link in links: print(link.to_dict())
-            {'pred': 'first_name', 'obj': 'Bob', 'type': 'simple'}
-            {'pred': 'last_name', 'obj': 'Smith', 'type': 'simple'}
+            >>> link_collection = field.parse(data=input, context={})
+            >>> print(link_collection.dict(exclude_unset=True))
+            {'simple_links': ({'pred': 'first_name', 'obj': 'Bob'}, {'pred': 'last_name', 'obj': 'Smith'})}
     """
 
     def __init__(
@@ -109,15 +108,15 @@ class AnonymousDictField(Field):
         self.optional = optional
         self.nullable = nullable
 
-    def parse(self, data: Dict[str, Any], context: Dict[str, Any]) -> List[Link]:
-        """Parse this field and return a list of Links.
+    def parse(self, data: Dict[str, Any], context: Dict[str, Any]) -> LinkCollection:
+        """Parse this field and return a LinkCollection.
 
        Args:
            data: dictionary of data to parse
            context: context dict containing data from higher level parsing code.
 
         Returns:
-            List of Link objects.
+            LinkCollection
 
         Raises:
             DictFieldSourceKeyNotFoundException if self.source_key is not in data.
@@ -127,7 +126,7 @@ class AnonymousDictField(Field):
             field_data = data.get(self.source_key, None)
             if field_data is None:
                 if self.nullable:
-                    return []
+                    return LinkCollection()
                 raise DictFieldValueIsNullException(
                     f"Key '{self.source_key} was expected to contain a dict, was null."
                 )
@@ -139,13 +138,12 @@ class AnonymousDictField(Field):
                         f"({type(field_data)})"
                     )
                 )
-            links: List[Link] = []
+            link_collection = LinkCollection()
             for field in self.fields:
-                sub_links = field.parse(field_data, context)
-                links += sub_links
-            return links
+                link_collection += field.parse(field_data, context)
+            return link_collection
         if self.optional:
-            return []
+            return LinkCollection()
         raise DictFieldSourceKeyNotFoundException(
             f"Expected key '{self.source_key}' in data, present keys: {', '.join(data.keys())}"
         )
@@ -166,24 +164,23 @@ class EmbeddedDictField(SubField):
                          {"FirstName": "Alice", "LastName": "Smith"}]}
             >>> field = ListField("People", EmbeddedDictField(ScalarField("FirstName"),\
                                   ScalarField("LastName")))
-            >>> links = field.parse(data=input, context={})
-            >>> for link in links: print(link.to_dict())
-            {'pred': 'people', 'obj': [{'pred': 'first_name', 'obj': 'Bob', 'type': 'simple'}, {'pred': 'last_name', 'obj': 'Smith', 'type': 'simple'}], 'type': 'multi'}
-            {'pred': 'people', 'obj': [{'pred': 'first_name', 'obj': 'Alice', 'type': 'simple'}, {'pred': 'last_name', 'obj': 'Smith', 'type': 'simple'}], 'type': 'multi'}
+            >>> link_collection = field.parse(data=input, context={})
+            >>> print(link_collection.dict(exclude_unset=True))
+            {'multi_links': ({'pred': 'people', 'obj': {'simple_links': ({'pred': 'first_name', 'obj': 'Bob'}, {'pred': 'last_name', 'obj': 'Smith'})}}, {'pred': 'people', 'obj': {'simple_links': ({'pred': 'first_name', 'obj': 'Alice'}, {'pred': 'last_name', 'obj': 'Smith'})}})}
     """
 
     def __init__(self, *fields: Field) -> None:
         self.fields = fields
 
-    def parse(self, data: Dict[str, Any], context: Dict[str, Any]) -> List[Link]:
-        """Parse this field and return a list of Links.
+    def parse(self, data: Dict[str, Any], context: Dict[str, Any]) -> LinkCollection:
+        """Parse this field and return a LinkCollection.
 
         Args:
             data: dictionary of data to parse
             context: context dict containing data from higher level parsing code.
 
         Returns:
-            List of MultiLink objects.
+            LinkCollection
 
         Raises:
             DictFieldSourceKeyNotFoundException if self.source_key is not in data.
@@ -192,13 +189,14 @@ class EmbeddedDictField(SubField):
         parent_alti_key = self.get_parent_alti_key(data, context)
         if not isinstance(data, dict):
             raise Exception(f"{type(data)} {data} was expected to be a dict.")
-        links: List[Link] = []
         updated_context = deepcopy(context)
         updated_context.update({"parent_alti_key": parent_alti_key})
+        multi_link_object_link_collection = LinkCollection()
         for field in self.fields:
-            sub_links = field.parse(data, updated_context)
-            links += sub_links
-        return [MultiLink(pred=parent_alti_key, obj=links)]
+            multi_link_object_link_collection += field.parse(data, context)
+        return LinkCollection(
+            multi_links=[MultiLink(pred=parent_alti_key, obj=multi_link_object_link_collection)]
+        )
 
 
 class AnonymousEmbeddedDictField(Field):
@@ -217,18 +215,15 @@ class AnonymousEmbeddedDictField(Field):
                          {"FirstName": "Alice", "LastName": "Smith"}]}
             >>> field = ListField("People", AnonymousEmbeddedDictField(ScalarField("FirstName"),\
                                   ScalarField("LastName")))
-            >>> links = field.parse(data=input, context={})
-            >>> for link in links: print(link.to_dict())
-            {'pred': 'first_name', 'obj': 'Bob', 'type': 'simple'}
-            {'pred': 'last_name', 'obj': 'Smith', 'type': 'simple'}
-            {'pred': 'first_name', 'obj': 'Alice', 'type': 'simple'}
-            {'pred': 'last_name', 'obj': 'Smith', 'type': 'simple'}
+            >>> link_collection = field.parse(data=input, context={})
+            >>> print(link_collection.dict(exclude_unset=True))
+            {'simple_links': ({'pred': 'first_name', 'obj': 'Bob'}, {'pred': 'last_name', 'obj': 'Smith'}, {'pred': 'first_name', 'obj': 'Alice'}, {'pred': 'last_name', 'obj': 'Smith'})}
     """
 
     def __init__(self, *fields: Field) -> None:
         self.fields = fields
 
-    def parse(self, data: Dict[str, Any], context: Dict[str, Any]) -> List[Link]:
+    def parse(self, data: Dict[str, Any], context: Dict[str, Any]) -> LinkCollection:
         """Parse this field and return a list of Links.
 
         Args:
@@ -236,15 +231,14 @@ class AnonymousEmbeddedDictField(Field):
             context: context dict containing data from higher level parsing code.
 
         Returns:
-            List of Link objects.
+            LinkCollection
 
         Raises:
             DictFieldValueNotADictException if the data does not appear to represent a dict.
         """
         if not isinstance(data, dict):
             raise DictFieldValueNotADictException(f"{type(data)} {data} was expected to be a dict.")
-        links: List[Link] = []
+        link_collection = LinkCollection()
         for field in self.fields:
-            sub_links = field.parse(data, context)
-            links += sub_links
-        return links
+            link_collection += field.parse(data, context)
+        return link_collection

@@ -1,20 +1,19 @@
 """A MultiHopAccessor contains a list of AccessSteps defining how to gain access to an account via
 role assumption(s)."""
-from dataclasses import asdict, dataclass, field
 import os
-from typing import Any, Dict, List, Optional, Type
+from typing import List, Optional
 
 import boto3
 import jinja2
-from jinja2 import Environment, select_autoescape
+from pydantic import validator
 
 from altimeter.aws.auth.cache import AWSCredentials, AWSCredentialsCache
+from altimeter.core.base_model import BaseImmutableModel
 from altimeter.core.log import Logger
 from altimeter.core.log_events import LogEvent
 
 
-@dataclass(frozen=True)
-class AccessStep:
+class AccessStep(BaseImmutableModel):
     """Represents a single access step to get to an account.
 
     Args:
@@ -25,34 +24,29 @@ class AccessStep:
     """
 
     role_name: str
-    account_id: Optional[str] = field(default=None)
-    external_id: Optional[str] = field(default=None)
+    account_id: Optional[str] = None
+    external_id: Optional[str] = None
+
+    # pylint: disable=no-self-argument,no-self-use
+    @validator("external_id")
+    def substitute_external_id_from_env(cls, external_id: Optional[str]) -> Optional[str]:
+        if external_id:
+            template = jinja2.Environment(
+                loader=jinja2.BaseLoader(),
+                undefined=jinja2.StrictUndefined,
+                autoescape=jinja2.select_autoescape(
+                    enabled_extensions=("html", "xml"), default_for_string=True
+                ),
+            ).from_string(external_id)
+            return template.render(env=os.environ)
+        return external_id
 
     def __str__(self) -> str:
         account = self.account_id if self.account_id else "target"
         return f"{self.role_name}@{account}"
 
-    @classmethod
-    def from_dict(cls: Type["AccessStep"], data: Dict[str, Any]) -> "AccessStep":
-        role_name = data.get("role_name")
-        if role_name is None:
-            raise ValueError(f"AccessStep '{data}' missing key 'role_name'")
-        account_id = data.get("account_id")
-        external_id = data.get("external_id")
-        if external_id is not None:
-            template = jinja2.Environment(
-                loader=jinja2.BaseLoader(),
-                undefined=jinja2.StrictUndefined,
-                autoescape=select_autoescape(
-                    enabled_extensions=("html", "xml"), default_for_string=True
-                ),
-            ).from_string(external_id)
-            external_id = template.render(env=os.environ)
-        return cls(role_name=role_name, account_id=account_id, external_id=external_id)
 
-
-@dataclass(frozen=True)
-class MultiHopAccessor:
+class MultiHopAccessor(BaseImmutableModel):
     """A MultiHopAccessor contains a list of AccessSteps defining how to gain access to an account
     via role assumption(s).
 
@@ -65,18 +59,21 @@ class MultiHopAccessor:
     role_session_name: str
     access_steps: List[AccessStep]
 
-    def __post_init__(self) -> None:
-        if not self.access_steps:
+    # pylint: disable=no-self-argument,no-self-use
+    @validator("access_steps")
+    def valid_access_steps(cls, access_steps: List[AccessStep]) -> List[AccessStep]:
+        if not access_steps:
             raise ValueError("One or more access steps must be specified")
-        for access_step in self.access_steps[:-1]:
+        for access_step in access_steps[:-1]:
             if not access_step.account_id:
                 raise ValueError(
                     "Non-final AccessStep of a MultiHopAccessor must specify an account_id"
                 )
-        if self.access_steps[-1].account_id:
+        if access_steps[-1].account_id:
             raise ValueError(
                 "The last AccessStep of a MultiHopAccessor must not specify account_id"
             )
+        return access_steps
 
     def get_session(
         self,
@@ -144,17 +141,3 @@ class MultiHopAccessor:
 
     def __str__(self) -> str:
         return f'accessor:{self.role_session_name}:{",".join([str(access_step) for access_step in self.access_steps])}'
-
-    def to_dict(self) -> Dict[str, Any]:
-        return asdict(self)
-
-    @classmethod
-    def from_dict(cls: Type["MultiHopAccessor"], data: Dict[str, Any]) -> "MultiHopAccessor":
-        role_session_name = data.get("role_session_name")
-        if not role_session_name:
-            raise ValueError(f"Expected key 'role_session_name' in {data} with non-empty value")
-        access_step_dicts = data.get("access_steps", [])
-        access_steps = [
-            AccessStep.from_dict(access_step_dict) for access_step_dict in access_step_dicts
-        ]
-        return cls(role_session_name=role_session_name, access_steps=access_steps,)

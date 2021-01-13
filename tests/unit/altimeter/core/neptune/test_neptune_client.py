@@ -1,7 +1,15 @@
 from unittest import TestCase
 
-from altimeter.core.neptune.client import get_required_tag_value, NeptuneEndpoint, AltimeterNeptuneClient
-from altimeter.core.neptune.exceptions import NeptuneNoGraphsFoundException, NeptuneLoadGraphException
+from altimeter.core.neptune.client import (
+    get_required_tag_value,
+    NeptuneEndpoint,
+    AltimeterNeptuneClient,
+)
+from altimeter.core.neptune.exceptions import (
+    NeptuneNoGraphsFoundException,
+    NeptuneLoadGraphException,
+)
+
 
 class TestGetRequiredTagValue(TestCase):
     def test_with_present_key(self):
@@ -165,9 +173,9 @@ class TestAltimeterNeptuneClient(TestCase):
         client = AltimeterNeptuneClient(0, endpoint)
         # An exception is expected here since there is no graph to write to
         with self.assertRaises(NeptuneLoadGraphException):
-            client.write_to_neptune_lpg({"vertices": [
-                {"~id": "123", "~label": "test"}],
-                "edges" : []}, "")
+            client.write_to_neptune_lpg(
+                {"vertices": [{"~id": "123", "~label": "test"}], "edges": []}, ""
+            )
 
     def test_write_to_neptune_lpg_no_graph(self):
         endpoint = NeptuneEndpoint(host="host", port=5555, region="us-east-1", ssl=False)
