@@ -2,6 +2,7 @@
 from typing import Dict, Type
 
 from botocore.client import BaseClient
+from botocore.exceptions import ClientError
 
 from altimeter.aws.resource.ec2.security_group import SecurityGroupResourceSpec
 from altimeter.aws.resource.ec2.subnet import SubnetResourceSpec
@@ -67,10 +68,17 @@ class ClassicLoadBalancerResourceSpec(ELBV1ResourceSpec):
                 resource_arn = cls.generate_arn(
                     account_id=account_id, region=region, resource_id=lb_name
                 )
-                lb_attrs = cls.get_lb_attrs(client, lb_name)
-                lb.update(lb_attrs)
-                lb["Type"] = "classic"
-                load_balancers[resource_arn] = lb
+                try:
+                    lb_attrs = cls.get_lb_attrs(client, lb_name)
+                    lb.update(lb_attrs)
+                    lb["Type"] = "classic"
+                    load_balancers[resource_arn] = lb
+                except ClientError as c_e:
+                    if (
+                        getattr(c_e, "response", {}).get("Error", {}).get("Code", {})
+                        != "LoadBalancerNotFound"
+                    ):
+                        raise c_e
         return ListFromAWSResult(resources=load_balancers)
 
     @classmethod
