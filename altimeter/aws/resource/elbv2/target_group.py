@@ -1,4 +1,5 @@
 """Resource for target groups"""
+import time
 from typing import Any, Dict, List, Type
 
 from botocore.client import BaseClient
@@ -84,16 +85,26 @@ class TargetGroupResourceSpec(ELBV2ResourceSpec):
 
 def get_target_group_health(client: BaseClient, target_group_arn: str) -> List[Dict[str, Any]]:
     """Describes target health for a given target group"""
-    try:
-        return client.describe_target_health(TargetGroupArn=target_group_arn).get(
-            "TargetHealthDescriptions", []
-        )
-    except ClientError as c_e:
-        response_error = getattr(c_e, "response", {}).get("Error", {})
-        error_code = response_error.get("Code", "")
-        if error_code == "AccessDenied":
-            raise TargetGroupAccessDeniedException(
-                f"Error getting encryption configuration for {target_group_arn}: {response_error}",
-                c_e,
-            ) from c_e
-        raise c_e
+    num_tries = 0
+    max_tries = 5
+    retry_sleep_sec = 5
+    while True:
+        try:
+            return client.describe_target_health(TargetGroupArn=target_group_arn).get(
+                "TargetHealthDescriptions", []
+            )
+        except ClientError as c_e:
+            response_error = getattr(c_e, "response", {}).get("Error", {})
+            error_code = response_error.get("Code", "")
+            if error_code == "AccessDenied":
+                raise TargetGroupAccessDeniedException(
+                    f"Error getting encryption configuration for {target_group_arn}: {response_error}",
+                    c_e,
+                ) from c_e
+            elif error_code == "Throttling":
+                num_tries += 1
+                if num_tries >= max_tries:
+                    raise c_e
+                time.sleep(retry_sleep_sec)
+            else:
+                raise c_e
