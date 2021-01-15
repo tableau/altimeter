@@ -1,7 +1,8 @@
 """Resource for IAM Policies"""
-from typing import Type
+from typing import Any, Dict, Type
 
 from botocore.client import BaseClient
+from botocore.exceptions import ClientError
 
 from altimeter.aws.resource.resource_spec import ListFromAWSResult
 from altimeter.aws.resource.iam import IAMResourceSpec
@@ -41,17 +42,34 @@ class IAMPolicyResourceSpec(IAMResourceSpec):
             for policy in resp.get("Policies", []):
                 resource_arn = policy["Arn"]
                 default_policy_version = policy["DefaultVersionId"]
-                policy_version_resp = client.get_policy_version(
-                    PolicyArn=resource_arn, VersionId=default_policy_version
-                )
-                default_policy_version_document_text = policy_version_resp["PolicyVersion"][
-                    "Document"
-                ]
-                policy["DefaultVersionPolicyDocumentText"] = policy_doc_dict_to_sorted_str(
-                    default_policy_version_document_text
-                )
-                policies[resource_arn] = policy
+                try:
+                    default_policy_version_document_text = cls.get_policy_version_document_text(
+                        client=client,
+                        policy_arn=resource_arn,
+                        policy_version=default_policy_version,
+                    )
+                    policy["DefaultVersionPolicyDocumentText"] = policy_doc_dict_to_sorted_str(
+                        default_policy_version_document_text
+                    )
+                    policies[resource_arn] = policy
+                except ClientError as c_e:
+                    error_code = getattr(c_e, "response", {}).get("Error", {}).get("Code", {})
+                    if error_code != "NoSuchEntity":
+                        raise c_e
+
         return ListFromAWSResult(resources=policies)
+
+    @classmethod
+    def get_policy_version_document_text(
+        cls: Type["IAMPolicyResourceSpec"],
+        client: BaseClient,
+        policy_arn: str,
+        policy_version: str,
+    ) -> Dict[str, Any]:
+        policy_version_resp = client.get_policy_version(
+            PolicyArn=policy_arn, VersionId=policy_version
+        )
+        return policy_version_resp["PolicyVersion"]["Document"]
 
 
 class IAMAWSManagedPolicyResourceSpec(IAMResourceSpec):
