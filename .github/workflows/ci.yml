@@ -1,9 +1,9 @@
-name: Run Tox
+name: CI
 
 on: [push]
 
 jobs:
-  build:
+  static_analysis_and_tests:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -12,8 +12,6 @@ jobs:
     - uses: actions/checkout@v1
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v1
-      with:
-        python-version: ${{ matrix.python-version }}
     - name: Install dependencies ${{ matrix.python-version }}
       run: |
         python -m pip install --upgrade pip
