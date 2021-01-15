@@ -3,6 +3,7 @@ import copy
 from typing import Any, Dict, List, Type
 
 from botocore.client import BaseClient
+from botocore.exceptions import ClientError
 
 from altimeter.aws.resource.resource_spec import ListFromAWSResult
 from altimeter.aws.resource.iam import IAMResourceSpec
@@ -87,11 +88,16 @@ class IAMRoleResourceSpec(IAMResourceSpec):
                         for obj_key in obj.keys():
                             if obj_key.lower() == "sts:externalid":
                                 obj[obj_key] = "REMOVED"
-                policies_result = get_attached_role_policies(client, role_name)
-                policies = policies_result
-                role["PolicyAttachments"] = policies
-                resource_arn = role["Arn"]
-                roles[resource_arn] = role
+                try:
+                    policies_result = get_attached_role_policies(client, role_name)
+                    policies = policies_result
+                    role["PolicyAttachments"] = policies
+                    resource_arn = role["Arn"]
+                    roles[resource_arn] = role
+                except ClientError as c_e:
+                    error_code = getattr(c_e, "response", {}).get("Error", {}).get("Code", {})
+                    if error_code != "NoSuchEntity":
+                        raise c_e
         return ListFromAWSResult(resources=roles)
 
 
