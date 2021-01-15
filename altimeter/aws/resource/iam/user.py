@@ -63,27 +63,62 @@ class IAMUserResourceSpec(IAMResourceSpec):
         for resp in paginator.paginate():
             for user in resp.get("Users", []):
                 resource_arn = user["Arn"]
-                user_name = user["UserName"]
-                access_keys_paginator = client.get_paginator("list_access_keys")
-                access_keys: List[Dict[str, Any]] = []
-                for access_keys_resp in access_keys_paginator.paginate(UserName=user_name):
-                    for resp_access_key in access_keys_resp["AccessKeyMetadata"]:
-                        access_key = copy.deepcopy(resp_access_key)
-                        access_key_id = access_key["AccessKeyId"]
-                        last_used_resp = client.get_access_key_last_used(AccessKeyId=access_key_id)
-                        access_key["AccessKeyLastUsed"] = last_used_resp["AccessKeyLastUsed"]
-                        access_keys.append(access_key)
-                user["AccessKeys"] = access_keys
-                mfa_devices_paginator = client.get_paginator("list_mfa_devices")
-                mfa_devices: List[Dict[str, Any]] = []
-                for mfa_devices_resp in mfa_devices_paginator.paginate(UserName=user_name):
-                    mfa_devices += mfa_devices_resp["MFADevices"]
-                    user["MfaDevices"] = mfa_devices
+                username = user["UserName"]
                 try:
-                    login_profile_resp = client.get_login_profile(UserName=user_name)
-                    user["LoginProfile"] = login_profile_resp["LoginProfile"]
+                    user["AccessKeys"] = cls.get_user_access_keys(client=client, username=username)
+                    user["MfaDevices"] = cls.get_user_mfa_devices(client=client, username=username)
+                    user["LoginProfile"] = cls.get_user_login_profile(
+                        client=client, username=username
+                    )
+                    users[resource_arn] = user
                 except ClientError as c_e:
-                    if "NoSuchEntity" not in str(c_e):
+                    error_code = getattr(c_e, "response", {}).get("Error", {}).get("Code", {})
+                    if error_code != "NoSuchEntity":
                         raise c_e
-                users[resource_arn] = user
         return ListFromAWSResult(resources=users)
+
+    @classmethod
+    def get_user_access_keys(
+        cls: Type["IAMUserResourceSpec"], client: BaseClient, username: str
+    ) -> List[Dict[str, Any]]:
+        access_keys: List[Dict[str, Any]] = []
+        access_keys_paginator = client.get_paginator("list_access_keys")
+        for access_keys_resp in access_keys_paginator.paginate(UserName=username):
+            for resp_access_key in access_keys_resp["AccessKeyMetadata"]:
+                access_key = copy.deepcopy(resp_access_key)
+                access_key_id = access_key["AccessKeyId"]
+                try:
+                    access_key_last_used = cls.get_access_key_last_used(
+                        client=client, access_key_id=access_key_id
+                    )
+                    access_key["AccessKeyLastUsed"] = access_key_last_used
+                    access_keys.append(access_key)
+                except ClientError as c_e:
+                    error_code = getattr(c_e, "response", {}).get("Error", {}).get("Code", {})
+                    if error_code != "AccessDenied":
+                        raise c_e
+        return access_keys
+
+    @classmethod
+    def get_access_key_last_used(
+        cls: Type["IAMUserResourceSpec"], client: BaseClient, access_key_id: str
+    ) -> Dict[str, Any]:
+        resp = client.get_access_key_last_used(AccessKeyId=access_key_id)
+        return resp["AccessKeyLastUsed"]
+
+    @classmethod
+    def get_user_mfa_devices(
+        cls: Type["IAMUserResourceSpec"], client: BaseClient, username: str
+    ) -> List[Dict[str, Any]]:
+        mfa_devices: List[Dict[str, Any]] = []
+        mfa_devices_paginator = client.get_paginator("list_mfa_devices")
+        for mfa_devices_resp in mfa_devices_paginator.paginate(UserName=username):
+            mfa_devices += mfa_devices_resp["MFADevices"]
+        return mfa_devices
+
+    @classmethod
+    def get_user_login_profile(
+        cls: Type["IAMUserResourceSpec"], client: BaseClient, username: str
+    ) -> Dict[str, Any]:
+        login_profile_resp = client.get_login_profile(UserName=username)
+        return login_profile_resp["LoginProfile"]
