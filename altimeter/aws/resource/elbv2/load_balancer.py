@@ -2,6 +2,7 @@
 from typing import Dict, Type
 
 from botocore.client import BaseClient
+from botocore.exceptions import ClientError
 
 from altimeter.aws.resource.resource_spec import ListFromAWSResult
 from altimeter.aws.resource.elbv2 import ELBV2ResourceSpec
@@ -77,9 +78,16 @@ class LoadBalancerResourceSpec(ELBV2ResourceSpec):
         for resp in paginator.paginate():
             for lb in resp.get("LoadBalancers", []):
                 resource_arn = lb["LoadBalancerArn"]
-                lb_attrs = cls.get_lb_attrs(client, resource_arn)
-                lb.update(lb_attrs)
-                load_balancers[resource_arn] = lb
+                try:
+                    lb_attrs = cls.get_lb_attrs(client, resource_arn)
+                    lb.update(lb_attrs)
+                    load_balancers[resource_arn] = lb
+                except ClientError as c_e:
+                    if (
+                        getattr(c_e, "response", {}).get("Error", {}).get("Code", {})
+                        != "LoadBalancerNotFound"
+                    ):
+                        raise c_e
         return ListFromAWSResult(resources=load_balancers)
 
     @classmethod
