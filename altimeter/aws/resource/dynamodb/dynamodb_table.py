@@ -2,6 +2,7 @@
 from typing import Any, Type, List, Dict
 
 from botocore.client import BaseClient
+from botocore.exceptions import ClientError
 
 from altimeter.core.graph.field.scalar_field import ScalarField
 from altimeter.core.graph.field.dict_field import AnonymousDictField
@@ -68,13 +69,18 @@ class DynamoDbTableResourceSpec(DynamoDBResourceSpec):
             table_names.extend(resp.get("TableNames", []))
 
         for table_name in table_names:
-            table_data = get_table_data(client=client, table_name=table_name)
-            continuous_backup_data = get_continuous_backup_table_data(
-                client=client, table_name=table_name
-            )
-            table_data.update(continuous_backup_data)
-            resource_arn = table_data["TableArn"]
-            tables[resource_arn] = table_data
+            try:
+                table_data = get_table_data(client=client, table_name=table_name)
+                continuous_backup_data = get_continuous_backup_table_data(
+                    client=client, table_name=table_name
+                )
+                table_data.update(continuous_backup_data)
+                resource_arn = table_data["TableArn"]
+                tables[resource_arn] = table_data
+            except ClientError as c_e:
+                error_code = getattr(c_e, "response", {}).get("Error", {}).get("Code", {})
+                if error_code not in ("ResourceNotFoundException", "TableNotFoundException"):
+                    raise c_e
         return ListFromAWSResult(resources=tables)
 
 
