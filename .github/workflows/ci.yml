@@ -19,6 +19,7 @@ jobs:
     - name: Run tox
       run: tox
   build_wheel:
+    needs: static_analysis_and_tests
     runs-on: ubuntu-latest
     strategy:
       matrix:
