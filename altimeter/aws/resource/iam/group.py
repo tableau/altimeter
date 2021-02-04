@@ -1,7 +1,8 @@
 """Resource for IAM Groups"""
-from typing import Type
+from typing import Any, Dict, List, Type
 
 from botocore.client import BaseClient
+from botocore.exceptions import ClientError
 
 from altimeter.aws.resource.resource_spec import ListFromAWSResult
 from altimeter.aws.resource.iam import IAMResourceSpec
@@ -45,7 +46,20 @@ class IAMGroupResourceSpec(IAMResourceSpec):
         for resp in paginator.paginate():
             for group in resp.get("Groups", []):
                 resource_arn = group["Arn"]
-                group_resp = client.get_group(GroupName=group["GroupName"])
-                group["Users"] = group_resp["Users"]
-                groups[resource_arn] = group
+                try:
+                    group["Users"] = cls.get_group_users(
+                        client=client, group_name=group["GroupName"]
+                    )
+                    groups[resource_arn] = group
+                except ClientError as c_e:
+                    error_code = getattr(c_e, "response", {}).get("Error", {}).get("Code", {})
+                    if error_code != "NoSuchEntity":
+                        raise c_e
         return ListFromAWSResult(resources=groups)
+
+    @classmethod
+    def get_group_users(
+        cls: Type["IAMGroupResourceSpec"], client: BaseClient, group_name: str
+    ) -> List[Dict[str, Any]]:
+        group_resp = client.get_group(GroupName=group_name)
+        return group_resp["Users"]

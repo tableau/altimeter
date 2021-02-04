@@ -1,7 +1,8 @@
 """Resource for RDS"""
-from typing import Type
+from typing import Any, Dict, List, Type
 
 from botocore.client import BaseClient
+from botocore.exceptions import ClientError
 
 from altimeter.aws.log_events import AWSLogEvents
 from altimeter.aws.resource.resource_spec import ListFromAWSResult
@@ -105,18 +106,29 @@ class RDSInstanceResourceSpec(RDSResourceSpec):
     def list_from_aws(
         cls: Type["RDSInstanceResourceSpec"], client: BaseClient, account_id: str, region: str
     ) -> ListFromAWSResult:
-        logger = Logger()
         dbinstances = {}
         paginator = client.get_paginator("describe_db_instances")
         for resp in paginator.paginate():
             for db in resp.get("DBInstances", []):
                 resource_arn = db["DBInstanceArn"]
-                db["Tags"] = client.list_tags_for_resource(ResourceName=resource_arn).get(
-                    "TagList", []
-                )
-                db["Backup"] = []
-                dbinstances[resource_arn] = db
+                try:
+                    db["Tags"] = cls.get_instance_tags(client=client, instance_arn=resource_arn)
+                    db["Backup"] = []
+                    dbinstances[resource_arn] = db
+                except ClientError as c_e:
+                    if (
+                        getattr(c_e, "response", {}).get("Error", {}).get("Code", {})
+                        != "DBInstanceNotFound"
+                    ):
+                        raise c_e
+        cls.set_automated_backups(client=client, dbinstances=dbinstances)
+        return ListFromAWSResult(resources=dbinstances)
 
+    @classmethod
+    def set_automated_backups(
+        cls, client: BaseClient, dbinstances: Dict[str, Dict[str, Any]]
+    ) -> None:
+        logger = Logger()
         backup_paginator = client.get_paginator("describe_db_instance_automated_backups")
         for resp in backup_paginator.paginate():
             for backup in resp.get("DBInstanceAutomatedBackups", []):
@@ -130,4 +142,9 @@ class RDSInstanceResourceSpec(RDSResourceSpec):
                             "(Possible Deletion)"
                         ),
                     )
-        return ListFromAWSResult(resources=dbinstances)
+
+    @classmethod
+    def get_instance_tags(
+        cls: Type["RDSInstanceResourceSpec"], client: BaseClient, instance_arn: str,
+    ) -> List[Dict[str, str]]:
+        return client.list_tags_for_resource(ResourceName=instance_arn).get("TagList", [])

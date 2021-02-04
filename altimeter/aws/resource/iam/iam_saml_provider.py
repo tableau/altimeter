@@ -3,6 +3,7 @@ import hashlib
 from typing import Type
 
 from botocore.client import BaseClient
+from botocore.exceptions import ClientError
 
 from altimeter.aws.resource.resource_spec import ListFromAWSResult
 from altimeter.aws.resource.iam import IAMResourceSpec
@@ -38,9 +39,22 @@ class IAMSAMLProviderResourceSpec(IAMResourceSpec):
         for saml_provider in resp.get("SAMLProviderList", []):
             resource_arn = saml_provider["Arn"]
             saml_provider["Name"] = "/".join(resource_arn.split("/")[1:])
-            saml_provider_resp = client.get_saml_provider(SAMLProviderArn=resource_arn)
-            saml_metadata_document = saml_provider_resp["SAMLMetadataDocument"]
-            hash_object = hashlib.sha256(saml_metadata_document.encode())
-            saml_provider["MetadataDocumentChecksum"] = hash_object.hexdigest()
-            saml_providers[resource_arn] = saml_provider
+            try:
+                saml_metadata_document = cls.get_saml_provider_metadata_doc(
+                    client=client, arn=resource_arn
+                )
+                hash_object = hashlib.sha256(saml_metadata_document.encode())
+                saml_provider["MetadataDocumentChecksum"] = hash_object.hexdigest()
+                saml_providers[resource_arn] = saml_provider
+            except ClientError as c_e:
+                error_code = getattr(c_e, "response", {}).get("Error", {}).get("Code", {})
+                if error_code != "NoSuchEntity":
+                    raise c_e
         return ListFromAWSResult(resources=saml_providers)
+
+    @classmethod
+    def get_saml_provider_metadata_doc(
+        cls: Type["IAMSAMLProviderResourceSpec"], client: BaseClient, arn: str
+    ) -> str:
+        saml_provider_resp = client.get_saml_provider(SAMLProviderArn=arn)
+        return saml_provider_resp["SAMLMetadataDocument"]

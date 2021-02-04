@@ -78,8 +78,15 @@ class TargetGroupResourceSpec(ELBV2ResourceSpec):
         for resp in paginator.paginate():
             for resource in resp.get("TargetGroups", []):
                 resource_arn = resource["TargetGroupArn"]
-                resource["TargetHealthDescriptions"] = get_target_group_health(client, resource_arn)
-                resources[resource_arn] = resource
+                try:
+                    resource["TargetHealthDescriptions"] = get_target_group_health(
+                        client, resource_arn
+                    )
+                    resources[resource_arn] = resource
+                except ClientError as c_e:
+                    error_code = getattr(c_e, "response", {}).get("Error", {}).get("Code", {})
+                    if error_code != "TargetGroupNotFound":
+                        raise c_e
         return ListFromAWSResult(resources=resources)
 
 
