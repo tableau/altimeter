@@ -43,6 +43,7 @@ class TestIAMUser(TestCase):
         session = boto3.Session()
         client = session.client("iam")
         client.create_user(UserName=user_name)
+        client.create_access_key(UserName=user_name)
 
         scan_accessor = AWSAccessor(session=session, account_id=account_id, region_name=region_name)
         with patch(
@@ -53,7 +54,8 @@ class TestIAMUser(TestCase):
                 error_response={"Error": {"Code": "AccessDenied", "Message": "",}},
             )
             resources = IAMUserResourceSpec.scan(scan_accessor=scan_accessor)
-            self.assertEqual(resources, [])
+            self.assertEqual(len(resources), 1)
+            self.assertEqual(resources[0].resource_id, "arn:aws:iam::123456789012:user/foo")
 
     @mock_iam
     def test_disappearing_user_race_condition_get_user_mfa_devices(self):
