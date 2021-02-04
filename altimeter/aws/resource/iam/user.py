@@ -1,6 +1,6 @@
 """Resource for IAM Users"""
 import copy
-from typing import Any, List, Dict, Type
+from typing import Any, Dict, List, Optional, Type
 
 from botocore.client import BaseClient
 from botocore.exceptions import ClientError
@@ -67,9 +67,9 @@ class IAMUserResourceSpec(IAMResourceSpec):
                 try:
                     user["AccessKeys"] = cls.get_user_access_keys(client=client, username=username)
                     user["MfaDevices"] = cls.get_user_mfa_devices(client=client, username=username)
-                    user["LoginProfile"] = cls.get_user_login_profile(
-                        client=client, username=username
-                    )
+                    login_profile = cls.get_user_login_profile(client=client, username=username)
+                    if login_profile is not None:
+                        user["LoginProfile"] = login_profile
                     users[resource_arn] = user
                 except ClientError as c_e:
                     error_code = getattr(c_e, "response", {}).get("Error", {}).get("Code", {})
@@ -119,6 +119,12 @@ class IAMUserResourceSpec(IAMResourceSpec):
     @classmethod
     def get_user_login_profile(
         cls: Type["IAMUserResourceSpec"], client: BaseClient, username: str
-    ) -> Dict[str, Any]:
-        login_profile_resp = client.get_login_profile(UserName=username)
-        return login_profile_resp["LoginProfile"]
+    ) -> Optional[Dict[str, Any]]:
+        try:
+            login_profile_resp = client.get_login_profile(UserName=username)
+            return login_profile_resp["LoginProfile"]
+        except ClientError as c_e:
+            error_code = getattr(c_e, "response", {}).get("Error", {}).get("Code", {})
+            if error_code != "NoSuchEntity":
+                raise c_e
+        return None
