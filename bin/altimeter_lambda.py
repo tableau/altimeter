@@ -11,7 +11,8 @@ from altimeter.aws.aws2n import AWS2NConfig, generate_scan_id, aws2n
 from altimeter.aws.scan.account_scanner import AccountScanner
 from altimeter.aws.scan.muxer.lambda_muxer import AccountScanLambdaEvent, LambdaAWSScanMuxer
 from altimeter.core.artifact_io.writer import ArtifactWriter
-from altimeter.core.config import Config
+from altimeter.core.config import Config, GraphPrunerConfig
+from altimeter.core.pruner import prune_graph
 
 
 class InvalidLambdaInputException(Exception):
@@ -53,6 +54,12 @@ def lambda_handler(event: Dict[str, Any], __: Any) -> Dict[str, Any]:
         )
         scan_results = account_scanner.scan()
         return scan_results.dict()
+    except ValidationError:
+        pass
+    try:
+        pruner_config = GraphPrunerConfig()
+        prune_results = prune_graph(pruner_config)
+        return prune_results.dict()
     except ValidationError:
         pass
     raise InvalidLambdaInputException(f"Invalid lambda input.\nENV: {os.environ}\nEvent: {event}")

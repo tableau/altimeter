@@ -3,7 +3,7 @@ from pathlib import Path
 from typing import Any, Optional, Type, Tuple
 
 import boto3
-from pydantic import Field
+from pydantic import Field, BaseSettings
 import toml
 
 from altimeter.aws.auth.accessor import Accessor
@@ -102,3 +102,7 @@ class Config(BaseImmutableModel):
             return cls(**config_dict)
         except InvalidConfigException as ice:
             raise InvalidConfigException(f"Error in conf file {s3_uri}: {str(ice)}") from ice
+
+
+class GraphPrunerConfig(BaseSettings):
+    config_path: str
