@@ -1,7 +1,6 @@
 """Scan a set of accounts as defined by an AccountScanPlan"""
-import json
 import logging
-from typing import Any, Dict, Tuple
+from typing import Any, Dict
 
 from altimeter.core.artifact_io.writer import ArtifactWriter
 from altimeter.aws.scan.account_scanner import AccountScanner

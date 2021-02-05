@@ -1,8 +1,6 @@
 """AWSScanMuxer that runs account scans one-per-lambda"""
 from concurrent.futures import Future, ThreadPoolExecutor
-from configparser import ConfigParser
 import json
-from pathlib import Path
 from typing import Tuple
 
 import boto3
