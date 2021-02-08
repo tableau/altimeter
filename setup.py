@@ -48,11 +48,9 @@ setup(
         ),
     ],
     scripts=[
-        "bin/account_scan.py",
         "bin/altimeter",
         "bin/aws2n.py",
         "bin/aws2neptune.py",
-        "bin/graphpruner.py",
         "bin/json2hyper.py",
         "bin/rdf2blaze",
         "bin/runquery.py",
