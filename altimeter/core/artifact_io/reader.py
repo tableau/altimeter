@@ -30,11 +30,7 @@ class ArtifactReader(abc.ABC):
         """Create an ArtifactReader based on an artifact path. This either returns a
         FileArtifactReader or an S3ArtifactReader depending on the value of artifact_path"""
         if is_s3_uri(artifact_path):
-            _, key_prefix = parse_s3_uri(artifact_path)
-            if key_prefix is not None:
-                raise ValueError(
-                    f"S3 artifact path should be s3://<bucket>, no key - got {artifact_path}"
-                )
+            parse_s3_uri(artifact_path)
             return S3ArtifactReader()
         return FileArtifactReader()
 
