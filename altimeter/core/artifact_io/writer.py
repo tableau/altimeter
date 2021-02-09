@@ -56,7 +56,7 @@ class ArtifactWriter(abc.ABC):
         if is_s3_uri(artifact_path):
             bucket, s3_uri_key_prefix = parse_s3_uri(artifact_path)
             if s3_uri_key_prefix is not None:
-                key_prefix = "/".join(s3_uri_key_prefix, scan_id)
+                key_prefix = "/".join((s3_uri_key_prefix, scan_id))
             else:
                 key_prefix = scan_id
             return S3ArtifactWriter(bucket=bucket, key_prefix=key_prefix)
