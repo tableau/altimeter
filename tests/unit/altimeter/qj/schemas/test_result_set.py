@@ -45,3 +45,27 @@ class TestResultSet(TestCase):
         )
         expected_csv = "account_id,foo,fizz\n123456789101,boo,bizz\n123456789101,boo2,bizz2\n"
         self.assertEqual(expected_csv, result_set.to_csv())
+
+    def test_empty_results_to_csv_returns_csv_str(self):
+        result_set = ResultSet(
+            job=Job(
+                name="foobizz",
+                description="FooBizz",
+                graph_spec=JobGraphSpec(graph_names=["test"]),
+                category=Category.gov,
+                severity=Severity.debug,
+                query="select ?foo ?fizz where { ?foo ?fizz } order by ?foo",
+                active=True,
+                created=datetime(2020, 1, 1),
+                query_fields=["account_id", "account_name"],
+                max_graph_age_sec=10000,
+                result_expiration_sec=100000,
+                max_result_age_sec=100000,
+            ),
+            graph_spec=ResultSetGraphSpec(
+                graph_uris_load_times={"https://alti/alti/1/1234": 1612974818}
+            ),
+            results=[],
+        )
+        expected_csv = ""
+        self.assertEqual(expected_csv, result_set.to_csv())
