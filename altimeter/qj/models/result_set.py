@@ -5,8 +5,10 @@ from sqlalchemy import Column, Index, Integer, ForeignKey, DateTime, Text
 from sqlalchemy.dialects.postgresql import UUID, JSONB
 from sqlalchemy.orm import relationship
 
+from altimeter.qj import schemas
 from altimeter.qj.db.base_class import BASE
 from altimeter.qj.models.job import Job
+
 
 # pylint: disable=too-few-public-methods
 class ResultSet(BASE):
@@ -27,6 +29,11 @@ class ResultSet(BASE):
         Index("result_set_job_id_idx", job_id,),
         Index("result_set_created_idx", created,),
     )
+
+    def to_api_schema(self) -> schemas.ResultSet:
+        """Build a ResultSet pydantic model from this result set"""
+        base_rs = schemas.ResultSet.from_orm(self)
+        return schemas.ResultSet.from_orm(base_rs)
 
 
 class Result(BASE):
