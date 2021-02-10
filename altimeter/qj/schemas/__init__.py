@@ -6,5 +6,6 @@ from altimeter.qj.schemas.result_set import (
     ResultSetCreate,
     ResultSetGraphSpec,
     ResultSetsPruneResult,
+    ResultSetFormat,
 )
 from altimeter.qj.schemas.status import Status

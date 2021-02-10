@@ -2,7 +2,7 @@
 from datetime import datetime
 from typing import Any, List
 
-from fastapi import APIRouter, Depends, HTTPException, Security
+from fastapi import APIRouter, Depends, HTTPException, Security, Response
 from sqlalchemy.orm import Session
 from starlette.status import HTTP_201_CREATED, HTTP_400_BAD_REQUEST, HTTP_404_NOT_FOUND
 
@@ -84,12 +84,17 @@ def get_job_latest_result_set(
     db_session: Session = Depends(deps.db_session),
     result_set_crud: CRUDResultSet = Depends(deps.result_set_crud),
     job_name: str,
+    result_format: schemas.ResultSetFormat = schemas.ResultSetFormat.json,
 ) -> Any:
     """Get the latest result set of a Job"""
+
     try:
-        return result_set_crud.get_latest_for_active_job(db_session, job_name=job_name)
+        result_set = result_set_crud.get_latest_for_active_job(db_session, job_name=job_name)
     except ResultSetNotFound as ex:
         raise HTTPException(status_code=HTTP_404_NOT_FOUND, detail=str(ex)) from ex
+    if result_format == schemas.ResultSetFormat.csv:
+        return Response(content=result_set.to_api_schema().to_csv(), media_type="text/csv")
+    return result_set
 
 
 @JOBS_ROUTER.get("/{job_name}/versions", response_model=List[schemas.Job])
