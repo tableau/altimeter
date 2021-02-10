@@ -66,11 +66,7 @@ class Config(BaseImmutableModel):
         ):
             raise InvalidConfigException("Accessor config not supported for single account mode")
         if is_s3_uri(self.artifact_path):
-            _, key_prefix = parse_s3_uri(self.artifact_path)
-            if key_prefix is not None:
-                raise InvalidConfigException(
-                    f"S3 artifact_path should be s3://<bucket>, no key - got {self.artifact_path}"
-                )
+            parse_s3_uri(self.artifact_path)
 
     @classmethod
     def from_path(cls: Type["Config"], path: str) -> "Config":

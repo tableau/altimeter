@@ -54,12 +54,12 @@ class ArtifactWriter(abc.ABC):
         """Create an ArtifactWriter based on an artifact path. This either returns a FileArtifactWriter
         or an S3ArtifactWriter depending on the value of artifact_path"""
         if is_s3_uri(artifact_path):
-            bucket, key_prefix = parse_s3_uri(artifact_path)
-            if key_prefix is not None:
-                raise ValueError(
-                    f"S3 artifact path should be s3://<bucket>, no key - got {artifact_path}"
-                )
-            return S3ArtifactWriter(bucket=bucket, key_prefix=scan_id)
+            bucket, s3_uri_key_prefix = parse_s3_uri(artifact_path)
+            if s3_uri_key_prefix is not None:
+                key_prefix = "/".join((s3_uri_key_prefix, scan_id))
+            else:
+                key_prefix = scan_id
+            return S3ArtifactWriter(bucket=bucket, key_prefix=key_prefix)
         return FileArtifactWriter(scan_id=scan_id, output_dir=Path(artifact_path))
 
 
