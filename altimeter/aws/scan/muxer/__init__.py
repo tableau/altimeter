@@ -1,6 +1,7 @@
 """Abstract base class for AWSScanMuxers."""
 import abc
 from concurrent.futures import as_completed, Future, ThreadPoolExecutor
+import time
 from typing import Generator, Tuple
 
 from altimeter.aws.log_events import AWSLogEvents
@@ -89,6 +90,7 @@ class AWSScanMuxer(abc.ABC):
                             )
                 if unscanned_account_ids:
                     account_id_blacklist = tuple(scanned_account_ids)
+                    time.sleep(5)
                 else:
                     break
             logger.info(event=AWSLogEvents.MuxerEnd)
