@@ -1,12 +1,11 @@
 """Abstract base class for AWSScanMuxers."""
 import abc
 from concurrent.futures import as_completed, Future, ThreadPoolExecutor
-from typing import Generator
+from typing import Generator, Tuple
 
 from altimeter.aws.log_events import AWSLogEvents
 from altimeter.aws.scan.scan_plan import AccountScanPlan, ScanPlan
 from altimeter.aws.scan.account_scan_manifest import AccountScanManifest
-from altimeter.aws.scan.account_scanner import AccountScanResult
 from altimeter.core.config import Config
 from altimeter.core.log import Logger
 
@@ -37,7 +36,6 @@ class AWSScanMuxer(abc.ABC):
         num_total_accounts = len(scan_plan.account_ids)
         scanned_account_ids = set()
         unscanned_account_ids = set(scan_plan.account_ids)
-        account_scan_plans = scan_plan.build_account_scan_plans()
         num_threads = self.config.concurrency.max_account_scan_threads
         logger = Logger()
         with logger.bind(
@@ -46,32 +44,53 @@ class AWSScanMuxer(abc.ABC):
             num_muxer_threads=num_threads,
         ):
             logger.info(event=AWSLogEvents.MuxerStart)
-            with ThreadPoolExecutor(max_workers=num_threads) as executor:
-                processed_accounts = 0
-                futures = []
-                for account_scan_plan in account_scan_plans:
-                    account_scan_future = self._schedule_account_scan(executor, account_scan_plan)
-                    futures.append(account_scan_future)
-                    logger.info(
-                        event=AWSLogEvents.MuxerQueueScan, account_id=account_scan_plan.account_id,
+            account_id_blacklist: Tuple[str, ...] = tuple()
+            for account_scan_try in range(self.config.concurrency.max_account_scan_tries):
+                with logger.bind(account_scan_try=account_scan_try):
+                    account_scan_plans = scan_plan.build_account_scan_plans(
+                        account_id_blacklist=account_id_blacklist
                     )
-                for future in as_completed(futures):
-                    account_scan_result = future.result()
-                    account_scan_manifest = AccountScanManifest(
-                        account_id=account_scan_result.account_id,
-                        artifacts=account_scan_result.artifacts,
-                        errors=account_scan_result.errors,
-                    )
-                    yield account_scan_manifest
-                    processed_accounts += 1
-                    scanned_account_ids.add(account_scan_result.account_id)
-                    unscanned_account_ids.remove(account_scan_result.account_id)
-                    logger.info(
-                        event=AWSLogEvents.MuxerStat,
-                        num_scanned=processed_accounts,
-                        scanned_account_ids=sorted(scanned_account_ids),
-                        unscanned_account_ids=sorted(unscanned_account_ids),
-                    )
+                    with ThreadPoolExecutor(max_workers=num_threads) as executor:
+                        processed_accounts = 0
+                        futures = []
+                        for account_scan_plan in account_scan_plans:
+                            account_scan_future = self._schedule_account_scan(
+                                executor, account_scan_plan
+                            )
+                            futures.append(account_scan_future)
+                            logger.info(
+                                event=AWSLogEvents.MuxerQueueScan,
+                                account_id=account_scan_plan.account_id,
+                            )
+                        for future in as_completed(futures):
+                            try:
+                                account_scan_result = future.result()
+                            except Exception as ex:
+                                logger.info(
+                                    event=AWSLogEvents.ScanAWSAccountError,
+                                    ex=str(ex),
+                                    attempt=account_scan_try + 1,
+                                )
+                                continue
+                            account_scan_manifest = AccountScanManifest(
+                                account_id=account_scan_result.account_id,
+                                artifacts=account_scan_result.artifacts,
+                                errors=account_scan_result.errors,
+                            )
+                            yield account_scan_manifest
+                            processed_accounts += 1
+                            scanned_account_ids.add(account_scan_result.account_id)
+                            unscanned_account_ids.remove(account_scan_result.account_id)
+                            logger.info(
+                                event=AWSLogEvents.MuxerStat,
+                                num_scanned=processed_accounts,
+                                scanned_account_ids=sorted(scanned_account_ids),
+                                unscanned_account_ids=sorted(unscanned_account_ids),
+                            )
+                if unscanned_account_ids:
+                    account_id_blacklist = tuple(scanned_account_ids)
+                else:
+                    break
             logger.info(event=AWSLogEvents.MuxerEnd)
 
     @abc.abstractmethod

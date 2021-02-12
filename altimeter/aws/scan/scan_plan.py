@@ -1,5 +1,5 @@
 """A ScanPlan defines how to scan a set of accounts."""
-from typing import Tuple
+from typing import Optional, Tuple
 
 from altimeter.aws.auth.accessor import Accessor
 from altimeter.core.base_model import BaseImmutableModel
@@ -32,10 +32,15 @@ class ScanPlan(BaseImmutableModel):
     regions: Tuple[str, ...]
     accessor: Accessor
 
-    def build_account_scan_plans(self) -> Tuple[AccountScanPlan, ...]:
+    def build_account_scan_plans(
+        self, account_id_blacklist: Optional[Tuple[str, ...]] = None
+    ) -> Tuple[AccountScanPlan, ...]:
+        if account_id_blacklist is None:
+            account_id_blacklist = tuple()
         return tuple(
             [
                 AccountScanPlan(account_id=account_id, regions=self.regions, accessor=self.accessor)
                 for account_id in self.account_ids
+                if account_id not in account_id_blacklist
             ]
         )
