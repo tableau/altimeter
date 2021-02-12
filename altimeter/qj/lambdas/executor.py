@@ -2,7 +2,6 @@
 """Execute all known QJs"""
 import hashlib
 import json
-import random
 from typing import Any, Dict, List
 import uuid
 
@@ -40,16 +39,11 @@ def lambda_handler(event: Dict[str, Any], _: Any) -> None:
         queue_url=config.query_queue_url,
         execution_hash=execution_hash,
         region=config.region,
-        max_jitter_sec=config.max_jitter_sec,
     )
 
 
 def enqueue_queries(
-    jobs: List[schemas.Job],
-    queue_url: str,
-    execution_hash: str,
-    region: str,
-    max_jitter_sec: int = 0,
+    jobs: List[schemas.Job], queue_url: str, execution_hash: str, region: str
 ) -> None:
     """Enqueue querys by sending a message for each job key to queue_url"""
     sqs_client = boto3.client("sqs", region_name=region)
@@ -61,21 +55,15 @@ def enqueue_queries(
             message_group_id = job_hash.hexdigest()
             job_hash.update(execution_hash.encode())
             message_dedupe_id = job_hash.hexdigest()
-            if max_jitter_sec > 0:
-                delay_seconds = random.randrange(max_jitter_sec)
-            else:
-                delay_seconds = 0
             logger.info(
                 QJLogEvents.ScheduleJob,
                 job=job,
                 message_group_id=message_group_id,
                 message_dedupe_id=message_dedupe_id,
-                delay_seconds=delay_seconds,
             )
             sqs_client.send_message(
                 QueueUrl=queue_url,
                 MessageBody=job.json(),
                 MessageGroupId=message_group_id,
                 MessageDeduplicationId=message_dedupe_id,
-                DelaySeconds=delay_seconds,
             )
