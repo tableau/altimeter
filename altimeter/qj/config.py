@@ -48,6 +48,7 @@ class ExecutorConfig(APIConfig):
     """Configuraton for the Executor lambda"""
 
     query_queue_url: str
+    max_jitter_sec: int = 300  # 5min
 
 
 # pylint: disable=too-few-public-methods
