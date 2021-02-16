@@ -29,6 +29,7 @@ class ConcurrencyConfig(BaseImmutableModel):
 
     max_account_scan_threads: int
     max_svc_scan_threads: int
+    max_account_scan_tries: int = 2
 
 
 class NeptuneConfig(BaseImmutableModel):
