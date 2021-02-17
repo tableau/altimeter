@@ -1,7 +1,8 @@
 """Resource for CloudWatchEvents Rules"""
-from typing import Type
+from typing import Any, Dict, List, Type
 
 from botocore.client import BaseClient
+from botocore.exceptions import ClientError
 
 from altimeter.aws.resource.resource_spec import ListFromAWSResult
 from altimeter.aws.resource.events import EventsResourceSpec
@@ -46,9 +47,20 @@ class EventsRuleResourceSpec(EventsResourceSpec):
         for resp in paginator.paginate():
             for rule in resp.get("Rules", []):
                 resource_arn = rule["Arn"]
-                rules[resource_arn] = rule
-                targets_paginator = client.get_paginator("list_targets_by_rule")
-                rule["Targets"] = []
-                for targets_resp in targets_paginator.paginate(Rule=rule["Name"]):
-                    rule["Targets"] += targets_resp.get("Targets", [])
+                try:
+                    rule["Targets"] = list_targets_by_rule(client=client, rule_name=rule["Name"])
+                    rules[resource_arn] = rule
+                except ClientError as c_e:
+                    error_code = getattr(c_e, "response", {}).get("Error", {}).get("Code", {})
+                    if error_code != "ResourceNotFoundException":
+                        raise c_e
         return ListFromAWSResult(resources=rules)
+
+
+def list_targets_by_rule(client: BaseClient, rule_name: str) -> List[Dict[str, Any]]:
+    """Return a list of target dicts for a given rule name"""
+    targets = []
+    targets_paginator = client.get_paginator("list_targets_by_rule")
+    for targets_resp in targets_paginator.paginate(Rule=rule_name):
+        targets += targets_resp.get("Targets", [])
+    return targets
