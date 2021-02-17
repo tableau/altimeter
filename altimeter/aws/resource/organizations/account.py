@@ -46,24 +46,12 @@ class OrgsAccountResourceSpec(OrganizationsResourceSpec):
         Where the dicts represent results from list_accounts_for_parent."""
         org_resp = client.describe_organization()
         org_arn = org_resp["Organization"]["Arn"]
-        # get all parents. parents include roots and ous.
-        parent_ids_arns = {}
-        paginator = client.get_paginator("list_roots")
-        for resp in paginator.paginate():
-            for root in resp["Roots"]:
-                root_id, root_arn = root["Id"], root["Arn"]
-                parent_ids_arns[root_id] = root_arn
-                root_path = f"/{root['Name']}"
-                ou_details = recursively_get_ou_details_for_parent(
-                    client=client, parent_id=root_id, parent_path=root_path
-                )
-                for ou_detail in ou_details:
-                    ou_id, ou_arn = ou_detail["Id"], ou_detail["Arn"]
-                    parent_ids_arns[ou_id] = ou_arn
+        # get all ou ids and arns as a dict
+        ou_ids_arns = get_ou_ids_arns(client)
         # now look up accounts for each ou
         orgs_accounts = {}
         accounts_paginator = client.get_paginator("list_accounts_for_parent")
-        for parent_id, parent_arn in parent_ids_arns.items():
+        for parent_id, parent_arn in ou_ids_arns.items():
             for accounts_resp in accounts_paginator.paginate(ParentId=parent_id):
                 for account in accounts_resp["Accounts"]:
                     account_id = account["Id"]
@@ -72,6 +60,24 @@ class OrgsAccountResourceSpec(OrganizationsResourceSpec):
                     account["OUArn"] = parent_arn
                     orgs_accounts[account_arn] = account
         return ListFromAWSResult(resources=orgs_accounts)
+
+
+def get_ou_ids_arns(client: BaseClient) -> Dict[str, str]:
+    """Build and return a dict of OU ids to arns"""
+    ou_ids_arns = {}
+    paginator = client.get_paginator("list_roots")
+    for resp in paginator.paginate():
+        for root in resp["Roots"]:
+            root_id, root_arn = root["Id"], root["Arn"]
+            ou_ids_arns[root_id] = root_arn
+            root_path = f"/{root['Name']}"
+            ou_details = recursively_get_ou_details_for_parent(
+                client=client, parent_id=root_id, parent_path=root_path
+            )
+            for ou_detail in ou_details:
+                ou_id, ou_arn = ou_detail["Id"], ou_detail["Arn"]
+                ou_ids_arns[ou_id] = ou_arn
+    return ou_ids_arns
 
 
 def recursively_get_ou_details_for_parent(
