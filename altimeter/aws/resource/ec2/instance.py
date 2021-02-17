@@ -1,5 +1,5 @@
 """Resource for EC2Instances"""
-from typing import Dict, Set, Type
+from typing import Type
 
 from botocore.client import BaseClient
 
@@ -28,8 +28,6 @@ class EC2InstanceResourceSpec(EC2ResourceSpec):
     schema = Schema(
         ScalarField("Name", optional=True),
         TransientResourceLinkField("ImageId", EC2ImageResourceSpec),
-        ScalarField("AMIId"),
-        ScalarField("AMIName"),
         ScalarField("KeyName", optional=True),
         AnonymousDictField("Placement", ScalarField("AvailabilityZone"), ScalarField("Tenancy")),
         ScalarField("InstanceType"),
@@ -69,13 +67,9 @@ class EC2InstanceResourceSpec(EC2ResourceSpec):
         Where the dicts represent results from describe_instances."""
         paginator = client.get_paginator("describe_instances")
         instances = {}
-        ami_ids: Set[str] = set()
         for resp in paginator.paginate():
             for reservation in resp.get("Reservations", []):
                 for instance in reservation.get("Instances", []):
-                    ami_id = instance["ImageId"]
-                    instance["AMIId"] = ami_id
-                    ami_ids.add(ami_id)
                     resource_arn = cls.generate_arn(
                         account_id=account_id, region=region, resource_id=instance["InstanceId"]
                     )
@@ -84,19 +78,4 @@ class EC2InstanceResourceSpec(EC2ResourceSpec):
                         if tag["Key"].lower() == "name":
                             instance["Name"] = tag["Value"]
                             break
-        # now fill ami
-        ami_ids_names = get_ami_ids_names(client=client, ami_ids=ami_ids)
-        for instance_dict in instances.values():
-            instance_dict["AMIName"] = ami_ids_names.get(
-                instance_dict["AMIId"],
-                "EC2 can't retrieve the name because the AMI was either deleted or made private.",
-            )
         return ListFromAWSResult(resources=instances)
-
-
-def get_ami_ids_names(client: BaseClient, ami_ids: Set[str]) -> Dict[str, str]:
-    """Get a dict of ami ids to ami names"""
-    resp = client.describe_images(ImageIds=list(ami_ids))
-    images = resp["Images"]
-    ami_ids_names = {image["ImageId"]: image["Name"] for image in images}
-    return ami_ids_names
