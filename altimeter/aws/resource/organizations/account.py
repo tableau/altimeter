@@ -1,11 +1,14 @@
 """Resource representing an AWS Account as viewed in Orgs. This tags
 on things like the Org itself and the OU in which this account lives."""
-from typing import Any, Dict, List, Type
+from typing import Dict, Type
 
 from botocore.client import BaseClient
 
 from altimeter.aws.resource.resource_spec import ListFromAWSResult
-from altimeter.aws.resource.organizations import OrganizationsResourceSpec
+from altimeter.aws.resource.organizations import (
+    OrganizationsResourceSpec,
+    recursively_get_ou_details_for_parent,
+)
 from altimeter.aws.resource.organizations.org import OrgResourceSpec
 from altimeter.aws.resource.organizations.ou import OUResourceSpec
 from altimeter.aws.resource.unscanned_account import UnscannedAccountResourceSpec
@@ -78,20 +81,3 @@ def get_ou_ids_arns(client: BaseClient) -> Dict[str, str]:
                 ou_id, ou_arn = ou_detail["Id"], ou_detail["Arn"]
                 ou_ids_arns[ou_id] = ou_arn
     return ou_ids_arns
-
-
-def recursively_get_ou_details_for_parent(
-    client: BaseClient, parent_id: str, parent_path: str
-) -> List[Dict[str, Any]]:
-    ous = []
-    paginator = client.get_paginator("list_organizational_units_for_parent")
-    for resp in paginator.paginate(ParentId=parent_id):
-        for ou in resp["OrganizationalUnits"]:
-            ou_id = ou["Id"]
-            path = f"{parent_path}/{ou['Name']}"
-            ou["Path"] = path
-            ous.append(ou)
-            ous += recursively_get_ou_details_for_parent(
-                client=client, parent_id=ou_id, parent_path=path
-            )
-    return ous
