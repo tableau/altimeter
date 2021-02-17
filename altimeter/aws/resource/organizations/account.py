@@ -54,7 +54,7 @@ class OrgsAccountResourceSpec(OrganizationsResourceSpec):
                 root_id, root_arn = root["Id"], root["Arn"]
                 parent_ids_arns[root_id] = root_arn
                 root_path = f"/{root['Name']}"
-                ou_details = cls._recursively_get_ou_details_for_parent(
+                ou_details = recursively_get_ou_details_for_parent(
                     client=client, parent_id=root_id, parent_path=root_path
                 )
                 for ou_detail in ou_details:
@@ -73,19 +73,19 @@ class OrgsAccountResourceSpec(OrganizationsResourceSpec):
                     orgs_accounts[account_arn] = account
         return ListFromAWSResult(resources=orgs_accounts)
 
-    @classmethod
-    def _recursively_get_ou_details_for_parent(
-        cls: Type["OrgsAccountResourceSpec"], client: BaseClient, parent_id: str, parent_path: str
-    ) -> List[Dict[str, Any]]:
-        ous = []
-        paginator = client.get_paginator("list_organizational_units_for_parent")
-        for resp in paginator.paginate(ParentId=parent_id):
-            for ou in resp["OrganizationalUnits"]:
-                ou_id = ou["Id"]
-                path = f"{parent_path}/{ou['Name']}"
-                ou["Path"] = path
-                ous.append(ou)
-                ous += cls._recursively_get_ou_details_for_parent(
-                    client=client, parent_id=ou_id, parent_path=path
-                )
-        return ous
+
+def recursively_get_ou_details_for_parent(
+    client: BaseClient, parent_id: str, parent_path: str
+) -> List[Dict[str, Any]]:
+    ous = []
+    paginator = client.get_paginator("list_organizational_units_for_parent")
+    for resp in paginator.paginate(ParentId=parent_id):
+        for ou in resp["OrganizationalUnits"]:
+            ou_id = ou["Id"]
+            path = f"{parent_path}/{ou['Name']}"
+            ou["Path"] = path
+            ous.append(ou)
+            ous += recursively_get_ou_details_for_parent(
+                client=client, parent_id=ou_id, parent_path=path
+            )
+    return ous
