@@ -6,6 +6,7 @@ from botocore.client import BaseClient
 from altimeter.aws.resource.resource_spec import ListFromAWSResult
 from altimeter.aws.resource.ec2 import EC2ResourceSpec
 from altimeter.core.graph.field.scalar_field import ScalarField
+from altimeter.core.graph.field.tags_field import TagsField
 from altimeter.core.graph.schema import Schema
 
 
@@ -17,6 +18,7 @@ class EC2ImageResourceSpec(EC2ResourceSpec):
         ScalarField("Name", optional=True),
         ScalarField("Description", optional=True),
         ScalarField("Public"),
+        TagsField(),
     )
 
     @classmethod
