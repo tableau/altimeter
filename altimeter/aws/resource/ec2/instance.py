@@ -84,13 +84,14 @@ class EC2InstanceResourceSpec(EC2ResourceSpec):
                         if tag["Key"].lower() == "name":
                             instance["Name"] = tag["Value"]
                             break
-        # now fill ami
-        ami_ids_names = get_ami_ids_names(client=client, ami_ids=ami_ids)
-        for instance_dict in instances.values():
-            instance_dict["AMIName"] = ami_ids_names.get(
-                instance_dict["AMIId"],
-                "EC2 can't retrieve the name because the AMI was either deleted or made private.",
-            )
+        # now fill ami name and ami id
+        if ami_ids:
+            ami_ids_names = get_ami_ids_names(client=client, ami_ids=ami_ids)
+            for instance_dict in instances.values():
+                instance_dict["AMIName"] = ami_ids_names.get(
+                    instance_dict["AMIId"],
+                    "EC2 can't retrieve the name because the AMI was either deleted or made private.",
+                )
         return ListFromAWSResult(resources=instances)
 
 
