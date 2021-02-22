@@ -21,7 +21,6 @@ class IAMPolicyResourceSpec(IAMResourceSpec):
         ScalarField("PolicyId"),
         ScalarField("DefaultVersionId"),
         ScalarField("DefaultVersionPolicyDocumentText"),
-        ScalarField("Description"),
     )
 
     @classmethod
