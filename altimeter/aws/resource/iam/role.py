@@ -28,6 +28,7 @@ class IAMRoleResourceSpec(IAMResourceSpec):
     schema = Schema(
         ScalarField("RoleName", "name"),
         ScalarField("MaxSessionDuration"),
+        ScalarField("Description"),
         AnonymousListField(
             "PolicyAttachments",
             AnonymousEmbeddedDictField(
