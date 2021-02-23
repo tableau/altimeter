@@ -7,7 +7,7 @@ from typing import Generator, Tuple
 from altimeter.aws.log_events import AWSLogEvents
 from altimeter.aws.scan.scan_plan import AccountScanPlan, ScanPlan
 from altimeter.aws.scan.account_scan_manifest import AccountScanManifest
-from altimeter.core.config import Config
+from altimeter.core.config import AWSConfig
 from altimeter.core.log import Logger
 
 
@@ -21,7 +21,7 @@ class AWSScanMuxer(abc.ABC):
         config: Config object
     """
 
-    def __init__(self, scan_id: str, config: Config):
+    def __init__(self, scan_id: str, config: AWSConfig):
         self.scan_id = scan_id
         self.config = config
 

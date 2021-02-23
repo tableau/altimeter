@@ -14,7 +14,7 @@ from altimeter.aws.scan.muxer.local_muxer import LocalAWSScanMuxer
 from altimeter.aws.scan.scan import run_scan
 from altimeter.core.artifact_io.reader import ArtifactReader
 from altimeter.core.artifact_io.writer import ArtifactWriter
-from altimeter.core.config import ConcurrencyConfig, Config, NeptuneConfig, ScanConfig
+from altimeter.core.config import ConcurrencyConfig, AWSConfig, NeptuneConfig, ScanConfig
 from altimeter.core.log import Logger
 from altimeter.core.log_events import LogEvent
 from altimeter.core.neptune.client import AltimeterNeptuneClient, NeptuneEndpoint
@@ -22,7 +22,7 @@ from altimeter.core.neptune.client import AltimeterNeptuneClient, NeptuneEndpoin
 logger = Logger(pretty_output=True)
 
 
-def aws2neptune_lpg(scan_id: str, config: Config, muxer: AWSScanMuxer) -> None:
+def aws2neptune_lpg(scan_id: str, config: AWSConfig, muxer: AWSScanMuxer) -> None:
     """Scan AWS resources to json, convert to RDF and load into Neptune
     if config.neptune is defined"""
 
@@ -63,7 +63,7 @@ def aws2neptune_lpg(scan_id: str, config: Config, muxer: AWSScanMuxer) -> None:
     print("Write to Amazon Neptune Complete")
 
 
-def aws2neptune_rdf(scan_id: str, config: Config, muxer: AWSScanMuxer) -> None:
+def aws2neptune_rdf(scan_id: str, config: AWSConfig, muxer: AWSScanMuxer) -> None:
     """Scan AWS resources to json, convert to RDF and load into Neptune
     if config.neptune is defined"""
 
@@ -139,7 +139,7 @@ def main(argv: Optional[List[str]] = None) -> int:
     current_account = boto3.client("sts").get_caller_identity().get("Account")
     current_region = boto3.session.Session().region_name
 
-    config = Config(
+    config = AWSConfig(
         artifact_path="./altimeter_runs",
         pruner_max_age_min=4320,
         graph_name="alti",

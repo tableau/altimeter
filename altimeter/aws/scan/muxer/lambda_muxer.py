@@ -11,7 +11,7 @@ from altimeter.aws.scan.account_scanner import AccountScanResult
 from altimeter.aws.scan.muxer import AWSScanMuxer
 from altimeter.aws.scan.scan_plan import AccountScanPlan
 from altimeter.core.base_model import BaseImmutableModel
-from altimeter.core.config import Config
+from altimeter.core.config import AWSConfig
 from altimeter.core.log import Logger
 
 
@@ -39,7 +39,7 @@ class LambdaAWSScanMuxer(AWSScanMuxer):
         scan_id: str,
         account_scan_lambda_name: str,
         account_scan_lambda_timeout: int,
-        config: Config,
+        config: AWSConfig,
     ):
         super().__init__(scan_id=scan_id, config=config)
         self.account_scan_lambda_name = account_scan_lambda_name
@@ -87,7 +87,7 @@ def invoke_lambda(
     account_id = account_scan_lambda_event.account_scan_plan.account_id
     with logger.bind(lambda_name=lambda_name, lambda_timeout=lambda_timeout, account_id=account_id):
         logger.info(event=AWSLogEvents.RunAccountScanLambdaStart)
-        boto_config = botocore.config.Config(
+        boto_config = botocore.config.AWSConfig(
             read_timeout=lambda_timeout + 10, retries={"max_attempts": 0},
         )
         session = boto3.Session()

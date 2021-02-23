@@ -11,7 +11,7 @@ from altimeter.aws.aws2n import AWS2NConfig, generate_scan_id, aws2n
 from altimeter.aws.scan.account_scanner import AccountScanner
 from altimeter.aws.scan.muxer.lambda_muxer import AccountScanLambdaEvent, LambdaAWSScanMuxer
 from altimeter.core.artifact_io.writer import ArtifactWriter
-from altimeter.core.config import Config, GraphPrunerConfig
+from altimeter.core.config import AWSConfig, GraphPrunerConfig
 from altimeter.core.pruner import prune_graph
 
 
@@ -28,7 +28,7 @@ def lambda_handler(event: Dict[str, Any], __: Any) -> Dict[str, Any]:
             root.removeHandler(handler)
     try:
         aws2n_config = AWS2NConfig()
-        config = Config.from_path(path=aws2n_config.config_path)
+        config = AWSConfig.from_path(path=aws2n_config.config_path)
         scan_id = generate_scan_id()
         muxer = LambdaAWSScanMuxer(
             scan_id=scan_id,

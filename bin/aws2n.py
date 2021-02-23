@@ -7,7 +7,7 @@ from typing import List, Optional
 
 from altimeter.aws.aws2n import generate_scan_id, aws2n
 from altimeter.aws.scan.muxer.local_muxer import LocalAWSScanMuxer
-from altimeter.core.config import Config
+from altimeter.core.config import AWSConfig
 
 
 def main(argv: Optional[List[str]] = None) -> int:
@@ -24,7 +24,7 @@ def main(argv: Optional[List[str]] = None) -> int:
         print("config must be provided as a positional arg or env var 'CONFIG_PATH'")
         return 1
 
-    config = Config.from_path(config)
+    config = AWSConfig.from_path(config)
     scan_id = generate_scan_id()
     muxer = LocalAWSScanMuxer(scan_id=scan_id, config=config)
     result = aws2n(scan_id=scan_id, config=config, muxer=muxer, load_neptune=False)

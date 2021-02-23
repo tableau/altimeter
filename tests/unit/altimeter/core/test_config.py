@@ -1,7 +1,7 @@
 from unittest import TestCase
 
 from altimeter.core.config import (
-    Config,
+    AWSConfig,
     InvalidConfigException,
     ScanConfig,
 )
@@ -45,6 +45,6 @@ class TestConfig(TestCase):
             },
             "neptune": None,
         }
-        config = Config(**config_dict)
+        config = AWSConfig(**config_dict)
         self.assertIsNone(config.neptune)
         self.assertEqual(config.pruner_max_age_min, 4320)
