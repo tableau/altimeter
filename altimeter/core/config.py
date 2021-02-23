@@ -46,17 +46,22 @@ class NeptuneConfig(BaseImmutableModel):
     auth_mode: Optional[str]
 
 
-class Config(BaseImmutableModel):
-    """Top level configuration class"""
+class BaseConfig(BaseImmutableModel):
+    """Base Config class to be overridden by non-AWS graphers"""
 
     artifact_path: str
     pruner_max_age_min: int
     graph_name: str
+    neptune: Optional[NeptuneConfig] = None
+
+
+class Config(BaseConfig):
+    """Top level configuration class"""
+
     concurrency: ConcurrencyConfig
     scan: ScanConfig
     accessor: Accessor = Field(default_factory=Accessor)
     write_master_json: bool = False
-    neptune: Optional[NeptuneConfig] = None
 
     def __init__(self, **data: Any):
         super().__init__(**data)
