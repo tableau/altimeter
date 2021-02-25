@@ -11,7 +11,7 @@ from altimeter.aws.scan.account_scanner import AccountScanResult
 from altimeter.aws.scan.muxer import AWSScanMuxer
 from altimeter.aws.scan.scan_plan import AccountScanPlan
 from altimeter.core.base_model import BaseImmutableModel
-from altimeter.core.config import Config
+from altimeter.core.config import AWSConfig
 from altimeter.core.log import Logger
 
 
@@ -39,7 +39,7 @@ class LambdaAWSScanMuxer(AWSScanMuxer):
         scan_id: str,
         account_scan_lambda_name: str,
         account_scan_lambda_timeout: int,
-        config: Config,
+        config: AWSConfig,
     ):
         super().__init__(scan_id=scan_id, config=config)
         self.account_scan_lambda_name = account_scan_lambda_name

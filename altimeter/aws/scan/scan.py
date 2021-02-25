@@ -9,7 +9,7 @@ from altimeter.aws.scan.muxer import AWSScanMuxer
 from altimeter.aws.scan.scan_manifest import ScanManifest
 from altimeter.core.artifact_io.reader import ArtifactReader
 from altimeter.core.artifact_io.writer import ArtifactWriter
-from altimeter.core.config import Config
+from altimeter.core.config import AWSConfig
 from altimeter.core.graph.graph_set import GraphSet, ValidatedGraphSet
 from altimeter.core.log import Logger
 
@@ -36,7 +36,7 @@ def get_sub_account_ids(account_ids: Tuple[str, ...], accessor: Accessor) -> Tup
 
 def run_scan(
     muxer: AWSScanMuxer,
-    config: Config,
+    config: AWSConfig,
     artifact_writer: ArtifactWriter,
     artifact_reader: ArtifactReader,
 ) -> Tuple[ScanManifest, ValidatedGraphSet]:

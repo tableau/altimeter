@@ -5,11 +5,11 @@ from altimeter.aws.scan.account_scanner import AccountScanner, AccountScanResult
 from altimeter.aws.scan.scan_plan import AccountScanPlan
 from altimeter.aws.scan.muxer import AWSScanMuxer
 from altimeter.core.artifact_io.writer import ArtifactWriter
-from altimeter.core.config import Config
+from altimeter.core.config import AWSConfig
 
 
 def local_account_scan(
-    scan_id: str, account_scan_plan: AccountScanPlan, config: Config,
+    scan_id: str, account_scan_plan: AccountScanPlan, config: AWSConfig,
 ) -> AccountScanResult:
     """Scan a set of accounts.
 

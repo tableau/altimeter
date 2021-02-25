@@ -3,7 +3,7 @@ from typing import List
 
 from pydantic import BaseModel
 
-from altimeter.core.config import Config, InvalidConfigException, GraphPrunerConfig
+from altimeter.core.config import AWSConfig, InvalidConfigException, GraphPrunerConfig
 from altimeter.core.log import Logger
 from altimeter.core.log_events import LogEvent
 from altimeter.core.neptune.client import NeptuneEndpoint, AltimeterNeptuneClient
@@ -17,7 +17,7 @@ class GraphPrunerResults(BaseModel):
 
 
 def prune_graph(graph_pruner_config: GraphPrunerConfig) -> GraphPrunerResults:
-    config = Config.from_path(path=graph_pruner_config.config_path)
+    config = AWSConfig.from_path(path=graph_pruner_config.config_path)
     if config.neptune is None:
         raise InvalidConfigException("Configuration missing neptune section.")
     now = int(datetime.now().timestamp())

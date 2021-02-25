@@ -13,7 +13,7 @@ from altimeter.aws.scan.scan import run_scan
 from altimeter.core.artifact_io import parse_s3_uri
 from altimeter.core.artifact_io.reader import ArtifactReader
 from altimeter.core.artifact_io.writer import ArtifactWriter, GZIP
-from altimeter.core.config import Config
+from altimeter.core.config import AWSConfig
 from altimeter.core.log import Logger
 from altimeter.core.log_events import LogEvent
 
@@ -42,7 +42,7 @@ def generate_scan_id() -> str:
     return scan_id
 
 
-def aws2n(scan_id: str, config: Config, muxer: AWSScanMuxer, load_neptune: bool) -> AWS2NResult:
+def aws2n(scan_id: str, config: AWSConfig, muxer: AWSScanMuxer, load_neptune: bool) -> AWS2NResult:
     """Scan AWS resources to json, convert to RDF and load into Neptune
     if config.neptune is defined"""
     artifact_reader = ArtifactReader.from_artifact_path(config.artifact_path)

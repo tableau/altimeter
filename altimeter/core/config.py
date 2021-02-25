@@ -1,6 +1,6 @@
 """Configuration classes"""
 from pathlib import Path
-from typing import Any, Optional, Type, Tuple
+from typing import Any, Optional, Type, Tuple, TypeVar
 
 import boto3
 from pydantic import Field, BaseSettings
@@ -46,38 +46,31 @@ class NeptuneConfig(BaseImmutableModel):
     auth_mode: Optional[str]
 
 
+GenericConfig = TypeVar("GenericConfig", bound="Config")
+
+
 class Config(BaseImmutableModel):
-    """Top level configuration class"""
+    """Config class to be overridden by graphers"""
 
     artifact_path: str
     pruner_max_age_min: int
     graph_name: str
-    concurrency: ConcurrencyConfig
-    scan: ScanConfig
-    accessor: Accessor = Field(default_factory=Accessor)
-    write_master_json: bool = False
     neptune: Optional[NeptuneConfig] = None
 
     def __init__(self, **data: Any):
         super().__init__(**data)
-        if (
-            not self.scan.accounts
-            and not self.scan.scan_sub_accounts
-            and self.accessor.multi_hop_accessors
-        ):
-            raise InvalidConfigException("Accessor config not supported for single account mode")
         if is_s3_uri(self.artifact_path):
             parse_s3_uri(self.artifact_path)
 
     @classmethod
-    def from_path(cls: Type["Config"], path: str) -> "Config":
-        """Load a Config from an s3 uri or a  file"""
+    def from_path(cls: Type[GenericConfig], path: str) -> GenericConfig:
+        """Load a Config from an s3 uri or a file"""
         if is_s3_uri(path):
             return cls.from_s3(s3_uri=path)
         return cls.from_file(filepath=Path(path))
 
     @classmethod
-    def from_file(cls: Type["Config"], filepath: Path) -> "Config":
+    def from_file(cls: Type[GenericConfig], filepath: Path) -> GenericConfig:
         """Load a Config from a file"""
         with open(filepath, "r") as fp:
             config_str = fp.read()
@@ -88,7 +81,7 @@ class Config(BaseImmutableModel):
             raise InvalidConfigException(f"Error in conf file {filepath}: {str(ice)}") from ice
 
     @classmethod
-    def from_s3(cls: Type["Config"], s3_uri: str) -> "Config":
+    def from_s3(cls: Type[GenericConfig], s3_uri: str) -> GenericConfig:
         """Load a Config from an s3 object"""
         bucket, key = parse_s3_uri(s3_uri)
         s3_client = boto3.client("s3")
@@ -99,6 +92,24 @@ class Config(BaseImmutableModel):
             return cls(**config_dict)
         except InvalidConfigException as ice:
             raise InvalidConfigException(f"Error in conf file {s3_uri}: {str(ice)}") from ice
+
+
+class AWSConfig(Config):
+    """Top level configuration class"""
+
+    concurrency: ConcurrencyConfig
+    scan: ScanConfig
+    accessor: Accessor = Field(default_factory=Accessor)
+    write_master_json: bool = False
+
+    def __init__(self, **data: Any):
+        super().__init__(**data)
+        if (
+            not self.scan.accounts
+            and not self.scan.scan_sub_accounts
+            and self.accessor.multi_hop_accessors
+        ):
+            raise InvalidConfigException("Accessor config not supported for single account mode")
 
 
 class GraphPrunerConfig(BaseSettings):
