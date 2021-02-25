@@ -57,6 +57,13 @@ class Config(BaseImmutableModel):
     graph_name: str
     neptune: Optional[NeptuneConfig] = None
 
+    class Config:
+        """Pydantic config"""
+
+        allow_mutation = False
+        extra = "ignore"
+        arbitrary_types_allowed = True
+
     def __init__(self, **data: Any):
         super().__init__(**data)
         if is_s3_uri(self.artifact_path):
