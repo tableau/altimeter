@@ -7,3 +7,4 @@ class GuardDutyResourceSpec(AWSResourceSpec):
     """Base class for GuardDuty resources."""
 
     service_name = "guardduty"
+    region_blacklist = ("ap-northeast-3",)

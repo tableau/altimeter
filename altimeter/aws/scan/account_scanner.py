@@ -153,6 +153,12 @@ class AccountScanner:
                                 )
                                 if not resource_scan_regions:
                                     resource_scan_regions = resource_spec_class.region_whitelist
+                            elif resource_spec_class.region_blacklist:
+                                resource_scan_regions = tuple(
+                                    region
+                                    for region in scan_regions
+                                    if region not in resource_spec_class.region_blacklist
+                                )
                             else:
                                 resource_scan_regions = scan_regions
                             for region in resource_scan_regions:
