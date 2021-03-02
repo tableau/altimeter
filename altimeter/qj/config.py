@@ -24,6 +24,13 @@ class QJConfig(BaseSettings):
 
 
 # pylint: disable=too-few-public-methods
+class QJHandlerConfig(BaseSettings):
+    """Lambda handler configuration"""
+
+    mode: str
+
+
+# pylint: disable=too-few-public-methods
 class SecurityConfig(BaseSettings):
     """Security related configuration"""
 
