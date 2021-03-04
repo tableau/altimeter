@@ -58,7 +58,6 @@ class TestLambdaFunctionResourceSpec(TestCase):
             KMSKeyArn="test_kms_arn",
             TracingConfig={"Mode": "Active"},
             Tags={"tagkey1": "tagval1", "tagkey2": "tagval2"},
-            Layers=["test_layer1"],
         )
 
         scan_accessor = AWSAccessor(session=session, account_id=account_id, region_name=region_name)
