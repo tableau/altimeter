@@ -10,7 +10,7 @@ import boto3
 from altimeter.aws.resource.resource_spec import AWSResourceSpec
 from altimeter.core.json_encoder import json_encoder
 from altimeter.aws.scan.aws_accessor import AWSAccessor
-from altimeter.aws.scan.settings import RESOURCE_SPEC_CLASSES
+from altimeter.aws.scan.settings import DEFAULT_RESOURCE_SPEC_CLASSES
 
 
 def main(argv: Optional[List[str]] = None) -> int:
@@ -31,7 +31,7 @@ def main(argv: Optional[List[str]] = None) -> int:
     region = args_ns.region
 
     resource_spec_class: Optional[Type[AWSResourceSpec]] = None
-    for cls in RESOURCE_SPEC_CLASSES:
+    for cls in DEFAULT_RESOURCE_SPEC_CLASSES:
         if cls.__name__ == resource_spec_class_name:
             resource_spec_class = cls
             break
@@ -39,7 +39,7 @@ def main(argv: Optional[List[str]] = None) -> int:
         print(
             (
                 f"Unable to find a class named {resource_spec_class_name} in "
-                f"altimeter.aws.scan.settings.RESOURCE_SPEC_CLASSES: {RESOURCE_SPEC_CLASSES}."
+                f"altimeter.aws.scan.settings.RESOURCE_SPEC_CLASSES: {DEFAULT_RESOURCE_SPEC_CLASSES}."
             )
         )
         return 1

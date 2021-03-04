@@ -16,7 +16,7 @@ from altimeter.aws.resource.unscanned_account import UnscannedAccountResourceSpe
 from altimeter.aws.scan.scan_plan import AccountScanPlan
 from altimeter.aws.scan.aws_accessor import AWSAccessor
 from altimeter.aws.scan.settings import (
-    RESOURCE_SPEC_CLASSES,
+    DEFAULT_RESOURCE_SPEC_CLASSES,
     INFRA_RESOURCE_SPEC_CLASSES,
     ORG_RESOURCE_SPEC_CLASSES,
 )
@@ -93,6 +93,7 @@ class AccountScanner:
         scan_sub_accounts: bool,
         graph_name: str = GRAPH_NAME,
         graph_version: str = GRAPH_VERSION,
+        resource_spec_classes: Tuple[Type[AWSResourceSpec], ...] = DEFAULT_RESOURCE_SPEC_CLASSES,
     ) -> None:
         self.account_scan_plan = account_scan_plan
         self.artifact_writer = artifact_writer
@@ -100,7 +101,7 @@ class AccountScanner:
         self.graph_version = graph_version
         self.max_threads = max_svc_scan_threads
         self.preferred_account_scan_regions = preferred_account_scan_regions
-        self.resource_spec_classes = RESOURCE_SPEC_CLASSES + INFRA_RESOURCE_SPEC_CLASSES
+        self.resource_spec_classes = resource_spec_classes + INFRA_RESOURCE_SPEC_CLASSES
         if scan_sub_accounts:
             self.resource_spec_classes += ORG_RESOURCE_SPEC_CLASSES
 
