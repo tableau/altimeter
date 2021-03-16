@@ -31,7 +31,11 @@ def query(event: Dict[str, Any]) -> None:
     logger.info(event=QJLogEvents.InitJob, job=job)
 
     logger.info(event=QJLogEvents.RunQueryStart)
-    query_result = run_query(job=job, config=query_config)
+    try:
+        query_result = run_query(job=job, config=query_config)
+    except Exception as ex:
+        logger.error(event=QJLogEvents.RunQueryError, msg=str(ex)[:8192])
+        raise ex
     logger.info(event=QJLogEvents.RunQueryEnd, num_results=query_result.get_length())
 
     results: List[schemas.Result] = []

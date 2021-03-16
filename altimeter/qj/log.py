@@ -31,6 +31,7 @@ class QJLogEvents(BaseLogEvent):
     InitJob: EventName
     RunQueryStart: EventName
     RunQueryEnd: EventName
+    RunQueryError: EventName
     CreateResultSetStart: EventName
     CreateResultSetEnd: EventName
 
