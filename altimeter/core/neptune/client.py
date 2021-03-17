@@ -3,6 +3,7 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta
 import hashlib
 import hmac
+import json
 import time
 from typing import Dict, List, Optional, Set, Tuple
 from urllib import parse
@@ -560,10 +561,20 @@ class AltimeterNeptuneClient:
         """
         neptune_sparql_url = self._neptune_endpoint.get_sparql_endpoint()
         auth = self._get_auth()
-        resp = requests.post(neptune_sparql_url, data={"query": query}, auth=auth)
+        resp = requests.post(
+            neptune_sparql_url, headers={"te": "trailers"}, data={"query": query}, auth=auth
+        )
         if resp.status_code != 200:
             raise NeptuneQueryException(f"Error running query {query}: {resp.text}")
-        return QueryResultSet.from_sparql_endpoint_json(resp.json())
+        try:
+            results_json = resp.json()
+        except json.decoder.JSONDecodeError as jde:
+            neptune_status = resp.headers.get("X-Neptune-Status", "unknown")
+            neptune_detail = resp.headers.get("X-Neptune-Detail", "unknown")
+            raise NeptuneQueryException(
+                f"Error running query {query}: {neptune_status}: {neptune_detail}"
+            ) from jde
+        return QueryResultSet.from_sparql_endpoint_json(results_json)
 
     @staticmethod
     def __normalize_query_string(query: str) -> str:
