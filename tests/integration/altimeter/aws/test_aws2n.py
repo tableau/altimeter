@@ -13,21 +13,18 @@ from altimeter.aws.auth.accessor import Accessor
 from altimeter.aws.auth.cache import AWSCredentialsCache
 from altimeter.aws.aws2n import aws2n
 from altimeter.aws.resource.awslambda.function import LambdaFunctionResourceSpec
-
-# TODO moto
-# from altimeter.aws.resource.dynamodb.dynamodb_table import DynamoDbTableResourceSpec
+# from altimeter.aws.resource.dynamodb.dynamodb_table import DynamoDbTableResourceSpec # TODO moto
 from altimeter.aws.resource.ec2.flow_log import FlowLogResourceSpec
 from altimeter.aws.resource.ec2.instance import EC2InstanceResourceSpec
 from altimeter.aws.resource.ec2.volume import EBSVolumeResourceSpec
 from altimeter.aws.resource.ec2.subnet import SubnetResourceSpec
 from altimeter.aws.resource.ec2.vpc import VPCResourceSpec
 from altimeter.aws.resource.iam.policy import IAMPolicyResourceSpec
-
-# https://github.com/spulec/moto/pull/3750
-# from altimeter.aws.resource.iam.role import IAMRoleResourceSpec
+from altimeter.aws.resource.iam.role import IAMRoleResourceSpec
 from altimeter.aws.resource.s3.bucket import S3BucketResourceSpec
 from altimeter.aws.scan.muxer.local_muxer import LocalAWSScanMuxer
 from altimeter.core.config import AWSConfig, ConcurrencyConfig, ScanConfig
+from altimeter.core.graph.graph_set import GraphSet
 
 
 class TestAWS2NSingleAccount(unittest.TestCase):
@@ -40,12 +37,12 @@ class TestAWS2NSingleAccount(unittest.TestCase):
     def test(self):
         with tempfile.TemporaryDirectory() as temp_dir:
             # TODO FIXME
-            # LEFT OFF - I don't think there's a good way to do what we really want to do. OTOH this
-            # test would be valuable in the future for any refactoring of core code. let's expand
+            # LEFT OFF - I don"t think there"s a good way to do what we really want to do. OTOH this
+            # test would be valuable in the future for any refactoring of core code. let"s expand
             # it to as many things as we can and run with it.
             # TODO FIXME
             region_name = "us-east-1"
-            # get moto's enabled regions
+            # get moto"s enabled regions
             ec2_client = boto3.client("ec2", region_name=region_name)
             regions_resp = ec2_client.describe_regions(
                 Filters=[{"Name": "opt-in-status", "Values": ["opt-in-not-required", "opted-in"]}]
@@ -79,7 +76,6 @@ class TestAWS2NSingleAccount(unittest.TestCase):
             instance_1_arn = create_instance(
                 ami_id=ami_id, subnet_id=subnet_1_id, region_name=region_name
             )
-            # TODO LEFT OFF HERE
             ## iam
             policy_1_arn = create_iam_policy(
                 name="test_policy_1",
@@ -92,7 +88,17 @@ class TestAWS2NSingleAccount(unittest.TestCase):
             )
             role_1_arn = create_iam_role(
                 name="test_role_1",
-                assume_role_policy_doc={},
+                assume_role_policy_doc={
+                    "Version": "2012-10-17",
+                    "Statement": [
+                        {
+                            "Sid": "",
+                            "Effect": "Allow",
+                            "Principal": {"Service": "lambda.amazonaws.com"},
+                            "Action": "sts:AssumeRole",
+                        }
+                    ],
+                },
                 description="Test Role 1",
                 max_session_duration=3600,
             )
@@ -141,7 +147,7 @@ class TestAWS2NSingleAccount(unittest.TestCase):
                 EC2InstanceResourceSpec,
                 FlowLogResourceSpec,
                 IAMPolicyResourceSpec,
-                # IAMRoleResourceSpec, https://github.com/spulec/moto/pull/3750
+                IAMRoleResourceSpec,
                 LambdaFunctionResourceSpec,
                 S3BucketResourceSpec,
                 SubnetResourceSpec,
@@ -159,25 +165,36 @@ class TestAWS2NSingleAccount(unittest.TestCase):
                 aws2n_result = aws2n(
                     scan_id=test_scan_id, config=aws_config, muxer=muxer, load_neptune=False,
                 )
-                with open(aws2n_result.json_path, "r") as fp:
-                    json_out = json.load(fp)
-                    print("*" * 80)
-                    print(json.dumps(json_out, indent=2))
-                    print("*" * 80)
+                print('-'*80)
+                print(type(aws2n_result.json_path), aws2n_result.json_path)
+                print('-'*80)
+                from pathlib import Path
+                graph_set = GraphSet.from_json_file(Path(aws2n_result.json_path))
+                print(graph_set)
+#                with open(aws2n_result.json_path, "r") as fp:
+#                    graph_set = GraphSet.from_json_file(fp)
+#                    print("*" * 80)
+#                    print(graph_set)
+#                    print("*" * 80)
                 raise NotImplementedError
 
 
 # helpers
 
 
-def delete_vpcs(enabled_regions: Iterable[str]) -> None:
-    for enabled_region_name in enabled_regions:
-        regional_ec2_client = boto3.client("ec2", region_name=enabled_region_name)
+def delete_vpcs(region_names: Iterable[str]) -> None:
+    for region_name in region_names:
+        regional_ec2_client = boto3.client("ec2", region_name=region_name)
         vpcs_resp = regional_ec2_client.describe_vpcs()
         vpcs = vpcs_resp.get("Vpcs", [])
         for vpc in vpcs:
             vpc_id = vpc["VpcId"]
-            print("**", vpc_id, regional_ec2_client.delete_vpc(VpcId=vpc_id))
+            subnets_resp = regional_ec2_client.describe_subnets(
+                Filters=[{"Name": "vpc-id", "Values": [vpc_id,]},],
+            )
+            for subnet in subnets_resp["Subnets"]:
+                subnet_id = subnet["SubnetId"]
+                regional_ec2_client.delete_subnet(SubnetId=subnet_id)
 
 
 ## resource builders
