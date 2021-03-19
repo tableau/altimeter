@@ -29,7 +29,7 @@ setup(
             "alembic==1.4.2",
             "fastapi>=0.60.1,<1",
             "psycopg2-binary>=2.8.5,<3",
-            "sqlalchemy>=1.3.16,<2",
+            "sqlalchemy>=1.3.16,<1.4",
             "uvicorn>=0.11.5,<2",
         ],
         "hyper": [
