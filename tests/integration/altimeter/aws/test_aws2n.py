@@ -1,7 +1,10 @@
+import datetime
 import io
+import ipaddress
 import json
+from pathlib import Path
 import tempfile
-from typing import Any, Dict, Iterable
+from typing import Any, Dict, Iterable, Tuple
 import unittest
 import unittest.mock
 import zipfile
@@ -13,9 +16,11 @@ from altimeter.aws.auth.accessor import Accessor
 from altimeter.aws.auth.cache import AWSCredentialsCache
 from altimeter.aws.aws2n import aws2n
 from altimeter.aws.resource.awslambda.function import LambdaFunctionResourceSpec
+from altimeter.aws.resource.util import policy_doc_dict_to_sorted_str
+
 # from altimeter.aws.resource.dynamodb.dynamodb_table import DynamoDbTableResourceSpec # TODO moto
 from altimeter.aws.resource.ec2.flow_log import FlowLogResourceSpec
-from altimeter.aws.resource.ec2.instance import EC2InstanceResourceSpec
+from altimeter.aws.resource.ec2.image import EC2ImageResourceSpec
 from altimeter.aws.resource.ec2.volume import EBSVolumeResourceSpec
 from altimeter.aws.resource.ec2.subnet import SubnetResourceSpec
 from altimeter.aws.resource.ec2.vpc import VPCResourceSpec
@@ -25,6 +30,14 @@ from altimeter.aws.resource.s3.bucket import S3BucketResourceSpec
 from altimeter.aws.scan.muxer.local_muxer import LocalAWSScanMuxer
 from altimeter.core.config import AWSConfig, ConcurrencyConfig, ScanConfig
 from altimeter.core.graph.graph_set import GraphSet
+from altimeter.core.graph.links import (
+    LinkCollection,
+    ResourceLink,
+    SimpleLink,
+    MultiLink,
+    TransientResourceLink,
+)
+from altimeter.core.resource.resource import Resource
 
 
 class TestAWS2NSingleAccount(unittest.TestCase):
@@ -36,19 +49,20 @@ class TestAWS2NSingleAccount(unittest.TestCase):
     @moto.mock_sts
     def test(self):
         with tempfile.TemporaryDirectory() as temp_dir:
-            # TODO FIXME
-            # LEFT OFF - I don"t think there"s a good way to do what we really want to do. OTOH this
-            # test would be valuable in the future for any refactoring of core code. let"s expand
-            # it to as many things as we can and run with it.
-            # TODO FIXME
-            region_name = "us-east-1"
+            resource_region_name = "us-east-1"
             # get moto"s enabled regions
-            ec2_client = boto3.client("ec2", region_name=region_name)
-            regions_resp = ec2_client.describe_regions(
+            ec2_client = boto3.client("ec2", region_name=resource_region_name)
+            all_regions = ec2_client.describe_regions(
                 Filters=[{"Name": "opt-in-status", "Values": ["opt-in-not-required", "opted-in"]}]
+            )["Regions"]
+            account_id = get_account_id()
+            all_region_names = tuple(region["RegionName"] for region in all_regions)
+            enabled_region_names = tuple(
+                region["RegionName"]
+                for region in all_regions
+                if region["OptInStatus"] != "not-opted-in"
             )
-            enabled_regions = tuple(region["RegionName"] for region in regions_resp["Regions"])
-            delete_vpcs(enabled_regions)
+            delete_vpcs(all_region_names)
             # add a diverse set of resources which are supported by moto
             ## dynamodb
             # TODO moto is not returning TableId in list/describe
@@ -60,25 +74,46 @@ class TestAWS2NSingleAccount(unittest.TestCase):
             #                region_name=region_name,
             #            )
             ## s3
-            bucket_1_arn = create_bucket(name="test_bucket")
+            bucket_1_name = "test_bucket"
+            bucket_1_arn, bucket_1_creation_date = create_bucket(
+                name=bucket_1_name, account_id=account_id, region_name=resource_region_name
+            )
             ## ec2
-            vpc_1_id = create_vpc(cidr_block="10.0.0.0/16", region_name=region_name)
+            vpc_1_cidr = "10.0.0.0/16"
+            vpc_1_id = create_vpc(cidr_block=vpc_1_cidr, region_name=resource_region_name)
+            vpc_1_arn = VPCResourceSpec.generate_arn(
+                resource_id=vpc_1_id, account_id=account_id, region=resource_region_name
+            )
+            subnet_1_cidr = "10.0.0.0/24"
+            subnet_1_cidr_network = ipaddress.IPv4Network(subnet_1_cidr, strict=False)
+            subnet_1_first_ip, subnet_1_last_ip = (
+                int(subnet_1_cidr_network[0]),
+                int(subnet_1_cidr_network[-1]),
+            )
             subnet_1_id = create_subnet(
-                cidr_block="10.0.0.0/24", vpc_id=vpc_1_id, region_name=region_name
+                cidr_block=subnet_1_cidr, vpc_id=vpc_1_id, region_name=resource_region_name
             )
-            flow_log_1_id = create_flow_log(
-                vpc_id=vpc_1_id, dest_bucket_arn=bucket_1_arn, region_name=region_name
+            subnet_1_arn = SubnetResourceSpec.generate_arn(
+                resource_id=subnet_1_id, account_id=account_id, region=resource_region_name
             )
-            ebs_volume_1_arn = create_volume(
-                size=100, az=f"{region_name}a", region_name=region_name
+            fixed_bucket_1_arn = f"arn:aws:s3:::{bucket_1_name}"
+            flow_log_1_id, flow_log_1_creation_time = create_flow_log(
+                vpc_id=vpc_1_id,
+                dest_bucket_arn=fixed_bucket_1_arn,
+                region_name=resource_region_name,
             )
-            ami_id = get_ami_id(region_name=region_name)
-            instance_1_arn = create_instance(
-                ami_id=ami_id, subnet_id=subnet_1_id, region_name=region_name
+            flow_log_1_arn = FlowLogResourceSpec.generate_arn(
+                resource_id=flow_log_1_id, account_id=account_id, region=resource_region_name
+            )
+            ebs_volume_1_size = 128
+            ebs_volume_1_az = f"{resource_region_name}a"
+            ebs_volume_1_arn, ebs_volume_1_create_time = create_volume(
+                size=ebs_volume_1_size, az=ebs_volume_1_az, region_name=resource_region_name
             )
             ## iam
-            policy_1_arn = create_iam_policy(
-                name="test_policy_1",
+            policy_1_name = "test_policy_1"
+            policy_1_arn, policy_1_id = create_iam_policy(
+                name=policy_1_name,
                 policy_doc={
                     "Version": "2012-10-17",
                     "Statement": [
@@ -86,40 +121,50 @@ class TestAWS2NSingleAccount(unittest.TestCase):
                     ],
                 },
             )
+            role_1_name = "test_role_1"
+            role_1_assume_role_policy_doc = {
+                "Version": "2012-10-17",
+                "Statement": [
+                    {
+                        "Action": "sts:AssumeRole",
+                        "Effect": "Allow",
+                        "Principal": {"Service": "lambda.amazonaws.com"},
+                        "Sid": "",
+                    }
+                ],
+            }
+            role_1_description = "Test Role 1"
+            role_1_max_session_duration = 3600
             role_1_arn = create_iam_role(
-                name="test_role_1",
-                assume_role_policy_doc={
-                    "Version": "2012-10-17",
-                    "Statement": [
-                        {
-                            "Sid": "",
-                            "Effect": "Allow",
-                            "Principal": {"Service": "lambda.amazonaws.com"},
-                            "Action": "sts:AssumeRole",
-                        }
-                    ],
-                },
-                description="Test Role 1",
-                max_session_duration=3600,
+                name=role_1_name,
+                assume_role_policy_doc=role_1_assume_role_policy_doc,
+                description=role_1_description,
+                max_session_duration=role_1_max_session_duration,
             )
             ## lambda
-            lambda_1_arn = create_lambda_function(
-                name="test_lambda_function_1",
-                runtime="python3.7",
+            lambda_function_1_name = "test_lambda_function_1"
+            lambda_function_1_runtime = "python3.7"
+            lambda_function_1_handler = "lambda_function.lambda_handler"
+            lambda_function_1_description = "Test Lambda Function 1"
+            lambda_function_1_timeout = 30
+            lambda_function_1_memory_size = 256
+            lambda_function_1_arn = create_lambda_function(
+                name=lambda_function_1_name,
+                runtime=lambda_function_1_runtime,
                 role_name=role_1_arn,
-                handler="lambda_function.lambda_handler",
-                description="Test Lambda Function 1",
-                timeout=30,
-                memory_size=256,
+                handler=lambda_function_1_handler,
+                description=lambda_function_1_description,
+                timeout=lambda_function_1_timeout,
+                memory_size=lambda_function_1_memory_size,
                 publish=False,
-                region_name=region_name,
+                region_name=resource_region_name,
             )
+            # scan
             test_scan_id = "test_scan_id"
             aws_config = AWSConfig(
                 artifact_path=temp_dir,
                 pruner_max_age_min=4320,
                 graph_name="alti",
-                neptune=None,
                 concurrency=ConcurrencyConfig(
                     max_account_scan_threads=1, max_svc_scan_threads=1, max_account_scan_tries=2
                 ),
@@ -144,7 +189,6 @@ class TestAWS2NSingleAccount(unittest.TestCase):
             resource_spec_classes = (
                 # DynamoDbTableResourceSpec, TODO moto
                 EBSVolumeResourceSpec,
-                EC2InstanceResourceSpec,
                 FlowLogResourceSpec,
                 IAMPolicyResourceSpec,
                 IAMRoleResourceSpec,
@@ -161,22 +205,355 @@ class TestAWS2NSingleAccount(unittest.TestCase):
             with unittest.mock.patch(
                 "altimeter.aws.scan.account_scanner.get_all_enabled_regions"
             ) as mock_get_all_enabled_regions:
-                mock_get_all_enabled_regions.return_value = enabled_regions
+                mock_get_all_enabled_regions.return_value = enabled_region_names
                 aws2n_result = aws2n(
                     scan_id=test_scan_id, config=aws_config, muxer=muxer, load_neptune=False,
                 )
-                print('-'*80)
-                print(type(aws2n_result.json_path), aws2n_result.json_path)
-                print('-'*80)
-                from pathlib import Path
                 graph_set = GraphSet.from_json_file(Path(aws2n_result.json_path))
-                print(graph_set)
-#                with open(aws2n_result.json_path, "r") as fp:
-#                    graph_set = GraphSet.from_json_file(fp)
-#                    print("*" * 80)
-#                    print(graph_set)
-#                    print("*" * 80)
-                raise NotImplementedError
+                self.assertEqual(len(graph_set.errors), 0)
+                self.assertEqual(graph_set.name, "alti")
+                self.assertEqual(graph_set.version, "2")
+                # now check each resource type
+                self.maxDiff = None
+                ## Accounts
+                expected_account_resources = [
+                    Resource(
+                        resource_id=f"arn:aws::::account/{account_id}",
+                        type="aws:account",
+                        link_collection=LinkCollection(
+                            simple_links=(SimpleLink(pred="account_id", obj=account_id),),
+                        ),
+                    )
+                ]
+                account_resources = [
+                    resource for resource in graph_set.resources if resource.type == "aws:account"
+                ]
+                self.assertCountEqual(account_resources, expected_account_resources)
+                ## Regions
+                expected_region_resources = [
+                    Resource(
+                        resource_id=f"arn:aws:::{account_id}:region/{region['RegionName']}",
+                        type="aws:region",
+                        link_collection=LinkCollection(
+                            simple_links=(
+                                SimpleLink(pred="name", obj=region["RegionName"]),
+                                SimpleLink(pred="opt_in_status", obj=region["OptInStatus"]),
+                            ),
+                            resource_links=(
+                                ResourceLink(
+                                    pred="account", obj=f"arn:aws::::account/{account_id}"
+                                ),
+                            ),
+                        ),
+                    )
+                    for region in all_regions
+                ]
+                region_resources = [
+                    resource for resource in graph_set.resources if resource.type == "aws:region"
+                ]
+                self.assertCountEqual(region_resources, expected_region_resources)
+                ## IAM Policies
+                expected_iam_policy_resources = [
+                    Resource(
+                        resource_id=policy_1_arn,
+                        type="aws:iam:policy",
+                        link_collection=LinkCollection(
+                            simple_links=(
+                                SimpleLink(pred="name", obj=policy_1_name),
+                                SimpleLink(pred="policy_id", obj=policy_1_id),
+                                SimpleLink(pred="default_version_id", obj="v1"),
+                                SimpleLink(
+                                    pred="default_version_policy_document_text",
+                                    obj='{"Statement": [{"Action": "logs:CreateLogGroup", "Effect": "Allow", "Resource": "*"}], "Version": "2012-10-17"}',
+                                ),
+                            ),
+                            resource_links=(
+                                ResourceLink(
+                                    pred="account", obj=f"arn:aws::::account/{account_id}"
+                                ),
+                            ),
+                        ),
+                    )
+                ]
+                iam_policy_resources = [
+                    resource
+                    for resource in graph_set.resources
+                    if resource.type == "aws:iam:policy"
+                ]
+                self.assertCountEqual(iam_policy_resources, expected_iam_policy_resources)
+                ## IAM Roles
+                expected_iam_role_resources = [
+                    Resource(
+                        resource_id=role_1_arn,
+                        type="aws:iam:role",
+                        link_collection=LinkCollection(
+                            simple_links=(
+                                SimpleLink(pred="name", obj=role_1_name),
+                                SimpleLink(
+                                    pred="max_session_duration", obj=role_1_max_session_duration
+                                ),
+                                SimpleLink(pred="description", obj=role_1_description),
+                                SimpleLink(
+                                    pred="assume_role_policy_document_text",
+                                    obj=policy_doc_dict_to_sorted_str(
+                                        role_1_assume_role_policy_doc
+                                    ),
+                                ),
+                            ),
+                            multi_links=(
+                                MultiLink(
+                                    pred="assume_role_policy_document",
+                                    obj=LinkCollection(
+                                        simple_links=(
+                                            SimpleLink(pred="version", obj="2012-10-17"),
+                                        ),
+                                        multi_links=(
+                                            MultiLink(
+                                                pred="statement",
+                                                obj=LinkCollection(
+                                                    simple_links=(
+                                                        SimpleLink(pred="effect", obj="Allow"),
+                                                        SimpleLink(
+                                                            pred="action", obj="sts:AssumeRole"
+                                                        ),
+                                                    ),
+                                                    multi_links=(
+                                                        MultiLink(
+                                                            pred="principal", obj=LinkCollection(),
+                                                        ),
+                                                    ),
+                                                ),
+                                            ),
+                                        ),
+                                    ),
+                                ),
+                            ),
+                            resource_links=(
+                                ResourceLink(pred="account", obj="arn:aws::::account/123456789012"),
+                            ),
+                        ),
+                    )
+                ]
+                iam_role_resources = [
+                    resource for resource in graph_set.resources if resource.type == "aws:iam:role"
+                ]
+                self.assertCountEqual(iam_role_resources, expected_iam_role_resources)
+
+                ## Lambda functions
+                expected_lambda_function_resources = [
+                    Resource(
+                        resource_id=lambda_function_1_arn,
+                        type="aws:lambda:function",
+                        link_collection=LinkCollection(
+                            simple_links=(
+                                SimpleLink(pred="function_name", obj=lambda_function_1_name),
+                                SimpleLink(pred="runtime", obj=lambda_function_1_runtime),
+                            ),
+                            resource_links=(
+                                ResourceLink(
+                                    pred="account", obj=f"arn:aws::::account/{account_id}"
+                                ),
+                                ResourceLink(
+                                    pred="region",
+                                    obj=f"arn:aws:::{account_id}:region/{resource_region_name}",
+                                ),
+                            ),
+                        ),
+                    ),
+                ]
+                lambda_function_resources = [
+                    resource
+                    for resource in graph_set.resources
+                    if resource.type == "aws:lambda:function"
+                ]
+                self.assertCountEqual(lambda_function_resources, expected_lambda_function_resources)
+                ## EC2 VPCs
+                expected_ec2_vpc_resources = [
+                    Resource(
+                        resource_id=vpc_1_arn,
+                        type="aws:ec2:vpc",
+                        link_collection=LinkCollection(
+                            simple_links=(
+                                SimpleLink(pred="is_default", obj=True),
+                                SimpleLink(pred="cidr_block", obj=vpc_1_cidr),
+                                SimpleLink(pred="state", obj="available"),
+                            ),
+                            resource_links=(
+                                ResourceLink(
+                                    pred="account", obj=f"arn:aws::::account/{account_id}"
+                                ),
+                                ResourceLink(
+                                    pred="region",
+                                    obj=f"arn:aws:::{account_id}:region/{resource_region_name}",
+                                ),
+                            ),
+                        ),
+                    )
+                ]
+                ec2_vpc_resources = [
+                    resource for resource in graph_set.resources if resource.type == "aws:ec2:vpc"
+                ]
+                self.assertCountEqual(ec2_vpc_resources, expected_ec2_vpc_resources)
+                ## EC2 VPC Flow Logs
+                expected_ec2_vpc_flow_log_resources = [
+                    Resource(
+                        resource_id=flow_log_1_arn,
+                        type="aws:ec2:flow-log",
+                        link_collection=LinkCollection(
+                            simple_links=(
+                                SimpleLink(
+                                    pred="creation_time",
+                                    obj=flow_log_1_creation_time.replace(
+                                        tzinfo=datetime.timezone.utc
+                                    ).isoformat(),
+                                ),
+                                SimpleLink(pred="deliver_logs_status", obj="SUCCESS"),
+                                SimpleLink(pred="flow_log_status", obj="ACTIVE"),
+                                SimpleLink(pred="traffic_type", obj="ALL"),
+                                SimpleLink(pred="log_destination_type", obj="s3"),
+                                SimpleLink(pred="log_destination", obj=fixed_bucket_1_arn),
+                                SimpleLink(
+                                    pred="log_format",
+                                    obj="${version} ${account-id} ${interface-id} ${srcaddr} ${dstaddr} ${srcport} ${dstport} ${protocol} ${packets} ${bytes} ${start} ${end} ${action} ${log-status}",
+                                ),
+                            ),
+                            resource_links=(
+                                ResourceLink(
+                                    pred="account", obj=f"arn:aws::::account/{account_id}"
+                                ),
+                                ResourceLink(
+                                    pred="region",
+                                    obj=f"arn:aws:::{account_id}:region/{resource_region_name}",
+                                ),
+                            ),
+                            transient_resource_links=(
+                                TransientResourceLink(pred="vpc", obj=vpc_1_arn,),
+                            ),
+                        ),
+                    )
+                ]
+                ec2_vpc_flow_log_resources = [
+                    resource
+                    for resource in graph_set.resources
+                    if resource.type == "aws:ec2:flow-log"
+                ]
+                self.assertCountEqual(
+                    ec2_vpc_flow_log_resources, expected_ec2_vpc_flow_log_resources
+                )
+                ## EC2 Subnets
+                expected_ec2_subnet_resources = [
+                    Resource(
+                        resource_id=subnet_1_arn,
+                        type="aws:ec2:subnet",
+                        link_collection=LinkCollection(
+                            simple_links=(
+                                SimpleLink(pred="cidr_block", obj=subnet_1_cidr),
+                                SimpleLink(pred="first_ip", obj=subnet_1_first_ip),
+                                SimpleLink(pred="last_ip", obj=subnet_1_last_ip),
+                                SimpleLink(pred="state", obj="available"),
+                            ),
+                            resource_links=(
+                                ResourceLink(pred="vpc", obj=vpc_1_arn),
+                                ResourceLink(
+                                    pred="account", obj=f"arn:aws::::account/{account_id}"
+                                ),
+                                ResourceLink(
+                                    pred="region",
+                                    obj=f"arn:aws:::{account_id}:region/{resource_region_name}",
+                                ),
+                            ),
+                        ),
+                    )
+                ]
+                ec2_subnet_resources = [
+                    resource
+                    for resource in graph_set.resources
+                    if resource.type == "aws:ec2:subnet"
+                ]
+                self.assertCountEqual(ec2_subnet_resources, expected_ec2_subnet_resources)
+                ## EC2 EBS Volumes
+                expected_ec2_ebs_volume_resources = [
+                    Resource(
+                        resource_id=ebs_volume_1_arn,
+                        type="aws:ec2:volume",
+                        link_collection=LinkCollection(
+                            simple_links=(
+                                SimpleLink(pred="availability_zone", obj=ebs_volume_1_az),
+                                SimpleLink(
+                                    pred="create_time",
+                                    obj=ebs_volume_1_create_time.replace(
+                                        tzinfo=datetime.timezone.utc
+                                    ).isoformat(),
+                                ),
+                                SimpleLink(pred="size", obj=ebs_volume_1_size),
+                                SimpleLink(pred="state", obj="available"),
+                                SimpleLink(pred="volume_type", obj="standard"),
+                                SimpleLink(pred="encrypted", obj=False),
+                            ),
+                            resource_links=(
+                                ResourceLink(
+                                    pred="account", obj=f"arn:aws::::account/{account_id}"
+                                ),
+                                ResourceLink(
+                                    pred="region",
+                                    obj=f"arn:aws:::{account_id}:region/{resource_region_name}",
+                                ),
+                            ),
+                        ),
+                    )
+                ]
+                ec2_ebs_volume_resources = [
+                    resource
+                    for resource in graph_set.resources
+                    if resource.type == "aws:ec2:volume"
+                ]
+                self.assertCountEqual(ec2_ebs_volume_resources, expected_ec2_ebs_volume_resources)
+                ## S3 Buckets
+                expected_s3_bucket_resources = [
+                    Resource(
+                        resource_id=bucket_1_arn,
+                        type="aws:s3:bucket",
+                        link_collection=LinkCollection(
+                            simple_links=(
+                                SimpleLink(pred="name", obj=bucket_1_name),
+                                SimpleLink(
+                                    pred="creation_date",
+                                    obj=bucket_1_creation_date.replace(
+                                        tzinfo=datetime.timezone.utc
+                                    ).isoformat(),
+                                ),
+                            ),
+                            resource_links=(
+                                ResourceLink(
+                                    pred="account", obj=f"arn:aws::::account/{account_id}"
+                                ),
+                                ResourceLink(
+                                    pred="region",
+                                    obj=f"arn:aws:::{account_id}:region/{resource_region_name}",
+                                ),
+                            ),
+                        ),
+                    )
+                ]
+                s3_bucket_resources = [
+                    resource for resource in graph_set.resources if resource.type == "aws:s3:bucket"
+                ]
+                self.assertCountEqual(s3_bucket_resources, expected_s3_bucket_resources)
+
+                expected_num_graph_set_resources = (
+                    0
+                    + len(expected_account_resources)
+                    + len(expected_region_resources)
+                    + len(expected_iam_policy_resources)
+                    + len(expected_iam_role_resources)
+                    + len(expected_lambda_function_resources)
+                    + len(expected_ec2_ebs_volume_resources)
+                    + len(expected_ec2_subnet_resources)
+                    + len(expected_ec2_vpc_resources)
+                    + len(expected_ec2_vpc_flow_log_resources)
+                    + len(expected_s3_bucket_resources)
+                )
+                self.assertEqual(len(graph_set.resources), expected_num_graph_set_resources)
 
 
 # helpers
@@ -195,6 +572,7 @@ def delete_vpcs(region_names: Iterable[str]) -> None:
             for subnet in subnets_resp["Subnets"]:
                 subnet_id = subnet["SubnetId"]
                 regional_ec2_client.delete_subnet(SubnetId=subnet_id)
+            regional_ec2_client.delete_vpc(VpcId=vpc_id)
 
 
 ## resource builders
@@ -217,31 +595,24 @@ def create_dynamodb_table(
 ## ec2
 
 
-def create_instance(ami_id: str, subnet_id: str, region_name: str) -> str:
-    client = boto3.client("ec2", region_name=region_name)
-    resp = client.run_instances(ImageId=ami_id, SubnetId=subnet_id, MinCount=1, MaxCount=1)
-    return resp["Instances"][0]["InstanceId"]
-
-
-def get_ami_id(region_name: str) -> str:
-    client = boto3.client("ec2", region_name=region_name)
-    resp = client.describe_images()
-    return resp["Images"][0]["ImageId"]
-
-
 def create_subnet(cidr_block: str, vpc_id: str, region_name: str) -> str:
     client = boto3.client("ec2", region_name=region_name)
     resp = client.create_subnet(VpcId=vpc_id, CidrBlock=cidr_block,)
     return resp["Subnet"]["SubnetId"]
 
 
-def create_volume(size: int, az: str, region_name: str) -> str:
+def create_volume(size: int, az: str, region_name: str) -> Tuple[str, str]:
     client = boto3.client("ec2", region_name=region_name)
     resp = client.create_volume(Size=size, AvailabilityZone=az,)
     volume_id = resp["VolumeId"]
+    create_time = resp["CreateTime"]
+    account_id = get_account_id()
+    return f"arn:aws:ec2:{region_name}:{account_id}:volume/{volume_id}", create_time
+
+
+def get_account_id() -> str:
     sts_client = boto3.client("sts")
-    account_id = sts_client.get_caller_identity()["Account"]
-    return f"arn:aws:ec2:{region_name}:{account_id}:volume/{volume_id}"
+    return sts_client.get_caller_identity()["Account"]
 
 
 def create_vpc(cidr_block: str, region_name: str) -> str:
@@ -250,7 +621,7 @@ def create_vpc(cidr_block: str, region_name: str) -> str:
     return resp["Vpc"]["VpcId"]
 
 
-def create_flow_log(vpc_id: str, dest_bucket_arn: str, region_name: str) -> str:
+def create_flow_log(vpc_id: str, dest_bucket_arn: str, region_name: str) -> Tuple[str, str]:
     client = boto3.client("ec2", region_name=region_name)
     resp = client.create_flow_logs(
         ResourceIds=[vpc_id],
@@ -262,19 +633,21 @@ def create_flow_log(vpc_id: str, dest_bucket_arn: str, region_name: str) -> str:
     )
     flow_log_ids = resp["FlowLogIds"]
     assert len(flow_log_ids) == 1
-    return flow_log_ids[0]
+    flow_log_id = flow_log_ids[0]
+    flow_logs_resp = client.describe_flow_logs(FlowLogIds=[flow_log_id])
+    creation_time = flow_logs_resp["FlowLogs"][0]["CreationTime"]
+    return flow_log_id, creation_time
 
 
 ## iam
 
 
-def create_iam_policy(name: str, policy_doc: Dict[str, Any]) -> str:
+def create_iam_policy(name: str, policy_doc: Dict[str, Any]) -> Tuple[str, str]:
     client = boto3.client("iam")
     resp = client.create_policy(PolicyName=name, PolicyDocument=json.dumps(policy_doc),)
-    return resp["Policy"]["Arn"]
+    return resp["Policy"]["Arn"], resp["Policy"]["PolicyId"]
 
 
-# https://github.com/spulec/moto/pull/3750
 def create_iam_role(
     name: str, assume_role_policy_doc: Dict[str, Any], description: str, max_session_duration: int
 ) -> str:
@@ -331,7 +704,14 @@ def lambda_handler(event, context):
 
 
 ## s3
-def create_bucket(name: str) -> str:
+def create_bucket(name: str, account_id: str, region_name: str) -> Tuple[str, str]:
     client = boto3.client("s3")
-    resp = client.create_bucket(Bucket=name)
-    return f"arn:aws:s3:::{name}"
+    client.create_bucket(Bucket=name)
+    buckets = client.list_buckets()["Buckets"]
+    creation_date = None
+    for bucket in buckets:
+        if bucket["Name"] == name:
+            creation_date = bucket["CreationDate"]
+    if not creation_date:
+        raise Exception("BUG: error determining test bucket creation date")
+    return f"arn:aws:s3:{region_name}:{account_id}:bucket/{name}", creation_date
