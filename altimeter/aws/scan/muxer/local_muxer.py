@@ -1,15 +1,21 @@
 """AWSScanMuxer that runs account scans one-per-thread"""
 from concurrent.futures import Future, ThreadPoolExecutor
+from typing import Tuple, Type
 
+from altimeter.aws.resource.resource_spec import AWSResourceSpec
 from altimeter.aws.scan.account_scanner import AccountScanner, AccountScanResult
 from altimeter.aws.scan.scan_plan import AccountScanPlan
 from altimeter.aws.scan.muxer import AWSScanMuxer
+from altimeter.aws.scan.settings import DEFAULT_RESOURCE_SPEC_CLASSES
 from altimeter.core.artifact_io.writer import ArtifactWriter
 from altimeter.core.config import AWSConfig
 
 
 def local_account_scan(
-    scan_id: str, account_scan_plan: AccountScanPlan, config: AWSConfig,
+    scan_id: str,
+    account_scan_plan: AccountScanPlan,
+    config: AWSConfig,
+    resource_spec_classes: Tuple[Type[AWSResourceSpec], ...],
 ) -> AccountScanResult:
     """Scan a set of accounts.
 
@@ -26,12 +32,22 @@ def local_account_scan(
         max_svc_scan_threads=config.concurrency.max_svc_scan_threads,
         preferred_account_scan_regions=config.scan.preferred_account_scan_regions,
         scan_sub_accounts=config.scan.scan_sub_accounts,
+        resource_spec_classes=resource_spec_classes,
     )
     return account_scanner.scan()
 
 
 class LocalAWSScanMuxer(AWSScanMuxer):
     """AWSScanMuxer that runs account scans batches of accounts using local os threads"""
+
+    def __init__(
+        self,
+        scan_id: str,
+        config: AWSConfig,
+        resource_spec_classes: Tuple[Type[AWSResourceSpec], ...] = DEFAULT_RESOURCE_SPEC_CLASSES,
+    ):
+        super().__init__(scan_id=scan_id, config=config)
+        self.resource_spec_classes = resource_spec_classes
 
     def _schedule_account_scan(
         self, executor: ThreadPoolExecutor, account_scan_plan: AccountScanPlan
@@ -44,6 +60,9 @@ class LocalAWSScanMuxer(AWSScanMuxer):
             account_scan_plan: AccountScanPlan defining this scan
         """
         scan_lambda = lambda: local_account_scan(
-            scan_id=self.scan_id, account_scan_plan=account_scan_plan, config=self.config,
+            scan_id=self.scan_id,
+            account_scan_plan=account_scan_plan,
+            config=self.config,
+            resource_spec_classes=self.resource_spec_classes,
         )
         return executor.submit(scan_lambda)

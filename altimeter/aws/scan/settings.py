@@ -49,8 +49,8 @@ from altimeter.aws.resource.rds.snapshot import RDSSnapshotResourceSpec
 from altimeter.aws.resource.s3.bucket import S3BucketResourceSpec
 from altimeter.aws.resource.support.severity_level import SeverityLevelResourceSpec
 
-# To enable a resource to be scanned, add it here.
-RESOURCE_SPEC_CLASSES: Tuple[Type[AWSResourceSpec], ...] = (
+# To enable a resource to be scanned, add it here
+DEFAULT_RESOURCE_SPEC_CLASSES: Tuple[Type[AWSResourceSpec], ...] = (
     ClassicLoadBalancerResourceSpec,
     CloudTrailTrailResourceSpec,
     DetectorResourceSpec,
