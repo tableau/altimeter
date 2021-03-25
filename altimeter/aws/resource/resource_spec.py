@@ -70,16 +70,6 @@ class AWSResourceSpec(ResourceSpec):
         return f"{cls.provider_name}:{cls.service_name}:{cls.type_name}"
 
     @classmethod
-    def get_client_name(cls: Type["AWSResourceSpec"]) -> str:
-        """Get the boto3 client name to be used for scanning resources of this type.
-        Generally this is the same as cls.service_name but in some cases it is not.
-
-        Returns:
-             string of boto3 client name for cls.service
-        """
-        return cls.service_name
-
-    @classmethod
     def generate_id(
         cls: Type["AWSResourceSpec"], short_resource_id: str, context: Dict[str, Any]
     ) -> str:
@@ -174,7 +164,7 @@ class AWSResourceSpec(ResourceSpec):
         cls: Type["AWSResourceSpec"], scan_accessor: AWSAccessor
     ) -> ListFromAWSResult:
         try:
-            resource_client = scan_accessor.client(cls.get_client_name())
+            resource_client = scan_accessor.client(cls.service_name)
             if cls.skip_resource_scan(
                 client=resource_client,
                 account_id=scan_accessor.account_id,

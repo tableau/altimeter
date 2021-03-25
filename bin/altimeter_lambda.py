@@ -49,7 +49,6 @@ def lambda_handler(event: Dict[str, Any], __: Any) -> Dict[str, Any]:
             account_scan_plan=account_scan_input.account_scan_plan,
             artifact_writer=artifact_writer,
             max_svc_scan_threads=account_scan_input.max_svc_scan_threads,
-            preferred_account_scan_regions=account_scan_input.preferred_account_scan_regions,
             scan_sub_accounts=account_scan_input.scan_sub_accounts,
         )
         scan_results = account_scanner.scan()

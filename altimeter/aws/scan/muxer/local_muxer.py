@@ -30,7 +30,6 @@ def local_account_scan(
         account_scan_plan=account_scan_plan,
         artifact_writer=artifact_writer,
         max_svc_scan_threads=config.concurrency.max_svc_scan_threads,
-        preferred_account_scan_regions=config.scan.preferred_account_scan_regions,
         scan_sub_accounts=config.scan.scan_sub_accounts,
         resource_spec_classes=resource_spec_classes,
     )

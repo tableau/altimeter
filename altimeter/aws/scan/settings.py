@@ -103,3 +103,7 @@ ORG_RESOURCE_SPEC_CLASSES: Tuple[Type[AWSResourceSpec], ...] = (
     OrgsAccountResourceSpec,
     OUResourceSpec,
 )
+
+ALL_RESOURCE_SPEC_CLASSES: Tuple[
+    Type[AWSResourceSpec], ...
+] = DEFAULT_RESOURCE_SPEC_CLASSES + INFRA_RESOURCE_SPEC_CLASSES + ORG_RESOURCE_SPEC_CLASSES
