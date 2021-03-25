@@ -108,7 +108,6 @@ class AWSConfig(Config):
     scan: ScanConfig
     accessor: Accessor = Field(default_factory=Accessor)
     write_master_json: bool = False
-    services_regions_json_url: str = "https://api.regional-table.region-services.aws.a2z.com/index.json"
 
     def __init__(self, **data: Any):
         super().__init__(**data)
