@@ -53,6 +53,7 @@ def aws2n(scan_id: str, config: AWSConfig, muxer: AWSScanMuxer, load_neptune: bo
     )
 
     aws_resource_region_mapping_repo = build_aws_resource_region_mapping_repo(
+        services_regions_json_url=config.services_regions_json_url,
         global_region_whitelist=config.scan.regions,
         preferred_account_scan_regions=config.scan.preferred_account_scan_regions,
     )

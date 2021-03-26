@@ -33,6 +33,7 @@ def aws2neptune_lpg(scan_id: str, config: AWSConfig, muxer: AWSScanMuxer) -> Non
     )
 
     aws_resource_region_mapping_repo = build_aws_resource_region_mapping_repo(
+        services_regions_json_url=config.services_regions_json_url,
         global_region_whitelist=config.scan.regions,
         preferred_account_scan_regions=config.scan.preferred_account_scan_regions,
     )
@@ -80,6 +81,7 @@ def aws2neptune_rdf(scan_id: str, config: AWSConfig, muxer: AWSScanMuxer) -> Non
     )
 
     aws_resource_region_mapping_repo = build_aws_resource_region_mapping_repo(
+        services_regions_json_url=config.services_regions_json_url,
         global_region_whitelist=config.scan.regions,
         preferred_account_scan_regions=config.scan.preferred_account_scan_regions,
     )
