@@ -92,10 +92,7 @@ class TestAWSResourceRegionMappingRepository(unittest.TestCase):
     def test_wrong_scan_granularity(self):
         """validate that if a resource is NOT account level gran and aws-global is found
         as a region we raise Exception"""
-        with unittest.mock.patch(
-            "altimeter.aws.resource.awslambda.function.LambdaFunctionResourceSpec.scan_granularity",
-            new_callable=unittest.mock.PropertyMock,
-        ) as mock_lambda_func_scan_gran:
+        with unittest.mock.patch("altimeter.aws.resource.awslambda.function.LambdaFunctionResourceSpec.scan_granularity", new_callable=unittest.mock.PropertyMock) as mock_lambda_func_scan_gran:
             mock_lambda_func_scan_gran.return_value = ScanGranularity.ACCOUNT
             with self.assertRaises(Exception):
                 build_aws_resource_region_mapping_repo(
