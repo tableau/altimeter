@@ -1,8 +1,7 @@
 """Discover service/region availability"""
 from collections import defaultdict
 import random
-from typing import DefaultDict, Dict, Mapping, Tuple, Type
-from types import MappingProxyType
+from typing import DefaultDict, Dict, Tuple, Type
 
 import boto3
 from pydantic import BaseModel
@@ -20,7 +19,7 @@ class NoRegionsFoundForResource(Exception):
 class AWSResourceRegionMappingRepository(BaseModel):
     """Contains the mappings between AWS resources and regions"""
 
-    boto_service_resource_region_mappings: Mapping[str, Mapping[str, Tuple[str, ...]]]
+    boto_service_resource_region_mappings: Dict[str, Dict[str, Tuple[str, ...]]]
 
     def get_regions(
         self, resource_spec_class: Type[AWSResourceSpec], region_whitelist: Tuple[str, ...]
@@ -66,7 +65,7 @@ def build_aws_resource_region_mapping_repo(
         resource_spec_class.service_name for resource_spec_class in resource_spec_classes
     )
     boto_service_region_mappings = get_boto_service_region_mapping(services=services)
-    raw_boto_service_resource_region_mappings: DefaultDict[
+    boto_service_resource_region_mappings: DefaultDict[
         str, Dict[str, Tuple[str, ...]]
     ] = defaultdict(dict)
     for resource_spec_class in resource_spec_classes:
@@ -99,24 +98,13 @@ def build_aws_resource_region_mapping_repo(
                 )
                 if candidate_regions:
                     candidate_regions = (random.choice(candidate_regions),)
-        raw_boto_service_resource_region_mappings[service_name][resource_name] = candidate_regions
-    less_mutable_boto_service_resource_region_mappings: Dict[
-        str, Mapping[str, Tuple[str, ...]]
-    ] = {}
-    for service_name, resource_region_mapping in raw_boto_service_resource_region_mappings.items():
-        less_mutable_boto_service_resource_region_mappings[service_name] = MappingProxyType(
-            resource_region_mapping
-        )
-    boto_service_resource_region_mappings = MappingProxyType(
-        less_mutable_boto_service_resource_region_mappings
-    )
-
+        boto_service_resource_region_mappings[service_name][resource_name] = candidate_regions
     return AWSResourceRegionMappingRepository(
         boto_service_resource_region_mappings=boto_service_resource_region_mappings,
     )
 
 
-def get_boto_service_region_mapping(services: Tuple[str, ...]) -> Mapping[str, Tuple[str, ...]]:
+def get_boto_service_region_mapping(services: Tuple[str, ...]) -> Dict[str, Tuple[str, ...]]:
     """Return a mapping of service names to supported regions for the given services using boto"""
     service_region_mapping: Dict[str, Tuple[str, ...]] = {}
     session = boto3.Session()
@@ -124,4 +112,4 @@ def get_boto_service_region_mapping(services: Tuple[str, ...]) -> Mapping[str, T
         service_region_mapping[service] = tuple(
             session.get_available_regions(service_name=service, allow_non_regional=True)
         )
-    return MappingProxyType(service_region_mapping)
+    return service_region_mapping
