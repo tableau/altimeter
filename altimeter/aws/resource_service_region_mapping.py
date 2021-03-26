@@ -86,12 +86,6 @@ def build_aws_resource_region_mapping_repo(
                 for region in resource_spec_class.region_whitelist
                 if region in candidate_regions
             )
-        if resource_spec_class.region_blacklist:
-            candidate_regions = tuple(
-                region
-                for region in resource_spec_class.region_whitelist
-                if region not in candidate_regions
-            )
         if global_region_whitelist:
             candidate_regions = tuple(
                 region for region in candidate_regions if region in global_region_whitelist
