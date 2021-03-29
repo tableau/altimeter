@@ -17,6 +17,8 @@ class AWSLogEvents(BaseLogEvent):
 
     GetServiceResourceRegionMappingStart: EventName
     GetServiceResourceRegionMappingEnd: EventName
+    GetServiceResourceRegionMappingWarning: EventName
+    GetServiceResourceRegionMappingDiscrepancy: EventName
 
     RunAccountScanLambdaStart: EventName
     RunAccountScanLambdaEnd: EventName

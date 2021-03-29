@@ -23,9 +23,9 @@ class UnsupportedServiceRegionMappingVersion(Exception):
 
 
 class AWSResourceRegionMappingRepository(BaseModel):
-    """Contains the mappings between AWS resources and regions"""
+    """Contains the mapping between AWS resources and regions"""
 
-    boto_service_resource_region_mappings: Dict[str, Dict[str, Tuple[str, ...]]]
+    boto_service_resource_region_mapping: Dict[str, Dict[str, Tuple[str, ...]]]
 
     def get_regions(
         self, resource_spec_class: Type[AWSResourceSpec], region_whitelist: Tuple[str, ...]
@@ -35,7 +35,7 @@ class AWSResourceRegionMappingRepository(BaseModel):
             logger.info(event=AWSLogEvents.GetServiceResourceRegionMappingStart)
             service = resource_spec_class.service_name
             resource = resource_spec_class.type_name
-            prefiltered_regions = self.boto_service_resource_region_mappings.get(service, {}).get(
+            prefiltered_regions = self.boto_service_resource_region_mapping.get(service, {}).get(
                 resource, ()
             )
             if region_whitelist:
@@ -58,35 +58,62 @@ def build_aws_resource_region_mapping_repo(
     services_regions_json_url: str,
     resource_spec_classes: Tuple[Type[AWSResourceSpec], ...] = ALL_RESOURCE_SPEC_CLASSES,
 ) -> "AWSResourceRegionMappingRepository":
-    """Build mappings representing the region availability of AWS Resources.
+    """Build mapping representing the region availability of AWS Resources.
 
     Args:
         global_region_whitelist: if populated this is used as a region whitelist
         preferred_account_scan_regions: regions which should be used for Account granularity resources
         services_regions_json_url: url of aws region/service mapping json
-        resource_spec_classes: AWSResourceSpec classes to include in the mappings
+        resource_spec_classes: AWSResourceSpec classes to include in the mapping
 
     Returns:
         AWSResourceRegionMappingRepository
     """
+    logger = Logger()
     services = tuple(
         resource_spec_class.service_name for resource_spec_class in resource_spec_classes
     )
-    boto_service_region_mappings = get_boto_service_region_mapping(services=services)
-    boto_service_resource_region_mappings: DefaultDict[
+    aws_service_region_mapping = {}
+    try:
+        aws_service_region_mapping = get_aws_service_region_mapping(
+            services=services, services_regions_json_url=services_regions_json_url,
+        )
+    except Exception as ex:
+        logger.warn(
+            event=AWSLogEvents.GetServiceResourceRegionMappingWarning,
+            services_regions_json_url=services_regions_json_url,
+            msg=str(ex),
+        )
+    boto_service_region_mapping = get_boto_service_region_mapping(services=services)
+    boto_service_resource_region_mapping: DefaultDict[
         str, Dict[str, Tuple[str, ...]]
     ] = defaultdict(dict)
     for resource_spec_class in resource_spec_classes:
         resource_name = resource_spec_class.type_name
         service_name = resource_spec_class.service_name
-        candidate_regions = boto_service_region_mappings.get(service_name, ())
+        candidate_regions = boto_service_region_mapping.get(service_name, ())
         if "aws-global" in candidate_regions:
             if resource_spec_class.scan_granularity != ScanGranularity.ACCOUNT:
                 raise Exception(
-                    f"BUG: boto mappings contain {resource_spec_class} "
+                    f"BUG: boto mapping contains {resource_spec_class} "
                     f"region aws-global but class is marked {resource_spec_class.scan_granularity} granularity"
                 )
             candidate_regions = preferred_account_scan_regions
+        else:
+            if aws_service_region_mapping:
+                # check against the aws_service_region_mapping, warn if any missing regions are found in the
+                # boto mapping
+                aws_regions = frozenset(aws_service_region_mapping.get(service_name, []))
+                boto_regions = frozenset(boto_service_region_mapping.get(service_name, []))
+                boto_missing = aws_regions - boto_regions
+                if boto_missing:
+                    logger.warn(
+                        event=AWSLogEvents.GetServiceResourceRegionMappingDiscrepancy,
+                        msg=(
+                            f"{service_name} boto mappings appear to be missing region(s): {', '.join(boto_missing)}. "
+                            "You may need to update the boto version of Altimeter and redeploy."
+                        ),
+                    )
         if resource_spec_class.region_whitelist:
             candidate_regions = tuple(
                 region
@@ -106,15 +133,9 @@ def build_aws_resource_region_mapping_repo(
                 )
                 if candidate_regions:
                     candidate_regions = (random.choice(candidate_regions),)
-        boto_service_resource_region_mappings[service_name][resource_name] = candidate_regions
-    # Check against the AWS advertised service/region json. If any regions are found in the
-    # json which are not in the boto mappings, emit a warning level log
-    aws_service_region_mapping = get_aws_service_region_mapping(
-        services=services, services_regions_json_url=services_regions_json_url,
-    )
-    # TODO actual check...
+        boto_service_resource_region_mapping[service_name][resource_name] = candidate_regions
     return AWSResourceRegionMappingRepository(
-        boto_service_resource_region_mappings=boto_service_resource_region_mappings,
+        boto_service_resource_region_mapping=boto_service_resource_region_mapping,
     )
 
 
@@ -124,7 +145,15 @@ def get_boto_service_region_mapping(services: Tuple[str, ...]) -> Dict[str, Tupl
     session = boto3.Session()
     for service in services:
         service_region_mapping[service] = tuple(
-            session.get_available_regions(service_name=service, allow_non_regional=True)
+            session.get_available_regions(
+                service_name=service, partition_name="aws", allow_non_regional=True
+            )
+            + session.get_available_regions(
+                service_name=service, partition_name="aws-cn", allow_non_regional=True
+            )
+            + session.get_available_regions(
+                service_name=service, partition_name="aws-us-gov", allow_non_regional=True
+            )
         )
     return service_region_mapping
 
