@@ -15,6 +15,9 @@ class AWSLogEvents(BaseLogEvent):
     GetSubAccountsStart: EventName
     GetSubAccountsEnd: EventName
 
+    GetServiceResourceRegionMappingStart: EventName
+    GetServiceResourceRegionMappingEnd: EventName
+
     RunAccountScanLambdaStart: EventName
     RunAccountScanLambdaEnd: EventName
     RunAccountScanLambdaError: EventName

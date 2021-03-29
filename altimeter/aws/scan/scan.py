@@ -4,6 +4,7 @@ import boto3
 
 from altimeter.aws.auth.accessor import Accessor
 from altimeter.aws.log_events import AWSLogEvents
+from altimeter.aws.resource_service_region_mapping import AWSResourceRegionMappingRepository
 from altimeter.aws.scan.scan_plan import ScanPlan
 from altimeter.aws.scan.muxer import AWSScanMuxer
 from altimeter.aws.scan.scan_manifest import ScanManifest
@@ -37,6 +38,7 @@ def get_sub_account_ids(account_ids: Tuple[str, ...], accessor: Accessor) -> Tup
 def run_scan(
     muxer: AWSScanMuxer,
     config: AWSConfig,
+    aws_resource_region_mapping_repo: AWSResourceRegionMappingRepository,
     artifact_writer: ArtifactWriter,
     artifact_reader: ArtifactReader,
 ) -> Tuple[ScanManifest, ValidatedGraphSet]:
@@ -51,7 +53,10 @@ def run_scan(
     else:
         account_ids = scan_account_ids
     scan_plan = ScanPlan(
-        account_ids=account_ids, regions=config.scan.regions, accessor=config.accessor
+        account_ids=account_ids,
+        regions=config.scan.regions,
+        aws_resource_region_mapping_repo=aws_resource_region_mapping_repo,
+        accessor=config.accessor,
     )
     logger = Logger()
     logger.info(event=AWSLogEvents.ScanAWSAccountsStart)

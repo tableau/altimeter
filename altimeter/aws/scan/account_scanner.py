@@ -89,7 +89,6 @@ class AccountScanner:
         account_scan_plan: AccountScanPlan,
         artifact_writer: ArtifactWriter,
         max_svc_scan_threads: int,
-        preferred_account_scan_regions: Tuple[str, ...],
         scan_sub_accounts: bool,
         graph_name: str = GRAPH_NAME,
         graph_version: str = GRAPH_VERSION,
@@ -100,7 +99,6 @@ class AccountScanner:
         self.graph_name = graph_name
         self.graph_version = graph_version
         self.max_threads = max_svc_scan_threads
-        self.preferred_account_scan_regions = preferred_account_scan_regions
         self.resource_spec_classes = resource_spec_classes + INFRA_RESOURCE_SPEC_CLASSES
         if scan_sub_accounts:
             self.resource_spec_classes += ORG_RESOURCE_SPEC_CLASSES
@@ -124,52 +122,22 @@ class AccountScanner:
                             f"BUG: sts detected account_id {sts_account_id} != {account_id}"
                         )
                     if self.account_scan_plan.regions:
-                        scan_regions = tuple(self.account_scan_plan.regions)
+                        account_scan_regions = tuple(self.account_scan_plan.regions)
                     else:
-                        scan_regions = get_all_enabled_regions(session=session)
-                    account_gran_scan_region = random.choice(self.preferred_account_scan_regions)
+                        account_scan_regions = get_all_enabled_regions(session=session)
                     # build a dict of regions -> services -> List[AWSResourceSpec]
                     regions_services_resource_spec_classes: DefaultDict[
                         str, DefaultDict[str, List[Type[AWSResourceSpec]]]
                     ] = defaultdict(lambda: defaultdict(list))
-                    resource_spec_class: Type[AWSResourceSpec]
                     for resource_spec_class in self.resource_spec_classes:
-                        client_name = resource_spec_class.get_client_name()
-                        if resource_spec_class.scan_granularity == ScanGranularity.ACCOUNT:
-                            if resource_spec_class.region_whitelist:
-                                account_resource_scan_region = resource_spec_class.region_whitelist[
-                                    0
-                                ]
-                            else:
-                                account_resource_scan_region = account_gran_scan_region
-                            regions_services_resource_spec_classes[account_resource_scan_region][
-                                client_name
+                        resource_regions = self.account_scan_plan.aws_resource_region_mapping_repo.get_regions(
+                            resource_spec_class=resource_spec_class,
+                            region_whitelist=account_scan_regions,
+                        )
+                        for region in resource_regions:
+                            regions_services_resource_spec_classes[region][
+                                resource_spec_class.service_name
                             ].append(resource_spec_class)
-                        elif resource_spec_class.scan_granularity == ScanGranularity.REGION:
-                            if resource_spec_class.region_whitelist:
-                                resource_scan_regions = tuple(
-                                    region
-                                    for region in scan_regions
-                                    if region in resource_spec_class.region_whitelist
-                                )
-                                if not resource_scan_regions:
-                                    resource_scan_regions = resource_spec_class.region_whitelist
-                            elif resource_spec_class.region_blacklist:
-                                resource_scan_regions = tuple(
-                                    region
-                                    for region in scan_regions
-                                    if region not in resource_spec_class.region_blacklist
-                                )
-                            else:
-                                resource_scan_regions = scan_regions
-                            for region in resource_scan_regions:
-                                regions_services_resource_spec_classes[region][client_name].append(
-                                    resource_spec_class
-                                )
-                        else:
-                            raise NotImplementedError(
-                                f"ScanGranularity {resource_spec_class.scan_granularity} unimplemented"
-                            )
                     # Build and submit ScanUnits
                     shuffed_regions_services_resource_spec_classes = random.sample(
                         regions_services_resource_spec_classes.items(),

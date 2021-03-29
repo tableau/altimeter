@@ -9,6 +9,7 @@ import json
 import boto3
 
 from altimeter.aws.log_events import AWSLogEvents
+from altimeter.aws.resource_service_region_mapping import build_aws_resource_region_mapping_repo
 from altimeter.aws.scan.muxer import AWSScanMuxer
 from altimeter.aws.scan.muxer.local_muxer import LocalAWSScanMuxer
 from altimeter.aws.scan.scan import run_scan
@@ -31,6 +32,11 @@ def aws2neptune_lpg(scan_id: str, config: AWSConfig, muxer: AWSScanMuxer) -> Non
         artifact_path=config.artifact_path, scan_id=scan_id
     )
 
+    aws_resource_region_mapping_repo = build_aws_resource_region_mapping_repo(
+        global_region_whitelist=config.scan.regions,
+        preferred_account_scan_regions=config.scan.preferred_account_scan_regions,
+    )
+
     logger.info(
         AWSLogEvents.ScanConfigured,
         config=str(config),
@@ -42,6 +48,7 @@ def aws2neptune_lpg(scan_id: str, config: AWSConfig, muxer: AWSScanMuxer) -> Non
     _, graph_set = run_scan(
         muxer=muxer,
         config=config,
+        aws_resource_region_mapping_repo=aws_resource_region_mapping_repo,
         artifact_writer=artifact_writer,
         artifact_reader=artifact_reader,
     )
@@ -72,6 +79,11 @@ def aws2neptune_rdf(scan_id: str, config: AWSConfig, muxer: AWSScanMuxer) -> Non
         artifact_path=config.artifact_path, scan_id=scan_id
     )
 
+    aws_resource_region_mapping_repo = build_aws_resource_region_mapping_repo(
+        global_region_whitelist=config.scan.regions,
+        preferred_account_scan_regions=config.scan.preferred_account_scan_regions,
+    )
+
     logger.info(
         AWSLogEvents.ScanConfigured,
         config=str(config),
@@ -82,6 +94,7 @@ def aws2neptune_rdf(scan_id: str, config: AWSConfig, muxer: AWSScanMuxer) -> Non
     _, graph_set = run_scan(
         muxer=muxer,
         config=config,
+        aws_resource_region_mapping_repo=aws_resource_region_mapping_repo,
         artifact_writer=artifact_writer,
         artifact_reader=artifact_reader,
     )

@@ -6,7 +6,3 @@ class ELBV1ResourceSpec(AWSResourceSpec):
     """Abstract base for ResourceSpec classes for classic elb resources."""
 
     service_name = "elb"
-
-    @classmethod
-    def get_client_name(cls) -> str:
-        return "elb"
