@@ -11,7 +11,9 @@ from altimeter.aws.scan.settings import ALL_RESOURCE_SPEC_CLASSES
 class TestAWSResourceRegionMappingRepository(unittest.TestCase):
     def test_with_empty_global_region_whitelist(self):
         mapping_repo = build_aws_resource_region_mapping_repo(
-            global_region_whitelist=(), preferred_account_scan_regions=("us-east-1",),
+            global_region_whitelist=(),
+            preferred_account_scan_regions=("us-east-1",),
+            services_regions_json_url="https://mock_url",
         )
         for resource_spec_class in ALL_RESOURCE_SPEC_CLASSES:
             scan_regions = mapping_repo.get_regions(
@@ -26,6 +28,7 @@ class TestAWSResourceRegionMappingRepository(unittest.TestCase):
         mapping_repo = build_aws_resource_region_mapping_repo(
             global_region_whitelist=("us-east-1", "us-east-2", "us-west-1", "us-west-2"),
             preferred_account_scan_regions=("us-east-1",),
+            services_regions_json_url="https://mock_url",
         )
         for resource_spec_class in ALL_RESOURCE_SPEC_CLASSES:
             scan_regions = mapping_repo.get_regions(
@@ -41,6 +44,7 @@ class TestAWSResourceRegionMappingRepository(unittest.TestCase):
         mapping_repo = build_aws_resource_region_mapping_repo(
             global_region_whitelist=("us-east-2", "us-west-1", "us-west-2"),
             preferred_account_scan_regions=("us-east-1",),
+            services_regions_json_url="https://mock_url",
         )
         for resource_spec_class in ALL_RESOURCE_SPEC_CLASSES:
             if resource_spec_class.scan_granularity == ScanGranularity.ACCOUNT:
@@ -59,6 +63,7 @@ class TestAWSResourceRegionMappingRepository(unittest.TestCase):
         mapping_repo = build_aws_resource_region_mapping_repo(
             global_region_whitelist=("us-east-1", "us-east-2", "us-west-1", "us-west-2"),
             preferred_account_scan_regions=("us-east-1",),
+            services_regions_json_url="https://mock_url",
         )
         for resource_spec_class in ALL_RESOURCE_SPEC_CLASSES:
             scan_regions = mapping_repo.get_regions(
@@ -74,6 +79,7 @@ class TestAWSResourceRegionMappingRepository(unittest.TestCase):
         mapping_repo = build_aws_resource_region_mapping_repo(
             global_region_whitelist=("us-east-1", "us-east-2", "us-west-1", "us-west-2"),
             preferred_account_scan_regions=("us-east-1",),
+            services_regions_json_url="https://mock_url",
         )
         for resource_spec_class in ALL_RESOURCE_SPEC_CLASSES:
             if resource_spec_class.scan_granularity == ScanGranularity.ACCOUNT:
