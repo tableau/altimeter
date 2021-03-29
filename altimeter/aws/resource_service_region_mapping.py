@@ -95,14 +95,14 @@ def build_aws_resource_region_mapping_repo(
         if "aws-global" in candidate_regions:
             if resource_spec_class.scan_granularity != ScanGranularity.ACCOUNT:
                 raise Exception(
-                    f"BUG: boto mapping contains {resource_spec_class} "
+                    f"BUG: botocore service/region mapping contains {resource_spec_class} "
                     f"region aws-global but class is marked {resource_spec_class.scan_granularity} granularity"
                 )
             candidate_regions = preferred_account_scan_regions
         else:
             if aws_service_region_mapping:
                 # check against the aws_service_region_mapping, warn if any missing regions are found in the
-                # boto mapping
+                # botocore mapping
                 aws_regions = frozenset(aws_service_region_mapping.get(service_name, []))
                 boto_regions = frozenset(boto_service_region_mapping.get(service_name, []))
                 boto_missing = aws_regions - boto_regions
@@ -110,8 +110,9 @@ def build_aws_resource_region_mapping_repo(
                     logger.warn(
                         event=AWSLogEvents.GetServiceResourceRegionMappingDiscrepancy,
                         msg=(
-                            f"{service_name} boto mappings appear to be missing region(s): {', '.join(boto_missing)}. "
-                            "You may need to update the boto version of Altimeter and redeploy."
+                            f"{service_name} botocore mappings appear to be missing region(s): "
+                            f"{', '.join(boto_missing)}. You likely need to update the botocore version in Altimeter "
+                            "and redeploy otherwise this service/region will not be scanned."
                         ),
                     )
         if resource_spec_class.region_whitelist:
