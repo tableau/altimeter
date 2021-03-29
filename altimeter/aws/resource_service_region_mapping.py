@@ -49,6 +49,7 @@ class AWSResourceRegionMappingRepository(BaseModel):
 def build_aws_resource_region_mapping_repo(
     global_region_whitelist: Tuple[str, ...],
     preferred_account_scan_regions: Tuple[str, ...],
+    services_regions_json_url: str,
     resource_spec_classes: Tuple[Type[AWSResourceSpec], ...] = ALL_RESOURCE_SPEC_CLASSES,
 ) -> "AWSResourceRegionMappingRepository":
     """Build mappings representing the region availability of AWS Resources.
@@ -56,6 +57,7 @@ def build_aws_resource_region_mapping_repo(
     Args:
         global_region_whitelist: if populated this is used as a region whitelist
         preferred_account_scan_regions: regions which should be used for Account granularity resources
+        services_regions_json_url: url of aws region/service mapping json
         resource_spec_classes: AWSResourceSpec classes to include in the mappings
 
     Returns:
