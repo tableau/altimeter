@@ -1,10 +1,12 @@
 """Discover service/region availability"""
 from collections import defaultdict
+import math
 import random
-from typing import DefaultDict, Dict, Tuple, Type
+from typing import Any, DefaultDict, Dict, List, Tuple, Type
 
 import boto3
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
+import requests
 
 from altimeter.aws.scan.settings import ALL_RESOURCE_SPEC_CLASSES
 from altimeter.aws.resource.resource_spec import AWSResourceSpec, ScanGranularity
@@ -14,6 +16,10 @@ from altimeter.aws.log_events import AWSLogEvents
 
 class NoRegionsFoundForResource(Exception):
     """Indicates no regions could be found for a resource"""
+
+
+class UnsupportedServiceRegionMappingVersion(Exception):
+    """Indiciates a service region mapping json artifact is using an unsupported version"""
 
 
 class AWSResourceRegionMappingRepository(BaseModel):
@@ -101,6 +107,12 @@ def build_aws_resource_region_mapping_repo(
                 if candidate_regions:
                     candidate_regions = (random.choice(candidate_regions),)
         boto_service_resource_region_mappings[service_name][resource_name] = candidate_regions
+    # Check against the AWS advertised service/region json. If any regions are found in the
+    # json which are not in the boto mappings, emit a warning level log
+    aws_service_region_mapping = get_aws_service_region_mapping(
+        services=services, services_regions_json_url=services_regions_json_url,
+    )
+    # TODO actual check...
     return AWSResourceRegionMappingRepository(
         boto_service_resource_region_mappings=boto_service_resource_region_mappings,
     )
@@ -114,4 +126,47 @@ def get_boto_service_region_mapping(services: Tuple[str, ...]) -> Dict[str, Tupl
         service_region_mapping[service] = tuple(
             session.get_available_regions(service_name=service, allow_non_regional=True)
         )
+    return service_region_mapping
+
+
+def get_aws_service_region_mapping_json(services_regions_json_url: str) -> Dict[str, Any]:
+    """Read AWS service/region mapping json and return as a dict"""
+    region_services_resp = requests.get(services_regions_json_url)
+    return region_services_resp.json()
+
+
+def get_aws_service_region_mapping(
+    services: Tuple[str, ...], services_regions_json_url: str
+) -> Dict[str, Tuple[str, ...]]:
+    """Return a mapping of service names to supported regions for the given services using advertised json"""
+
+    class RawServiceRegionDict(BaseModel):
+        class RawServiceRegionDictMetadata(BaseModel):
+            version: float = Field(alias="format:version")
+
+        class RawService(BaseModel):
+            class RawServiceAttributes(BaseModel):
+                region: str = Field(alias="aws:region")
+
+            attributes: RawServiceAttributes
+            id: str
+
+        metadata: RawServiceRegionDictMetadata
+        services: List[RawService] = Field(alias="prices")
+
+    region_services_json = get_aws_service_region_mapping_json(
+        services_regions_json_url=services_regions_json_url
+    )
+    raw_service_region_mapping = RawServiceRegionDict(**region_services_json)
+    expected_major_version: int = 1
+    major_version = math.floor(raw_service_region_mapping.metadata.version)
+    if major_version != expected_major_version:
+        raise UnsupportedServiceRegionMappingVersion(
+            f"Expected metadata -> format:version major_version {expected_major_version}, got {major_version}"
+        )
+    service_region_mapping: DefaultDict[str, Tuple[str, ...]] = defaultdict(tuple)
+    for service in raw_service_region_mapping.services:
+        service_name, service_region = service.id.split(":")
+        if service_name in services:
+            service_region_mapping[service_name] += (service_region,)
     return service_region_mapping
