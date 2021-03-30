@@ -125,6 +125,8 @@ def build_aws_resource_region_mapping_repo(
                             f"{', '.join(boto_missing)}. You likely need to update the botocore version in Altimeter "
                             "and redeploy otherwise this service/region will not be scanned."
                         ),
+                        boto3_version=boto3.__version__,
+                        botocore_version=botocore.__version__,
                     )
         if resource_spec_class.region_whitelist:
             candidate_regions = tuple(
