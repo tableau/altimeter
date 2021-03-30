@@ -5,6 +5,7 @@ import random
 from typing import Any, DefaultDict, Dict, List, Tuple, Type
 
 import boto3
+import botocore
 from pydantic import BaseModel, Field
 import requests
 
@@ -32,7 +33,11 @@ class AWSResourceRegionMappingRepository(BaseModel):
     ) -> Tuple[str, ...]:
         logger = Logger()
         with logger.bind(
-            resource_spec_class=resource_spec_class, region_whitelist=region_whitelist
+            service_name=resource_spec_class.service_name,
+            resource_name=resource_spec_class.type_name,
+            region_whitelist=region_whitelist,
+            boto3_version=boto3.__version__,
+            botocore_version=botocore.__version__,
         ):
             logger.info(event=AWSLogEvents.GetServiceResourceRegionMappingStart)
             service = resource_spec_class.service_name
