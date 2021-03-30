@@ -175,6 +175,22 @@ class QJAPIClient:
         raw_json = response.json()
         return schemas.ResultSetsPruneResult(**raw_json)
 
+    def get_job_latest_result_set(self, job_name: str) -> Optional[schemas.ResultSet]:
+        """Get the latest result set of a Job by name"""
+        url = f"{self._base_url_v1}/jobs/{job_name}/latest_result_set"
+        try:
+            response = requests.get(url)
+            if response.status_code == 404:
+                return None
+        except Exception as ex:
+            raise QJAPIClientError(f"Error connecting to {url}: {str(ex)}") from ex
+        try:
+            response.raise_for_status()
+        except Exception as ex:
+            raise_client_error(response, exception=ex)
+        raw_json = response.json()
+        return schemas.ResultSet(**raw_json)
+
 
 def raise_client_error(response: requests.Response, exception: Exception) -> None:
     """Raise an QJAPIClientError based on a Response and Exception"""
