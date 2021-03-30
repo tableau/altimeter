@@ -31,7 +31,9 @@ class AWSResourceRegionMappingRepository(BaseModel):
         self, resource_spec_class: Type[AWSResourceSpec], region_whitelist: Tuple[str, ...]
     ) -> Tuple[str, ...]:
         logger = Logger()
-        with logger.bind(resource_spec_class=resource_spec_class):
+        with logger.bind(
+            resource_spec_class=resource_spec_class, region_whitelist=region_whitelist
+        ):
             logger.info(event=AWSLogEvents.GetServiceResourceRegionMappingStart)
             service = resource_spec_class.service_name
             resource = resource_spec_class.type_name
@@ -48,7 +50,11 @@ class AWSResourceRegionMappingRepository(BaseModel):
                 raise NoRegionsFoundForResource(
                     f"No regions found for resource {service}/{resource}"
                 )
-            logger.info(event=AWSLogEvents.GetServiceResourceRegionMappingEnd)
+            logger.info(
+                event=AWSLogEvents.GetServiceResourceRegionMappingEnd,
+                prefiltered_regions=prefiltered_regions,
+                regions=regions,
+            )
             return regions
 
 
