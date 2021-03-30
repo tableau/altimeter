@@ -5,6 +5,7 @@ import random
 from typing import Any, DefaultDict, Dict, List, Tuple, Type
 
 import boto3
+import botocore
 from pydantic import BaseModel, Field
 import requests
 
@@ -31,7 +32,13 @@ class AWSResourceRegionMappingRepository(BaseModel):
         self, resource_spec_class: Type[AWSResourceSpec], region_whitelist: Tuple[str, ...]
     ) -> Tuple[str, ...]:
         logger = Logger()
-        with logger.bind(resource_spec_class=resource_spec_class):
+        with logger.bind(
+            service_name=resource_spec_class.service_name,
+            resource_name=resource_spec_class.type_name,
+            region_whitelist=region_whitelist,
+            boto3_version=boto3.__version__,
+            botocore_version=botocore.__version__,
+        ):
             logger.info(event=AWSLogEvents.GetServiceResourceRegionMappingStart)
             service = resource_spec_class.service_name
             resource = resource_spec_class.type_name
@@ -48,7 +55,11 @@ class AWSResourceRegionMappingRepository(BaseModel):
                 raise NoRegionsFoundForResource(
                     f"No regions found for resource {service}/{resource}"
                 )
-            logger.info(event=AWSLogEvents.GetServiceResourceRegionMappingEnd)
+            logger.info(
+                event=AWSLogEvents.GetServiceResourceRegionMappingEnd,
+                prefiltered_regions=prefiltered_regions,
+                regions=regions,
+            )
             return regions
 
 
@@ -114,6 +125,8 @@ def build_aws_resource_region_mapping_repo(
                             f"{', '.join(boto_missing)}. You likely need to update the botocore version in Altimeter "
                             "and redeploy otherwise this service/region will not be scanned."
                         ),
+                        boto3_version=boto3.__version__,
+                        botocore_version=botocore.__version__,
                     )
         if resource_spec_class.region_whitelist:
             candidate_regions = tuple(
