@@ -10,6 +10,7 @@ from altimeter.aws.resource.iam import IAMResourceSpec
 from altimeter.aws.resource.iam.policy import IAMPolicyResourceSpec
 from altimeter.aws.resource.util import policy_doc_dict_to_sorted_str
 from altimeter.core.graph.field.dict_field import (
+    AnonymousDictField,
     EmbeddedDictField,
     AnonymousEmbeddedDictField,
     DictField,
@@ -60,6 +61,7 @@ class IAMRoleResourceSpec(IAMResourceSpec):
             ),
         ),
         ScalarField("AssumeRolePolicyDocumentText"),
+        AnonymousDictField("RoleLastUsed", ScalarField("LastUsedDate", "last_used_date")),
     )
 
     @classmethod
