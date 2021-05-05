@@ -110,6 +110,8 @@ class APIServiceConfig(APIConfig, DBConfig, LimitsConfig, SecurityConfig):
 
     # db extras
     db_ro_user: str
+    # notifications
+    result_set_notification_sns_topic_arn: str
 
     # pylint: disable=no-self-argument,no-self-use
     @root_validator(pre=True)
