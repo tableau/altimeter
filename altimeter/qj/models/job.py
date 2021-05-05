@@ -28,6 +28,7 @@ class Job(BASE):
     result_expiration_sec = Column(Integer, nullable=False)
     max_result_age_sec = Column(Integer, nullable=False)
     result_sets = relationship("ResultSet", passive_deletes=True)
+    notify_if_results = Column(Boolean, nullable=False, server_default="false")
 
     __table_args__ = (
         Index("job_name_active_key", name, active, unique=True, postgresql_where=(active)),

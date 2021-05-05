@@ -39,6 +39,7 @@ class JobBase(BaseModel):
     category: Category
     severity: Severity
     query: str
+    notify_if_results: bool
 
     class Config:
         """Pydantic config overrides"""
@@ -82,6 +83,7 @@ class JobUpdate(BaseModel):
     max_graph_age_sec: Optional[int] = Field(gt=0)
     result_expiration_sec: Optional[int] = Field(gt=0)
     max_result_age_sec: Optional[int] = Field(gt=0)
+    notify_if_results: Optional[bool]
 
     class Config:
         """Pydantic config overrides"""

@@ -53,13 +53,15 @@ def create_result_set(
     """Create a ResultSet"""
     try:
         result_set = result_set_crud.create(db_session, obj_in=result_set_in)
-        result_set_notification = schemas.ResultSetNotification(
-            job=result_set_in.job,
-            graph_spec=result_set_in.graph_spec,
-            created=result_set_in.created,
-            num_results=len(result_set_in.results),
-        )
-        result_set_notifier.notify(notification=result_set_notification)
+        if result_set.results:
+            if result_set_in.job.notify_if_results:
+                result_set_notification = schemas.ResultSetNotification(
+                    job=result_set_in.job,
+                    graph_spec=result_set_in.graph_spec,
+                    created=result_set_in.created,
+                    num_results=len(result_set_in.results),
+                )
+                result_set_notifier.notify(notification=result_set_notification)
         return result_set
     except (JobVersionNotFound, ResultSetResultsLimitExceeded, ResultSizeExceeded) as ex:
         raise HTTPException(status_code=HTTP_400_BAD_REQUEST, detail=str(ex)) from ex
