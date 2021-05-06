@@ -163,6 +163,8 @@ class CRUDJob:
             job_version.active = job_update.active
             if job_version.active:
                 self._create_views(db_session=db_session, job_version=job_version)
+        if job_update.notify_if_results is not None:
+            job_version.notify_if_results = job_update.notify_if_results
         db_session.commit()
         db_session.refresh(job_version)
         return job_version
