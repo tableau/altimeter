@@ -16,12 +16,13 @@ class ResultSetNotifier:
 
     def notify(self, notification: schemas.ResultSetNotification) -> None:
         logger = Logger()
-        logger.info(event=QJLogEvents.NotifyNewResultsStart)
-        session = boto3.Session(region_name=self.region_name)
-        sns_client = session.client("sns", region_name=self.region_name)
-        sns_client.publish(
-            TopicArn=self.sns_topic_arn,
-            Message=json.dumps({"default": notification.json()}),
-            MessageStructure="json",
-        )
-        logger.info(event=QJLogEvents.NotifyNewResultsEnd)
+        with logger.bind(notification=notification):
+            logger.info(event=QJLogEvents.NotifyNewResultsStart)
+            session = boto3.Session(region_name=self.region_name)
+            sns_client = session.client("sns", region_name=self.region_name)
+            sns_client.publish(
+                TopicArn=self.sns_topic_arn,
+                Message=json.dumps({"default": notification.json()}),
+                MessageStructure="json",
+            )
+            logger.info(event=QJLogEvents.NotifyNewResultsEnd)
