@@ -34,6 +34,10 @@ class QJLogEvents(BaseLogEvent):
     CreateResultSetStart: EventName
     CreateResultSetEnd: EventName
 
+    # Notifications
+    NotifyNewResultsStart: EventName
+    NotifyNewResultsEnd: EventName
+
     # CRUD Jobs
     CreateJob: EventName
     DeleteJob: EventName

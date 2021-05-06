@@ -34,6 +34,7 @@ class TestResultSet(TestCase):
                 max_graph_age_sec=10000,
                 result_expiration_sec=100000,
                 max_result_age_sec=100000,
+                notify_if_results=False,
             ),
             graph_spec=ResultSetGraphSpec(
                 graph_uris_load_times={"https://alti/alti/1/1234": 1612974818}
@@ -61,6 +62,7 @@ class TestResultSet(TestCase):
                 max_graph_age_sec=10000,
                 result_expiration_sec=100000,
                 max_result_age_sec=100000,
+                notify_if_results=False,
             ),
             graph_spec=ResultSetGraphSpec(
                 graph_uris_load_times={"https://alti/alti/1/1234": 1612974818}

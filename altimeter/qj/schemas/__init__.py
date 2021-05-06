@@ -8,4 +8,5 @@ from altimeter.qj.schemas.result_set import (
     ResultSetsPruneResult,
     ResultSetFormat,
 )
+from altimeter.qj.schemas.result_set_notification import ResultSetNotification
 from altimeter.qj.schemas.status import Status

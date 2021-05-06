@@ -44,6 +44,7 @@ class TestGetActiveJob(unittest.TestCase):
                 max_graph_age_sec=int(1e6),
                 result_expiration_sec=int(1e6),
                 max_result_age_sec=int(1e6),
+                notify_if_results=False,
             )
             created_timestamp = job_crud.create(
                 db_session=session, job_create_in=job_create
@@ -60,6 +61,7 @@ class TestGetActiveJob(unittest.TestCase):
                 max_graph_age_sec=int(1e6),
                 result_expiration_sec=int(1e6),
                 max_result_age_sec=int(1e6),
+                notify_if_results=False,
             )
             job_crud.create(db_session=session, job_create_in=another_job_create).created
 
@@ -101,6 +103,7 @@ class TestGetActiveJob(unittest.TestCase):
                 max_graph_age_sec=int(1e6),
                 result_expiration_sec=int(1e6),
                 max_result_age_sec=int(1e6),
+                notify_if_results=False,
             )
             job_crud.create(db_session=session, job_create_in=job_create)
             with self.assertRaises(ActiveJobVersionNotFound):
@@ -132,6 +135,7 @@ class TestGetJobs(unittest.TestCase):
                 max_graph_age_sec=int(1e6),
                 result_expiration_sec=int(1e6),
                 max_result_age_sec=int(1e6),
+                notify_if_results=False,
             )
             created_timestamp_1 = job_crud.create(
                 db_session=session, job_create_in=job_create_1
@@ -147,6 +151,7 @@ class TestGetJobs(unittest.TestCase):
                 max_graph_age_sec=int(1e6),
                 result_expiration_sec=int(1e6),
                 max_result_age_sec=int(1e6),
+                notify_if_results=False,
             )
             created_timestamp_2 = job_crud.create(
                 db_session=session, job_create_in=job_create_2
@@ -162,6 +167,7 @@ class TestGetJobs(unittest.TestCase):
                 max_graph_age_sec=int(1e6),
                 result_expiration_sec=int(1e6),
                 max_result_age_sec=int(1e6),
+                notify_if_results=False,
             )
             _job_3 = job_crud.create(db_session=session, job_create_in=job_create_3)
             job_3 = schemas.Job.from_orm(_job_3)
@@ -217,6 +223,7 @@ class TestCreate(unittest.TestCase):
                 max_graph_age_sec=int(1e6),
                 result_expiration_sec=int(1e6),
                 max_result_age_sec=int(1e6),
+                notify_if_results=False,
             )
             with self.assertRaises(JobQueryInvalid):
                 job_crud.create(db_session=session, job_create_in=job_create)
@@ -245,6 +252,7 @@ class TestCreate(unittest.TestCase):
                 max_graph_age_sec=int(1e6),
                 result_expiration_sec=int(1e6),
                 max_result_age_sec=int(1e6),
+                notify_if_results=False,
             )
             with self.assertRaises(JobQueryMissingAccountId):
                 job_crud.create(db_session=session, job_create_in=job_create)
@@ -278,6 +286,7 @@ class TestViews(unittest.TestCase):
                 max_graph_age_sec=int(1e6),
                 result_expiration_sec=int(1e6),
                 max_result_age_sec=int(1e6),
+                notify_if_results=False,
             )
             created_timestamp = job_crud.create(
                 db_session=session, job_create_in=job_create
@@ -352,6 +361,7 @@ class TestViews(unittest.TestCase):
                 max_graph_age_sec=int(1e6),
                 result_expiration_sec=int(1e6),
                 max_result_age_sec=int(1e6),
+                notify_if_results=False,
             )
             created_timestamp = job_crud.create(
                 db_session=session, job_create_in=job_create
@@ -487,6 +497,7 @@ class TestViews(unittest.TestCase):
                 max_graph_age_sec=int(1e6),
                 result_expiration_sec=int(1e6),
                 max_result_age_sec=int(1e6),
+                notify_if_results=False,
             )
             created_timestamp = job_crud.create(
                 db_session=session, job_create_in=job_create
@@ -610,6 +621,7 @@ class TestViews(unittest.TestCase):
                 max_graph_age_sec=int(1e6),
                 result_expiration_sec=int(1e6),
                 max_result_age_sec=int(1e6),
+                notify_if_results=False,
             )
             created_timestamp = job_crud.create(
                 db_session=session, job_create_in=job_create
@@ -703,6 +715,7 @@ class TestViews(unittest.TestCase):
                 max_graph_age_sec=int(1e6),
                 result_expiration_sec=int(1e6),
                 max_result_age_sec=int(1e6),
+                notify_if_results=False,
             )
             created_timestamp = job_crud.create(
                 db_session=session, job_create_in=job_create

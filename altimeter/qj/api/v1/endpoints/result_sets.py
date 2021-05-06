@@ -14,6 +14,7 @@ from altimeter.qj.exceptions import (
     ResultSetResultsLimitExceeded,
     ResultSizeExceeded,
 )
+from altimeter.qj.notifier import ResultSetNotifier
 
 RESULT_SETS_ROUTER = APIRouter()
 
@@ -45,12 +46,23 @@ def get_result_set(
 def create_result_set(
     *,
     db_session: Session = Depends(deps.db_session),
+    result_set_notifier: ResultSetNotifier = Depends(deps.result_set_notifier),
     result_set_crud: CRUDResultSet = Depends(deps.result_set_crud),
     result_set_in: schemas.ResultSetCreate,
 ) -> Any:
     """Create a ResultSet"""
     try:
-        return result_set_crud.create(db_session, obj_in=result_set_in)
+        result_set = result_set_crud.create(db_session, obj_in=result_set_in)
+        if result_set.results:
+            if result_set_in.job.notify_if_results:
+                result_set_notification = schemas.ResultSetNotification(
+                    job=result_set_in.job,
+                    graph_spec=result_set_in.graph_spec,
+                    created=result_set_in.created,
+                    num_results=len(result_set_in.results),
+                )
+                result_set_notifier.notify(notification=result_set_notification)
+        return result_set
     except (JobVersionNotFound, ResultSetResultsLimitExceeded, ResultSizeExceeded) as ex:
         raise HTTPException(status_code=HTTP_400_BAD_REQUEST, detail=str(ex)) from ex
 

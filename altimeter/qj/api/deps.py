@@ -12,6 +12,7 @@ from altimeter.core.log import Singleton
 from altimeter.qj.config import APIServiceConfig, DBConfig
 from altimeter.qj.crud.crud_job import CRUDJob
 from altimeter.qj.crud.crud_result_set import CRUDResultSet
+from altimeter.qj.notifier import ResultSetNotifier
 from altimeter.qj.security import get_api_key
 from altimeter.qj.settings import API_KEY_HEADER_NAME
 
@@ -60,6 +61,15 @@ def result_set_crud() -> CRUDResultSet:
         max_result_set_results=api_svc_config.max_result_set_results,
         max_result_size_bytes=api_svc_config.max_result_size_bytes,
         job_crud=job_crud(),
+    )
+
+
+def result_set_notifier() -> ResultSetNotifier:
+    """Get a ResultSetNotifier object"""
+    api_svc_config = APIServiceConfig()
+    return ResultSetNotifier(
+        sns_topic_arn=api_svc_config.result_set_notification_sns_topic_arn,
+        region_name=api_svc_config.region,
     )
 
 

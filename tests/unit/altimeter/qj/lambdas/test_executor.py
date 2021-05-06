@@ -25,6 +25,7 @@ def test_enqueue_queries():
         max_graph_age_sec=10000,
         result_expiration_sec=100000,
         max_result_age_sec=100000,
+        notify_if_results=False,
     )
     job_2 = Job(
         name="boo",
@@ -39,6 +40,7 @@ def test_enqueue_queries():
         max_graph_age_sec=10000,
         result_expiration_sec=100000,
         max_result_age_sec=100000,
+        notify_if_results=False,
     )
     jobs: List[Job] = [job_1, job_2]
     enqueue_queries(jobs=jobs, queue_url=queue_url, execution_hash="1234", region="us-west-2")
