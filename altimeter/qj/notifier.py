@@ -4,7 +4,9 @@ import json
 
 import boto3
 
+from altimeter.core.log import Logger
 from altimeter.qj import schemas
+from altimeter.qj.log import QJLogEvents
 
 
 @dataclass(frozen=True)
@@ -13,6 +15,8 @@ class ResultSetNotifier:
     region_name: str
 
     def notify(self, notification: schemas.ResultSetNotification) -> None:
+        logger = Logger()
+        logger.info(event=QJLogEvents.NotifyNewResultsStart)
         session = boto3.Session(region_name=self.region_name)
         sns_client = session.client("sns", region_name=self.region_name)
         sns_client.publish(
@@ -20,3 +24,4 @@ class ResultSetNotifier:
             Message=json.dumps({"default": notification.json()}),
             MessageStructure="json",
         )
+        logger.info(event=QJLogEvents.NotifyNewResultsEnd)
