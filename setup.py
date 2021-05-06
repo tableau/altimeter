@@ -44,7 +44,10 @@ setup(
         ),
         (
             "altimeter/services/qj/alembic/versions",
-            ["services/qj/alembic/versions/dc8f1df07766_init.py",],
+            [
+                "services/qj/alembic/versions/dc8f1df07766_init.py",
+                "services/qj/alembic/versions/60990e9bc347_added_notify_if_results_bool_on_job.py",
+                ],
         ),
     ],
     scripts=[
