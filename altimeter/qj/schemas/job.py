@@ -39,7 +39,7 @@ class JobBase(BaseModel):
     category: Category
     severity: Severity
     query: str
-    notify_if_results: bool = False
+    notify_if_results: bool
 
     class Config:
         """Pydantic config overrides"""
