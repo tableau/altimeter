@@ -22,7 +22,7 @@ setup(
         "jinja2>=2.11.1,<3",
         "pydantic>=1.6.1,<2",
         "toml>=0.10.0,<1",
-        "gremlinpython>=3.4.3",
+        "gremlinpython>=3.4.3"
     ],
     extras_require={
         "qj": [
@@ -32,7 +32,10 @@ setup(
             "sqlalchemy>=1.3.16,<1.4",
             "uvicorn>=0.11.5,<2",
         ],
-        "hyper": ["tableauhyperapi>=0.0.11355,<1", "pydantic>=1.6.1,<2",],
+        "hyper": [
+            "tableauhyperapi>=0.0.11355,<1",
+            "pydantic>=1.6.1,<2",
+        ]
     },
     data_files=[
         (
@@ -41,10 +44,7 @@ setup(
         ),
         (
             "altimeter/services/qj/alembic/versions",
-            [
-                "services/qj/alembic/versions/dc8f1df07766_init.py",
-                "services/qj/alembic/versions/f667b1410473_added_notify_if_results_bool_on_job.py",
-            ],
+            ["services/qj/alembic/versions/dc8f1df07766_init.py",],
         ),
     ],
     scripts=[
