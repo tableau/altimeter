@@ -22,7 +22,7 @@ setup(
         "jinja2>=2.11.1,<3",
         "pydantic>=1.6.1,<2",
         "toml>=0.10.0,<1",
-        "gremlinpython>=3.4.3"
+        "gremlinpython>=3.4.7,<3.5"
     ],
     extras_require={
         "qj": [
