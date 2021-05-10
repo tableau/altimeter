@@ -26,19 +26,21 @@ class DetectorResourceSpec(GuardDutyResourceSpec):
         ListField(
             "Members",
             EmbeddedDictField(
-                TransientResourceLinkField("DetectorArn", "DetectorResourceSpec", value_is_id=True),
+                TransientResourceLinkField(
+                    "DetectorArn", "DetectorResourceSpec", value_is_id=True, optional=True
+                ),
                 ScalarField("Email"),
                 ScalarField("RelationshipStatus"),
-                ScalarField("InvitedAt"),
+                ScalarField("InvitedAt", optional=True),
                 ScalarField("UpdatedAt"),
             ),
             alti_key="member",
         ),
         AnonymousDictField(
             "Master",
-            ScalarField("AccountId", alti_key="master_account_id"),
-            ScalarField("RelationshipStatus", alti_key="master_relationship_status"),
-            ScalarField("InvitedAt", alti_key="master_invited_at"),
+            ScalarField("AccountId", alti_key="master_account_id", optional=True),
+            ScalarField("RelationshipStatus", alti_key="master_relationship_status", optional=True),
+            ScalarField("InvitedAt", alti_key="master_invited_at", optional=True),
             optional=True,
         ),
     )
@@ -90,10 +92,10 @@ class DetectorResourceSpec(GuardDutyResourceSpec):
         master_account_resp = client.get_master_account(DetectorId=detector_id)
         master_account_dict = master_account_resp.get("Master")
         if master_account_dict:
-            detector["Master"] = {
-                key: master_account_dict[key]
-                for key in ("AccountId", "RelationshipStatus", "InvitedAt",)
-            }
+            detector["Master"] = {}
+            for key in ("AccountId", "RelationshipStatus", "InvitedAt"):
+                if key in master_account_dict:
+                    detector["Master"][key] = master_account_dict[key]
         return detector
 
     @classmethod
@@ -108,20 +110,21 @@ class DetectorResourceSpec(GuardDutyResourceSpec):
         if member_resps:
             for member_resp in member_resps:
                 member_account_id = member_resp["AccountId"]
-                member_detector_id = member_resp["DetectorId"]
                 member_email = member_resp["Email"]
                 member_relationship_status = member_resp["RelationshipStatus"]
-                member_invited_at = member_resp["InvitedAt"]
                 member_updated_at = member_resp["UpdatedAt"]
-                member_detector_arn = cls.generate_arn(
-                    account_id=member_account_id, region=region, resource_id=member_detector_id,
-                )
                 member = {
-                    "DetectorArn": member_detector_arn,
                     "Email": member_email,
                     "RelationshipStatus": member_relationship_status,
-                    "InvitedAt": member_invited_at,
                     "UpdatedAt": member_updated_at,
                 }
+                if "InvitedAt" in member_resp:
+                    member["InvitedAt"] = member_resp["InvitedAt"]
+                if "DetectorId" in member_resp:
+                    member_detector_id = member_resp["DetectorId"]
+                    member_detector_arn = cls.generate_arn(
+                        account_id=member_account_id, region=region, resource_id=member_detector_id,
+                    )
+                    member["DetectorArn"] = member_detector_arn
                 members.append(member)
         return members
