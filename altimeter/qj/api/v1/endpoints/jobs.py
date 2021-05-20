@@ -1,10 +1,15 @@
 """Endpoints for Jobs"""
 from datetime import datetime
-from typing import Any, List
+from typing import Any, List, Optional
 
-from fastapi import APIRouter, Depends, HTTPException, Security, Response
+from fastapi import APIRouter, Depends, Header, HTTPException, Security, Response
 from sqlalchemy.orm import Session
-from starlette.status import HTTP_201_CREATED, HTTP_400_BAD_REQUEST, HTTP_404_NOT_FOUND
+from starlette.status import (
+    HTTP_201_CREATED,
+    HTTP_304_NOT_MODIFIED,
+    HTTP_400_BAD_REQUEST,
+    HTTP_404_NOT_FOUND,
+)
 
 from altimeter.qj import schemas
 from altimeter.qj.api import deps
@@ -85,11 +90,18 @@ def get_job_latest_result_set(
     result_set_crud: CRUDResultSet = Depends(deps.result_set_crud),
     job_name: str,
     result_format: schemas.ResultSetFormat = schemas.ResultSetFormat.json,
+    response: Response,
+    if_none_match: Optional[str] = Header(None),
 ) -> Any:
     """Get the latest result set of a Job"""
 
     try:
         result_set = result_set_crud.get_latest_for_active_job(db_session, job_name=job_name)
+        etag = str(result_set.created)
+        response.headers["Cache-Control"] = "public, no-cache"
+        response.headers["ETag"] = etag
+        if etag == if_none_match:
+            return Response(status_code=HTTP_304_NOT_MODIFIED)
     except ResultSetNotFound as ex:
         raise HTTPException(status_code=HTTP_404_NOT_FOUND, detail=str(ex)) from ex
     if result_format == schemas.ResultSetFormat.csv:

@@ -26,10 +26,12 @@ def get_result_set(
     result_set_crud: CRUDResultSet = Depends(deps.result_set_crud),
     result_set_id: str,
     result_format: schemas.ResultSetFormat = schemas.ResultSetFormat.json,
+    response: Response,
 ) -> Any:
     """Get a ResultSet by id"""
     try:
         result_set = result_set_crud.get(db_session, result_set_id=result_set_id)
+        response.headers["Cache-Control"] = "public, max-age=604800, immutable"
     except ResultSetNotFound as ex:
         raise HTTPException(status_code=HTTP_404_NOT_FOUND, detail=str(ex)) from ex
     if result_format == schemas.ResultSetFormat.csv:
