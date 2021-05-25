@@ -1,4 +1,5 @@
 """Endpoints for Jobs"""
+import base64
 from datetime import datetime
 from typing import Any, List, Optional
 
@@ -94,11 +95,10 @@ def get_job_latest_result_set(
     if_none_match: Optional[str] = Header(None),
 ) -> Any:
     """Get the latest result set of a Job"""
-
     try:
         result_set = result_set_crud.get_latest_for_active_job(db_session, job_name=job_name)
-        etag = str(result_set.created)
-        response.headers["Cache-Control"] = "public, no-cache"
+        response.headers["Cache-Control"] = "public, must-revalidate, proxy-revalidate, max-age=30"
+        etag = base64.b64encode(str(result_set.created).encode()).decode()
         response.headers["ETag"] = etag
         if etag == if_none_match:
             return Response(status_code=HTTP_304_NOT_MODIFIED)
