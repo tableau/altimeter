@@ -62,7 +62,6 @@ class TestLambdaFunctionResourceSpec(TestCase):
 
         scan_accessor = AWSAccessor(session=session, account_id=account_id, region_name=region_name)
         resources = LambdaFunctionResourceSpec.scan(scan_accessor=scan_accessor)
-        self.maxDiff = None
         expected_resources = [
             Resource(
                 resource_id="arn:aws:lambda:us-east-1:123456789012:function:func_name",
