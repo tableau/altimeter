@@ -6,8 +6,12 @@ from botocore.client import BaseClient
 from altimeter.aws.resource.resource_spec import ListFromAWSResult
 from altimeter.aws.resource.ec2.vpc import VPCResourceSpec
 from altimeter.aws.resource.awslambda import LambdaResourceSpec
+from altimeter.aws.resource.iam.role import IAMRoleResourceSpec
 from altimeter.core.graph.field.dict_field import AnonymousDictField
-from altimeter.core.graph.field.resource_link_field import TransientResourceLinkField
+from altimeter.core.graph.field.resource_link_field import (
+    ResourceLinkField,
+    TransientResourceLinkField,
+)
 from altimeter.core.graph.field.scalar_field import ScalarField
 from altimeter.core.graph.schema import Schema
 
@@ -24,6 +28,7 @@ class LambdaFunctionResourceSpec(LambdaResourceSpec):
             TransientResourceLinkField("VpcId", VPCResourceSpec, optional=True),
             optional=True,
         ),
+        ResourceLinkField("Role", IAMRoleResourceSpec, value_is_id=True),
     )
 
     @classmethod
