@@ -62,7 +62,7 @@ class TestLambdaFunctionResourceSpec(TestCase):
 
         scan_accessor = AWSAccessor(session=session, account_id=account_id, region_name=region_name)
         resources = LambdaFunctionResourceSpec.scan(scan_accessor=scan_accessor)
-
+        self.maxDiff = None
         expected_resources = [
             Resource(
                 resource_id="arn:aws:lambda:us-east-1:123456789012:function:func_name",
@@ -73,6 +73,7 @@ class TestLambdaFunctionResourceSpec(TestCase):
                         SimpleLink(pred="runtime", obj="python3.7"),
                     ),
                     resource_links=(
+                        ResourceLink(pred="role", obj="arn:aws:iam::123456789012:role/testrole"),
                         ResourceLink(pred="account", obj="arn:aws::::account/123456789012"),
                         ResourceLink(pred="region", obj="arn:aws:::123456789012:region/us-east-1"),
                     ),
