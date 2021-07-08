@@ -351,14 +351,16 @@ class TestAWS2NSingleAccount(unittest.TestCase):
                             ),
                             resource_links=(
                                 ResourceLink(
-                                    pred="role", obj="arn:aws:iam::123456789012:role/test_role_1"
-                                ),
-                                ResourceLink(
                                     pred="account", obj=f"arn:aws::::account/{account_id}"
                                 ),
                                 ResourceLink(
                                     pred="region",
                                     obj=f"arn:aws:::{account_id}:region/{resource_region_name}",
+                                ),
+                            ),
+                            transient_resource_links=(
+                                ResourceLink(
+                                    pred="role", obj="arn:aws:iam::123456789012:role/test_role_1"
                                 ),
                             ),
                         ),
