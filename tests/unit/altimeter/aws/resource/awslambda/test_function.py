@@ -72,7 +72,6 @@ class TestLambdaFunctionResourceSpec(TestCase):
                         SimpleLink(pred="runtime", obj="python3.7"),
                     ),
                     resource_links=(
-                        ResourceLink(pred="role", obj="arn:aws:iam::123456789012:role/testrole"),
                         ResourceLink(pred="account", obj="arn:aws::::account/123456789012"),
                         ResourceLink(pred="region", obj="arn:aws:::123456789012:region/us-east-1"),
                     ),
@@ -80,9 +79,12 @@ class TestLambdaFunctionResourceSpec(TestCase):
                         TransientResourceLink(
                             pred="vpc", obj="arn:aws:ec2:us-east-1:123456789012:vpc/vpc-123abc"
                         ),
+                        TransientResourceLink(
+                            pred="role", obj="arn:aws:iam::123456789012:role/testrole"
+                        ),
                     ),
                 ),
             )
         ]
-
+        self.maxDiff = None
         self.assertEqual(resources, expected_resources)
