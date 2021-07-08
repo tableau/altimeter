@@ -84,8 +84,10 @@ class ResultSet(ResultSetBase):
         """
         with io.StringIO() as csv_buf:
             if self.results:
-                fieldnames = self._flatten_result(self.results[0]).keys()
-                writer = csv.DictWriter(csv_buf, fieldnames=fieldnames, lineterminator="\n")
+                fieldnames = tuple(self._flatten_result(self.results[0]).keys())
+                writer: csv.DictWriter = csv.DictWriter(
+                    csv_buf, fieldnames=fieldnames, lineterminator="\n"
+                )
                 writer.writeheader()
                 for result in self.results:
                     writer.writerow(self._flatten_result(result))

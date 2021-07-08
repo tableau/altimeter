@@ -62,7 +62,6 @@ class TestLambdaFunctionResourceSpec(TestCase):
 
         scan_accessor = AWSAccessor(session=session, account_id=account_id, region_name=region_name)
         resources = LambdaFunctionResourceSpec.scan(scan_accessor=scan_accessor)
-
         expected_resources = [
             Resource(
                 resource_id="arn:aws:lambda:us-east-1:123456789012:function:func_name",
@@ -80,9 +79,12 @@ class TestLambdaFunctionResourceSpec(TestCase):
                         TransientResourceLink(
                             pred="vpc", obj="arn:aws:ec2:us-east-1:123456789012:vpc/vpc-123abc"
                         ),
+                        TransientResourceLink(
+                            pred="role", obj="arn:aws:iam::123456789012:role/testrole"
+                        ),
                     ),
                 ),
             )
         ]
-
+        self.maxDiff = None
         self.assertEqual(resources, expected_resources)
