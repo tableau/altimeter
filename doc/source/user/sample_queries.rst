@@ -38,12 +38,17 @@ Locate vpcs with no ec2 instances, rds instances lambdas or ENIs attached.
 
         ?account    <alti:account_id>          ?account_id .
 
-        FILTER NOT EXISTS { ?resource   <alti:aws:ec2:vpc> ?vpc .
-                            ?resource   a                   ?resource_type .
-                            FILTER ( ?resource_type = <alti:aws:ec2:instance> ||
-                                     ?resource_type = <alti:aws:rds:db> ||
-                                     ?resource_type = <alti:aws:lambda:function> ||
-                                     ?resource_type = <alti:aws:ec2:network-interface> ) }
+        FILTER NOT EXISTS { ?resource   a                   ?resource_type ;
+                                        <alti:vpc>          ?vpc .
+                            FILTER ( ?resource_type IN
+                                (
+                                    <alti:aws:ec2:instance>,
+                                    <alti:aws:rds:db>,
+                                    <alti:aws:lambda:function>,
+                                    <alti:aws:ec2:network-interface>
+                                )
+                            )
+        }
     }
     order by ?account_id ?region_name ?vpc_id
 
