@@ -118,10 +118,10 @@ class FileArtifactWriter(ArtifactWriter):
             logger.info(event=LogEvent.WriteToFSStart)
             with open(artifact_path, "wb") as fp:
                 if compression is None:
-                    graph.serialize(fp)
+                    graph.serialize(fp, format="xml")
                 elif compression == GZIP:
                     with gzip.GzipFile(fileobj=fp, mode="wb") as gz:
-                        graph.serialize(gz)
+                        graph.serialize(gz, format="xml")
                 else:
                     raise ValueError(f"Unknown compression arg {compression}")
             logger.info(event=LogEvent.WriteToFSEnd)
@@ -188,10 +188,10 @@ class S3ArtifactWriter(ArtifactWriter):
             logger.info(event=LogEvent.WriteToS3Start)
             with io.BytesIO() as rdf_bytes_buf:
                 if compression is None:
-                    graph.serialize(rdf_bytes_buf)
+                    graph.serialize(rdf_bytes_buf, format="xml")
                 elif compression == GZIP:
                     with gzip.GzipFile(fileobj=rdf_bytes_buf, mode="wb") as gz:
-                        graph.serialize(gz)
+                        graph.serialize(gz, format="xml")
                 else:
                     raise ValueError(f"Unknown compression arg {compression}")
                 rdf_bytes_buf.flush()

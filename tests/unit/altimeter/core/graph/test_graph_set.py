@@ -90,7 +90,7 @@ class TestGraphSetWithValidDataNoMerging(TestCase):
 
     def test_rdf_b_type(self):
         graph = self.validated_graph_set.to_rdf()
-        graph.serialize("/tmp/test.rdf")
+        graph.serialize("/tmp/test.rdf", format="xml")
         linked_a_node_results = graph.query(
             "select ?s where {?s a <test-name:test:a>; <test-name:id> '123' }"
         )
