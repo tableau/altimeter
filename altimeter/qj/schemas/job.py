@@ -40,6 +40,7 @@ class JobBase(BaseModel):
     severity: Severity
     query: str
     notify_if_results: bool
+    remediate_sqs_queue: Optional[str] = None
 
     class Config:
         """Pydantic config overrides"""
@@ -56,6 +57,17 @@ class JobBase(BaseModel):
                 f"Job name {value} is not valid. Jobs must begin with a letter and may contain "
                 "letters, numbers and underscores"
             )
+        return value
+
+    # pylint: disable=no-self-argument,no-self-use
+    @validator("remediate_sqs_queue")
+    def remediate_sqs_queue_is_valid_arn(cls, value: Optional[str]) -> Optional[str]:
+        """If present validate that the remediate_sqs_queue is a valid sqs arn"""
+        if value is not None:
+            if not re.match(r"^arn:aws:sqs:.+:\d{12}:.+$", value, re.IGNORECASE):
+                raise ValueError(
+                    f"remediate_sqs_queue value {value} does not appear to be a valid aws sqs arn"
+                )
         return value
 
 
