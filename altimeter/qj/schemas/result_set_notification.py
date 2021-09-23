@@ -15,3 +15,4 @@ class ResultSetNotification(BaseModel):
     graph_spec: ResultSetGraphSpec
     created: datetime
     num_results: int
+    result_set_id: str
