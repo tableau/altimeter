@@ -62,7 +62,7 @@ def create_result_set(
                     graph_spec=result_set_in.graph_spec,
                     created=result_set_in.created,
                     num_results=len(result_set_in.results),
-                    result_set_id=result_set.result_set_id,
+                    result_set_id=str(result_set.result_set_id),
                 )
                 result_set_notifier.notify(notification=result_set_notification)
         return result_set
