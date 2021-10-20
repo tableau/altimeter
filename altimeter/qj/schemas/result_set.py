@@ -5,7 +5,7 @@ import csv
 
 from enum import Enum
 from datetime import datetime
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 from pydantic import BaseModel, Field, validator  # pylint: disable=no-name-in-module
 
@@ -72,6 +72,8 @@ class ResultSetCreate(ResultSetBase):
 
 class ResultSet(ResultSetBase):
     """ResultSet schema"""
+
+    result_set_id: Optional[str]
 
     class Config:
         """Pydantic config overrides"""
