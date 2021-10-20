@@ -75,6 +75,14 @@ class ResultSet(ResultSetBase):
 
     result_set_id: Optional[str]
 
+    # pylint: disable=no-self-argument,no-self-use
+    @validator("result_set_id", pre=True)
+    def stringify_result_set_id(cls, value: Optional[Any]) -> Optional[str]:
+        """Stringify the result_set_id"""
+        if value is not None:
+            return str(value)
+        return value
+
     class Config:
         """Pydantic config overrides"""
 
