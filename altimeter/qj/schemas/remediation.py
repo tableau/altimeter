@@ -9,7 +9,6 @@ class Remediation(BaseModel):
 
     job_name: str
     result_set_id: str
-    qj_api_host: str
 
     class Config:
         """Pydantic config overrides"""
