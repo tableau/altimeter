@@ -37,7 +37,6 @@ class Result(BaseModel):
     class Config:
         """Pydantic config overrides"""
 
-        extra = "forbid"
         orm_mode = True
 
 
@@ -55,38 +54,25 @@ class ResultSetBase(BaseModel):
     results: List[Result]
     created: datetime = Field(default_factory=datetime.utcnow)
 
-    class Config:
-        """Pydantic config overrides"""
-
-        extra = "forbid"
-
 
 class ResultSetCreate(ResultSetBase):
     """ResultSetCreate schema"""
-
-    class Config:
-        """Pydantic config overrides"""
-
-        extra = "forbid"
 
 
 class ResultSet(ResultSetBase):
     """ResultSet schema"""
 
-    result_set_id: Optional[str]
+    result_set_id: str
 
     # pylint: disable=no-self-argument,no-self-use
     @validator("result_set_id", pre=True)
-    def stringify_result_set_id(cls, value: Optional[Any]) -> Optional[str]:
+    def stringify_result_set_id(cls, value: str) -> str:
         """Stringify the result_set_id"""
-        if value is not None:
-            return str(value)
-        return value
+        return str(value)
 
     class Config:
         """Pydantic config overrides"""
 
-        extra = "forbid"
         orm_mode = True
 
     def to_csv(self) -> str:
@@ -116,11 +102,6 @@ class ResultSetsPruneResult(BaseModel):
     """ResultSetsPruneResult schema"""
 
     num_pruned: int
-
-    class Config:
-        """Pydantic config overrides"""
-
-        extra = "forbid"
 
 
 # pylint: disable=too-few-public-methods

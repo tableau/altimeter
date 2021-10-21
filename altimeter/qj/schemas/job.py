@@ -42,11 +42,6 @@ class JobBase(BaseModel):
     notify_if_results: bool
     remediate_sqs_queue: Optional[str] = None
 
-    class Config:
-        """Pydantic config overrides"""
-
-        extra = "forbid"
-
     # pylint: disable=no-self-argument,no-self-use
     @validator("name")
     def name_is_valid(cls, value: str) -> str:
@@ -59,17 +54,6 @@ class JobBase(BaseModel):
             )
         return value
 
-    # pylint: disable=no-self-argument,no-self-use
-    @validator("remediate_sqs_queue")
-    def remediate_sqs_queue_is_valid_arn(cls, value: Optional[str]) -> Optional[str]:
-        """If present validate that the remediate_sqs_queue is a valid sqs arn"""
-        if value is not None:
-            if not re.match(r"^arn:aws:sqs:.+:\d{12}:.+$", value, re.IGNORECASE):
-                raise ValueError(
-                    f"remediate_sqs_queue value {value} does not appear to be a valid aws sqs arn"
-                )
-        return value
-
 
 class JobCreate(JobBase):
     """JobCreate schema"""
@@ -77,11 +61,6 @@ class JobCreate(JobBase):
     max_graph_age_sec: Optional[int] = Field(gt=0)
     result_expiration_sec: Optional[int] = Field(gt=0)
     max_result_age_sec: Optional[int] = Field(gt=0)
-
-    class Config:
-        """Pydantic config overrides"""
-
-        extra = "forbid"
 
 
 class JobUpdate(BaseModel):
@@ -96,11 +75,6 @@ class JobUpdate(BaseModel):
     result_expiration_sec: Optional[int] = Field(gt=0)
     max_result_age_sec: Optional[int] = Field(gt=0)
     notify_if_results: Optional[bool]
-
-    class Config:
-        """Pydantic config overrides"""
-
-        extra = "forbid"
 
     @classmethod
     def from_job_create(cls, job_create: JobCreate) -> "JobUpdate":
@@ -132,5 +106,4 @@ class Job(JobBase):
     class Config:
         """Pydantic config overrides"""
 
-        extra = "forbid"
         orm_mode = True

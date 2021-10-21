@@ -57,6 +57,12 @@ class ExecutorConfig(APIConfig):
     query_queue_url: str
 
 
+class RemediatorConfig(BaseSettings):
+    """Remediator configuration"""
+
+    qj_api_host: str
+
+
 # pylint: disable=too-few-public-methods
 class QueryConfig(APIConfig, SecurityConfig):
     """Configuraton for the Query lambda"""
