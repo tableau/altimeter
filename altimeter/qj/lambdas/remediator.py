@@ -17,21 +17,7 @@ def remediator(event: Dict[str, Any]) -> None:
     """Run the remediation lambda for a QJ result set"""
     config = RemediatorConfig()
     logger = Logger()
-    records = event.get("Records", [])
-    if not records:
-        msg = "No SQS records found"
-        logger.info(event=QJLogEvents.InvalidInput, detail=msg)
-    if len(records) > 1:
-        msg = f"More than one record. BatchSize is probably not 1. event: {event}"
-        logger.info(event=QJLogEvents.InvalidInput, detail=msg)
-        raise RemediationError(msg)
-    body = records[0].get("body")
-    if body is None:
-        msg = f"No record body found. BatchSize is probably not 1. event: {event}"
-        logger.info(event=QJLogEvents.InvalidInput, detail=msg)
-        raise RemediationError(msg)
-    body = json.loads(body)
-    remediation = Remediation(**body)
+    remediation = Remediation(**event)
     with logger.bind(remediation=remediation):
         logger.info(event=QJLogEvents.RemediationInit)
         qj_api_client = QJAPIClient(host=config.qj_api_host)

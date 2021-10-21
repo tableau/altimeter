@@ -56,7 +56,6 @@ class QJLogEvents(BaseLogEvent):
     GetLatestResultSetForActiveJob: EventName
 
     # Remediations
-    InvalidInput: EventName
     ProcessResult: EventName
     RemediationInit: EventName
     StaleResultSet: EventName
