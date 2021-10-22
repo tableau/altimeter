@@ -11,9 +11,9 @@ from altimeter.qj.schemas.result_set import Result
 
 
 class Config(BaseSettings):
+    dry_run: bool
     remediator_target_role_name: str
     remediator_target_role_external_id: Optional[str] = None
-    dry_run: bool = True
 
 
 class RemediatorLambda:
