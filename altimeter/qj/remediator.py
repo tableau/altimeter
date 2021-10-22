@@ -13,11 +13,12 @@ from altimeter.qj.schemas.result_set import Result
 class Config(BaseSettings):
     remediator_target_role_name: str
     remediator_target_role_external_id: Optional[str] = None
+    dry_run: bool = True
 
 
 class RemediatorLambda:
     @classmethod
-    def remediate(cls, session: boto3.Session, result: Dict[str, Any]) -> None:
+    def remediate(cls, session: boto3.Session, result: Dict[str, Any], dry_run: bool) -> None:
         raise NotImplementedError("RemediatorLambda.remediate must be implemented in subclasses")
 
     @classmethod
@@ -35,7 +36,7 @@ class RemediatorLambda:
                     role_name=config.remediator_target_role_name,
                     external_id=config.remediator_target_role_external_id,
                 )
-                cls.remediate(session=session, result=result.result)
+                cls.remediate(session=session, result=result.result, dry_run=config.dry_run)
                 logger.info(event=QJLogEvents.ResultRemediationSuccessful)
             except Exception as ex:
                 logger.error(event=QJLogEvents.ResultRemediationFailed, error=str(ex))
