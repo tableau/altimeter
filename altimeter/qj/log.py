@@ -64,6 +64,7 @@ class QJLogEvents(BaseLogEvent):
     InvokeResultRemediationLambdaEnd: EventName
     InvokeResultRemediationLambdaError: EventName
     ResultRemediationLambdaRunError: EventName
+    ResultRemediationStart: EventName
     ResultRemediationFailed: EventName
     ResultRemediationSuccessful: EventName
     ResultSetRemediationFailed: EventName

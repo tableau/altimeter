@@ -9,13 +9,10 @@ import botocore
 from altimeter.core.log import Logger
 from altimeter.qj.client import QJAPIClient
 from altimeter.qj.config import RemediatorConfig
+from altimeter.qj.exceptions import RemediationError
 from altimeter.qj.log import QJLogEvents
 from altimeter.qj.schemas.remediation import Remediation
 from altimeter.qj.schemas.result_set import Result
-
-
-class RemediationError(Exception):
-    """An error during Remediation"""
 
 
 def remediator(event: Dict[str, Any]) -> None:
