@@ -39,3 +39,7 @@ class ResultSetResultsLimitExceeded(QJException):
 
 class ResultSizeExceeded(QJException):
     """The size of an individual result exceeds the configured maximum"""
+
+
+class RemediationError(Exception):
+    """An error during Remediation"""

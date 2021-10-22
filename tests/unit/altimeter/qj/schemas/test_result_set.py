@@ -43,6 +43,7 @@ class TestResultSet(TestCase):
                 Result(account_id="123456789101", result={"foo": "boo", "fizz": "bizz"}),
                 Result(account_id="123456789101", result={"foo": "boo2", "fizz": "bizz2"}),
             ],
+            result_set_id="fake-result-set-id",
         )
         expected_csv = "account_id,foo,fizz\n123456789101,boo,bizz\n123456789101,boo2,bizz2\n"
         self.assertEqual(expected_csv, result_set.to_csv())
@@ -68,6 +69,7 @@ class TestResultSet(TestCase):
                 graph_uris_load_times={"https://alti/alti/1/1234": 1612974818}
             ),
             results=[],
+            result_set_id="fake-result-set-id",
         )
         expected_csv = ""
         self.assertEqual(expected_csv, result_set.to_csv())

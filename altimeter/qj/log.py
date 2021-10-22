@@ -55,6 +55,21 @@ class QJLogEvents(BaseLogEvent):
     GetResultSet: EventName
     GetLatestResultSetForActiveJob: EventName
 
+    # Remediations
+    ProcessResult: EventName
+    RemediationInit: EventName
+    StaleResultSet: EventName
+    JobHasNoRemediator: EventName
+    InvokeResultRemediationLambdaStart: EventName
+    InvokeResultRemediationLambdaEnd: EventName
+    InvokeResultRemediationLambdaError: EventName
+    ResultRemediationLambdaRunError: EventName
+    ResultRemediationStart: EventName
+    ResultRemediationFailed: EventName
+    ResultRemediationSuccessful: EventName
+    ResultSetRemediationFailed: EventName
+    ResultSetRemediationSuccessful: EventName
+
     # HTTP
     APIError: EventName
     HTTPRequest: EventName

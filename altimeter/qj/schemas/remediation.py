@@ -13,5 +13,4 @@ class Remediation(BaseModel):
     class Config:
         """Pydantic config overrides"""
 
-        extra = "forbid"
         orm_mode = True

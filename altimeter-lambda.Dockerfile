@@ -1,4 +1,4 @@
-FROM public.ecr.aws/lambda/python:3.8
+FROM amazon/aws-lambda-python:3.8
 
 COPY . /tmp/src
 COPY bin/altimeter_lambda.py "${LAMBDA_TASK_ROOT}"
