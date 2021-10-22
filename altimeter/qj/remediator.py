@@ -11,8 +11,8 @@ from altimeter.qj.schemas.result_set import Result
 
 
 class Config(BaseSettings):
-    remediator_role_name: str
-    remediator_role_external_id: Optional[str] = None
+    remediator_target_role_name: str
+    remediator_target_role_external_id: Optional[str] = None
 
 
 class RemediatorLambda:
@@ -32,8 +32,8 @@ class RemediatorLambda:
             try:
                 session = get_assumed_session(
                     account_id=result.account_id,
-                    role_name=config.remediator_role_name,
-                    external_id=config.remediator_role_external_id,
+                    role_name=config.remediator_target_role_name,
+                    external_id=config.remediator_target_role_external_id,
                 )
                 cls.remediate(session=session, result=result.result)
                 logger.info(event=QJLogEvents.ResultRemediationSuccessful)
