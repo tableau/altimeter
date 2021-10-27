@@ -138,9 +138,10 @@ class MultiLink(BaseLink):
             "~id": vertex_id,
             "~label": self.pred,
         }
+        edge_label = prefix if prefix != "" else self.pred
         edge = {
             "~id": uuid.uuid1(),
-            "~label": self.pred,
+            "~label": edge_label,
             "~from": parent["~id"],
             "~to": vertex_id,
         }
