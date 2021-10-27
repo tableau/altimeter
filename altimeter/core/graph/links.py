@@ -147,7 +147,7 @@ class MultiLink(BaseLink):
         }
         edges.append(edge)
         vertices.append(v)
-        self.obj.to_lpg(v,vertices, edges)
+        self.obj.to_lpg(v, vertices, edges)
 
 class ResourceLink(BaseLink):
     """Represents a link to another resource which must exist in the graph."""

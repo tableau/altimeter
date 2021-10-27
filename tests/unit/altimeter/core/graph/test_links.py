@@ -1,4 +1,5 @@
 import unittest
+import uuid
 
 from rdflib import BNode, Graph, Literal, Namespace
 from rdflib.term import URIRef
@@ -182,16 +183,46 @@ class TestMultiLink(unittest.TestCase):
             ),
         )
         link = MultiLink(pred=pred, obj=obj)
-        expected_link_dict = {
-            "test-multi-pred.test-simple-pred-1": "test-simple-obj-1",
-            "test-multi-pred.test-simple-pred-2": "test-simple-obj-2",
-            "test-multi-pred.test-simple-pred-3": "test-simple-obj-3",
+
+        parent = {
+            "~id": "parent_id"
         }
-        parent = {}
         vertices = []
         edges = []
         link.to_lpg(parent, vertices, edges, "")
-        self.assertDictEqual(expected_link_dict, parent)
+
+        expected_vertex = {
+                '~label': 'test-multi-pred',
+                'test-simple-pred-1': 'test-simple-obj-1',
+                'test-simple-pred-2': 'test-simple-obj-2',
+                'test-simple-pred-3': 'test-simple-obj-3',
+        }
+
+        self.assertEqual(len(vertices), 1)
+        self.assertIsInstance(vertices[0]['~id'], uuid.UUID)
+        vertex_id = vertices[0]['~id']
+        del vertices[0]['~id']
+        self.assertDictEqual(expected_vertex, vertices[0])
+
+
+        expected_edge = {
+                '~label': 'test-multi-pred',
+                '~from': 'parent_id',
+                '~to': vertex_id,
+        }
+        self.assertEqual(len(edges), 1)
+        self.assertIsInstance(edges[0]['~id'], uuid.UUID)
+        del edges[0]['~id']
+        self.assertDictEqual(expected_edge, edges[0])
+
+        vertices = []
+        edges = []
+        link.to_lpg(parent, vertices, edges, "test_prefix")
+        self.assertEqual(len(edges), 1)
+        self.assertEqual("test_prefix", edges[0]['~label'])
+
+
+
 
 
 class TestResourceLink(unittest.TestCase):
