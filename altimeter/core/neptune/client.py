@@ -14,6 +14,7 @@ from gremlin_python.process.graph_traversal import __
 from gremlin_python.process.anonymous_traversal import traversal
 from gremlin_python.driver.driver_remote_connection import DriverRemoteConnection
 from gremlin_python.process.traversal import T
+from rdflib import Graph
 import requests
 from tornado import httpclient
 
@@ -833,7 +834,7 @@ class AltimeterNeptuneClient:
         else:
             raise NeptuneNoGraphsFoundException
 
-    def write_to_neptune_rdf(self, graph: Dict) -> None:
+    def write_to_neptune_rdf(self, graph: Graph) -> None:
         """
         Writes the graph to an RDF graph
         :param graph: The graph to write

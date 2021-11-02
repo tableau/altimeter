@@ -118,7 +118,8 @@ class FileArtifactWriter(ArtifactWriter):
             logger.info(event=LogEvent.WriteToFSStart)
             with open(artifact_path, "wb") as fp:
                 if compression is None:
-                    graph.serialize(fp, format="xml")
+                    # see https://github.com/python/mypy/pull/9275
+                    graph.serialize(fp, format="xml")  # type: ignore
                 elif compression == GZIP:
                     with gzip.GzipFile(fileobj=fp, mode="wb") as gz:
                         graph.serialize(gz, format="xml")
