@@ -34,6 +34,15 @@ class ACMCertificateResourceSpec(ACMResourceSpec):
         ListField("InUseBy", EmbeddedScalarField(), optional=True),
         ScalarField("FailureReason", optional=True),
         ScalarField("Type", optional=True),
+        ListField(
+            "DomainValidationOptions",
+            ScalarField("DomainName", optional=True),
+            ListField("ValidationEmails", optional=True),
+            ScalarField("ValidationDomain", optional=True),
+            ScalarField("ValidationStatus", optional=True),
+            ScalarField("ValidationMethod", optional=True),
+            optional=True,
+        ),
         ScalarField("RenewalEligibility", optional=True),
     )
 
