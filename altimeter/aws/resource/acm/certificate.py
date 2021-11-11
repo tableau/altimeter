@@ -4,6 +4,7 @@ from typing import Any, Type, List, Dict
 from botocore.client import BaseClient
 from botocore.exceptions import ClientError
 
+from altimeter.core.graph.field.dict_field import DictField, EmbeddedDictField
 from altimeter.core.graph.field.list_field import ListField
 from altimeter.core.graph.field.scalar_field import ScalarField, EmbeddedScalarField
 from altimeter.core.graph.schema import Schema
@@ -34,6 +35,33 @@ class ACMCertificateResourceSpec(ACMResourceSpec):
         ListField("InUseBy", EmbeddedScalarField(), optional=True),
         ScalarField("FailureReason", optional=True),
         ScalarField("Type", optional=True),
+        ListField(
+            "DomainValidationOptions",
+            EmbeddedDictField(
+                ScalarField("DomainName", optional=True),
+                ListField("ValidationEmails", EmbeddedScalarField(), optional=True),
+                ScalarField("ValidationDomain", optional=True),
+                ScalarField("ValidationStatus", optional=True),
+                DictField(
+                    "ResourceRecord",
+                    EmbeddedDictField(
+                        ScalarField("Name", optional=True),
+                        ScalarField("Type", optional=True),
+                        ScalarField("Value", optional=True),
+                    ),
+                    optional=True,
+                ),
+                ScalarField("ValidationMethod", optional=True),
+            ),
+            optional=True,
+        ),
+        ListField("KeyUsages", EmbeddedDictField(ScalarField("Name")), optional=True),
+        ListField(
+            "ExtendedKeyUsages",
+            EmbeddedDictField(ScalarField("Name"), ScalarField("OID", optional=True)),
+            optional=True,
+        ),
+        ScalarField("RenewalEligibility", optional=True),
     )
 
     @classmethod
