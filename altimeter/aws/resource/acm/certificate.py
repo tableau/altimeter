@@ -34,6 +34,7 @@ class ACMCertificateResourceSpec(ACMResourceSpec):
         ListField("InUseBy", EmbeddedScalarField(), optional=True),
         ScalarField("FailureReason", optional=True),
         ScalarField("Type", optional=True),
+        ScalarField("RenewalEligibility", optional=True),
     )
 
     @classmethod
