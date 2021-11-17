@@ -55,6 +55,9 @@ class IAMRoleResourceSpec(IAMResourceSpec):
                         ListField(
                             "Federated", EmbeddedScalarField(), optional=True, allow_scalar=True
                         ),
+                        ListField(
+                            "Service", EmbeddedScalarField(), optional=True, allow_scalar=True
+                        ),
                     ),
                 ),
             ),
