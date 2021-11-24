@@ -319,7 +319,15 @@ class TestAWS2NSingleAccount(unittest.TestCase):
                                                     ),
                                                     multi_links=(
                                                         MultiLink(
-                                                            pred="principal", obj=LinkCollection(),
+                                                            pred="principal",
+                                                            obj=LinkCollection(
+                                                                simple_links=(
+                                                                    SimpleLink(
+                                                                        pred="service",
+                                                                        obj="lambda.amazonaws.com",
+                                                                    ),
+                                                                )
+                                                            ),
                                                         ),
                                                     ),
                                                 ),
@@ -572,7 +580,7 @@ def delete_vpcs(region_names: Iterable[str]) -> None:
         for vpc in vpcs:
             vpc_id = vpc["VpcId"]
             subnets_resp = regional_ec2_client.describe_subnets(
-                Filters=[{"Name": "vpc-id", "Values": [vpc_id,]},],
+                Filters=[{"Name": "vpc-id", "Values": [vpc_id,],},],
             )
             for subnet in subnets_resp["Subnets"]:
                 subnet_id = subnet["SubnetId"]
