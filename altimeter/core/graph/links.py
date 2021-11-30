@@ -133,7 +133,21 @@ class MultiLink(BaseLink):
              edges: the list of all edge dictionaries
              prefix: A string to prefix the property name with
         """
-        self.obj.to_lpg(parent, vertices, edges, prefix=self.pred + ".")
+        vertex_id = uuid.uuid1()
+        v = {
+            "~id": vertex_id,
+            "~label": self.pred,
+        }
+        edge_label = prefix if prefix != "" else self.pred
+        edge = {
+            "~id": uuid.uuid1(),
+            "~label": edge_label,
+            "~from": parent["~id"],
+            "~to": vertex_id,
+        }
+        edges.append(edge)
+        vertices.append(v)
+        self.obj.to_lpg(v, vertices, edges)
 
 
 class ResourceLink(BaseLink):
