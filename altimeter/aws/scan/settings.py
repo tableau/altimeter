@@ -47,6 +47,7 @@ from altimeter.aws.resource.organizations.ou import OUResourceSpec
 from altimeter.aws.resource.organizations.account import OrgsAccountResourceSpec
 from altimeter.aws.resource.rds.instance import RDSInstanceResourceSpec
 from altimeter.aws.resource.rds.snapshot import RDSSnapshotResourceSpec
+from altimeter.aws.resource.route53.hosted_zone import HostedZoneResourceSpec
 from altimeter.aws.resource.s3.bucket import S3BucketResourceSpec
 from altimeter.aws.resource.support.severity_level import SeverityLevelResourceSpec
 
@@ -82,6 +83,7 @@ DEFAULT_RESOURCE_SPEC_CLASSES: Tuple[Type[AWSResourceSpec], ...] = (
     LoadBalancerResourceSpec,
     RDSInstanceResourceSpec,
     RDSSnapshotResourceSpec,
+    HostedZoneResourceSpec,
     S3BucketResourceSpec,
     SecurityGroupResourceSpec,
     SeverityLevelResourceSpec,
