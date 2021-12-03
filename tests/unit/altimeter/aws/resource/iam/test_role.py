@@ -79,37 +79,36 @@ class TestIAMRole(TestCase):
         session = boto3.Session()
         client = session.client("iam")
         client.create_role(RoleName=role_name, AssumeRolePolicyDocument=assume_role_policy_document)
-        iam = boto3.resource('iam')
-        policy = iam.RolePolicy(role_name,role_policy)
+        iam = boto3.resource("iam")
+        policy = iam.RolePolicy(role_name, role_policy)
         policy.put(PolicyDocument=policy_document)
-        policy = iam.RolePolicy(role_name,role_policy2)
+        policy = iam.RolePolicy(role_name, role_policy2)
         policy.put(PolicyDocument=policy_document2)
 
         scan_accessor = AWSAccessor(session=session, account_id=account_id, region_name=region_name)
         resources = IAMRoleResourceSpec.scan(scan_accessor=scan_accessor)
         embedded_resources_links = [
-            link for link in resources[0].link_collection.multi_links
+            link
+            for link in resources[0].link_collection.multi_links
             if link.pred == "embedded_policy"
         ]
         self.assertEqual(len(embedded_resources_links), 2)
         # First policy.
         embedded_resources_link = embedded_resources_links[0]
-        self.assertTrue(compare_embedded_policy(
-            embedded_resources_link,
-            role_policy,
-            policy_document))
+        self.assertTrue(
+            compare_embedded_policy(embedded_resources_link, role_policy, policy_document)
+        )
         # Second policy.
         embedded_resources_link = embedded_resources_links[1]
-        self.assertTrue(compare_embedded_policy(embedded_resources_link, role_policy2, policy_document2))
+        self.assertTrue(
+            compare_embedded_policy(embedded_resources_link, role_policy2, policy_document2)
+        )
 
-def compare_embedded_policy(
-    source_policy,
-    expected_policy_name,
-    expected_policy_document
-    ):
+
+def compare_embedded_policy(source_policy, expected_policy_name, expected_policy_document):
     if source_policy.pred != "embedded_policy":
         return False
-    if len(source_policy.obj.simple_links) !=  2:
+    if len(source_policy.obj.simple_links) != 2:
         return False
     embedded_policy = source_policy.obj.simple_links[0]
     if embedded_policy.pred != "policy_name":
@@ -119,10 +118,6 @@ def compare_embedded_policy(
     embedded_policy_document = source_policy.obj.simple_links[1]
     if embedded_policy_document.pred != "policy_document":
         return False
-    got_policy_document = policy_doc_dict_to_sorted_str(
-        json.loads(embedded_policy_document.obj)
-    )
-    expected_policy_document = policy_doc_dict_to_sorted_str(
-        json.loads(expected_policy_document)
-    )
+    got_policy_document = policy_doc_dict_to_sorted_str(json.loads(embedded_policy_document.obj))
+    expected_policy_document = policy_doc_dict_to_sorted_str(json.loads(expected_policy_document))
     return got_policy_document == expected_policy_document
