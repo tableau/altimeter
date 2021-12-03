@@ -43,9 +43,7 @@ class IAMRoleResourceSpec(IAMResourceSpec):
         ),
         ListField(
             "EmbeddedPolicy",
-            EmbeddedDictField(
-                ScalarField("PolicyName"), ScalarField("PolicyDocument"),
-            ),
+            EmbeddedDictField(ScalarField("PolicyName"), ScalarField("PolicyDocument"),),
             optional=True,
         ),
         DictField(
@@ -58,17 +56,9 @@ class IAMRoleResourceSpec(IAMResourceSpec):
                     ListField("Action", EmbeddedScalarField(), allow_scalar=True),
                     DictField(
                         "Principal",
+                        ListField("AWS", EmbeddedScalarField(), optional=True, allow_scalar=True,),
                         ListField(
-                            "AWS",
-                            EmbeddedScalarField(),
-                            optional=True,
-                            allow_scalar=True,
-                        ),
-                        ListField(
-                            "Federated",
-                            EmbeddedScalarField(),
-                            optional=True,
-                            allow_scalar=True,
+                            "Federated", EmbeddedScalarField(), optional=True, allow_scalar=True,
                         ),
                     ),
                 ),
@@ -79,10 +69,7 @@ class IAMRoleResourceSpec(IAMResourceSpec):
 
     @classmethod
     def list_from_aws(
-        cls: Type["IAMRoleResourceSpec"],
-        client: BaseClient,
-        account_id: str,
-        region: str,
+        cls: Type["IAMRoleResourceSpec"], client: BaseClient, account_id: str, region: str,
     ) -> ListFromAWSResult:
         """Return a dict of dicts of the format:
 
@@ -97,9 +84,7 @@ class IAMRoleResourceSpec(IAMResourceSpec):
         for resp in paginator.paginate():
             for role in resp.get("Roles", []):
                 role_name = role["RoleName"]
-                assume_role_policy_document = copy.deepcopy(
-                    role["AssumeRolePolicyDocument"]
-                )
+                assume_role_policy_document = copy.deepcopy(role["AssumeRolePolicyDocument"])
                 assume_role_policy_document_text = policy_doc_dict_to_sorted_str(
                     assume_role_policy_document
                 )
@@ -117,17 +102,13 @@ class IAMRoleResourceSpec(IAMResourceSpec):
                     embedded_policies = get_embedded_role_policies(client, role_name)
                     role["EmbeddedPolicy"] = embedded_policies
                 except ClientError as c_e:
-                    error_code = (
-                        getattr(c_e, "response", {}).get("Error", {}).get("Code", {})
-                    )
+                    error_code = getattr(c_e, "response", {}).get("Error", {}).get("Code", {})
                     if error_code != "NoSuchEntity":
                         raise c_e
         return ListFromAWSResult(resources=roles)
 
 
-def get_attached_role_policies(
-    client: BaseClient, role_name: str
-) -> List[Dict[str, Any]]:
+def get_attached_role_policies(client: BaseClient, role_name: str) -> List[Dict[str, Any]]:
     """Get attached role policies"""
     policies = []
     paginator = client.get_paginator("list_attached_role_policies")
@@ -137,9 +118,7 @@ def get_attached_role_policies(
     return policies
 
 
-def get_embedded_role_policies(
-    client: BaseClient, role_name: str
-) -> List[Dict[str, Any]]:
+def get_embedded_role_policies(client: BaseClient, role_name: str) -> List[Dict[str, Any]]:
     """Get attached embedded policies"""
     policies = []
     paginator = client.get_paginator("list_role_policies")
