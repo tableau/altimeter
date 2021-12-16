@@ -41,6 +41,7 @@ class TargetGroupResourceSpec(ELBV2ResourceSpec):
             EmbeddedResourceLinkField(LoadBalancerResourceSpec, value_is_id=True),
         ),
         ScalarField("TargetType"),
+        ScalarField("PreserveClientIpEnabled", optional=True),
         ListField(
             "TargetHealthDescriptions",
             EmbeddedDictField(
@@ -79,6 +80,8 @@ class TargetGroupResourceSpec(ELBV2ResourceSpec):
             for resource in resp.get("TargetGroups", []):
                 resource_arn = resource["TargetGroupArn"]
                 try:
+                    resource_attrs = cls.get_tg_attrs(client, resource_arn)
+                    resource.update(resource_attrs)
                     resource["TargetHealthDescriptions"] = get_target_group_health(
                         client, resource_arn
                     )
@@ -88,6 +91,18 @@ class TargetGroupResourceSpec(ELBV2ResourceSpec):
                     if error_code != "TargetGroupNotFound":
                         raise c_e
         return ListFromAWSResult(resources=resources)
+
+    @classmethod
+    def get_tg_attrs(
+        cls: Type["TargetGroupResourceSpec"], client: BaseClient, target_group_arn: str,
+    ) -> Dict[str, str]:
+        """Get tg attributes that Altimeter graphs."""
+        tg_attrs = {}
+        resp = client.describe_target_group_attributes(TargetGroupArn=target_group_arn)
+        for attr in resp["Attributes"]:
+            if attr["Key"] == "preserve_client_ip.enabled":
+                tg_attrs["PreserveClientIpEnabled"] = attr["Value"]
+        return tg_attrs
 
 
 def get_target_group_health(client: BaseClient, target_group_arn: str) -> List[Dict[str, Any]]:
