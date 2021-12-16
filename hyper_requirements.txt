@@ -1,2 +1,0 @@
-tableauhyperapi>=0.0.11355,<1
-pydantic>=1.6.1,<2

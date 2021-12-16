@@ -36,7 +36,7 @@ class TestEBSVolumeResourceSpec(TestCase):
                         SimpleLink(pred="create_time", obj=create_time),
                         SimpleLink(pred="size", obj=True),
                         SimpleLink(pred="state", obj="available"),
-                        SimpleLink(pred="volume_type", obj="standard"),
+                        SimpleLink(pred="volume_type", obj="gp2"),
                         SimpleLink(pred="encrypted", obj=False),
                     ),
                     resource_links=(
