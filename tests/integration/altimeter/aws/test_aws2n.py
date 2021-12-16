@@ -500,7 +500,7 @@ class TestAWS2NSingleAccount(unittest.TestCase):
                                 ),
                                 SimpleLink(pred="size", obj=ebs_volume_1_size),
                                 SimpleLink(pred="state", obj="available"),
-                                SimpleLink(pred="volume_type", obj="standard"),
+                                SimpleLink(pred="volume_type", obj="gp2"),
                                 SimpleLink(pred="encrypted", obj=False),
                             ),
                             resource_links=(
