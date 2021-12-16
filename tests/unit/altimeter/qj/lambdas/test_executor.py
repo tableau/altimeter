@@ -11,7 +11,9 @@ from altimeter.qj.lambdas.executor import enqueue_queries
 @moto.mock_sqs
 def test_enqueue_queries():
     sqs_client = boto3.client("sqs", region_name="us-west-2")
-    queue_url = sqs_client.create_queue(QueueName="test")["QueueUrl"]
+    queue_url = sqs_client.create_queue(QueueName="test.fifo", Attributes={"FifoQueue": "true"})[
+        "QueueUrl"
+    ]
     job_1 = Job(
         name="fooboo",
         description="FooBoo",

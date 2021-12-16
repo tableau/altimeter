@@ -1,10 +1,9 @@
 import json
-import mock
 import os
 from pathlib import Path
 import tempfile
 import time
-from unittest import TestCase
+from unittest import mock, TestCase
 
 from altimeter.aws.auth.accessor import Accessor
 from altimeter.aws.auth.exceptions import AccountAuthException

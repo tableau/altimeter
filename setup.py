@@ -32,7 +32,6 @@ setup(
             "sqlalchemy>=1.3.16,<1.4",
             "uvicorn>=0.11.5,<2",
         ],
-        "hyper": ["tableauhyperapi>=0.0.11355,<1", "pydantic>=1.6.1,<2",],
     },
     data_files=[
         (
@@ -52,7 +51,6 @@ setup(
         "bin/altimeter",
         "bin/aws2n.py",
         "bin/aws2neptune.py",
-        "bin/json2hyper.py",
         "bin/rdf2blaze",
         "bin/runquery.py",
         "bin/scan_resource.py",
