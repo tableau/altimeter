@@ -124,9 +124,7 @@ class DetectorResourceSpec(GuardDutyResourceSpec):
                 if "DetectorId" in member_resp:
                     member_detector_id = member_resp["DetectorId"]
                     member_detector_arn = cls.generate_arn(
-                        account_id=member_account_id,
-                        region=region,
-                        resource_id=member_detector_id,
+                        account_id=member_account_id, region=region, resource_id=member_detector_id,
                     )
                     member["DetectorArn"] = member_detector_arn
                 members.append(member)
