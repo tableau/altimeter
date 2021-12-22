@@ -29,7 +29,7 @@ class DetectorResourceSpec(GuardDutyResourceSpec):
                 TransientResourceLinkField(
                     "DetectorArn", "DetectorResourceSpec", value_is_id=True, optional=True
                 ),
-                ScalarField("Email"),
+                ScalarField("Email", optional=True),
                 ScalarField("RelationshipStatus"),
                 ScalarField("InvitedAt", optional=True),
                 ScalarField("UpdatedAt"),
@@ -110,14 +110,15 @@ class DetectorResourceSpec(GuardDutyResourceSpec):
         if member_resps:
             for member_resp in member_resps:
                 member_account_id = member_resp["AccountId"]
-                member_email = member_resp["Email"]
+                member_email = member_resp.get("Email")
                 member_relationship_status = member_resp["RelationshipStatus"]
                 member_updated_at = member_resp["UpdatedAt"]
                 member = {
-                    "Email": member_email,
                     "RelationshipStatus": member_relationship_status,
                     "UpdatedAt": member_updated_at,
                 }
+                if member_email:
+                    member["Email"] = member_email
                 if "InvitedAt" in member_resp:
                     member["InvitedAt"] = member_resp["InvitedAt"]
                 if "DetectorId" in member_resp:
