@@ -271,9 +271,14 @@ class TagLink(BaseLink):
              edges: the list of all edge dictionaries
              prefix: string to prefix the property name with
         """
-        if not any(x["~id"] == f"{self.pred}:{self.obj}" for x in vertices):
+
+        id_ = str(self.pred)
+        if str(self.obj) != "":
+            id_ = f"{id_}:{self.obj}"
+
+        if not any(x["~id"] == id_ for x in vertices):
             vertex = {}
-            vertex["~id"] = f"{self.pred}:{self.obj}"
+            vertex["~id"] = id_
             vertex["~label"] = "tag"
             vertex[self.pred] = self.obj
             vertices.append(vertex)
@@ -281,7 +286,7 @@ class TagLink(BaseLink):
             "~id": uuid.uuid1(),
             "~label": "tagged",
             "~from": parent["~id"],
-            "~to": f"{self.pred}:{self.obj}",
+            "~to": id_,
         }
         edges.append(edge)
 
