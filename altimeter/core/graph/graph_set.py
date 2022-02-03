@@ -155,7 +155,7 @@ class ValidatedGraphSet(GraphSet):
             # Add an edge from each vertex to the metadata vertex
             edges.append(
                 {
-                    "~id": uuid.uuid1(),
+                    "~id": str(uuid.uuid1()),
                     "~label": "identified_resource",
                     "~from": scan_id,
                     "~to": v["~id"],
