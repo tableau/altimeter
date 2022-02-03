@@ -757,7 +757,7 @@ class AltimeterNeptuneClient:
                         __.addV(self.parse_arn(r["~from"])["resource"])
                         .property(T.id, from_id)
                         .property("scan_id", scan_id)
-                        .property("arn", r["~from"]),
+                        .property("arn", str(r["~from"])),
                     )
                 )
                 .to(
@@ -768,7 +768,7 @@ class AltimeterNeptuneClient:
                         __.addV(self.parse_arn(r["~to"])["resource"])
                         .property(T.id, to_id)
                         .property("scan_id", scan_id)
-                        .property("arn", r["~to"]),
+                        .property("arn", str(r["~to"])),
                     )
                 )
             )
