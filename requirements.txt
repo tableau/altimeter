@@ -6,3 +6,7 @@ jinja2>=2.11.1,<3
 pydantic>=1.6.1,<2
 toml>=0.10.0,<1
 gremlinpython>=3.4.7,<3.5
+
+# Pin version of MarkupSafe to avoid this error:
+# https://github.com/aws/aws-sam-cli/pull/3662
+MarkupSafe>=2.0
