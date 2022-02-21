@@ -22,6 +22,7 @@ class ScanConfig(BaseImmutableModel):
     regions: Tuple[str, ...]
     scan_sub_accounts: bool
     preferred_account_scan_regions: Tuple[str, ...]
+    ignored_resources: Tuple[str, ...] = ()
 
 
 class ConcurrencyConfig(BaseImmutableModel):

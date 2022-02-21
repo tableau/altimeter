@@ -11,12 +11,11 @@ from typing import DefaultDict, Dict, List, Tuple, Type
 import boto3
 
 from altimeter.aws.log_events import AWSLogEvents
-from altimeter.aws.resource.resource_spec import ScanGranularity, AWSResourceSpec
+from altimeter.aws.resource.resource_spec import AWSResourceSpec
 from altimeter.aws.resource.unscanned_account import UnscannedAccountResourceSpec
 from altimeter.aws.scan.scan_plan import AccountScanPlan
 from altimeter.aws.scan.aws_accessor import AWSAccessor
 from altimeter.aws.scan.settings import (
-    DEFAULT_RESOURCE_SPEC_CLASSES,
     INFRA_RESOURCE_SPEC_CLASSES,
     ORG_RESOURCE_SPEC_CLASSES,
 )
@@ -33,7 +32,7 @@ from altimeter.core.resource.resource import Resource
 
 
 class AccountScanResult(BaseImmutableModel):
-    """pydantic model representing account scan results """
+    """pydantic model representing account scan results"""
 
     account_id: str
     artifacts: List[str]
@@ -90,9 +89,9 @@ class AccountScanner:
         artifact_writer: ArtifactWriter,
         max_svc_scan_threads: int,
         scan_sub_accounts: bool,
+        resource_spec_classes: Tuple[Type[AWSResourceSpec], ...],
         graph_name: str = GRAPH_NAME,
         graph_version: str = GRAPH_VERSION,
-        resource_spec_classes: Tuple[Type[AWSResourceSpec], ...] = DEFAULT_RESOURCE_SPEC_CLASSES,
     ) -> None:
         self.account_scan_plan = account_scan_plan
         self.artifact_writer = artifact_writer
