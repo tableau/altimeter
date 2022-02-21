@@ -1,0 +1,4 @@
+MarkupSafe==2.0.1
+jinja2==2.11.3
+sphinx==3.5.4
+sphinx-autodoc-typehints==1.12.0
