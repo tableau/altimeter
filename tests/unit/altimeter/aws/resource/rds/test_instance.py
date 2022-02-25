@@ -7,6 +7,7 @@ from moto import mock_rds2
 
 from altimeter.aws.resource.rds.instance import RDSInstanceResourceSpec
 from altimeter.aws.scan.aws_accessor import AWSAccessor
+from altimeter.aws.scan.settings import ALL_RESOURCE_SPEC_CLASSES
 
 
 class TestRDSInstanceResourceSpec(TestCase):
@@ -45,5 +46,8 @@ class TestRDSInstanceResourceSpec(TestCase):
                         }
                     },
                 )
-                resources = RDSInstanceResourceSpec.scan(scan_accessor=scan_accessor)
+                resources = RDSInstanceResourceSpec.scan(
+                    scan_accessor=scan_accessor,
+                    all_resource_spec_classes=ALL_RESOURCE_SPEC_CLASSES,
+                )
                 self.assertEqual(resources, [])

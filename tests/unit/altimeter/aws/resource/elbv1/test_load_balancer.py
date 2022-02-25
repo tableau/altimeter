@@ -5,6 +5,7 @@ from moto import mock_elb
 from unittest.mock import patch
 from altimeter.aws.resource.elbv1.load_balancer import ClassicLoadBalancerResourceSpec
 from altimeter.aws.scan.aws_accessor import AWSAccessor
+from altimeter.aws.scan.settings import ALL_RESOURCE_SPEC_CLASSES
 
 
 class TestLB(TestCase):
@@ -36,5 +37,7 @@ class TestLB(TestCase):
                     }
                 },
             )
-            resources = ClassicLoadBalancerResourceSpec.scan(scan_accessor=scan_accessor)
+            resources = ClassicLoadBalancerResourceSpec.scan(
+                scan_accessor=scan_accessor, all_resource_spec_classes=ALL_RESOURCE_SPEC_CLASSES,
+            )
             self.assertEqual(resources, [])

@@ -1,4 +1,4 @@
-from typing import Any, List, Type
+from typing import Any, List, Tuple, Type
 from unittest import TestCase
 
 from altimeter.core.graph.graph_spec import GraphSpec
@@ -15,7 +15,11 @@ class TestResourceSpecA(ResourceSpec):
         return "test:a"
 
     @classmethod
-    def scan(cls: Type["TestResourceSpecA"], scan_accessor: Any) -> List[Resource]:
+    def scan(
+        cls: Type["TestResourceSpecA"],
+        scan_accessor: Any,
+        all_resource_spec_classes: Tuple[Type["ResourceSpec"], ...],
+    ) -> List[Resource]:
         resources = [
             Resource(resource_id="123", type=cls.type_name, link_collection=LinkCollection()),
             Resource(resource_id="456", type=cls.type_name, link_collection=LinkCollection()),
@@ -31,7 +35,11 @@ class TestResourceSpecB(ResourceSpec):
         return "test:b"
 
     @classmethod
-    def scan(cls: Type["TestResourceSpecB"], scan_accessor: Any) -> List[Resource]:
+    def scan(
+        cls: Type["TestResourceSpecB"],
+        scan_accessor: Any,
+        all_resource_spec_classes: Tuple[Type["ResourceSpec"], ...],
+    ) -> List[Resource]:
         resources = [
             Resource(resource_id="abc", type=cls.type_name, link_collection=LinkCollection()),
             Resource(resource_id="def", type=cls.type_name, link_collection=LinkCollection()),
@@ -50,6 +58,7 @@ class TestGraphSpec(TestCase):
             name="test-name",
             version="1",
             resource_spec_classes=(TestResourceSpecA, TestResourceSpecB),
+            all_resource_spec_classes=(TestResourceSpecA, TestResourceSpecB),
             scan_accessor=scan_accessor,
         )
         resources = graph_spec.scan()

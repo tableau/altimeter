@@ -1,6 +1,6 @@
 """A Schema consists of a list of Fields which define how to parse an arbitrary dictionary
 into a list of Links."""
-from typing import Any, Dict
+from typing import Any, Dict, Tuple, Type
 
 from altimeter.core.graph.field.base import Field
 from altimeter.core.graph.links import LinkCollection
@@ -17,7 +17,7 @@ class Schema:
     def __init__(self, *fields: Field) -> None:
         self.fields = fields
 
-    def parse(self, data: Dict[str, Any], context: Dict[str, Any]) -> LinkCollection:
+    def parse(self, data: Dict[str, Any], context: Dict[str, Any],) -> LinkCollection:
         """Parse this schema into a list of Links
 
         Args:

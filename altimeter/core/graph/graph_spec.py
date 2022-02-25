@@ -26,11 +26,13 @@ class GraphSpec:
         name: str,
         version: str,
         resource_spec_classes: Tuple[Type[ResourceSpec], ...],
+        all_resource_spec_classes: Tuple[Type[ResourceSpec], ...],
         scan_accessor: Any,
     ):
         self.name = name
         self.version = version
         self.resource_spec_classes = resource_spec_classes
+        self.all_resource_spec_classes = all_resource_spec_classes
         self.scan_accessor = scan_accessor
 
     def scan(self) -> List[Resource]:
@@ -45,7 +47,10 @@ class GraphSpec:
         for resource_spec_class in self.resource_spec_classes:
             with logger.bind(resource_type=str(resource_spec_class.type_name)):
                 logger.debug(event=LogEvent.ScanResourceTypeStart)
-                scanned_resources = resource_spec_class.scan(scan_accessor=self.scan_accessor)
+                scanned_resources = resource_spec_class.scan(
+                    scan_accessor=self.scan_accessor,
+                    all_resource_spec_classes=self.all_resource_spec_classes,
+                )
                 resources += scanned_resources
                 logger.debug(event=LogEvent.ScanResourceTypeEnd)
         return resources

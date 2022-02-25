@@ -1,5 +1,5 @@
 """Resource representing an unscanned AWS Account"""
-from typing import List, Type
+from typing import List, Tuple, Type
 import uuid
 
 from botocore.client import BaseClient
@@ -8,6 +8,7 @@ from altimeter.core.graph.links import LinkCollection, SimpleLink
 from altimeter.core.graph.schema import Schema
 from altimeter.aws.resource.resource_spec import ScanGranularity, ListFromAWSResult, AWSResourceSpec
 from altimeter.core.resource.resource import Resource
+from altimeter.core.resource.resource_spec import ResourceSpec
 from altimeter.aws.scan.aws_accessor import AWSAccessor
 
 
@@ -56,6 +57,8 @@ class UnscannedAccountResourceSpec(AWSResourceSpec):
 
     @classmethod
     def scan(
-        cls: Type["UnscannedAccountResourceSpec"], scan_accessor: AWSAccessor
+        cls: Type[AWSResourceSpec],
+        scan_accessor: AWSAccessor,
+        all_resource_spec_classes: Tuple[Type[ResourceSpec], ...],
     ) -> List[Resource]:
         raise NotImplementedError(f"{cls.__name__} is not a scannable ResourceSpec class.")

@@ -142,25 +142,34 @@ class AWSResourceSpec(ResourceSpec):
         """
 
     @classmethod
-    def scan(cls: Type["AWSResourceSpec"], scan_accessor: AWSAccessor) -> List[Resource]:
+    def scan(
+        cls: Type["AWSResourceSpec"],
+        scan_accessor: AWSAccessor,
+        all_resource_spec_classes: Tuple[Type["ResourceSpec"], ...],
+    ) -> List[Resource]:
         """Scan this ResourceSpec
 
        Args:
            scan_accessor: AWSAccessor object to use for api access
+           all_resource_spec_classes: Tuple[Type[ResourceSpec], ...],
 
         Returns:
             List of Resource objects
         """
-        context = {"account_id": scan_accessor.account_id, "region": scan_accessor.region}
-        list_from_aws_result = cls._list_from_aws(scan_accessor)
+        context = {
+            "account_id": scan_accessor.account_id,
+            "region": scan_accessor.region,
+            "all_resource_spec_classes": all_resource_spec_classes,
+        }
+        list_from_aws_result = cls._list_from_aws(scan_accessor=scan_accessor)
         resources = cls._list_from_aws_result_to_resources(
-            list_from_aws_result=list_from_aws_result, context=context
+            list_from_aws_result=list_from_aws_result, context=context,
         )
         return resources
 
     @classmethod
     def _list_from_aws(
-        cls: Type["AWSResourceSpec"], scan_accessor: AWSAccessor
+        cls: Type["AWSResourceSpec"], scan_accessor: AWSAccessor,
     ) -> ListFromAWSResult:
         try:
             resource_client = scan_accessor.client(cls.service_name)
@@ -184,12 +193,14 @@ class AWSResourceSpec(ResourceSpec):
     def _list_from_aws_result_to_resources(
         cls: Type["AWSResourceSpec"],
         list_from_aws_result: ListFromAWSResult,
-        context: Dict[str, str],
+        context: Dict[str, Any],
     ) -> List[Resource]:
         resources: List[Resource] = []
         for arn, resource_dict in list_from_aws_result.resources.items():
             try:
-                partial_resource_link_collection = cls.schema.parse(resource_dict, context)
+                partial_resource_link_collection = cls.schema.parse(
+                    data=resource_dict, context=context,
+                )
             except Exception as ex:
                 raise SchemaParseException(
                     (

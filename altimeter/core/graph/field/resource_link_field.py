@@ -22,7 +22,7 @@ class ResourceLinkField(Field):
             >>> class TestResourceSpec(ResourceSpec): type_name="thing"
             >>> input = {"ThingId": "123"}
             >>> field = ResourceLinkField("ThingId", TestResourceSpec)
-            >>> link_collection = field.parse(data=input, context={})
+            >>> link_collection = field.parse(data=input, context={"all_resource_spec_classes": [TestResourceSpec]})
             >>> print(link_collection.dict(exclude_unset=True))
             {'resource_links': ({'pred': 'thing', 'obj': 'thing:123'},)}
 
@@ -31,7 +31,7 @@ class ResourceLinkField(Field):
             >>> class TestResourceSpec(ResourceSpec): type_name="thing"
             >>> input = {"ThingId": "thing:123"}
             >>> field = ResourceLinkField("ThingId", TestResourceSpec, value_is_id=True)
-            >>> link_collection = field.parse(data=input, context={})
+            >>> link_collection = field.parse(data=input, context={"all_resource_spec_classes": [TestResourceSpec]})
             >>> print(link_collection.dict(exclude_unset=True))
             {'resource_links': ({'pred': 'thing', 'obj': 'thing:123'},)}
 
@@ -76,6 +76,9 @@ class ResourceLinkField(Field):
             )
         else:
             resource_spec_class = self._resource_spec_class
+        all_resource_spec_classes = context.get("all_resource_spec_classes", [])
+        if resource_spec_class not in all_resource_spec_classes:
+            return LinkCollection()
         if not self.alti_key:
             self.alti_key = resource_spec_class.type_name
         short_resource_id = data.get(self.source_key)
@@ -110,7 +113,7 @@ class EmbeddedResourceLinkField(SubField):
             >>> class TestResourceSpec(ResourceSpec): type_name="thing"
             >>> input = {"Thing": ["123", "456"]}
             >>> field = ListField("Thing", EmbeddedResourceLinkField(TestResourceSpec))
-            >>> link_collection = field.parse(data=input, context={})
+            >>> link_collection = field.parse(data=input, context={"all_resource_spec_classes": [TestResourceSpec]})
             >>> print(link_collection.dict(exclude_unset=True))
             {'resource_links': ({'pred': 'thing', 'obj': 'thing:123'}, {'pred': 'thing', 'obj': 'thing:456'})}
 
@@ -183,7 +186,7 @@ class TransientResourceLinkField(Field):
             >>> class TestResourceSpec(ResourceSpec): type_name="thing"
             >>> input = {"ThingId": "123"}
             >>> field = TransientResourceLinkField("ThingId", TestResourceSpec)
-            >>> link_collection = field.parse(data=input, context={})
+            >>> link_collection = field.parse(data=input, context={"all_resource_spec_classes": [TestResourceSpec]})
             >>> print(link_collection.dict(exclude_unset=True))
             {'transient_resource_links': ({'pred': 'thing', 'obj': 'thing:123'},)}
     """

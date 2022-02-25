@@ -6,6 +6,7 @@ from moto import mock_ec2, mock_iam, mock_lambda
 
 from altimeter.aws.resource.awslambda.function import LambdaFunctionResourceSpec
 from altimeter.aws.scan.aws_accessor import AWSAccessor
+from altimeter.aws.scan.settings import ALL_RESOURCE_SPEC_CLASSES
 from altimeter.core.graph.links import (
     LinkCollection,
     ResourceLink,
@@ -61,7 +62,9 @@ class TestLambdaFunctionResourceSpec(TestCase):
         )
 
         scan_accessor = AWSAccessor(session=session, account_id=account_id, region_name=region_name)
-        resources = LambdaFunctionResourceSpec.scan(scan_accessor=scan_accessor)
+        resources = LambdaFunctionResourceSpec.scan(
+            scan_accessor=scan_accessor, all_resource_spec_classes=ALL_RESOURCE_SPEC_CLASSES,
+        )
         expected_resources = [
             Resource(
                 resource_id="arn:aws:lambda:us-east-1:123456789012:function:func_name",

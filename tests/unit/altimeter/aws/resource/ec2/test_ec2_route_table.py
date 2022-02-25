@@ -1,6 +1,7 @@
 import unittest
 
 from altimeter.aws.resource.ec2.route_table import EC2RouteTableResourceSpec
+from altimeter.aws.scan.settings import ALL_RESOURCE_SPEC_CLASSES
 from altimeter.core.graph.links import LinkCollection, MultiLink, ResourceLink, SimpleLink
 from altimeter.core.resource.resource import Resource
 
@@ -50,7 +51,12 @@ class TestRouteTableSchema(unittest.TestCase):
         }
 
         link_collection = EC2RouteTableResourceSpec.schema.parse(
-            data=aws_resource_dict, context={"account_id": "111122223333", "region": "us-west-2"}
+            data=aws_resource_dict,
+            context={
+                "account_id": "111122223333",
+                "region": "us-west-2",
+                "all_resource_spec_classes": ALL_RESOURCE_SPEC_CLASSES,
+            },
         )
         resource = Resource(
             resource_id=resource_arn,

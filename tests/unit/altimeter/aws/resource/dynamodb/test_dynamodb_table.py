@@ -7,6 +7,7 @@ from moto import mock_dynamodb2
 
 from altimeter.aws.resource.dynamodb.dynamodb_table import DynamoDbTableResourceSpec
 from altimeter.aws.scan.aws_accessor import AWSAccessor
+from altimeter.aws.scan.settings import ALL_RESOURCE_SPEC_CLASSES
 
 
 class TestDynamoDbTableResourceSpec(TestCase):
@@ -38,7 +39,9 @@ class TestDynamoDbTableResourceSpec(TestCase):
                     }
                 },
             )
-            resources = DynamoDbTableResourceSpec.scan(scan_accessor=scan_accessor)
+            resources = DynamoDbTableResourceSpec.scan(
+                scan_accessor=scan_accessor, all_resource_spec_classes=ALL_RESOURCE_SPEC_CLASSES,
+            )
             self.assertEqual(resources, [])
 
     @mock_dynamodb2
@@ -69,5 +72,7 @@ class TestDynamoDbTableResourceSpec(TestCase):
                     }
                 },
             )
-            resources = DynamoDbTableResourceSpec.scan(scan_accessor=scan_accessor)
+            resources = DynamoDbTableResourceSpec.scan(
+                scan_accessor=scan_accessor, all_resource_spec_classes=ALL_RESOURCE_SPEC_CLASSES,
+            )
             self.assertEqual(resources, [])

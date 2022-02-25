@@ -5,6 +5,7 @@ from moto import mock_ec2, mock_elbv2
 from unittest.mock import patch
 from altimeter.aws.resource.elbv2.target_group import TargetGroupResourceSpec
 from altimeter.aws.scan.aws_accessor import AWSAccessor
+from altimeter.aws.scan.settings import ALL_RESOURCE_SPEC_CLASSES
 
 
 class TestTargetGroup(TestCase):
@@ -35,5 +36,7 @@ class TestTargetGroup(TestCase):
                     }
                 },
             )
-            resources = TargetGroupResourceSpec.scan(scan_accessor=scan_accessor)
+            resources = TargetGroupResourceSpec.scan(
+                scan_accessor=scan_accessor, all_resource_spec_classes=ALL_RESOURCE_SPEC_CLASSES,
+            )
             self.assertEqual(resources, [])

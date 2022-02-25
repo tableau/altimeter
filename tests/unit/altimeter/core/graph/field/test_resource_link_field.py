@@ -36,7 +36,9 @@ class TestResourceLinkField(TestCase):
         field = ResourceLinkField("FieldName", TestResourceSpec)
 
         input_data = json.loads(input_str)
-        link_collection = field.parse(data=input_data, context={})
+        link_collection = field.parse(
+            data=input_data, context={"all_resource_spec_classes": (TestResourceSpec,)}
+        )
 
         expected_link_collection = LinkCollection(
             resource_links=(ResourceLink(pred="test_type_name", obj="test_type_name:Value"),),
@@ -48,7 +50,9 @@ class TestResourceLinkField(TestCase):
         field = ResourceLinkField("FieldName", "TestResourceSpec")
 
         input_data = json.loads(input_str)
-        link_collection = field.parse(data=input_data, context={})
+        link_collection = field.parse(
+            data=input_data, context={"all_resource_spec_classes": (TestResourceSpec,)}
+        )
 
         expected_link_collection = LinkCollection(
             resource_links=(ResourceLink(pred="test_type_name", obj="test_type_name:Value"),),
@@ -60,7 +64,9 @@ class TestResourceLinkField(TestCase):
         field = ResourceLinkField("FieldName", TestResourceSpec, alti_key="alti_field_name")
 
         input_data = json.loads(input_str)
-        link_collection = field.parse(data=input_data, context={})
+        link_collection = field.parse(
+            data=input_data, context={"all_resource_spec_classes": (TestResourceSpec,)}
+        )
 
         expected_link_collection = LinkCollection(
             resource_links=(ResourceLink(pred="alti_field_name", obj="test_type_name:Value"),),
@@ -72,7 +78,9 @@ class TestResourceLinkField(TestCase):
         field = ResourceLinkField("FieldName", TestResourceSpec, optional=True)
 
         input_data = json.loads(input_str)
-        link_collection = field.parse(data=input_data, context={})
+        link_collection = field.parse(
+            data=input_data, context={"all_resource_spec_classes": (TestResourceSpec,)}
+        )
 
         expected_link_collection = LinkCollection(
             resource_links=(ResourceLink(pred="test_type_name", obj="test_type_name:Value"),),
@@ -83,7 +91,9 @@ class TestResourceLinkField(TestCase):
         input_str = "{}"
         field = ResourceLinkField("FieldName", TestResourceSpec, optional=True)
         input_data = json.loads(input_str)
-        link_collection = field.parse(data=input_data, context={})
+        link_collection = field.parse(
+            data=input_data, context={"all_resource_spec_classes": (TestResourceSpec,)}
+        )
 
         self.assertEqual(link_collection, LinkCollection())
 
@@ -93,7 +103,7 @@ class TestResourceLinkField(TestCase):
 
         input_data = json.loads(input_str)
         with self.assertRaises(ResourceLinkFieldSourceKeyNotFoundException):
-            field.parse(data=input_data, context={})
+            field.parse(data=input_data, context={"all_resource_spec_classes": (TestResourceSpec,)})
 
     def test_value_not_a_string(self):
         input_str = '{"FieldName": [1, 2, 3]}'
@@ -101,13 +111,15 @@ class TestResourceLinkField(TestCase):
 
         input_data = json.loads(input_str)
         with self.assertRaises(ResourceLinkFieldValueNotAStringException):
-            field.parse(data=input_data, context={})
+            field.parse(data=input_data, context={"all_resource_spec_classes": (TestResourceSpec,)})
 
     def test_value_is_id(self):
         input_str = '{"FieldName": "Value"}'
         field = ResourceLinkField("FieldName", TestResourceSpec, value_is_id=True)
         input_data = json.loads(input_str)
-        link_collection = field.parse(data=input_data, context={})
+        link_collection = field.parse(
+            data=input_data, context={"all_resource_spec_classes": (TestResourceSpec,)}
+        )
 
         expected_link_collection = LinkCollection(
             resource_links=(ResourceLink(pred="test_type_name", obj="Value"),),
@@ -119,7 +131,9 @@ class TestEmbeddedResourceLinkField(TestCase):
     def test_valid_input(self):
         input_data = "foo"
         field = EmbeddedResourceLinkField(TestResourceSpec)
-        link_collection = field.parse(data=input_data, context={})
+        link_collection = field.parse(
+            data=input_data, context={"all_resource_spec_classes": (TestResourceSpec,)}
+        )
 
         expected_link_collection = LinkCollection(
             resource_links=(ResourceLink(pred="test_type_name", obj="test_type_name:foo"),)
@@ -129,7 +143,9 @@ class TestEmbeddedResourceLinkField(TestCase):
     def test_valid_input_str_classname(self):
         input_data = "foo"
         field = EmbeddedResourceLinkField("TestResourceSpec")
-        link_collection = field.parse(data=input_data, context={})
+        link_collection = field.parse(
+            data=input_data, context={"all_resource_spec_classes": (TestResourceSpec,)}
+        )
 
         expected_link_collection = LinkCollection(
             resource_links=(ResourceLink(pred="test_type_name", obj="test_type_name:foo"),),
@@ -140,7 +156,9 @@ class TestEmbeddedResourceLinkField(TestCase):
         input_data = "foo"
         field = EmbeddedResourceLinkField("TestResourceSpec", value_is_id=True)
 
-        link_collection = field.parse(data=input_data, context={})
+        link_collection = field.parse(
+            data=input_data, context={"all_resource_spec_classes": (TestResourceSpec,)}
+        )
 
         expected_link_collection = LinkCollection(
             resource_links=(ResourceLink(pred="test_type_name", obj="foo"),),

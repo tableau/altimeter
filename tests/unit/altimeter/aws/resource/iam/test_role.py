@@ -7,6 +7,7 @@ from moto import mock_iam
 from altimeter.aws.resource.iam.role import IAMRoleResourceSpec
 from altimeter.aws.scan.aws_accessor import AWSAccessor
 from altimeter.aws.resource.util import policy_doc_dict_to_sorted_str
+from altimeter.aws.scan.settings import ALL_RESOURCE_SPEC_CLASSES
 
 
 class TestIAMRole(TestCase):
@@ -33,7 +34,9 @@ class TestIAMRole(TestCase):
                     }
                 },
             )
-            resources = IAMRoleResourceSpec.scan(scan_accessor=scan_accessor)
+            resources = IAMRoleResourceSpec.scan(
+                scan_accessor=scan_accessor, all_resource_spec_classes=ALL_RESOURCE_SPEC_CLASSES,
+            )
             self.assertEqual(resources, [])
 
     @mock_iam
@@ -86,7 +89,9 @@ class TestIAMRole(TestCase):
         policy.put(PolicyDocument=policy_document2)
 
         scan_accessor = AWSAccessor(session=session, account_id=account_id, region_name=region_name)
-        resources = IAMRoleResourceSpec.scan(scan_accessor=scan_accessor)
+        resources = IAMRoleResourceSpec.scan(
+            scan_accessor=scan_accessor, all_resource_spec_classes=ALL_RESOURCE_SPEC_CLASSES,
+        )
         embedded_resources_links = [
             link
             for link in resources[0].link_collection.multi_links

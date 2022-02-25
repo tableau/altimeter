@@ -70,6 +70,7 @@ class ScanUnit:
     secret_key: str
     token: str
     resource_spec_classes: Tuple[Type[AWSResourceSpec], ...]
+    all_resource_spec_classes: Tuple[Type[AWSResourceSpec], ...]
 
 
 class AccountScanner:
@@ -182,6 +183,7 @@ class AccountScanner:
                                     secret_key=region_creds.secret_key,
                                     token=region_creds.token,
                                     resource_spec_classes=(parallel_svc_resource_spec_class,),
+                                    all_resource_spec_classes=self.resource_spec_classes,
                                 )
                                 futures.append(parallel_future)
                             serial_future = schedule_scan(
@@ -195,6 +197,7 @@ class AccountScanner:
                                 secret_key=region_creds.secret_key,
                                 token=region_creds.token,
                                 resource_spec_classes=tuple(serial_svc_resource_spec_classes),
+                                all_resource_spec_classes=self.resource_spec_classes,
                             )
                             futures.append(serial_future)
                 except Exception as ex:
@@ -285,6 +288,7 @@ def scan_scan_unit(scan_unit: ScanUnit) -> GraphSet:
             name=scan_unit.graph_name,
             version=scan_unit.graph_version,
             resource_spec_classes=scan_unit.resource_spec_classes,
+            all_resource_spec_classes=scan_unit.all_resource_spec_classes,
             scan_accessor=scan_accessor,
         )
         start_time = int(time.time())
@@ -326,6 +330,7 @@ def schedule_scan(
     secret_key: str,
     token: str,
     resource_spec_classes: Tuple[Type[AWSResourceSpec], ...],
+    all_resource_spec_classes: Tuple[Type[AWSResourceSpec], ...],
 ) -> Future:
     scan_unit = ScanUnit(
         graph_name=graph_name,
@@ -337,6 +342,7 @@ def schedule_scan(
         secret_key=secret_key,
         token=token,
         resource_spec_classes=resource_spec_classes,
+        all_resource_spec_classes=all_resource_spec_classes,
     )
     future = executor.submit(lambda: scan_scan_unit(scan_unit=scan_unit))
     return future
