@@ -11,7 +11,7 @@ pruner_max_age_min = 4320 # prune graphs over 3 days old
     # accounts to scan
     accounts = []
     # regions to scan. If empty, scan all available regions
-    regions = []
+    regions = ["us-east-1"]
     # if true, discover and scan subaccounts of the above accounts
     scan_sub_accounts = false
     # preferred regions to use when scanning non-regional resources (e.g. IAM policies)
