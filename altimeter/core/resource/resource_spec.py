@@ -48,6 +48,7 @@ class ResourceSpec(abc.ABC):
         Returns:
             List of Resource objects
         """
+        raise Exception("HERE")
 
     @classmethod
     def get_full_type_name(cls: Type["ResourceSpec"]) -> str:
