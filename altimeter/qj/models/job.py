@@ -30,6 +30,7 @@ class Job(BASE):
     result_sets = relationship("ResultSet", passive_deletes=True)
     notify_if_results = Column(Boolean, nullable=False, server_default="false")
     remediate_sqs_queue = Column(Text, nullable=True)
+    raw_query = Column(Boolean, nullable=False, server_default="false")
 
     __table_args__ = (
         Index("job_name_active_key", name, active, unique=True, postgresql_where=(active)),

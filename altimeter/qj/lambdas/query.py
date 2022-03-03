@@ -65,7 +65,15 @@ def run_query(job: schemas.Job, config: QueryConfig) -> QueryResult:
     neptune_client = AltimeterNeptuneClient(
         max_age_min=int(job.max_graph_age_sec / 60.0), neptune_endpoint=endpoint
     )
-    query_result = neptune_client.run_query(
-        graph_names=set(job.graph_spec.graph_names), query=job.query
-    )
+    if job.raw_query:
+        all_graph_metadatas = neptune_client.get_all_graph_metadatas()
+        graph_uris_load_times: Dict[str, int] = {
+            graph_metadata.uri: graph_metadata.end_time for graph_metadata in all_graph_metadatas
+        }
+        query_result_set = neptune_client.run_raw_query(query=job.query)
+        query_result = QueryResult(graph_uris_load_times, query_result_set)
+    else:
+        query_result = neptune_client.run_query(
+            graph_names=set(job.graph_spec.graph_names), query=job.query,
+        )
     return query_result
