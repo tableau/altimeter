@@ -495,6 +495,38 @@ class AltimeterNeptuneClient:
             end_time=latest_end_time,
         )
 
+    def get_all_graph_metadatas(self) -> Tuple[GraphMetadata, ...]:
+        """Return GraphMetadata objects representing all graphs
+
+        Returns:
+            GraphMetadatas of all graphs
+        """
+        get_graph_metadatas_query = (
+            f"SELECT ?uri ?name ?version ?start_time ?end_time\n"
+            f"FROM <{META_GRAPH_NAME}>\n"
+            f"WHERE {{\n"
+            f"    ?graph_metadata <alti:uri> ?uri ;\n"
+            f"                    <alti:version> ?version ;\n"
+            f"                    <alti:name> ?name ;\n"
+            f"                    <alti:start_time> ?start_time ;\n"
+            f"                    <alti:end_time> ?end_time }}\n"
+            f"ORDER BY DESC(?version) DESC(?end_time)"
+        )
+        results = self.run_raw_query(query=get_graph_metadatas_query)
+        results_list = results.to_list()
+        graph_metadatas: List[GraphMetadata] = []
+        for result in results_list:
+            graph_metadatas.append(
+                GraphMetadata(
+                    name=result["name"],
+                    uri=result["uri"],
+                    version=result["version"],
+                    start_time=int(result["start_time"]),
+                    end_time=int(result["end_time"]),
+                )
+            )
+        return tuple(graph_metadatas)
+
     def clear_registered_graph(self, name: str, uri: str) -> None:
         """Remove data and metadata for a graph by uri
 

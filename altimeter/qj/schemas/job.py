@@ -41,6 +41,7 @@ class JobBase(BaseModel):
     query: str
     notify_if_results: bool
     remediate_sqs_queue: Optional[str] = None
+    raw_query: bool = False
 
     # pylint: disable=no-self-argument,no-self-use
     @validator("name")
