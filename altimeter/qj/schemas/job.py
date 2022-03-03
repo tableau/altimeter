@@ -41,7 +41,7 @@ class JobBase(BaseModel):
     query: str
     notify_if_results: bool
     remediate_sqs_queue: Optional[str] = None
-    raw_query: bool = False
+    raw_query: Optional[bool] = None
 
     # pylint: disable=no-self-argument,no-self-use
     @validator("name")
@@ -76,6 +76,7 @@ class JobUpdate(BaseModel):
     result_expiration_sec: Optional[int] = Field(gt=0)
     max_result_age_sec: Optional[int] = Field(gt=0)
     notify_if_results: Optional[bool]
+    raw_query: Optional[bool]
 
     @classmethod
     def from_job_create(cls, job_create: JobCreate) -> "JobUpdate":
