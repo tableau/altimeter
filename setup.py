@@ -19,7 +19,7 @@ setup(
         "aws-requests-auth==0.4.3",
         "rdflib==6.0.2",
         "structlog==20.2.0",
-        "boto3==1.21.3",
+        "boto3==1.21.20",
         "jinja2==2.11.3",
         "pydantic==1.8.2",
         "toml==0.10.2",
@@ -29,7 +29,7 @@ setup(
         "qj": [
             "MarkupSafe==2.0.1",
             "alembic==1.4.2",
-            "boto3==1.21.3",
+            "boto3==1.21.20",
             "fastapi==0.70.1",
             "psycopg2-binary==2.9.2",
             "sqlalchemy==1.3.24",
