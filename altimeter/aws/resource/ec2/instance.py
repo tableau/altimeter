@@ -44,7 +44,7 @@ class EC2InstanceResourceSpec(EC2ResourceSpec):
         ResourceLinkField("SubnetId", SubnetResourceSpec, optional=True),
         AnonymousListField(
             "SecurityGroups",
-            AnonymousEmbeddedDictField(ResourceLinkField("GroupId", SecurityGroupResourceSpec)),
+            AnonymousEmbeddedDictField(TransientResourceLinkField("GroupId", SecurityGroupResourceSpec)),
         ),
         AnonymousDictField(
             "IamInstanceProfile",
