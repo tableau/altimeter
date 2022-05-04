@@ -37,7 +37,7 @@ class LoadBalancerResourceSpec(ELBV2ResourceSpec):
             "AvailabilityZones",
             EmbeddedDictField(
                 ScalarField("ZoneName"),
-                ResourceLinkField("SubnetId", SubnetResourceSpec, optional=True),
+                TransientResourceLinkField("SubnetId", SubnetResourceSpec, optional=True),
                 ListField(
                     "LoadBalancerAddresses",
                     EmbeddedDictField(
