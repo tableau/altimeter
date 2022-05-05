@@ -13,7 +13,7 @@ from altimeter.core.graph.field.dict_field import (
     AnonymousDictField,
     DictField,
     EmbeddedDictField,
-    AnonymousEmbeddedDictField
+    AnonymousEmbeddedDictField,
 )
 from altimeter.core.graph.field.list_field import AnonymousListField, ListField
 from altimeter.core.graph.field.resource_link_field import ResourceLinkField
@@ -61,14 +61,17 @@ class IAMUserResourceSpec(IAMResourceSpec):
                     optional=True,
                     value_is_id=True,
                     alti_key="attached_policy",
-            )
-        ),
-    ),
-        ListField(
-                "EmbeddedPolicy",
-                EmbeddedDictField(ScalarField("PolicyName"), ScalarField("PolicyDocument"),),
-                optional=True,
+                )
             ),
+        ),
+        ListField(
+            "EmbeddedPolicy",
+            EmbeddedDictField(
+                ScalarField("PolicyName"),
+                ScalarField("PolicyDocument"),
+            ),
+            optional=True,
+        ),
     )
 
     @classmethod
@@ -179,9 +182,8 @@ def get_embedded_user_policies(client: BaseClient, username: str) -> List[Dict[s
             policies.append(policy)
     return policies
 
-def get_embedded_user_policy(
-    client: BaseClient, username: str, policy_name: str
-) -> Dict[str, str]:
+
+def get_embedded_user_policy(client: BaseClient, username: str, policy_name: str) -> Dict[str, str]:
     """Get embedded user policy"""
     resp = client.get_user_policy(UserName=username, PolicyName=policy_name)
     policy_document = resp.get("PolicyDocument")

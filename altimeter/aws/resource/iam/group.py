@@ -47,9 +47,12 @@ class IAMGroupResourceSpec(IAMResourceSpec):
         ),
         ListField(
             "EmbeddedPolicy",
-            EmbeddedDictField(ScalarField("PolicyName"), ScalarField("PolicyDocument"),),
-            optional=True,
+            EmbeddedDictField(
+                ScalarField("PolicyName"),
+                ScalarField("PolicyDocument"),
             ),
+            optional=True,
+        ),
     )
 
     @classmethod
@@ -70,9 +73,7 @@ class IAMGroupResourceSpec(IAMResourceSpec):
                 resource_arn = group["Arn"]
                 group_name = group["GroupName"]
                 try:
-                    group["Users"] = cls.get_group_users(
-                        client=client, group_name=group_name
-                    )
+                    group["Users"] = cls.get_group_users(client=client, group_name=group_name)
                     groups[resource_arn] = group
                     attached_policies = get_attached_group_policies(client, group_name)
                     group["PolicyAttachments"] = attached_policies
