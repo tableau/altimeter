@@ -74,6 +74,7 @@ def run_query(job: schemas.Job, config: QueryConfig) -> QueryResult:
         query_result = QueryResult(graph_uris_load_times, query_result_set)
     else:
         query_result = neptune_client.run_query(
-            graph_names=set(job.graph_spec.graph_names), query=job.query,
+            graph_names=set(job.graph_spec.graph_names),
+            query=job.query,
         )
     return query_result

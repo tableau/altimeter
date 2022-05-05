@@ -90,7 +90,10 @@ class AWSResourceSpec(ResourceSpec):
 
     @classmethod
     def generate_arn(
-        cls: Type["AWSResourceSpec"], resource_id: str, account_id: str = "", region: str = "",
+        cls: Type["AWSResourceSpec"],
+        resource_id: str,
+        account_id: str = "",
+        region: str = "",
     ) -> str:
         """Generate an ARN for this resource
 
@@ -145,11 +148,11 @@ class AWSResourceSpec(ResourceSpec):
     def scan(cls: Type["AWSResourceSpec"], scan_accessor: AWSAccessor) -> List[Resource]:
         """Scan this ResourceSpec
 
-       Args:
-           scan_accessor: AWSAccessor object to use for api access
+        Args:
+            scan_accessor: AWSAccessor object to use for api access
 
-        Returns:
-            List of Resource objects
+         Returns:
+             List of Resource objects
         """
         context = {"account_id": scan_accessor.account_id, "region": scan_accessor.region}
         list_from_aws_result = cls._list_from_aws(scan_accessor)
@@ -217,7 +220,9 @@ class AWSResourceSpec(ResourceSpec):
             )
 
             resource = Resource(
-                resource_id=arn, type=cls.get_full_type_name(), link_collection=link_collection,
+                resource_id=arn,
+                type=cls.get_full_type_name(),
+                link_collection=link_collection,
             )
             resources.append(resource)
         return resources

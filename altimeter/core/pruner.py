@@ -82,5 +82,6 @@ def prune_graph(graph_pruner_config: GraphPrunerConfig) -> GraphPrunerResults:
             logger.error(event=LogEvent.PruneNeptuneGraphsError, msg=msg)
             raise Exception(msg)
     return GraphPrunerResults(
-        pruned_graph_uris=pruned_graph_uris, skipped_graph_uris=skipped_graph_uris,
+        pruned_graph_uris=pruned_graph_uris,
+        skipped_graph_uris=skipped_graph_uris,
     )

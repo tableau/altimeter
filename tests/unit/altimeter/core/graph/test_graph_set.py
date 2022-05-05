@@ -48,7 +48,11 @@ class TestGraphSetWithValidDataNoMerging(TestCase):
             type="test:a",
             link_collection=LinkCollection(simple_links=[SimpleLink(pred="has-foo", obj="goo")]),
         )
-        resource_a2 = Resource(resource_id="456", type="test:a", link_collection=LinkCollection(),)
+        resource_a2 = Resource(
+            resource_id="456",
+            type="test:a",
+            link_collection=LinkCollection(),
+        )
         resource_b1 = Resource(
             resource_id="abc",
             type="test:b",
@@ -134,7 +138,11 @@ class TestGraphSetWithValidDataNoMerging(TestCase):
                     simple_links=(SimpleLink(pred="has-foo", obj="goo"),),
                 ),
             ),
-            Resource(resource_id="456", type="test:a", link_collection=LinkCollection(),),
+            Resource(
+                resource_id="456",
+                type="test:a",
+                link_collection=LinkCollection(),
+            ),
             Resource(
                 resource_id="abc",
                 type="test:b",
@@ -145,7 +153,9 @@ class TestGraphSetWithValidDataNoMerging(TestCase):
             Resource(
                 resource_id="def",
                 type="test:b",
-                link_collection=LinkCollection(simple_links=(SimpleLink(pred="name", obj="sue"),),),
+                link_collection=LinkCollection(
+                    simple_links=(SimpleLink(pred="name", obj="sue"),),
+                ),
             ),
         )
         expected_errors = ["test err 1", "test err 2"]
@@ -262,20 +272,40 @@ class TestGraphSetWithInValidData(TestCase):
 class TestGraphSetFromGraphSets(TestCase):
     def test_invalid_diff_names(self):
         graph_set_1 = GraphSet(
-            name="graph-1", version="1", start_time=10, end_time=20, resources=[], errors=[],
+            name="graph-1",
+            version="1",
+            start_time=10,
+            end_time=20,
+            resources=[],
+            errors=[],
         )
         graph_set_2 = GraphSet(
-            name="graph-2", version="1", start_time=15, end_time=25, resources=[], errors=[],
+            name="graph-2",
+            version="1",
+            start_time=15,
+            end_time=25,
+            resources=[],
+            errors=[],
         )
         with self.assertRaises(UnmergableGraphSetsException):
             GraphSet.from_graph_sets([graph_set_1, graph_set_2])
 
     def test_invalid_diff_versions(self):
         graph_set_1 = GraphSet(
-            name="graph-1", version="1", start_time=10, end_time=20, resources=[], errors=[],
+            name="graph-1",
+            version="1",
+            start_time=10,
+            end_time=20,
+            resources=[],
+            errors=[],
         )
         graph_set_2 = GraphSet(
-            name="graph-1", version="2", start_time=15, end_time=25, resources=[], errors=[],
+            name="graph-1",
+            version="2",
+            start_time=15,
+            end_time=25,
+            resources=[],
+            errors=[],
         )
         with self.assertRaises(UnmergableGraphSetsException):
             GraphSet.from_graph_sets([graph_set_1, graph_set_2])
@@ -329,7 +359,11 @@ class TestGraphSetFromGraphSets(TestCase):
                     simple_links=(SimpleLink(pred="has-foo", obj="goo"),),
                 ),
             ),
-            Resource(resource_id="456", type="test:a", link_collection=LinkCollection(),),
+            Resource(
+                resource_id="456",
+                type="test:a",
+                link_collection=LinkCollection(),
+            ),
             Resource(
                 resource_id="abc",
                 type="test:b",
@@ -340,7 +374,9 @@ class TestGraphSetFromGraphSets(TestCase):
             Resource(
                 resource_id="def",
                 type="test:b",
-                link_collection=LinkCollection(simple_links=(SimpleLink(pred="name", obj="sue"),),),
+                link_collection=LinkCollection(
+                    simple_links=(SimpleLink(pred="name", obj="sue"),),
+                ),
             ),
         )
         expected_errors = ["errora1", "errora2", "errorb1", "errorb2"]

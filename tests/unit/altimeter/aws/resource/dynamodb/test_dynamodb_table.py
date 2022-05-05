@@ -20,8 +20,18 @@ class TestDynamoDbTableResourceSpec(TestCase):
         client = session.client("dynamodb", region_name=region_name)
 
         client.create_table(
-            AttributeDefinitions=[{"AttributeName": "string", "AttributeType": "S",},],
-            KeySchema=[{"AttributeName": "string", "KeyType": "HASH",},],
+            AttributeDefinitions=[
+                {
+                    "AttributeName": "string",
+                    "AttributeType": "S",
+                },
+            ],
+            KeySchema=[
+                {
+                    "AttributeName": "string",
+                    "KeyType": "HASH",
+                },
+            ],
             TableName=table_name,
         )
 
@@ -51,8 +61,18 @@ class TestDynamoDbTableResourceSpec(TestCase):
         client = session.client("dynamodb", region_name=region_name)
 
         client.create_table(
-            AttributeDefinitions=[{"AttributeName": "string", "AttributeType": "S",},],
-            KeySchema=[{"AttributeName": "string", "KeyType": "HASH",},],
+            AttributeDefinitions=[
+                {
+                    "AttributeName": "string",
+                    "AttributeType": "S",
+                },
+            ],
+            KeySchema=[
+                {
+                    "AttributeName": "string",
+                    "KeyType": "HASH",
+                },
+            ],
             TableName=table_name,
         )
 

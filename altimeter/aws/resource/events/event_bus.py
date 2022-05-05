@@ -13,7 +13,11 @@ class EventBusResourceSpec(EventsResourceSpec):
     """Resource for CloudWatchEvents EventBus"""
 
     type_name = "event-bus"
-    schema = Schema(ScalarField("Name"), ScalarField("Arn"), ScalarField("Policy", optional=True),)
+    schema = Schema(
+        ScalarField("Name"),
+        ScalarField("Arn"),
+        ScalarField("Policy", optional=True),
+    )
 
     @classmethod
     def list_from_aws(

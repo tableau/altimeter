@@ -23,7 +23,10 @@ class QJAPIClient:
         base_url = f"{scheme}://{host}:{port}"
         self._base_url = base_url
         self._base_url_v1 = f"{base_url}/v1"
-        self._auth_header = {API_KEY_HEADER_NAME: api_key}
+        if api_key:
+            self._auth_header = {API_KEY_HEADER_NAME: api_key}
+        else:
+            self._auth_header = {}
 
     def get_auth(self) -> str:
         """Get the currently used api auth token. This can be used to validate that the client's

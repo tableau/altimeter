@@ -39,8 +39,7 @@ class RDSSnapshotResourceSpec(RDSResourceSpec):
     def generate_instance_arn(
         cls: Type["RDSSnapshotResourceSpec"], account_id: str, region: str, resource_id: str
     ) -> str:
-        """Generate an ARN for this resource, e.g. arn:aws:rds:<region>:<account>:db:<name>
-        """
+        """Generate an ARN for this resource, e.g. arn:aws:rds:<region>:<account>:db:<name>"""
         return ":".join(
             (
                 "arn",

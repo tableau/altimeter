@@ -164,7 +164,8 @@ class TestAWSCredentialsCache(TestCase):
         creds = session.get_credentials()
         self.assertEqual(creds.access_key, "test_aki")
         self.assertEqual(
-            creds.secret_key, "test_sak",
+            creds.secret_key,
+            "test_sak",
         )
         self.assertEqual(creds.token, "test_st")
 
@@ -194,7 +195,8 @@ class TestAWSCredentialsCache(TestCase):
         creds = session.get_credentials()
         self.assertEqual(creds.access_key, "test_aki")
         self.assertEqual(
-            creds.secret_key, "test_sak",
+            creds.secret_key,
+            "test_sak",
         )
         self.assertEqual(creds.token, "test_st")
 

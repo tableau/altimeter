@@ -12,7 +12,11 @@ _PERMITTED_OPERATION_NAMES_RE = re.compile(_PERMITTED_OPERATION_NAMES_STR)
 
 
 def on_request_created(
-    account_id: str, region_name: str, service_name: str, readonly: bool, **kwargs: Any,
+    account_id: str,
+    region_name: str,
+    service_name: str,
+    readonly: bool,
+    **kwargs: Any,
 ) -> None:
     """Called when a boto3 request is created.
 

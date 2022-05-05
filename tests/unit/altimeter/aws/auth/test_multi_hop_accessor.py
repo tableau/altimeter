@@ -29,7 +29,8 @@ class TestAccessStep(TestCase):
         data = {"role_name": "test_rn"}
         access_step = AccessStep(**data)
         self.assertEqual(
-            access_step, AccessStep(role_name="test_rn"),
+            access_step,
+            AccessStep(role_name="test_rn"),
         )
 
 

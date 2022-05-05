@@ -67,12 +67,12 @@ class ScalarField(Field):
     def parse(self, data: Dict[str, Any], context: Dict[str, Any]) -> LinkCollection:
         """Parse this field and return a LinkCollection
 
-       Args:
-           data: dictionary of data to parse
-           context: context dict containing data from higher level parsing code.
+        Args:
+            data: dictionary of data to parse
+            context: context dict containing data from higher level parsing code.
 
-        Returns:
-            LinkCollection
+         Returns:
+             LinkCollection
         """
         value = data.get(self.source_key)
         if value is None:
@@ -86,7 +86,9 @@ class ScalarField(Field):
                 f"Expected key '{self.source_key}' in data, present keys: {', '.join(data.keys())}"
             )
         if isinstance(value, SCALAR_TYPES):
-            return LinkCollection(simple_links=[SimpleLink(pred=self.alti_key, obj=value)],)
+            return LinkCollection(
+                simple_links=[SimpleLink(pred=self.alti_key, obj=value)],
+            )
         raise ScalarFieldValueNotAScalarException(
             (
                 f"Expected data for key '{self.source_key}' to be one "
@@ -122,7 +124,9 @@ class EmbeddedScalarField(SubField):
         parent_alti_key = self.get_parent_alti_key(data, context)
         if isinstance(data, SCALAR_TYPES):
             link = SimpleLink(pred=parent_alti_key, obj=data)
-            return LinkCollection(simple_links=[link],)
+            return LinkCollection(
+                simple_links=[link],
+            )
         raise ScalarFieldValueNotAScalarException(
             (f"Expected data to be one of {SCALAR_TYPES}, is " f"{type(data)}: {data}")
         )

@@ -94,7 +94,9 @@ class TargetGroupResourceSpec(ELBV2ResourceSpec):
 
     @classmethod
     def get_tg_attrs(
-        cls: Type["TargetGroupResourceSpec"], client: BaseClient, target_group_arn: str,
+        cls: Type["TargetGroupResourceSpec"],
+        client: BaseClient,
+        target_group_arn: str,
     ) -> Dict[str, str]:
         """Get tg attributes that Altimeter graphs."""
         tg_attrs = {}

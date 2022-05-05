@@ -87,7 +87,8 @@ def build_aws_resource_region_mapping_repo(
     aws_service_region_mapping = {}
     try:
         aws_service_region_mapping = get_aws_service_region_mapping(
-            services=services, services_regions_json_url=services_regions_json_url,
+            services=services,
+            services_regions_json_url=services_regions_json_url,
         )
     except Exception as ex:
         logger.warn(

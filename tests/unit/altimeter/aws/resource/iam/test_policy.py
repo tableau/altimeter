@@ -24,7 +24,8 @@ class TestIAMPolicy(TestCase):
             "Statement": [{"Effect": "Allow", "Action": "logs:CreateLogGroup", "Resource": "*"}],
         }
         policy_resp = client.create_policy(
-            PolicyName=policy_name, PolicyDocument=json.dumps(policy_json),
+            PolicyName=policy_name,
+            PolicyDocument=json.dumps(policy_json),
         )
         policy_arn = policy_resp["Policy"]["Arn"]
 
