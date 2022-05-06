@@ -47,10 +47,7 @@ class IAMGroupResourceSpec(IAMResourceSpec):
         ),
         ListField(
             "EmbeddedPolicy",
-            EmbeddedDictField(
-                ScalarField("PolicyName"),
-                ScalarField("PolicyDocument"),
-            ),
+            EmbeddedDictField(ScalarField("PolicyName"), ScalarField("PolicyDocument"),),
             optional=True,
         ),
     )
