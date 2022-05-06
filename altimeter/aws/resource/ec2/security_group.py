@@ -88,7 +88,7 @@ class SecurityGroupResourceSpec(EC2ResourceSpec):
                     "UserIdGroupPairs",
                     EmbeddedDictField(
                         ResourceLinkField("GroupId", "SecurityGroupResourceSpec"),
-                        ScalarField("UserId", alti_key="account_id"),
+                        ScalarField("UserId", alti_key="account_id", optional=True),
                         ScalarField("PeeringStatus", optional=True),
                         ScalarField("VpcId", optional=True),
                         ScalarField("VpcPeeringConnectionId", optional=True),
