@@ -84,7 +84,7 @@ def remediate_via_sqs(
         logger.info(event=QJLogEvents.SubmittingResultRemediation, result=result)
         try:
             sqs_client.send_message(
-                QueueUrl=remediate_sqs_queue_url, MessageBody=result.dict(),
+                QueueUrl=remediate_sqs_queue_url, MessageBody=json.dumps(result.dict()),
             )
             logger.info(event=QJLogEvents.SubmittedResultRemediation, result=result)
         except Exception as ex:
