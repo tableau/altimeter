@@ -70,6 +70,7 @@ def remediate_via_sqs(
     try:
         remediate_sqs_queue_url = sqs_client.get_queue_url(QueueName=remediate_sqs_queue_name)
     except Exception as ex:
+        err_msg = f"Error getting SQS queue url for {remediate_sqs_queue_name}"
         logger.error(
             QJLogEvents.UnknownRemediatorSQSQueue,
             queue_name=remediate_sqs_queue_name,
