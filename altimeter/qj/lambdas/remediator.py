@@ -68,7 +68,9 @@ def remediate_via_sqs(
         raise RemediationError(err_msg) from i_e
     sqs_client = boto3.client("sqs", region_name=remediate_sqs_queue_region_name)
     try:
-        remediate_sqs_queue_url = sqs_client.get_queue_url(QueueName=remediate_sqs_queue_name)
+        remediate_sqs_queue_url = sqs_client.get_queue_url(QueueName=remediate_sqs_queue_name)[
+            "QueueUrl"
+        ]
     except Exception as ex:
         err_msg = f"Error getting SQS queue url for {remediate_sqs_queue_name}"
         logger.error(
