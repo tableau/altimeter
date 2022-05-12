@@ -12,7 +12,7 @@ from altimeter.qj.config import RemediatorConfig
 from altimeter.qj.exceptions import RemediationError
 from altimeter.qj.log import QJLogEvents
 from altimeter.qj.schemas.remediation import Remediation
-from altimeter.qj.schemas.result_set import Result
+from altimeter.qj.schemas.result_set import Result, ResultSet
 
 
 def remediator(event: Dict[str, Any]) -> None:
@@ -39,36 +39,86 @@ def remediator(event: Dict[str, Any]) -> None:
             msg = f"Job {latest_result_set.job.name} has no remediator"
             logger.error(QJLogEvents.JobHasNoRemediator, detail=msg)
             raise RemediationError(msg)
-        num_threads = 10  # TODO env var
-        errors = []
-        with ThreadPoolExecutor(max_workers=num_threads) as executor:
-            futures = []
-            for result in latest_result_set.results:
-                logger.info(event=QJLogEvents.ProcessResult, result=result)
-                future = _schedule_result_remediation(
-                    executor=executor,
-                    lambda_name=latest_result_set.job.remediate_sqs_queue,
-                    lambda_timeout=300,  # TODO env var?
-                    result=result,
-                )
-                futures.append(future)
-            for future in as_completed(futures):
-                try:
-                    lambda_result = future.result()
-                    logger.info(
-                        QJLogEvents.ResultRemediationSuccessful, lambda_result=lambda_result
-                    )
-                except Exception as ex:
-                    logger.info(
-                        event=QJLogEvents.ResultSetRemediationFailed, error=str(ex),
-                    )
-                    errors.append(str(ex))
-        if errors:
-            logger.error(event=QJLogEvents.ResultSetRemediationFailed, errors=errors)
-            raise RemediationError(
-                f"Errors encountered during remediation of {latest_result_set.job.name} "
-                f"/ {latest_result_set.result_set_id}: {errors}"
+        if latest_result_set.job.remediate_sqs_queue.startswith("arn:aws:sqs:"):
+            remediate_via_sqs(
+                remediate_sqs_queue=latest_result_set.job.remediate_sqs_queue,
+                latest_result_set=latest_result_set,
+                logger=logger,
             )
+        else:
+            remediate_via_lambda(
+                lambda_name=latest_result_set.job.remediate_sqs_queue,
+                latest_result_set=latest_result_set,
+                logger=logger,
+            )
+
+
+def remediate_via_sqs(
+    remediate_sqs_queue: str, latest_result_set: ResultSet, logger: Logger
+) -> None:
+    try:
+        remediate_sqs_queue_region_name = remediate_sqs_queue.split(":")[3]
+        remediate_sqs_queue_name = remediate_sqs_queue.split(":")[5]
+    except IndexError as i_e:
+        err_msg = (
+            f"{latest_result_set.job.name} field remediate_sqs_queue "
+            f"{remediate_sqs_queue} is invalid"
+        )
+        logger.error(QJLogEvents.InvalidRemediatorSQSQueueArn, detail=err_msg)
+        raise RemediationError(err_msg) from i_e
+    sqs_client = boto3.client("sqs", region_name=remediate_sqs_queue_region_name)
+    try:
+        remediate_sqs_queue_url = sqs_client.get_queue_url(QueueName=remediate_sqs_queue_name)
+    except Exception as ex:
+        logger.error(
+            QJLogEvents.UnknownRemediatorSQSQueue,
+            queue_name=remediate_sqs_queue_name,
+            queue_region=remediate_sqs_queue_region_name,
+            detail=err_msg,
+        )
+        raise RemediationError(err_msg) from ex
+    for result in latest_result_set.results:
+        logger.info(event=QJLogEvents.SubmittingResultRemediation, result=result)
+        try:
+            sqs_client.send_message(
+                QueueUrl=remediate_sqs_queue_url, MessageBody=result.dict(),
+            )
+            logger.info(event=QJLogEvents.SubmittedResultRemediation, result=result)
+        except Exception as ex:
+            logger.error(
+                event=QJLogEvents.FailedSubmittingResultRemediation, result=result, detail=ex,
+            )
+
+
+def remediate_via_lambda(lambda_name: str, latest_result_set: ResultSet, logger: Logger) -> None:
+    num_threads = 10  # TODO env var
+    errors = []
+    with ThreadPoolExecutor(max_workers=num_threads) as executor:
+        futures = []
+        for result in latest_result_set.results:
+            logger.info(event=QJLogEvents.ProcessResult, result=result)
+            future = _schedule_result_remediation(
+                executor=executor,
+                lambda_name=lambda_name,
+                lambda_timeout=300,  # TODO env var?
+                result=result,
+            )
+            futures.append(future)
+        for future in as_completed(futures):
+            try:
+                lambda_result = future.result()
+                logger.info(QJLogEvents.ResultRemediationSuccessful, lambda_result=lambda_result)
+            except Exception as ex:
+                logger.info(
+                    event=QJLogEvents.ResultSetRemediationFailed, error=str(ex),
+                )
+                errors.append(str(ex))
+    if errors:
+        logger.error(event=QJLogEvents.ResultSetRemediationFailed, errors=errors)
+        raise RemediationError(
+            f"Errors encountered during remediation of {latest_result_set.job.name} "
+            f"/ {latest_result_set.result_set_id}: {errors}"
+        )
 
 
 def _schedule_result_remediation(
