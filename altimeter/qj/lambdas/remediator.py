@@ -1,5 +1,6 @@
 """Remediate results of a QJ"""
 from concurrent.futures import as_completed, Future, ThreadPoolExecutor
+import hashlib
 import json
 from typing import Any, Dict
 
@@ -80,11 +81,18 @@ def remediate_via_sqs(
             detail=err_msg,
         )
         raise RemediationError(err_msg) from ex
+    message_group_id = latest_result_set.result_set_id
     for result in latest_result_set.results:
         logger.info(event=QJLogEvents.SubmittingResultRemediation, result=result)
+        result_hash = hashlib.sha256()
+        result_hash.update(json.dumps(result.json()).encode())
+        message_dedupe_id = result_hash.hexdigest()
         try:
             sqs_client.send_message(
-                QueueUrl=remediate_sqs_queue_url, MessageBody=json.dumps(result.dict()),
+                QueueUrl=remediate_sqs_queue_url,
+                MessageBody=json.dumps(result.dict()),
+                MessageGroupId=message_group_id,
+                MessageDeduplicationId=message_dedupe_id,
             )
             logger.info(event=QJLogEvents.SubmittedResultRemediation, result=result)
         except Exception as ex:
