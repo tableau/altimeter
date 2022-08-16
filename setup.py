@@ -48,6 +48,7 @@ setup(
                 "services/qj/alembic/versions/60990e9bc347_added_notify_if_results_bool_on_job.py",
                 "services/qj/alembic/versions/9d956e753055_added_remediate_sqs_queue_column_to_qj_.py",
                 "services/qj/alembic/versions/e6e2a6bf2a39_adding_query_job_raw_query_column.py",
+                "services/qj/alembic/versions/94f36533d115_remove_result_synthetic_pk.py",
             ],
         ),
     ],
