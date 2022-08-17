@@ -41,13 +41,14 @@ class Result(BASE):
 
     __tablename__ = "result"
 
-    id = Column(Integer, primary_key=True)
     result_set_id = Column(
         "result_set_id", ForeignKey(ResultSet.id, ondelete="CASCADE"), nullable=False,
     )
     result_set = relationship(ResultSet)
     account_id = Column(Text, nullable=False)
-    result_id = Column(UUID(as_uuid=True), default=uuid.uuid4, nullable=False, unique=True)
+    result_id = Column(
+        UUID(as_uuid=True), default=uuid.uuid4, nullable=False, unique=True, primary_key=True
+    )
     result = Column(JSONB, nullable=False)
 
     __table_args__ = (
