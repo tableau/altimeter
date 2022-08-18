@@ -44,11 +44,13 @@ def main(argv: Optional[List[str]] = None) -> int:
 
     if args_ns.historic_graph_names:
         results = client.run_historic_query(graph_names=args_ns.historic_graph_names, query=query)
-    if args_ns.raw:
-        results = client.run_raw_query(query=query)
+        print(results.to_csv(), end="")
+    elif args_ns.raw:
+        raw_results = client.run_raw_query(query=query)
+        print(raw_results.to_csv(), end="")
     else:
         results = client.run_query(graph_names=args_ns.graph_names, query=query)
-    print(results.to_csv(), end="")
+        print(results.to_csv(), end="")
     return 0
 
 
