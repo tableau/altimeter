@@ -21,6 +21,7 @@ def main(argv: Optional[List[str]] = None) -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("query_file", type=str)
     parser.add_argument("--graph_names", type=str, default=["alti"], nargs="+")
+    parser.add_argument("--historic_graph_names", type=str, nargs="+")
     parser.add_argument("--max_age_min", type=int, default=1440)
     parser.add_argument("--raw", default=False, action="store_true")
     parser.add_argument("--neptune_endpoint", help="Neptune endpoint specified as host:port:region")
@@ -41,7 +42,10 @@ def main(argv: Optional[List[str]] = None) -> int:
         endpoint = discover_neptune_endpoint()
     client = AltimeterNeptuneClient(max_age_min=args_ns.max_age_min, neptune_endpoint=endpoint)
 
-    if args_ns.raw:
+    if args_ns.historic_graph_names:
+        results = client.run_historic_query(graph_names=args_ns.historic_graph_names, query=query)
+        print(results.to_csv(), end="")
+    elif args_ns.raw:
         raw_results = client.run_raw_query(query=query)
         print(raw_results.to_csv(), end="")
     else:

@@ -202,6 +202,28 @@ class AltimeterNeptuneClient:
         query_result_set = self.run_raw_query(finalized_query)
         return QueryResult(graph_uris_load_times, query_result_set)
 
+    def run_historic_query(self, graph_names: Set[str], query: str) -> QueryResult:
+        """Runs a SPARQL query against all available graphs given a list of
+        graph names.
+
+        Args:
+            graph_names: list of graph names to query
+            query: query string. This query string should not include any 'from' clause;
+                   the graph_names param will be used to inject the correct graph uris
+                   by locating all graphs for the given name.
+
+        Returns:
+            QueryResult object
+        """
+        graph_uris_load_times: Dict[str, int] = {}
+        for graph_name in graph_names:
+            graph_metadatas = self._get_graph_metadatas(name=graph_name)
+            for graph_metadata in graph_metadatas:
+                graph_uris_load_times[graph_metadata.uri] = graph_metadata.end_time
+        finalized_query = finalize_query(query, graph_uris=list(graph_uris_load_times.keys()))
+        query_result_set = self.run_raw_query(finalized_query)
+        return QueryResult(graph_uris_load_times, query_result_set)
+
     def load_graph(self, bucket: str, key: str, load_iam_role_arn: str) -> GraphMetadata:
         """Load a graph into Neptune.
         Args:
@@ -494,6 +516,68 @@ class AltimeterNeptuneClient:
             start_time=latest_start_time,
             end_time=latest_end_time,
         )
+
+    def _get_graph_metadatas(
+        self, name: str, version: Optional[str] = None
+    ) -> Tuple[GraphMetadata, ...]:
+        """Return a tuple of GraphMetadata object representing all successfully loaded graphs
+        for a given name/version
+
+        Args:
+            name: graph name
+            version: graph version
+
+        Returns:
+            TUple of GraphMetadata of all succesfully loaded graphs for the given name/version
+
+        Raises:
+            NeptuneNoGraphsFoundException if no matching graphs were found
+        """
+        if version is None:
+            get_graph_metadatas_query = (
+                f"SELECT ?uri ?version ?start_time ?end_time\n"
+                f"FROM <{META_GRAPH_NAME}>\n"
+                f"WHERE {{\n"
+                f"    ?graph_metadata <alti:uri> ?uri ;\n"
+                f'                    <alti:name> "{name}" ;\n'
+                f"                    <alti:version> ?version ;\n"
+                f"                    <alti:start_time> ?start_time ;\n"
+                f"                    <alti:end_time> ?end_time }}\n"
+                f"ORDER BY DESC(?version) DESC(?end_time)"
+            )
+        else:
+            get_graph_metadatas_query = (
+                f"SELECT ?uri ?version ?start_time ?end_time\n"
+                f"FROM <{META_GRAPH_NAME}>\n"
+                f"WHERE {{\n"
+                f"    ?graph_metadata <alti:uri> ?uri ;\n"
+                f'                    <alti:name> "{name}" ;\n'
+                f"                    <alti:version> {version} ;\n"
+                f"                    <alti:version> ?version ;\n"
+                f"                    <alti:start_time> ?start_time ;\n"
+                f"                    <alti:end_time> ?end_time }}\n"
+                f"ORDER BY DESC(?end_time)"
+            )
+        results = self.run_raw_query(query=get_graph_metadatas_query)
+        results_list = results.to_list()
+        if not results_list:
+            raise NeptuneNoGraphsFoundException(f"No graphs found for graph name '{name}'")
+        graph_metadatas: List[GraphMetadata] = []
+        for result in results_list:
+            latest_uri = result["uri"]
+            latest_version = result["version"]
+            latest_start_time = int(result["start_time"])
+            latest_end_time = int(result["end_time"])
+            graph_metadatas.append(
+                GraphMetadata(
+                    uri=latest_uri,
+                    name=name,
+                    version=latest_version,
+                    start_time=latest_start_time,
+                    end_time=latest_end_time,
+                )
+            )
+        return tuple(graph_metadatas)
 
     def get_all_graph_metadatas(self) -> Tuple[GraphMetadata, ...]:
         """Return GraphMetadata objects representing all graphs
