@@ -51,7 +51,7 @@ jmespath==0.10.0
     #   botocore
 jsonschema==3.2.0
     # via aws-sam-translator
-mako==1.2.0
+mako==1.2.2
     # via alembic
 markupsafe==2.0.1
     # via
