@@ -30,6 +30,7 @@ class InitOutput(BaseImmutableModel):
     aws_resource_region_mapping_repo: AWSResourceRegionMappingRepository
     accessor: Accessor
     artifact_path: str
+    max_svc_scan_threads: int
     scan_sub_accounts: bool
 
 
