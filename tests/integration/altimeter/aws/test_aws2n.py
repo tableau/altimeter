@@ -41,7 +41,7 @@ from altimeter.core.resource.resource import Resource
 
 
 class TestAWS2NSingleAccount(unittest.TestCase):
-    @moto.mock_dynamodb2
+    @moto.mock_dynamodb
     @moto.mock_ec2
     @moto.mock_iam
     @moto.mock_lambda
@@ -387,7 +387,7 @@ class TestAWS2NSingleAccount(unittest.TestCase):
                         type="aws:ec2:vpc",
                         link_collection=LinkCollection(
                             simple_links=(
-                                SimpleLink(pred="is_default", obj=True),
+                                SimpleLink(pred="is_default", obj=False),
                                 SimpleLink(pred="cidr_block", obj=vpc_1_cidr),
                                 SimpleLink(pred="state", obj="available"),
                             ),
