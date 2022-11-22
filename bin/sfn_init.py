@@ -42,7 +42,6 @@ def lambda_handler(_: Dict[str, Any], __: Any) -> Dict[str, Any]:
             root.removeHandler(handler)
     settings = Settings()
     config = AWSConfig.from_path(path=settings.config_path)
-    config.accessor.cache_creds = False
     scan_id = generate_scan_id()
     aws_resource_region_mapping_repo = build_aws_resource_region_mapping_repo(
         global_region_whitelist=config.scan.regions,
