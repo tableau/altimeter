@@ -74,6 +74,4 @@ def lambda_handler(event: Dict[str, Any], _: Any) -> Dict[str, Any]:
         name="master", graph_set=validated_graph_set, compression=GZIP
     )
 
-    return CompileGraphsOutput(
-        rdf_path=rdf_path,
-    ).dict()
+    return CompileGraphsOutput(rdf_path=rdf_path,).dict()
