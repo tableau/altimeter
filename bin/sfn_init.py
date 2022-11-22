@@ -24,14 +24,10 @@ class Settings(BaseSettings):
 
 
 class InitOutput(BaseImmutableModel):
+    config: AWSConfig
     scan_id: str
     account_ids: Tuple[str, ...]
-    regions: Tuple[str, ...]
     aws_resource_region_mapping_repo: AWSResourceRegionMappingRepository
-    accessor: Accessor
-    artifact_path: str
-    max_svc_scan_threads: int
-    scan_sub_accounts: bool
 
 
 def lambda_handler(_: Dict[str, Any], __: Any) -> Dict[str, Any]:
@@ -59,12 +55,8 @@ def lambda_handler(_: Dict[str, Any], __: Any) -> Dict[str, Any]:
     else:
         account_ids = scan_account_ids
     return InitOutput(
+        config=config,
         scan_id=scan_id,
         account_ids=account_ids,
-        regions=config.scan.regions,
         aws_resource_region_mapping_repo=aws_resource_region_mapping_repo,
-        accessor=config.accessor,
-        artifact_path=config.artifact_path,
-        max_svc_scan_threads=config.concurrency.max_svc_scan_threads,
-        scan_sub_accounts=config.scan.scan_sub_accounts,
     ).dict()

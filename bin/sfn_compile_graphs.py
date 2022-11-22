@@ -9,13 +9,14 @@ from altimeter.aws.scan.scan_manifest import ScanManifest
 from altimeter.core.artifact_io.reader import ArtifactReader
 from altimeter.core.artifact_io.writer import GZIP, ArtifactWriter
 from altimeter.core.base_model import BaseImmutableModel
+from altimeter.core.config import AWSConfig
 from altimeter.core.graph.graph_set import GraphSet, ValidatedGraphSet
 
 
 class CompileGraphsInput(BaseImmutableModel):
-    account_scan_manifests: Tuple[AccountScanManifest, ...]
-    artifact_path: str
+    config: AWSConfig
     scan_id: str
+    account_scan_manifests: Tuple[AccountScanManifest, ...]
 
 
 class CompileGraphsOutput(BaseImmutableModel):
@@ -36,9 +37,10 @@ def lambda_handler(event: Dict[str, Any], _: Any) -> Dict[str, Any]:
     unscanned_accounts: Set[str] = set()
     graph_sets: List[GraphSet] = []
 
-    artifact_reader = ArtifactReader.from_artifact_path(compile_graphs_input.artifact_path)
+    artifact_reader = ArtifactReader.from_artifact_path(compile_graphs_input.config.artifact_path)
     artifact_writer = ArtifactWriter.from_artifact_path(
-        artifact_path=compile_graphs_input.artifact_path, scan_id=compile_graphs_input.scan_id
+        artifact_path=compile_graphs_input.config.artifact_path,
+        scan_id=compile_graphs_input.scan_id,
     )
 
     for account_scan_manifest in compile_graphs_input.account_scan_manifests:

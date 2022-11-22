@@ -11,17 +11,14 @@ from altimeter.aws.resource_service_region_mapping import AWSResourceRegionMappi
 from altimeter.aws.scan.account_scanner import AccountScanner
 from altimeter.aws.scan.scan_plan import AccountScanPlan
 from altimeter.core.artifact_io.writer import ArtifactWriter
+from altimeter.core.config import AWSConfig
 
 
 class AccountScanInput(BaseModel):
+    config: AWSConfig
     scan_id: str
     account_id: str
-    regions: Tuple[str, ...]
     aws_resource_region_mapping_repo: AWSResourceRegionMappingRepository
-    accessor: Accessor
-    artifact_path: str
-    max_svc_scan_threads: int
-    scan_sub_accounts: bool
 
 
 def lambda_handler(event: Dict[str, Any], _: Any) -> Dict[str, Any]:
@@ -32,19 +29,19 @@ def lambda_handler(event: Dict[str, Any], _: Any) -> Dict[str, Any]:
             root.removeHandler(handler)
     account_scan_input = AccountScanInput(**event)
     artifact_writer = ArtifactWriter.from_artifact_path(
-        artifact_path=account_scan_input.artifact_path, scan_id=account_scan_input.scan_id
+        artifact_path=account_scan_input.config.artifact_path, scan_id=account_scan_input.scan_id
     )
     account_scan_plan = AccountScanPlan(
         account_id=account_scan_input.account_id,
-        regions=account_scan_input.regions,
+        regions=account_scan_input.config.scan.regions,
         aws_resource_region_mapping_repo=account_scan_input.aws_resource_region_mapping_repo,
-        accessor=account_scan_input.accessor,
+        accessor=account_scan_input.config.accessor,
     )
     account_scanner = AccountScanner(
         account_scan_plan=account_scan_plan,
         artifact_writer=artifact_writer,
-        max_svc_scan_threads=account_scan_input.max_svc_scan_threads,
-        scan_sub_accounts=account_scan_input.scan_sub_accounts,
+        max_svc_scan_threads=account_scan_input.config.concurrency.max_svc_scan_threads,
+        scan_sub_accounts=account_scan_input.config.scan.scan_sub_accounts,
     )
     scan_results = account_scanner.scan()
     return scan_results.dict()
