@@ -24,7 +24,7 @@ class AccountScanInput(BaseModel):
     scan_sub_accounts: bool
 
 
-def lambda_handler(event: Dict[str, Any], __: Any) -> Dict[str, Any]:
+def lambda_handler(event: Dict[str, Any], _: Any) -> Dict[str, Any]:
     """Lambda entrypoint"""
     root = logging.getLogger()
     if root.handlers:
