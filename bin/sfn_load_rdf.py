@@ -33,6 +33,9 @@ def lambda_handler(event: Dict[str, Any], _: Any) -> Dict[str, Any]:
     logger = Logger()
     load_rdf_input = LoadRDFInput(**event)
 
+    if load_rdf_input.config.neptune is None:
+        raise ValueError("Input config must include neptune section")
+
     endpoint = NeptuneEndpoint(
         host=load_rdf_input.config.neptune.host,
         port=load_rdf_input.config.neptune.port,
