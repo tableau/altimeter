@@ -6,7 +6,7 @@ from typing import Any, Dict, List, Set, Tuple
 
 from altimeter.aws.scan.account_scan_manifest import AccountScanManifest
 from altimeter.aws.scan.scan_manifest import ScanManifest
-from altimeter.aws.scan.settings import ALL_RESOURCE_SPEC_CLASSES # pylint: disable=unused-import
+from altimeter.aws.scan.settings import ALL_RESOURCE_SPEC_CLASSES  # pylint: disable=unused-import
 from altimeter.core.artifact_io.reader import ArtifactReader
 from altimeter.core.artifact_io.writer import GZIP, ArtifactWriter
 from altimeter.core.base_model import BaseImmutableModel
