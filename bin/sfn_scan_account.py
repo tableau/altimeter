@@ -2,11 +2,10 @@
 """ScanAccount StepFunction Lambda
 Scan a single AWS account and write output to S3."""
 import logging
-from typing import Any, Dict, Tuple
+from typing import Any, Dict
 
 from pydantic import BaseModel
 
-from altimeter.aws.auth.accessor import Accessor
 from altimeter.aws.resource_service_region_mapping import AWSResourceRegionMappingRepository
 from altimeter.aws.scan.account_scanner import AccountScanner
 from altimeter.aws.scan.scan_plan import AccountScanPlan

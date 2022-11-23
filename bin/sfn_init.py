@@ -8,7 +8,6 @@ from typing import Any, Dict, Tuple
 import boto3
 from pydantic import BaseSettings
 
-from altimeter.aws.auth.accessor import Accessor
 from altimeter.aws.aws2n import generate_scan_id
 from altimeter.aws.resource_service_region_mapping import (
     build_aws_resource_region_mapping_repo,
