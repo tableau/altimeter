@@ -67,4 +67,4 @@ def lambda_handler(event: Dict[str, Any], _: Any) -> Dict[str, Any]:
         Message=json.dumps(message_dict),
     )
     logger.info(event=LogEvent.GraphLoadedSNSNotificationEnd)
-    return LoadRDFOutput().dict()
+    return LoadRDFOutput(graph_metadata=graph_metadata).dict()
