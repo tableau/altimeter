@@ -12,7 +12,7 @@ from altimeter.core.base_model import BaseImmutableModel
 from altimeter.core.config import AWSConfig
 from altimeter.core.log import Logger
 from altimeter.core.log_events import LogEvent
-from altimeter.core.neptune.client import GraphMetadata, NeptuneEndpoint, AltimeterNeptuneClient
+from altimeter.core.neptune.client import NeptuneEndpoint, AltimeterNeptuneClient
 
 
 class LoadRDFInput(BaseImmutableModel):
@@ -21,7 +21,11 @@ class LoadRDFInput(BaseImmutableModel):
 
 
 class LoadRDFOutput(BaseImmutableModel):
-    graph_metadata: GraphMetadata
+    uri: str
+    name: str
+    version: str
+    start_time: int
+    end_time: int
 
 
 def lambda_handler(event: Dict[str, Any], _: Any) -> Dict[str, Any]:
@@ -67,4 +71,10 @@ def lambda_handler(event: Dict[str, Any], _: Any) -> Dict[str, Any]:
         Message=json.dumps(message_dict),
     )
     logger.info(event=LogEvent.GraphLoadedSNSNotificationEnd)
-    return LoadRDFOutput(graph_metadata=graph_metadata).dict()
+    return LoadRDFOutput(
+        uri=graph_metadata.uri,
+        name=graph_metadata.name,
+        version=graph_metadata.version,
+        start_time=graph_metadata.start_time,
+        end_time=graph_metadata.end_time,
+    ).dict()
