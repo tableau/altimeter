@@ -4,12 +4,12 @@ import logging
 from typing import Any, Dict
 
 from altimeter.core.base_model import BaseImmutableModel
-from altimeter.core.config import GraphPrunerConfig
-from altimeter.core.pruner import prune_graph
+from altimeter.core.config import Config
+from altimeter.core.pruner import prune_graph_from_config
 
 
 class PruneGraphsInput(BaseImmutableModel):
-    config_path: str
+    config: Config
 
 
 def lambda_handler(event: Dict[str, Any], _: Any) -> Dict[str, Any]:
@@ -19,6 +19,5 @@ def lambda_handler(event: Dict[str, Any], _: Any) -> Dict[str, Any]:
         for handler in root.handlers:
             root.removeHandler(handler)
     prune_graphs_input = PruneGraphsInput(**event)
-    pruner_config = GraphPrunerConfig(config_path=prune_graphs_input.config_path)
-    prune_results = prune_graph(pruner_config)
+    prune_results = prune_graph_from_config(prune_graphs_input.config)
     return prune_results.dict()
