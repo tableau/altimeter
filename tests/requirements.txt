@@ -5,34 +5,34 @@
 #    pip-compile requirements.in
 #
 alembic==1.4.2
-    # via -r requirements.in
+    # via -r tests/requirements.in
 attrs==21.4.0
     # via pytest
 boto3==1.24.89
     # via
-    #   -r requirements.in
+    #   -r tests/requirements.in
     #   moto
 botocore==1.27.89
     # via
     #   boto3
     #   moto
     #   s3transfer
-certifi==2021.10.8
+certifi==2022.12.7
     # via requests
 cffi==1.15.0
     # via cryptography
 charset-normalizer==2.0.12
     # via requests
 colorama==0.4.1
-    # via -r requirements.in
+    # via -r tests/requirements.in
 coverage==4.5.4
     # via
-    #   -r requirements.in
+    #   -r tests/requirements.in
     #   pytest-cov
 cryptography==36.0.2
     # via moto
 docker==6.0.0
-    # via -r requirements.in
+    # via -r tests/requirements.in
 idna==3.3
     # via requests
 iniconfig==1.1.1
@@ -47,12 +47,12 @@ mako==1.2.2
     # via alembic
 markupsafe==2.0.1
     # via
-    #   -r requirements.in
+    #   -r tests/requirements.in
     #   jinja2
     #   mako
     #   moto
 moto==4.0.7
-    # via -r requirements.in
+    # via -r tests/requirements.in
 packaging==21.3
     # via
     #   docker
@@ -67,10 +67,10 @@ pyparsing==3.0.7
     # via packaging
 pytest==6.2.5
     # via
-    #   -r requirements.in
+    #   -r tests/requirements.in
     #   pytest-cov
 pytest-cov==2.10.1
-    # via -r requirements.in
+    # via -r tests/requirements.in
 python-dateutil==2.8.2
     # via
     #   alembic
@@ -93,7 +93,7 @@ six==1.16.0
     # via python-dateutil
 sqlalchemy==1.3.24
     # via
-    #   -r requirements.in
+    #   -r tests/requirements.in
     #   alembic
 toml==0.10.2
     # via pytest
