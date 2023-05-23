@@ -80,7 +80,7 @@ python-editor==1.0.4
     # via alembic
 pytz==2021.3
     # via moto
-requests==2.27.1
+requests==2.31.0
     # via
     #   docker
     #   moto
