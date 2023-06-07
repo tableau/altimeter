@@ -1,6 +1,6 @@
-MarkupSafe==2.0.1
+MarkupSafe==2.1.1
 alembic==1.4.2
-boto3==1.24.89
+boto3==1.26.149
 fastapi==0.70.1
 psycopg2-binary==2.9.2
 sqlalchemy==1.3.24
