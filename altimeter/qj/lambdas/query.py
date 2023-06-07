@@ -1,9 +1,11 @@
 """Run the query portion of a QJ"""
 import json
+import time
 from typing import Any, Dict, List
 
 from altimeter.core.log import Logger
 from altimeter.core.neptune.client import AltimeterNeptuneClient, NeptuneEndpoint
+from altimeter.core.neptune.exceptions import NeptuneQueryException
 from altimeter.core.neptune.results import QueryResult
 from altimeter.qj import schemas
 from altimeter.qj.client import QJAPIClient
@@ -29,9 +31,20 @@ def query(event: Dict[str, Any]) -> None:
     body = json.loads(body)
     job = schemas.Job(**body)
     logger.info(event=QJLogEvents.InitJob, job=job)
-
     logger.info(event=QJLogEvents.RunQueryStart)
-    query_result = run_query(job=job, config=query_config)
+    max_tries = 5
+    current_try = 0
+    while True:
+        current_try += 1
+        try:
+            query_result = run_query(job=job, config=query_config)
+            break
+        except NeptuneQueryException as nq_ex:
+            logger.info(event=QJLogEvents.RunQueryError, detail=str(nq_ex))
+        if current_try >= max_tries:
+            logger.info(event=QJLogEvents.RunQueryError, detail="Max tries exceeded")
+            raise NeptuneQueryException("Max tries exceeded")
+        time.sleep(5)
     logger.info(event=QJLogEvents.RunQueryEnd, num_results=query_result.get_length())
 
     results: List[schemas.Result] = []

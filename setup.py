@@ -6,7 +6,7 @@ with open("README.md", "r") as fh:
 
 setup(
     name="altimeter",
-    version="LOCALVERSION",
+    version="0.0.1",
     packages=find_packages(exclude=["tests"]),
     author="Tableau",
     description="Graph AWS resources in Neptune",
