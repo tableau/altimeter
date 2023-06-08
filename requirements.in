@@ -1,9 +1,11 @@
-MarkupSafe==2.0.1
+MarkupSafe==2.1.1
 aws-requests-auth==0.4.3
 rdflib==6.0.2
 structlog==20.2.0
-boto3==1.24.89
+boto3==1.26.149
 jinja2==3.0.3
 pydantic==1.8.2
 toml==0.10.2
 gremlinpython==3.4.12
+requests==2.31.0
+certifi==2023.5.7
