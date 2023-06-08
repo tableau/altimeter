@@ -38,7 +38,7 @@ markupsafe==2.1.1
     # via
     #   -r requirements.in
     #   jinja2
-pydantic==1.8.2
+pydantic==1.9.0
     # via -r requirements.in
 pyparsing==3.0.7
     # via rdflib
