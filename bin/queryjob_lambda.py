@@ -15,17 +15,17 @@ class InvalidLambdaModeException(Exception):
     """Indicates the mode associated with the queryjob lambda is invalid"""
 
 
-def lambda_handler(event: Dict[str, Any], _: Any) -> None:
+def lambda_handler(event: Dict[str, Any], _: Any) -> Any:
     """Lambda entrypoint"""
     handler = QJHandlerConfig()
     if handler.mode == "executor":
-        executor(event)
+        return executor(event)
     elif handler.mode == "query":
-        query(event)
+        return query(event)
     elif handler.mode == "pruner":
-        pruner()
+        return pruner()
     elif handler.mode == "remediator":
-        remediator(event)
+        return remediator(event)
     else:
         raise InvalidLambdaModeException(
             f"Invalid lambda MODE value.\nENV: {os.environ}\nEvent: {event}"
