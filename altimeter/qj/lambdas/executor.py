@@ -8,12 +8,12 @@ from altimeter.qj.config import ExecutorConfig
 from altimeter.qj.log import QJLogEvents
 
 
-def executor(_: Dict[str, Any]) -> List[Dict[str, Any]]:
-    """Find all known QJs and return them as a list of dict"""
+def executor(_: Dict[str, Any]) -> List[str]:
+    """Return the name of active QJ names"""
     exec_config = ExecutorConfig()
     logger = Logger()
     logger.info(event=QJLogEvents.InitConfig)
     qj_client = QJAPIClient(host=exec_config.api_host, port=exec_config.api_port)
     jobs = qj_client.get_jobs(active_only=True)
     logger.info(event=QJLogEvents.GetJobs, num_jobs=len(jobs))
-    return [json.loads(job.json()) for job in jobs]
+    return [job.name for job in jobs]

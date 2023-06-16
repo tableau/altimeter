@@ -18,10 +18,13 @@ def query(event: Dict[str, Any]) -> None:
     query_config = QueryConfig()
     logger = Logger()
     logger.info(event=QJLogEvents.InitConfig, config=query_config)
-    raw_job = event.get("job")
-    if not raw_job:
-        raise Exception("Expected input key 'job'")
-    job = schemas.Job(**raw_job)
+    job_name = event.get("job_name")
+    if not job_name:
+        raise Exception("Missing expected input parameter 'job_name'")
+    qj_client = QJAPIClient(host=query_config.api_host, port=query_config.api_port)
+    job = qj_client.get_job(job_name=job_name)
+    if not job:
+        raise Exception(f"ERROR: unknown job {job_name}")
     logger.info(event=QJLogEvents.InitJob, job=job)
     logger.info(event=QJLogEvents.RunQueryStart)
     max_tries = 5
