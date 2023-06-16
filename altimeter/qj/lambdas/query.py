@@ -1,5 +1,4 @@
 """Run the query portion of a QJ"""
-import json
 import time
 from typing import Any, Dict, List
 
@@ -19,17 +18,10 @@ def query(event: Dict[str, Any]) -> None:
     query_config = QueryConfig()
     logger = Logger()
     logger.info(event=QJLogEvents.InitConfig, config=query_config)
-
-    records = event.get("Records", [])
-    if not records:
-        raise Exception("No records found")
-    if len(records) > 1:
-        raise Exception(f"More than one record. BatchSize is probably not 1. event: {event}")
-    body = records[0].get("body")
-    if body is None:
-        raise Exception(f"No record body found. BatchSize is probably not 1. event: {event}")
-    body = json.loads(body)
-    job = schemas.Job(**body)
+    raw_job = event.get("job")
+    if not raw_job:
+        raise Exception("Expected input key 'job'")
+    job = schemas.Job(**raw_job)
     logger.info(event=QJLogEvents.InitJob, job=job)
     logger.info(event=QJLogEvents.RunQueryStart)
     max_tries = 5
