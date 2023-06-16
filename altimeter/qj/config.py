@@ -54,8 +54,6 @@ class PrunerConfig(APIConfig, SecurityConfig):
 class ExecutorConfig(APIConfig):
     """Configuraton for the Executor lambda"""
 
-    query_queue_url: str
-
 
 class RemediatorConfig(BaseSettings):
     """Remediator configuration"""
