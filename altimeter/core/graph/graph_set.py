@@ -212,6 +212,8 @@ def validate_resources(resources: Tuple[Resource, ...]) -> None:
     for resource in resources:
         if resource.link_collection.resource_links:
             for link in resource.link_collection.resource_links:
+                if link.obj.startswith("arn:aws:") and link.obj.split(":")[4] == "aws":
+                    continue
                 resource_ref_ids_used_by_ids[link.obj].append(resource.resource_id)
     resource_ref_ids = set(resource_ref_ids_used_by_ids.keys())
     orphan_refs = resource_ref_ids - present_resource_ids
