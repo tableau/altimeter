@@ -35,8 +35,6 @@ cryptography==41.0.0
     #   moto
 docker==6.1.3
     # via -r requirements.in
-exceptiongroup==1.1.1
-    # via pytest
 idna==3.3
     # via requests
 iniconfig==1.1.1
@@ -96,11 +94,7 @@ sqlalchemy==1.3.24
     # via
     #   -r requirements.in
     #   alembic
-tomli==2.0.1
-    # via
-    #   coverage
-    #   pytest
-urllib3==1.26.9
+urllib3==1.26.17
     # via
     #   botocore
     #   docker
