@@ -96,7 +96,9 @@ class ResourceLinkField(Field):
             resource_id = short_resource_id
         else:
             resource_id = resource_spec_class.generate_id(short_resource_id, context)
-        return LinkCollection(resource_links=[ResourceLink(pred=self.alti_key, obj=resource_id)],)
+        return LinkCollection(
+            resource_links=[ResourceLink(pred=self.alti_key, obj=resource_id)],
+        )
 
 
 class EmbeddedResourceLinkField(SubField):
@@ -158,7 +160,9 @@ class EmbeddedResourceLinkField(SubField):
             resource_id = short_resource_id
         else:
             resource_id = resource_spec_class.generate_id(short_resource_id, context)
-        return LinkCollection(resource_links=[ResourceLink(pred=self.alti_key, obj=resource_id)],)
+        return LinkCollection(
+            resource_links=[ResourceLink(pred=self.alti_key, obj=resource_id)],
+        )
 
 
 class TransientResourceLinkField(Field):

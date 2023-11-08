@@ -15,7 +15,7 @@ botocore==1.29.149
     #   boto3
     #   moto
     #   s3transfer
-certifi==2023.5.7
+certifi==2023.7.22
     # via
     #   -r requirements.in
     #   requests
@@ -29,7 +29,7 @@ coverage[toml]==7.2.7
     # via
     #   -r requirements.in
     #   pytest-cov
-cryptography==41.0.0
+cryptography==41.0.5
     # via
     #   -r requirements.in
     #   moto
@@ -100,8 +100,9 @@ tomli==2.0.1
     # via
     #   coverage
     #   pytest
-urllib3==1.26.9
+urllib3==1.26.18
     # via
+    #   -r requirements.in
     #   botocore
     #   docker
     #   requests

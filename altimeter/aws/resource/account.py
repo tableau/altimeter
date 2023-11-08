@@ -28,7 +28,7 @@ class AccountResourceSpec(AWSResourceSpec):
         cls: Type["AccountResourceSpec"], client: BaseClient, account_id: str, region: str
     ) -> ListFromAWSResult:
         """This resource is somewhat synthetic, this method simply returns a dict of form
-            {'account_arn': {account_dict}"""
+        {'account_arn': {account_dict}"""
         sts_account_id = client.get_caller_identity()["Account"]
         if sts_account_id != account_id:
             raise ValueError(f"BUG: sts detected account_id {sts_account_id} != {account_id}")
@@ -37,7 +37,10 @@ class AccountResourceSpec(AWSResourceSpec):
 
     @classmethod
     def generate_arn(
-        cls: Type["AccountResourceSpec"], resource_id: str, account_id: str = "", region: str = "",
+        cls: Type["AccountResourceSpec"],
+        resource_id: str,
+        account_id: str = "",
+        region: str = "",
     ) -> str:
         """Generate an ARN for this resource"""
         return f"arn:aws::::account/{resource_id}"

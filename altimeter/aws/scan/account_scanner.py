@@ -33,7 +33,7 @@ from altimeter.core.resource.resource import Resource
 
 
 class AccountScanResult(BaseImmutableModel):
-    """pydantic model representing account scan results """
+    """pydantic model representing account scan results"""
 
     account_id: str
     artifacts: List[str]
@@ -130,9 +130,11 @@ class AccountScanner:
                         str, DefaultDict[str, List[Type[AWSResourceSpec]]]
                     ] = defaultdict(lambda: defaultdict(list))
                     for resource_spec_class in self.resource_spec_classes:
-                        resource_regions = self.account_scan_plan.aws_resource_region_mapping_repo.get_regions(
-                            resource_spec_class=resource_spec_class,
-                            region_whitelist=account_scan_regions,
+                        resource_regions = (
+                            self.account_scan_plan.aws_resource_region_mapping_repo.get_regions(
+                                resource_spec_class=resource_spec_class,
+                                region_whitelist=account_scan_regions,
+                            )
                         )
                         for region in resource_regions:
                             regions_services_resource_spec_classes[region][
@@ -225,11 +227,14 @@ class AccountScanner:
                     errors=prescan_errors,
                 )
                 output_artifact = self.artifact_writer.write_json(
-                    name=account_id, data=account_graph_set,
+                    name=account_id,
+                    data=account_graph_set,
                 )
                 logger.info(event=AWSLogEvents.ScanAWSAccountEnd)
                 return AccountScanResult(
-                    account_id=account_id, artifacts=[output_artifact], errors=prescan_errors,
+                    account_id=account_id,
+                    artifacts=[output_artifact],
+                    errors=prescan_errors,
                 )
             # if there are any errors whatsoever we generate an empty graph with errors only
             errors = []
@@ -250,11 +255,14 @@ class AccountScanner:
             else:
                 account_graph_set = GraphSet.from_graph_sets(graph_sets)
             output_artifact = self.artifact_writer.write_json(
-                name=account_id, data=account_graph_set,
+                name=account_id,
+                data=account_graph_set,
             )
             logger.info(event=AWSLogEvents.ScanAWSAccountEnd)
             return AccountScanResult(
-                account_id=account_id, artifacts=[output_artifact], errors=errors,
+                account_id=account_id,
+                artifacts=[output_artifact],
+                errors=errors,
             )
 
 

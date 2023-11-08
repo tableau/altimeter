@@ -43,7 +43,10 @@ class IAMRoleResourceSpec(IAMResourceSpec):
         ),
         ListField(
             "EmbeddedPolicy",
-            EmbeddedDictField(ScalarField("PolicyName"), ScalarField("PolicyDocument"),),
+            EmbeddedDictField(
+                ScalarField("PolicyName"),
+                ScalarField("PolicyDocument"),
+            ),
             optional=True,
         ),
         DictField(
@@ -56,9 +59,17 @@ class IAMRoleResourceSpec(IAMResourceSpec):
                     ListField("Action", EmbeddedScalarField(), allow_scalar=True),
                     DictField(
                         "Principal",
-                        ListField("AWS", EmbeddedScalarField(), optional=True, allow_scalar=True,),
                         ListField(
-                            "Federated", EmbeddedScalarField(), optional=True, allow_scalar=True,
+                            "AWS",
+                            EmbeddedScalarField(),
+                            optional=True,
+                            allow_scalar=True,
+                        ),
+                        ListField(
+                            "Federated",
+                            EmbeddedScalarField(),
+                            optional=True,
+                            allow_scalar=True,
                         ),
                         ListField(
                             "Service", EmbeddedScalarField(), optional=True, allow_scalar=True
@@ -72,7 +83,10 @@ class IAMRoleResourceSpec(IAMResourceSpec):
 
     @classmethod
     def list_from_aws(
-        cls: Type["IAMRoleResourceSpec"], client: BaseClient, account_id: str, region: str,
+        cls: Type["IAMRoleResourceSpec"],
+        client: BaseClient,
+        account_id: str,
+        region: str,
     ) -> ListFromAWSResult:
         """Return a dict of dicts of the format:
 

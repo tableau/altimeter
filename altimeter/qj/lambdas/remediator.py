@@ -60,7 +60,8 @@ def remediator(event: Dict[str, Any]) -> None:
                     )
                 except Exception as ex:
                     logger.info(
-                        event=QJLogEvents.ResultSetRemediationFailed, error=str(ex),
+                        event=QJLogEvents.ResultSetRemediationFailed,
+                        error=str(ex),
                     )
                     errors.append(str(ex))
         if errors:
@@ -72,25 +73,41 @@ def remediator(event: Dict[str, Any]) -> None:
 
 
 def _schedule_result_remediation(
-    executor: ThreadPoolExecutor, lambda_name: str, lambda_timeout: int, result: Result,
+    executor: ThreadPoolExecutor,
+    lambda_name: str,
+    lambda_timeout: int,
+    result: Result,
 ) -> Future:
     """Schedule a result remediation"""
-    return executor.submit(_invoke_lambda, lambda_name, lambda_timeout, result,)
+    return executor.submit(
+        _invoke_lambda,
+        lambda_name,
+        lambda_timeout,
+        result,
+    )
 
 
-def _invoke_lambda(lambda_name: str, lambda_timeout: int, result: Result,) -> Any:
+def _invoke_lambda(
+    lambda_name: str,
+    lambda_timeout: int,
+    result: Result,
+) -> Any:
     """Invoke a QJ's remediator function"""
     logger = Logger()
     with logger.bind(lambda_name=lambda_name, lambda_timeout=lambda_timeout, result=result):
         logger.info(event=QJLogEvents.InvokeResultRemediationLambdaStart)
         boto_config = botocore.config.Config(
-            read_timeout=lambda_timeout + 10, retries={"max_attempts": 0},
+            read_timeout=lambda_timeout + 10,
+            retries={"max_attempts": 0},
         )
         session = boto3.Session()
         lambda_client = session.client("lambda", config=boto_config)
         event = result.json().encode("utf-8")
         try:
-            resp = lambda_client.invoke(FunctionName=lambda_name, Payload=event,)
+            resp = lambda_client.invoke(
+                FunctionName=lambda_name,
+                Payload=event,
+            )
         except Exception as invoke_ex:
             error = str(invoke_ex)
             logger.info(event=QJLogEvents.InvokeResultRemediationLambdaError, error=error)

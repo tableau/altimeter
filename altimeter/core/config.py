@@ -92,7 +92,10 @@ class Config(BaseImmutableModel):
         """Load a Config from an s3 object"""
         bucket, key = parse_s3_uri(s3_uri)
         s3_client = boto3.client("s3")
-        resp = s3_client.get_object(Bucket=bucket, Key=key,)
+        resp = s3_client.get_object(
+            Bucket=bucket,
+            Key=key,
+        )
         config_str = resp["Body"].read().decode("utf-8")
         config_dict = dict(toml.loads(config_str))
         try:
@@ -108,7 +111,9 @@ class AWSConfig(Config):
     scan: ScanConfig
     accessor: Accessor = Field(default_factory=Accessor)
     write_master_json: bool = False
-    services_regions_json_url: str = "https://api.regional-table.region-services.aws.a2z.com/index.json"
+    services_regions_json_url: str = (
+        "https://api.regional-table.region-services.aws.a2z.com/index.json"
+    )
 
     def __init__(self, **data: Any):
         super().__init__(**data)

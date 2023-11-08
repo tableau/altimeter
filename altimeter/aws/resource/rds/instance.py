@@ -145,6 +145,8 @@ class RDSInstanceResourceSpec(RDSResourceSpec):
 
     @classmethod
     def get_instance_tags(
-        cls: Type["RDSInstanceResourceSpec"], client: BaseClient, instance_arn: str,
+        cls: Type["RDSInstanceResourceSpec"],
+        client: BaseClient,
+        instance_arn: str,
     ) -> List[Dict[str, str]]:
         return client.list_tags_for_resource(ResourceName=instance_arn).get("TagList", [])

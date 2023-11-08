@@ -715,7 +715,7 @@ class AltimeterNeptuneClient:
 
     @staticmethod
     def __sign(key: bytes, msg: str) -> bytes:
-        """ Sign the msg with the key """
+        """Sign the msg with the key"""
         return hmac.new(key, msg.encode("utf-8"), hashlib.sha256).digest()
 
     def prepare_request(

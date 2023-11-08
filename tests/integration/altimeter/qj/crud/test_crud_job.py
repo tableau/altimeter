@@ -347,7 +347,9 @@ class TestViews(unittest.TestCase):
             account_id_key="test_account_id",
         )
         result_set_crud = CRUDResultSet(
-            max_result_set_results=int(1e6), max_result_size_bytes=int(1e6), job_crud=job_crud,
+            max_result_set_results=int(1e6),
+            max_result_size_bytes=int(1e6),
+            job_crud=job_crud,
         )
         with temp_db_session() as session:
             session.execute(f"CREATE ROLE {db_ro_user}")
@@ -385,16 +387,20 @@ class TestViews(unittest.TestCase):
             )
             results_1 = [
                 schemas.Result(
-                    account_id=account_id_a, result={"foo": "oldhello_a", "boo": "oldthere_a"},
+                    account_id=account_id_a,
+                    result={"foo": "oldhello_a", "boo": "oldthere_a"},
                 ),
                 schemas.Result(
-                    account_id=account_id_a, result={"foo": "oldboo_a", "boo": "oldfoo_a"},
+                    account_id=account_id_a,
+                    result={"foo": "oldboo_a", "boo": "oldfoo_a"},
                 ),
                 schemas.Result(
-                    account_id=account_id_b, result={"foo": "oldhello_b", "boo": "oldthere_b"},
+                    account_id=account_id_b,
+                    result={"foo": "oldhello_b", "boo": "oldthere_b"},
                 ),
                 schemas.Result(
-                    account_id=account_id_b, result={"foo": "oldboo_b", "boo": "oldfoo_b"},
+                    account_id=account_id_b,
+                    result={"foo": "oldboo_b", "boo": "oldfoo_b"},
                 ),
             ]
             result_set_1_create = ResultSetCreate(
@@ -411,16 +417,20 @@ class TestViews(unittest.TestCase):
             )
             results_2 = [
                 schemas.Result(
-                    account_id=account_id_a, result={"foo": "newhello_a", "boo": "newthere_a"},
+                    account_id=account_id_a,
+                    result={"foo": "newhello_a", "boo": "newthere_a"},
                 ),
                 schemas.Result(
-                    account_id=account_id_a, result={"foo": "newboo_a", "boo": "newfoo_a"},
+                    account_id=account_id_a,
+                    result={"foo": "newboo_a", "boo": "newfoo_a"},
                 ),
                 schemas.Result(
-                    account_id=account_id_b, result={"foo": "newhello_b", "boo": "newthere_b"},
+                    account_id=account_id_b,
+                    result={"foo": "newhello_b", "boo": "newthere_b"},
                 ),
                 schemas.Result(
-                    account_id=account_id_b, result={"foo": "newboo_b", "boo": "newfoo_b"},
+                    account_id=account_id_b,
+                    result={"foo": "newboo_b", "boo": "newfoo_b"},
                 ),
             ]
             result_set_2_create = ResultSetCreate(
@@ -483,7 +493,9 @@ class TestViews(unittest.TestCase):
             account_id_key="test_account_id",
         )
         result_set_crud = CRUDResultSet(
-            max_result_set_results=int(1e6), max_result_size_bytes=int(1e6), job_crud=job_crud,
+            max_result_set_results=int(1e6),
+            max_result_size_bytes=int(1e6),
+            job_crud=job_crud,
         )
         with temp_db_session() as session:
             session.execute(f"CREATE ROLE {db_ro_user}")
@@ -521,16 +533,20 @@ class TestViews(unittest.TestCase):
             )
             results_1 = [
                 schemas.Result(
-                    account_id=account_id_a, result={"foo": "oldhello_a", "boo": "oldthere_a"},
+                    account_id=account_id_a,
+                    result={"foo": "oldhello_a", "boo": "oldthere_a"},
                 ),
                 schemas.Result(
-                    account_id=account_id_a, result={"foo": "oldboo_a", "boo": "oldfoo_a"},
+                    account_id=account_id_a,
+                    result={"foo": "oldboo_a", "boo": "oldfoo_a"},
                 ),
                 schemas.Result(
-                    account_id=account_id_b, result={"foo": "oldhello_b", "boo": "oldthere_b"},
+                    account_id=account_id_b,
+                    result={"foo": "oldhello_b", "boo": "oldthere_b"},
                 ),
                 schemas.Result(
-                    account_id=account_id_b, result={"foo": "oldboo_b", "boo": "oldfoo_b"},
+                    account_id=account_id_b,
+                    result={"foo": "oldboo_b", "boo": "oldfoo_b"},
                 ),
             ]
             result_set_1_create = ResultSetCreate(
@@ -547,10 +563,12 @@ class TestViews(unittest.TestCase):
             )
             results_2 = [
                 schemas.Result(
-                    account_id=account_id_a, result={"foo": "newhello_a", "boo": "newthere_a"},
+                    account_id=account_id_a,
+                    result={"foo": "newhello_a", "boo": "newthere_a"},
                 ),
                 schemas.Result(
-                    account_id=account_id_a, result={"foo": "newboo_a", "boo": "newfoo_a"},
+                    account_id=account_id_a,
+                    result={"foo": "newboo_a", "boo": "newfoo_a"},
                 ),
             ]
             result_set_2_create = ResultSetCreate(
@@ -607,7 +625,9 @@ class TestViews(unittest.TestCase):
             account_id_key="test_account_id",
         )
         result_set_crud = CRUDResultSet(
-            max_result_set_results=int(1e6), max_result_size_bytes=int(1e6), job_crud=job_crud,
+            max_result_set_results=int(1e6),
+            max_result_size_bytes=int(1e6),
+            job_crud=job_crud,
         )
         with temp_db_session() as session:
             session.execute(f"CREATE ROLE {db_ro_user}")
@@ -647,16 +667,20 @@ class TestViews(unittest.TestCase):
             )
             results_1 = [
                 schemas.Result(
-                    account_id=account_id_a, result={"foo": "oldhello_a", "boo": "oldthere_a"},
+                    account_id=account_id_a,
+                    result={"foo": "oldhello_a", "boo": "oldthere_a"},
                 ),
                 schemas.Result(
-                    account_id=account_id_a, result={"foo": "oldboo_a", "boo": "oldfoo_a"},
+                    account_id=account_id_a,
+                    result={"foo": "oldboo_a", "boo": "oldfoo_a"},
                 ),
                 schemas.Result(
-                    account_id=account_id_b, result={"foo": "oldhello_b", "boo": "oldthere_b"},
+                    account_id=account_id_b,
+                    result={"foo": "oldhello_b", "boo": "oldthere_b"},
                 ),
                 schemas.Result(
-                    account_id=account_id_b, result={"foo": "oldboo_b", "boo": "oldfoo_b"},
+                    account_id=account_id_b,
+                    result={"foo": "oldboo_b", "boo": "oldfoo_b"},
                 ),
             ]
             result_set_1_create = ResultSetCreate(
@@ -701,7 +725,9 @@ class TestViews(unittest.TestCase):
             account_id_key="test_account_id",
         )
         result_set_crud = CRUDResultSet(
-            max_result_set_results=int(1e6), max_result_size_bytes=int(1e6), job_crud=job_crud,
+            max_result_set_results=int(1e6),
+            max_result_size_bytes=int(1e6),
+            job_crud=job_crud,
         )
         with temp_db_session() as session:
             session.execute(f"CREATE ROLE {db_ro_user}")
@@ -741,16 +767,20 @@ class TestViews(unittest.TestCase):
             )
             results_1 = [
                 schemas.Result(
-                    account_id=account_id_a, result={"foo": "oldhello_a", "boo": "oldthere_a"},
+                    account_id=account_id_a,
+                    result={"foo": "oldhello_a", "boo": "oldthere_a"},
                 ),
                 schemas.Result(
-                    account_id=account_id_a, result={"foo": "oldboo_a", "boo": "oldfoo_a"},
+                    account_id=account_id_a,
+                    result={"foo": "oldboo_a", "boo": "oldfoo_a"},
                 ),
                 schemas.Result(
-                    account_id=account_id_b, result={"foo": "oldhello_b", "boo": "oldthere_b"},
+                    account_id=account_id_b,
+                    result={"foo": "oldhello_b", "boo": "oldthere_b"},
                 ),
                 schemas.Result(
-                    account_id=account_id_b, result={"foo": "oldboo_b", "boo": "oldfoo_b"},
+                    account_id=account_id_b,
+                    result={"foo": "oldboo_b", "boo": "oldfoo_b"},
                 ),
             ]
             result_set_1_create = ResultSetCreate(
@@ -767,10 +797,12 @@ class TestViews(unittest.TestCase):
             )
             results_2 = [
                 schemas.Result(
-                    account_id=account_id_a, result={"foo": "newhello_a", "boo": "newthere_a"},
+                    account_id=account_id_a,
+                    result={"foo": "newhello_a", "boo": "newthere_a"},
                 ),
                 schemas.Result(
-                    account_id=account_id_a, result={"foo": "newboo_a", "boo": "newfoo_a"},
+                    account_id=account_id_a,
+                    result={"foo": "newboo_a", "boo": "newfoo_a"},
                 ),
             ]
             result_set_2_create = ResultSetCreate(

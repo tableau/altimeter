@@ -19,6 +19,7 @@ from altimeter.qj.log import QJLogEvents
 from altimeter.qj.models.job import Job
 from altimeter.qj.models.result_set import ResultSet, Result
 
+
 # pylint: disable=no-self-use,too-few-public-methods
 class CRUDResultSet:
     """CRUD for ResultSets"""
@@ -28,7 +29,11 @@ class CRUDResultSet:
         self._max_result_size_bytes = max_result_size_bytes
         self._job_crud = job_crud
 
-    def get(self, db_session: Session, result_set_id: str,) -> ResultSet:
+    def get(
+        self,
+        db_session: Session,
+        result_set_id: str,
+    ) -> ResultSet:
         """Get a ResultSet by id"""
         logger = Logger()
         logger.info(event=QJLogEvents.GetResultSet, result_set_id=result_set_id)

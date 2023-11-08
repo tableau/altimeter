@@ -63,16 +63,16 @@ class ListField(Field):
     def parse(self, data: Dict[str, Any], context: Dict[str, Any]) -> LinkCollection:
         """Parse this field and return a LinkCollection
 
-       Args:
-           data: dictionary of data to parse
-           context: context dict containing data from higher level parsing code.
+        Args:
+            data: dictionary of data to parse
+            context: context dict containing data from higher level parsing code.
 
-        Returns:
-            LinkCollection
+         Returns:
+             LinkCollection
 
-        Raises:
-            ListFieldSourceKeyNotFoundException if self.source_key is not in data.
-            ListFieldValueNotAListException if the data does not appear to represent a list.
+         Raises:
+             ListFieldSourceKeyNotFoundException if self.source_key is not in data.
+             ListFieldValueNotAListException if the data does not appear to represent a list.
         """
         if self.source_key not in data:
             if self.optional:
@@ -133,16 +133,16 @@ class AnonymousListField(Field):
     def parse(self, data: Dict[str, Any], context: Dict[str, Any]) -> LinkCollection:
         """Parse this field and return a list of Links.
 
-       Args:
-           data: dictionary of data to parse
-           context: context dict containing data from higher level parsing code.
+        Args:
+            data: dictionary of data to parse
+            context: context dict containing data from higher level parsing code.
 
-        Returns:
-            LinkCollection
+         Returns:
+             LinkCollection
 
-        Raises:
-            ListFieldSourceKeyNotFoundException if self.source_key is not in data.
-            ListFieldValueNotAListException if the data does not appear to represent a list.
+         Raises:
+             ListFieldSourceKeyNotFoundException if self.source_key is not in data.
+             ListFieldValueNotAListException if the data does not appear to represent a list.
         """
         if self.source_key not in data:
             if self.optional:
