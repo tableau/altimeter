@@ -41,7 +41,7 @@ from altimeter.core.resource.resource import Resource
 
 
 class TestAWS2NSingleAccount(unittest.TestCase):
-    @moto.mock_dynamodb2
+    @moto.mock_dynamodb
     @moto.mock_ec2
     @moto.mock_iam
     @moto.mock_lambda
@@ -207,7 +207,10 @@ class TestAWS2NSingleAccount(unittest.TestCase):
             ) as mock_get_all_enabled_regions:
                 mock_get_all_enabled_regions.return_value = enabled_region_names
                 aws2n_result = aws2n(
-                    scan_id=test_scan_id, config=aws_config, muxer=muxer, load_neptune=False,
+                    scan_id=test_scan_id,
+                    config=aws_config,
+                    muxer=muxer,
+                    load_neptune=False,
                 )
                 graph_set = GraphSet.from_json_file(Path(aws2n_result.json_path))
                 self.assertEqual(len(graph_set.errors), 0)
@@ -387,7 +390,7 @@ class TestAWS2NSingleAccount(unittest.TestCase):
                         type="aws:ec2:vpc",
                         link_collection=LinkCollection(
                             simple_links=(
-                                SimpleLink(pred="is_default", obj=True),
+                                SimpleLink(pred="is_default", obj=False),
                                 SimpleLink(pred="cidr_block", obj=vpc_1_cidr),
                                 SimpleLink(pred="state", obj="available"),
                             ),
@@ -440,7 +443,10 @@ class TestAWS2NSingleAccount(unittest.TestCase):
                                 ),
                             ),
                             transient_resource_links=(
-                                TransientResourceLink(pred="vpc", obj=vpc_1_arn,),
+                                TransientResourceLink(
+                                    pred="vpc",
+                                    obj=vpc_1_arn,
+                                ),
                             ),
                         ),
                     )
@@ -580,7 +586,14 @@ def delete_vpcs(region_names: Iterable[str]) -> None:
         for vpc in vpcs:
             vpc_id = vpc["VpcId"]
             subnets_resp = regional_ec2_client.describe_subnets(
-                Filters=[{"Name": "vpc-id", "Values": [vpc_id,],},],
+                Filters=[
+                    {
+                        "Name": "vpc-id",
+                        "Values": [
+                            vpc_id,
+                        ],
+                    },
+                ],
             )
             for subnet in subnets_resp["Subnets"]:
                 subnet_id = subnet["SubnetId"]
@@ -599,8 +612,18 @@ def create_dynamodb_table(
     client = boto3.client("dynamodb", region_name=region_name)
     resp = client.create_table(
         TableName=name,
-        AttributeDefinitions=[{"AttributeName": attr_name, "AttributeType": attr_type,},],
-        KeySchema=[{"AttributeName": attr_name, "KeyType": key_type,},],
+        AttributeDefinitions=[
+            {
+                "AttributeName": attr_name,
+                "AttributeType": attr_type,
+            },
+        ],
+        KeySchema=[
+            {
+                "AttributeName": attr_name,
+                "KeyType": key_type,
+            },
+        ],
     )
     return resp["TableDescription"]["TableName"]
 
@@ -610,13 +633,19 @@ def create_dynamodb_table(
 
 def create_subnet(cidr_block: str, vpc_id: str, region_name: str) -> str:
     client = boto3.client("ec2", region_name=region_name)
-    resp = client.create_subnet(VpcId=vpc_id, CidrBlock=cidr_block,)
+    resp = client.create_subnet(
+        VpcId=vpc_id,
+        CidrBlock=cidr_block,
+    )
     return resp["Subnet"]["SubnetId"]
 
 
 def create_volume(size: int, az: str, region_name: str) -> Tuple[str, str]:
     client = boto3.client("ec2", region_name=region_name)
-    resp = client.create_volume(Size=size, AvailabilityZone=az,)
+    resp = client.create_volume(
+        Size=size,
+        AvailabilityZone=az,
+    )
     volume_id = resp["VolumeId"]
     create_time = resp["CreateTime"]
     account_id = get_account_id()
@@ -657,7 +686,10 @@ def create_flow_log(vpc_id: str, dest_bucket_arn: str, region_name: str) -> Tupl
 
 def create_iam_policy(name: str, policy_doc: Dict[str, Any]) -> Tuple[str, str]:
     client = boto3.client("iam")
-    resp = client.create_policy(PolicyName=name, PolicyDocument=json.dumps(policy_doc),)
+    resp = client.create_policy(
+        PolicyName=name,
+        PolicyDocument=json.dumps(policy_doc),
+    )
     return resp["Policy"]["Arn"], resp["Policy"]["PolicyId"]
 
 

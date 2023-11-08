@@ -22,7 +22,10 @@ class TestLB(TestCase):
 
         client = session.client("elbv2", region_name=region_name)
 
-        resp = client.create_load_balancer(Name=lb_name, Subnets=moto_subnets[:2],)
+        resp = client.create_load_balancer(
+            Name=lb_name,
+            Subnets=moto_subnets[:2],
+        )
         lb_arn = resp["LoadBalancers"][0]["LoadBalancerArn"]
 
         scan_accessor = AWSAccessor(session=session, account_id=account_id, region_name=region_name)
@@ -39,6 +42,7 @@ class TestLB(TestCase):
                 },
             )
             resources = LoadBalancerResourceSpec.scan(
-                scan_accessor=scan_accessor, all_resource_spec_classes=ALL_RESOURCE_SPEC_CLASSES,
+                scan_accessor=scan_accessor,
+                all_resource_spec_classes=ALL_RESOURCE_SPEC_CLASSES,
             )
             self.assertEqual(resources, [])

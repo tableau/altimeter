@@ -13,6 +13,6 @@ def camel_case_to_snake_case(name: str) -> str:
 
     Returns:
          snake cased string
-     """
+    """
     first_capped_str = FIRST_CAP_RE.sub(r"\1_\2", name)
     return ALL_CAP_RE.sub(r"\1_\2", first_capped_str).lower()

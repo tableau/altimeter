@@ -37,7 +37,7 @@ class LoadBalancerResourceSpec(ELBV2ResourceSpec):
             "AvailabilityZones",
             EmbeddedDictField(
                 ScalarField("ZoneName"),
-                ResourceLinkField("SubnetId", SubnetResourceSpec, optional=True),
+                TransientResourceLinkField("SubnetId", SubnetResourceSpec, optional=True),
                 ListField(
                     "LoadBalancerAddresses",
                     EmbeddedDictField(
@@ -92,7 +92,9 @@ class LoadBalancerResourceSpec(ELBV2ResourceSpec):
 
     @classmethod
     def get_lb_attrs(
-        cls: Type["LoadBalancerResourceSpec"], client: BaseClient, lb_arn: str,
+        cls: Type["LoadBalancerResourceSpec"],
+        client: BaseClient,
+        lb_arn: str,
     ) -> Dict[str, str]:
         """Get lb attributes that Altimeter graphs."""
         lb_attrs = {}

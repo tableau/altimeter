@@ -31,7 +31,10 @@ class TestConfig(TestCase):
             "pruner_max_age_min": 4320,
             "graph_name": "alti",
             "accessor": {"multi_hop_accessors": [], "credentials_cache": {"cache": {}}},
-            "concurrency": {"max_account_scan_threads": 1, "max_svc_scan_threads": 64,},
+            "concurrency": {
+                "max_account_scan_threads": 1,
+                "max_svc_scan_threads": 64,
+            },
             "scan": {
                 "accounts": ("1234",),
                 "regions": (),

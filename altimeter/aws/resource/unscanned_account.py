@@ -44,6 +44,7 @@ class UnscannedAccountResourceSpec(AWSResourceSpec):
         cls: Type["UnscannedAccountResourceSpec"], client: BaseClient, account_id: str, region: str
     ) -> ListFromAWSResult:
         """List resources from AWS using client."""
+        return ListFromAWSResult(resources={})
 
     @classmethod
     def generate_arn(

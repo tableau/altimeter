@@ -22,7 +22,8 @@ class TestEBSVolumeResourceSpec(TestCase):
         session = boto3.Session()
         scan_accessor = AWSAccessor(session=session, account_id=account_id, region_name=region_name)
         resources = AccountResourceSpec.scan(
-            scan_accessor=scan_accessor, all_resource_spec_classes=ALL_RESOURCE_SPEC_CLASSES,
+            scan_accessor=scan_accessor,
+            all_resource_spec_classes=ALL_RESOURCE_SPEC_CLASSES,
         )
 
         expected_resources = [
@@ -46,7 +47,8 @@ class TestEBSVolumeResourceSpec(TestCase):
         scan_accessor = AWSAccessor(session=session, account_id=account_id, region_name=region_name)
         with self.assertRaises(ValueError):
             AccountResourceSpec.scan(
-                scan_accessor=scan_accessor, all_resource_spec_classes=ALL_RESOURCE_SPEC_CLASSES,
+                scan_accessor=scan_accessor,
+                all_resource_spec_classes=ALL_RESOURCE_SPEC_CLASSES,
             )
 
     def test_generate_arn(self):

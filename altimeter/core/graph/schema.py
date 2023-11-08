@@ -17,7 +17,11 @@ class Schema:
     def __init__(self, *fields: Field) -> None:
         self.fields = fields
 
-    def parse(self, data: Dict[str, Any], context: Dict[str, Any],) -> LinkCollection:
+    def parse(
+        self,
+        data: Dict[str, Any],
+        context: Dict[str, Any],
+    ) -> LinkCollection:
         """Parse this schema into a list of Links
 
         Args:

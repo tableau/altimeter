@@ -6,8 +6,10 @@ from botocore.client import BaseClient
 from altimeter.aws.resource.resource_spec import ListFromAWSResult
 from altimeter.aws.resource.ec2 import EC2ResourceSpec
 from altimeter.aws.resource.ec2.vpc import VPCResourceSpec
+from altimeter.aws.resource.ec2.security_group import SecurityGroupResourceSpec
 from altimeter.aws.resource.ec2.subnet import SubnetResourceSpec
-from altimeter.core.graph.field.dict_field import AnonymousDictField
+from altimeter.core.graph.field.dict_field import AnonymousDictField, AnonymousEmbeddedDictField
+from altimeter.core.graph.field.list_field import AnonymousListField
 from altimeter.core.graph.field.resource_link_field import ResourceLinkField
 from altimeter.core.graph.field.scalar_field import ScalarField
 from altimeter.core.graph.schema import Schema
@@ -32,6 +34,10 @@ class EC2NetworkInterfaceResourceSpec(EC2ResourceSpec):
         ScalarField("Status"),
         ResourceLinkField("SubnetId", SubnetResourceSpec, optional=True),
         ResourceLinkField("VpcId", VPCResourceSpec, optional=True),
+        AnonymousListField(
+            "Groups",
+            AnonymousEmbeddedDictField(ResourceLinkField("GroupId", SecurityGroupResourceSpec)),
+        ),
     )
 
     @classmethod

@@ -49,7 +49,8 @@ def main(argv: Optional[List[str]] = None) -> int:
     account_id = sts_client.get_caller_identity()["Account"]
     aws_accessor = AWSAccessor(session=session, account_id=account_id, region_name=region)
     resource_scan_result = resource_spec_class.scan(
-        scan_accessor=aws_accessor, all_resource_spec_classes=DEFAULT_RESOURCE_SPEC_CLASSES,
+        scan_accessor=aws_accessor,
+        all_resource_spec_classes=DEFAULT_RESOURCE_SPEC_CLASSES,
     )
     resource_dicts = []
     for resource in resource_scan_result:

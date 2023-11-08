@@ -15,6 +15,7 @@ from altimeter.core.graph.field.resource_link_field import (
     EmbeddedResourceLinkField,
     ResourceLinkField,
     TransientResourceLinkField,
+    TransientEmbeddedResourceLinkField,
 )
 from altimeter.core.graph.field.list_field import ListField
 from altimeter.core.graph.field.scalar_field import ScalarField
@@ -31,7 +32,7 @@ class ClassicLoadBalancerResourceSpec(ELBV1ResourceSpec):
         ScalarField("LoadBalancerName"),
         ScalarField("Scheme"),
         ResourceLinkField("VPCId", VPCResourceSpec, optional=True),
-        ListField("Subnets", EmbeddedResourceLinkField(SubnetResourceSpec), optional=True),
+        ListField("Subnets", TransientEmbeddedResourceLinkField(SubnetResourceSpec), optional=True),
         ListField(
             "SecurityGroups", EmbeddedResourceLinkField(SecurityGroupResourceSpec), optional=True
         ),
@@ -83,7 +84,9 @@ class ClassicLoadBalancerResourceSpec(ELBV1ResourceSpec):
 
     @classmethod
     def get_lb_attrs(
-        cls: Type["ClassicLoadBalancerResourceSpec"], client: BaseClient, lb_name: str,
+        cls: Type["ClassicLoadBalancerResourceSpec"],
+        client: BaseClient,
+        lb_name: str,
     ) -> Dict[str, str]:
         """Get lb attributes that Altimeter graphs."""
         lb_attrs = {}

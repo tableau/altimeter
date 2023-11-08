@@ -202,6 +202,28 @@ class AltimeterNeptuneClient:
         query_result_set = self.run_raw_query(finalized_query)
         return QueryResult(graph_uris_load_times, query_result_set)
 
+    def run_historic_query(self, graph_names: Set[str], query: str) -> QueryResult:
+        """Runs a SPARQL query against all available graphs given a list of
+        graph names.
+
+        Args:
+            graph_names: list of graph names to query
+            query: query string. This query string should not include any 'from' clause;
+                   the graph_names param will be used to inject the correct graph uris
+                   by locating all graphs for the given name.
+
+        Returns:
+            QueryResult object
+        """
+        graph_uris_load_times: Dict[str, int] = {}
+        for graph_name in graph_names:
+            graph_metadatas = self._get_graph_metadatas(name=graph_name)
+            for graph_metadata in graph_metadatas:
+                graph_uris_load_times[graph_metadata.uri] = graph_metadata.end_time
+        finalized_query = finalize_query(query, graph_uris=list(graph_uris_load_times.keys()))
+        query_result_set = self.run_raw_query(finalized_query)
+        return QueryResult(graph_uris_load_times, query_result_set)
+
     def load_graph(self, bucket: str, key: str, load_iam_role_arn: str) -> GraphMetadata:
         """Load a graph into Neptune.
         Args:
@@ -495,6 +517,100 @@ class AltimeterNeptuneClient:
             end_time=latest_end_time,
         )
 
+    def _get_graph_metadatas(
+        self, name: str, version: Optional[str] = None
+    ) -> Tuple[GraphMetadata, ...]:
+        """Return a tuple of GraphMetadata object representing all successfully loaded graphs
+        for a given name/version
+
+        Args:
+            name: graph name
+            version: graph version
+
+        Returns:
+            TUple of GraphMetadata of all succesfully loaded graphs for the given name/version
+
+        Raises:
+            NeptuneNoGraphsFoundException if no matching graphs were found
+        """
+        if version is None:
+            get_graph_metadatas_query = (
+                f"SELECT ?uri ?version ?start_time ?end_time\n"
+                f"FROM <{META_GRAPH_NAME}>\n"
+                f"WHERE {{\n"
+                f"    ?graph_metadata <alti:uri> ?uri ;\n"
+                f'                    <alti:name> "{name}" ;\n'
+                f"                    <alti:version> ?version ;\n"
+                f"                    <alti:start_time> ?start_time ;\n"
+                f"                    <alti:end_time> ?end_time }}\n"
+                f"ORDER BY DESC(?version) DESC(?end_time)"
+            )
+        else:
+            get_graph_metadatas_query = (
+                f"SELECT ?uri ?version ?start_time ?end_time\n"
+                f"FROM <{META_GRAPH_NAME}>\n"
+                f"WHERE {{\n"
+                f"    ?graph_metadata <alti:uri> ?uri ;\n"
+                f'                    <alti:name> "{name}" ;\n'
+                f"                    <alti:version> {version} ;\n"
+                f"                    <alti:version> ?version ;\n"
+                f"                    <alti:start_time> ?start_time ;\n"
+                f"                    <alti:end_time> ?end_time }}\n"
+                f"ORDER BY DESC(?end_time)"
+            )
+        results = self.run_raw_query(query=get_graph_metadatas_query)
+        results_list = results.to_list()
+        if not results_list:
+            raise NeptuneNoGraphsFoundException(f"No graphs found for graph name '{name}'")
+        graph_metadatas: List[GraphMetadata] = []
+        for result in results_list:
+            latest_uri = result["uri"]
+            latest_version = result["version"]
+            latest_start_time = int(result["start_time"])
+            latest_end_time = int(result["end_time"])
+            graph_metadatas.append(
+                GraphMetadata(
+                    uri=latest_uri,
+                    name=name,
+                    version=latest_version,
+                    start_time=latest_start_time,
+                    end_time=latest_end_time,
+                )
+            )
+        return tuple(graph_metadatas)
+
+    def get_all_graph_metadatas(self) -> Tuple[GraphMetadata, ...]:
+        """Return GraphMetadata objects representing all graphs
+
+        Returns:
+            GraphMetadatas of all graphs
+        """
+        get_graph_metadatas_query = (
+            f"SELECT ?uri ?name ?version ?start_time ?end_time\n"
+            f"FROM <{META_GRAPH_NAME}>\n"
+            f"WHERE {{\n"
+            f"    ?graph_metadata <alti:uri> ?uri ;\n"
+            f"                    <alti:version> ?version ;\n"
+            f"                    <alti:name> ?name ;\n"
+            f"                    <alti:start_time> ?start_time ;\n"
+            f"                    <alti:end_time> ?end_time }}\n"
+            f"ORDER BY DESC(?version) DESC(?end_time)"
+        )
+        results = self.run_raw_query(query=get_graph_metadatas_query)
+        results_list = results.to_list()
+        graph_metadatas: List[GraphMetadata] = []
+        for result in results_list:
+            graph_metadatas.append(
+                GraphMetadata(
+                    name=result["name"],
+                    uri=result["uri"],
+                    version=result["version"],
+                    start_time=int(result["start_time"]),
+                    end_time=int(result["end_time"]),
+                )
+            )
+        return tuple(graph_metadatas)
+
     def clear_registered_graph(self, name: str, uri: str) -> None:
         """Remove data and metadata for a graph by uri
 
@@ -599,7 +715,7 @@ class AltimeterNeptuneClient:
 
     @staticmethod
     def __sign(key: bytes, msg: str) -> bytes:
-        """ Sign the msg with the key """
+        """Sign the msg with the key"""
         return hmac.new(key, msg.encode("utf-8"), hashlib.sha256).digest()
 
     def prepare_request(
@@ -757,7 +873,7 @@ class AltimeterNeptuneClient:
                         __.addV(self.parse_arn(r["~from"])["resource"])
                         .property(T.id, from_id)
                         .property("scan_id", scan_id)
-                        .property("arn", r["~from"]),
+                        .property("arn", str(r["~from"])),
                     )
                 )
                 .to(
@@ -768,7 +884,7 @@ class AltimeterNeptuneClient:
                         __.addV(self.parse_arn(r["~to"])["resource"])
                         .property(T.id, to_id)
                         .property("scan_id", scan_id)
-                        .property("arn", r["~to"]),
+                        .property("arn", str(r["~to"])),
                     )
                 )
             )

@@ -38,7 +38,8 @@ class TestLambdaFunctionResourceSpec(TestCase):
             ],
         }
         iam_role_resp = iam_client.create_role(
-            RoleName="testrole", AssumeRolePolicyDocument=json.dumps(test_assume_role_policy_doc),
+            RoleName="testrole",
+            AssumeRolePolicyDocument=json.dumps(test_assume_role_policy_doc),
         )
         iam_role_arn = iam_role_resp["Role"]["Arn"]
 
@@ -63,7 +64,8 @@ class TestLambdaFunctionResourceSpec(TestCase):
 
         scan_accessor = AWSAccessor(session=session, account_id=account_id, region_name=region_name)
         resources = LambdaFunctionResourceSpec.scan(
-            scan_accessor=scan_accessor, all_resource_spec_classes=ALL_RESOURCE_SPEC_CLASSES,
+            scan_accessor=scan_accessor,
+            all_resource_spec_classes=ALL_RESOURCE_SPEC_CLASSES,
         )
         expected_resources = [
             Resource(

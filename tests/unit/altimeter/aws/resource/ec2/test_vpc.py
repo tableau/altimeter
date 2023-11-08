@@ -31,7 +31,8 @@ class TestVPCResourceSpec(TestCase):
 
         scan_accessor = AWSAccessor(session=session, account_id=account_id, region_name=region_name)
         resources = VPCResourceSpec.scan(
-            scan_accessor=scan_accessor, all_resource_spec_classes=ALL_RESOURCE_SPEC_CLASSES,
+            scan_accessor=scan_accessor,
+            all_resource_spec_classes=ALL_RESOURCE_SPEC_CLASSES,
         )
 
         expected_resources = [

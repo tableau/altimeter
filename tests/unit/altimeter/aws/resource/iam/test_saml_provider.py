@@ -38,6 +38,7 @@ class TestIAMSAMLProvider(TestCase):
                 },
             )
             resources = IAMSAMLProviderResourceSpec.scan(
-                scan_accessor=scan_accessor, all_resource_spec_classes=ALL_RESOURCE_SPEC_CLASSES,
+                scan_accessor=scan_accessor,
+                all_resource_spec_classes=ALL_RESOURCE_SPEC_CLASSES,
             )
             self.assertEqual(resources, [])

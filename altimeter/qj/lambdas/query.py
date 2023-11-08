@@ -1,9 +1,10 @@
 """Run the query portion of a QJ"""
-import json
+import time
 from typing import Any, Dict, List
 
 from altimeter.core.log import Logger
 from altimeter.core.neptune.client import AltimeterNeptuneClient, NeptuneEndpoint
+from altimeter.core.neptune.exceptions import NeptuneQueryException
 from altimeter.core.neptune.results import QueryResult
 from altimeter.qj import schemas
 from altimeter.qj.client import QJAPIClient
@@ -17,21 +18,28 @@ def query(event: Dict[str, Any]) -> None:
     query_config = QueryConfig()
     logger = Logger()
     logger.info(event=QJLogEvents.InitConfig, config=query_config)
-
-    records = event.get("Records", [])
-    if not records:
-        raise Exception("No records found")
-    if len(records) > 1:
-        raise Exception(f"More than one record. BatchSize is probably not 1. event: {event}")
-    body = records[0].get("body")
-    if body is None:
-        raise Exception(f"No record body found. BatchSize is probably not 1. event: {event}")
-    body = json.loads(body)
-    job = schemas.Job(**body)
+    job_name = event.get("job_name")
+    if not job_name:
+        raise Exception("Missing expected input parameter 'job_name'")
+    qj_client = QJAPIClient(host=query_config.api_host, port=query_config.api_port)
+    job = qj_client.get_job(job_name=job_name)
+    if not job:
+        raise Exception(f"ERROR: unknown job {job_name}")
     logger.info(event=QJLogEvents.InitJob, job=job)
-
     logger.info(event=QJLogEvents.RunQueryStart)
-    query_result = run_query(job=job, config=query_config)
+    max_tries = 5
+    current_try = 0
+    while True:
+        current_try += 1
+        try:
+            query_result = run_query(job=job, config=query_config)
+            break
+        except NeptuneQueryException as nq_ex:
+            logger.info(event=QJLogEvents.RunQueryError, detail=str(nq_ex))
+        if current_try >= max_tries:
+            logger.info(event=QJLogEvents.RunQueryError, detail="Max tries exceeded")
+            raise NeptuneQueryException("Max tries exceeded")
+        time.sleep(5)
     logger.info(event=QJLogEvents.RunQueryEnd, num_results=query_result.get_length())
 
     results: List[schemas.Result] = []
@@ -65,7 +73,14 @@ def run_query(job: schemas.Job, config: QueryConfig) -> QueryResult:
     neptune_client = AltimeterNeptuneClient(
         max_age_min=int(job.max_graph_age_sec / 60.0), neptune_endpoint=endpoint
     )
-    query_result = neptune_client.run_query(
-        graph_names=set(job.graph_spec.graph_names), query=job.query
-    )
+    if job.raw_query:
+        query_result = neptune_client.run_historic_query(
+            graph_names=set(job.graph_spec.graph_names),
+            query=job.query,
+        )
+    else:
+        query_result = neptune_client.run_query(
+            graph_names=set(job.graph_spec.graph_names),
+            query=job.query,
+        )
     return query_result

@@ -90,7 +90,10 @@ class AWSResourceSpec(ResourceSpec):
 
     @classmethod
     def generate_arn(
-        cls: Type["AWSResourceSpec"], resource_id: str, account_id: str = "", region: str = "",
+        cls: Type["AWSResourceSpec"],
+        resource_id: str,
+        account_id: str = "",
+        region: str = "",
     ) -> str:
         """Generate an ARN for this resource
 
@@ -149,12 +152,12 @@ class AWSResourceSpec(ResourceSpec):
     ) -> List[Resource]:
         """Scan this ResourceSpec
 
-       Args:
-           scan_accessor: AWSAccessor object to use for api access
-           all_resource_spec_classes: Tuple[Type[ResourceSpec], ...],
+        Args:
+            scan_accessor: AWSAccessor object to use for api access
+            all_resource_spec_classes: Tuple[Type[ResourceSpec], ...],
 
-        Returns:
-            List of Resource objects
+          Returns:
+              List of Resource objects
         """
         context = {
             "account_id": scan_accessor.account_id,
@@ -163,13 +166,15 @@ class AWSResourceSpec(ResourceSpec):
         }
         list_from_aws_result = cls._list_from_aws(scan_accessor=scan_accessor)
         resources = cls._list_from_aws_result_to_resources(
-            list_from_aws_result=list_from_aws_result, context=context,
+            list_from_aws_result=list_from_aws_result,
+            context=context,
         )
         return resources
 
     @classmethod
     def _list_from_aws(
-        cls: Type["AWSResourceSpec"], scan_accessor: AWSAccessor,
+        cls: Type["AWSResourceSpec"],
+        scan_accessor: AWSAccessor,
     ) -> ListFromAWSResult:
         try:
             resource_client = scan_accessor.client(cls.service_name)
@@ -199,7 +204,8 @@ class AWSResourceSpec(ResourceSpec):
         for arn, resource_dict in list_from_aws_result.resources.items():
             try:
                 partial_resource_link_collection = cls.schema.parse(
-                    data=resource_dict, context=context,
+                    data=resource_dict,
+                    context=context,
                 )
             except Exception as ex:
                 raise SchemaParseException(
@@ -228,7 +234,9 @@ class AWSResourceSpec(ResourceSpec):
             )
 
             resource = Resource(
-                resource_id=arn, type=cls.get_full_type_name(), link_collection=link_collection,
+                resource_id=arn,
+                type=cls.get_full_type_name(),
+                link_collection=link_collection,
             )
             resources.append(resource)
         return resources

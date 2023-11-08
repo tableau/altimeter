@@ -43,7 +43,11 @@ class CRUDJob:
         self._max_result_age_sec_limit = max_result_age_sec_limit
         self._account_id_key = account_id_key
 
-    def get_active(self, db_session: Session, job_name: str,) -> Job:
+    def get_active(
+        self,
+        db_session: Session,
+        job_name: str,
+    ) -> Job:
         """Get the active version of a Job"""
         logger = Logger()
         query = db_session.query(Job).filter(Job.active).filter(Job.name == job_name)
@@ -135,7 +139,11 @@ class CRUDJob:
         raise JobVersionNotFound(f"Could not find job {job_name} / {created}")
 
     def update_version(
-        self, db_session: Session, job_name: str, created: datetime, job_update: schemas.JobUpdate,
+        self,
+        db_session: Session,
+        job_name: str,
+        created: datetime,
+        job_update: schemas.JobUpdate,
     ) -> Job:
         """Update a Job"""
         logger = Logger()

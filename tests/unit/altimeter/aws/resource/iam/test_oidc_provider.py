@@ -25,12 +25,15 @@ class TestIAMOIDCProvider(TestCase):
         oidc_thumbprints = ["9999999999999999999999999999999999999999"]
 
         _ = client.create_open_id_connect_provider(
-            Url=oidc_url, ClientIDList=oidc_client_ids, ThumbprintList=oidc_thumbprints,
+            Url=oidc_url,
+            ClientIDList=oidc_client_ids,
+            ThumbprintList=oidc_thumbprints,
         )
 
         scan_accessor = AWSAccessor(session=session, account_id=account_id, region_name=region_name)
         resources = IAMOIDCProviderResourceSpec.scan(
-            scan_accessor=scan_accessor, all_resource_spec_classes=ALL_RESOURCE_SPEC_CLASSES,
+            scan_accessor=scan_accessor,
+            all_resource_spec_classes=ALL_RESOURCE_SPEC_CLASSES,
         )
 
         expected_resources = [
@@ -77,7 +80,9 @@ class TestIAMOIDCProvider(TestCase):
         client = session.client("iam")
 
         oidc_provider_resp = client.create_open_id_connect_provider(
-            Url=oidc_url, ClientIDList=oidc_client_ids, ThumbprintList=oidc_thumbprints,
+            Url=oidc_url,
+            ClientIDList=oidc_client_ids,
+            ThumbprintList=oidc_thumbprints,
         )
         oidc_provider_arn = oidc_provider_resp["OpenIDConnectProviderArn"]
 
@@ -96,6 +101,7 @@ class TestIAMOIDCProvider(TestCase):
                 },
             )
             resources = IAMOIDCProviderResourceSpec.scan(
-                scan_accessor=scan_accessor, all_resource_spec_classes=ALL_RESOURCE_SPEC_CLASSES,
+                scan_accessor=scan_accessor,
+                all_resource_spec_classes=ALL_RESOURCE_SPEC_CLASSES,
             )
             self.assertEqual(resources, [])

@@ -4,11 +4,19 @@ from typing import Any, Dict, List, Optional, Type
 
 from botocore.client import BaseClient
 from botocore.exceptions import ClientError
+from altimeter.aws.resource.iam.policy import IAMPolicyResourceSpec
 
+from altimeter.aws.resource.util import policy_doc_dict_to_sorted_str
 from altimeter.aws.resource.resource_spec import ListFromAWSResult
 from altimeter.aws.resource.iam import IAMResourceSpec
-from altimeter.core.graph.field.dict_field import AnonymousDictField, DictField, EmbeddedDictField
-from altimeter.core.graph.field.list_field import ListField
+from altimeter.core.graph.field.dict_field import (
+    AnonymousDictField,
+    DictField,
+    EmbeddedDictField,
+    AnonymousEmbeddedDictField,
+)
+from altimeter.core.graph.field.list_field import AnonymousListField, ListField
+from altimeter.core.graph.field.resource_link_field import ResourceLinkField
 from altimeter.core.graph.field.scalar_field import ScalarField
 from altimeter.core.graph.schema import Schema
 
@@ -44,6 +52,26 @@ class IAMUserResourceSpec(IAMResourceSpec):
             EmbeddedDictField(ScalarField("SerialNumber"), ScalarField("EnableDate")),
             optional=True,
         ),
+        AnonymousListField(
+            "PolicyAttachments",
+            AnonymousEmbeddedDictField(
+                ResourceLinkField(
+                    "PolicyArn",
+                    IAMPolicyResourceSpec,
+                    optional=True,
+                    value_is_id=True,
+                    alti_key="attached_policy",
+                )
+            ),
+        ),
+        ListField(
+            "EmbeddedPolicy",
+            EmbeddedDictField(
+                ScalarField("PolicyName"),
+                ScalarField("PolicyDocument"),
+            ),
+            optional=True,
+        ),
     )
 
     @classmethod
@@ -71,6 +99,10 @@ class IAMUserResourceSpec(IAMResourceSpec):
                     if login_profile is not None:
                         user["LoginProfile"] = login_profile
                     users[resource_arn] = user
+                    attached_policies = get_attached_user_policies(client, username)
+                    user["PolicyAttachments"] = attached_policies
+                    embedded_policies = get_embedded_user_policies(client, username)
+                    user["EmbeddedPolicy"] = embedded_policies
                 except ClientError as c_e:
                     error_code = getattr(c_e, "response", {}).get("Error", {}).get("Code", {})
                     if error_code != "NoSuchEntity":
@@ -128,3 +160,36 @@ class IAMUserResourceSpec(IAMResourceSpec):
             if error_code != "NoSuchEntity":
                 raise c_e
         return None
+
+
+def get_attached_user_policies(client: BaseClient, username: str) -> List[Dict[str, Any]]:
+    """Get attached user policies"""
+    policies = []
+    paginator = client.get_paginator("list_attached_user_policies")
+    for resp in paginator.paginate(UserName=username):
+        for policy in resp.get("AttachedPolicies", []):
+            policies.append(policy)
+    return policies
+
+
+def get_embedded_user_policies(client: BaseClient, username: str) -> List[Dict[str, Any]]:
+    """Get embedded user policies"""
+    policies = []
+    paginator = client.get_paginator("list_user_policies")
+    for resp in paginator.paginate(UserName=username):
+        for policy_name in resp.get("PolicyNames", []):
+            policy = get_embedded_user_policy(client, username, policy_name)
+            policies.append(policy)
+    return policies
+
+
+def get_embedded_user_policy(client: BaseClient, username: str, policy_name: str) -> Dict[str, str]:
+    """Get embedded user policy"""
+    resp = client.get_user_policy(UserName=username, PolicyName=policy_name)
+    policy_document = resp.get("PolicyDocument")
+    policy_name = resp.get("PolicyName")
+    policy_document = policy_doc_dict_to_sorted_str(policy_document)
+    return {
+        "PolicyName": policy_name,
+        "PolicyDocument": policy_document,
+    }

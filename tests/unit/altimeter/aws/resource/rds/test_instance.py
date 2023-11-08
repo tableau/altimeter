@@ -3,7 +3,7 @@ from unittest.mock import patch
 
 import boto3
 from botocore.exceptions import ClientError
-from moto import mock_rds2
+from moto import mock_rds
 
 from altimeter.aws.resource.rds.instance import RDSInstanceResourceSpec
 from altimeter.aws.scan.aws_accessor import AWSAccessor
@@ -11,7 +11,7 @@ from altimeter.aws.scan.settings import ALL_RESOURCE_SPEC_CLASSES
 
 
 class TestRDSInstanceResourceSpec(TestCase):
-    @mock_rds2
+    @mock_rds
     def test_disappearing_instance_race_condition(self):
         account_id = "123456789012"
         region_name = "us-east-1"

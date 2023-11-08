@@ -56,7 +56,8 @@ class Accessor(BaseImmutableModel):
                             )
                         else:
                             session = mha.get_session(
-                                account_id=account_id, region_name=region_name,
+                                account_id=account_id,
+                                region_name=region_name,
                             )
                         return session
                     except Exception as ex:

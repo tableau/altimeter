@@ -18,6 +18,10 @@ class GraphPrunerResults(BaseModel):
 
 def prune_graph(graph_pruner_config: GraphPrunerConfig) -> GraphPrunerResults:
     config = Config.from_path(path=graph_pruner_config.config_path)
+    return prune_graph_from_config(config)
+
+
+def prune_graph_from_config(config: Config) -> GraphPrunerResults:
     if config.neptune is None:
         raise InvalidConfigException("Configuration missing neptune section.")
     now = int(datetime.now().timestamp())
@@ -82,5 +86,6 @@ def prune_graph(graph_pruner_config: GraphPrunerConfig) -> GraphPrunerResults:
             logger.error(event=LogEvent.PruneNeptuneGraphsError, msg=msg)
             raise Exception(msg)
     return GraphPrunerResults(
-        pruned_graph_uris=pruned_graph_uris, skipped_graph_uris=skipped_graph_uris,
+        pruned_graph_uris=pruned_graph_uris,
+        skipped_graph_uris=skipped_graph_uris,
     )

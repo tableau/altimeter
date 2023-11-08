@@ -1,9 +1,10 @@
 """Resource for EC2Instances"""
-from typing import Dict, Set, Type
+from typing import Any, Dict, List, Set, Type
 
 from botocore.client import BaseClient
 
 from altimeter.aws.resource.resource_spec import ListFromAWSResult
+from altimeter.aws.resource.util import binary_aws_list_op
 from altimeter.aws.resource.ec2 import EC2ResourceSpec
 from altimeter.aws.resource.ec2.image import EC2ImageResourceSpec
 from altimeter.aws.resource.ec2.security_group import SecurityGroupResourceSpec
@@ -44,7 +45,9 @@ class EC2InstanceResourceSpec(EC2ResourceSpec):
         ResourceLinkField("SubnetId", SubnetResourceSpec, optional=True),
         AnonymousListField(
             "SecurityGroups",
-            AnonymousEmbeddedDictField(ResourceLinkField("GroupId", SecurityGroupResourceSpec)),
+            AnonymousEmbeddedDictField(
+                TransientResourceLinkField("GroupId", SecurityGroupResourceSpec)
+            ),
         ),
         AnonymousDictField(
             "IamInstanceProfile",
@@ -97,7 +100,14 @@ class EC2InstanceResourceSpec(EC2ResourceSpec):
 
 def get_ami_ids_names(client: BaseClient, ami_ids: Set[str]) -> Dict[str, str]:
     """Get a dict of ami ids to ami names"""
-    resp = client.describe_images(ImageIds=list(ami_ids))
-    images = resp["Images"]
+    describe_responses: List[Dict[str, Any]] = binary_aws_list_op(
+        aws_op=client.describe_images,
+        resource_ids=list(ami_ids),
+        resource_id_kwarg_field="ImageIds",
+    )
+    images: List[Dict[str, Any]] = []
+    describe_response: Dict[str, Any]
+    for describe_response in describe_responses:
+        images += describe_response["Images"]
     ami_ids_names = {image["ImageId"]: image["Name"] for image in images}
     return ami_ids_names

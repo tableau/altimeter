@@ -33,7 +33,8 @@ class TestIAMUser(TestCase):
                 },
             )
             resources = IAMUserResourceSpec.scan(
-                scan_accessor=scan_accessor, all_resource_spec_classes=ALL_RESOURCE_SPEC_CLASSES,
+                scan_accessor=scan_accessor,
+                all_resource_spec_classes=ALL_RESOURCE_SPEC_CLASSES,
             )
             self.assertEqual(resources, [])
 
@@ -54,10 +55,16 @@ class TestIAMUser(TestCase):
         ) as mock_get_group_users:
             mock_get_group_users.side_effect = ClientError(
                 operation_name="GetAccessKeyLastUsed",
-                error_response={"Error": {"Code": "AccessDenied", "Message": "",}},
+                error_response={
+                    "Error": {
+                        "Code": "AccessDenied",
+                        "Message": "",
+                    }
+                },
             )
             resources = IAMUserResourceSpec.scan(
-                scan_accessor=scan_accessor, all_resource_spec_classes=ALL_RESOURCE_SPEC_CLASSES,
+                scan_accessor=scan_accessor,
+                all_resource_spec_classes=ALL_RESOURCE_SPEC_CLASSES,
             )
             self.assertEqual(len(resources), 1)
             self.assertEqual(resources[0].resource_id, "arn:aws:iam::123456789012:user/foo")
@@ -86,7 +93,8 @@ class TestIAMUser(TestCase):
                 },
             )
             resources = IAMUserResourceSpec.scan(
-                scan_accessor=scan_accessor, all_resource_spec_classes=ALL_RESOURCE_SPEC_CLASSES,
+                scan_accessor=scan_accessor,
+                all_resource_spec_classes=ALL_RESOURCE_SPEC_CLASSES,
             )
             self.assertEqual(resources, [])
 
@@ -114,6 +122,7 @@ class TestIAMUser(TestCase):
                 },
             )
             resources = IAMUserResourceSpec.scan(
-                scan_accessor=scan_accessor, all_resource_spec_classes=ALL_RESOURCE_SPEC_CLASSES,
+                scan_accessor=scan_accessor,
+                all_resource_spec_classes=ALL_RESOURCE_SPEC_CLASSES,
             )
             self.assertEqual(resources, [])

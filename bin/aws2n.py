@@ -37,7 +37,9 @@ def main(argv: Optional[List[str]] = None) -> int:
         resource_spec_classes = DEFAULT_RESOURCE_SPEC_CLASSES
     scan_id = generate_scan_id()
     muxer = LocalAWSScanMuxer(
-        scan_id=scan_id, config=config, resource_spec_classes=resource_spec_classes,
+        scan_id=scan_id,
+        config=config,
+        resource_spec_classes=resource_spec_classes,
     )
     result = aws2n(scan_id=scan_id, config=config, muxer=muxer, load_neptune=False)
     print(result.rdf_path)

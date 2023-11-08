@@ -22,7 +22,10 @@ class InternetGatewayResourceSpec(EC2ResourceSpec):
         ScalarField("OwnerId"),
         ListField(
             "Attachments",
-            EmbeddedDictField(ScalarField("State"), ResourceLinkField("VpcId", VPCResourceSpec),),
+            EmbeddedDictField(
+                ScalarField("State"),
+                ResourceLinkField("VpcId", VPCResourceSpec),
+            ),
             optional=True,
             alti_key="attachment",
         ),

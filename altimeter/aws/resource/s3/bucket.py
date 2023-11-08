@@ -109,10 +109,14 @@ class S3BucketResourceSpec(S3ResourceSpec):
 
 def get_s3_bucket_region(client: BaseClient, bucket_name: str) -> str:
     """Get S3 bucket region"""
+    # The list of valid location values is defined here:
+    # https://docs.aws.amazon.com/general/latest/gr/s3.html
     try:
         region = client.get_bucket_location(Bucket=bucket_name)["LocationConstraint"]
         if region is None:
             region = "us-east-1"  # aws api wart
+        elif region == "EU":
+            region = "eu-west-1"
         return region
     except ClientError as c_e:
         response_error = getattr(c_e, "response", {}).get("Error", {})

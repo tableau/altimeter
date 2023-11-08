@@ -26,8 +26,14 @@ class ResultSet(BASE):
     results = relationship("Result", passive_deletes=True)
 
     __table_args__ = (
-        Index("result_set_job_id_idx", job_id,),
-        Index("result_set_created_idx", created,),
+        Index(
+            "result_set_job_id_idx",
+            job_id,
+        ),
+        Index(
+            "result_set_created_idx",
+            created,
+        ),
     )
 
     def to_api_schema(self) -> schemas.ResultSet:
@@ -41,16 +47,22 @@ class Result(BASE):
 
     __tablename__ = "result"
 
-    id = Column(Integer, primary_key=True)
     result_set_id = Column(
-        "result_set_id", ForeignKey(ResultSet.id, ondelete="CASCADE"), nullable=False,
+        "result_set_id",
+        ForeignKey(ResultSet.id, ondelete="CASCADE"),
+        nullable=False,
     )
     result_set = relationship(ResultSet)
     account_id = Column(Text, nullable=False)
-    result_id = Column(UUID(as_uuid=True), default=uuid.uuid4, nullable=False, unique=True)
+    result_id = Column(
+        UUID(as_uuid=True), default=uuid.uuid4, nullable=False, unique=True, primary_key=True
+    )
     result = Column(JSONB, nullable=False)
 
     __table_args__ = (
-        Index("result_result_set_id_idx", result_set_id,),
+        Index(
+            "result_result_set_id_idx",
+            result_set_id,
+        ),
         Index("result_account_id_idx", account_id),
     )

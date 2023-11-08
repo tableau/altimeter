@@ -71,7 +71,9 @@ def create_result_set(
 
 
 @RESULT_SETS_ROUTER.get(
-    "/expired", response_model=List[schemas.ResultSet], dependencies=[Security(deps.api_key)],
+    "/expired",
+    response_model=List[schemas.ResultSet],
+    dependencies=[Security(deps.api_key)],
 )
 def get_expired_result_sets(
     *,
@@ -83,7 +85,9 @@ def get_expired_result_sets(
 
 
 @RESULT_SETS_ROUTER.delete(
-    "/expired", response_model=schemas.ResultSetsPruneResult, dependencies=[Security(deps.api_key)],
+    "/expired",
+    response_model=schemas.ResultSetsPruneResult,
+    dependencies=[Security(deps.api_key)],
 )
 def delete_expired_result_sets(
     *,
