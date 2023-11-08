@@ -24,12 +24,12 @@ class SubField(Field):
     def get_parent_alti_key(self, data: Any, context: Dict[str, Any]) -> str:
         """Get the alti_key of the parent of this SubField.
 
-       Args:
-           data: field data
-           context: contains auxiliary information which can be passed through the parse process.
+        Args:
+            data: field data
+            context: contains auxiliary information which can be passed through the parse process.
 
-        Returns:
-            alti_key of parent of this SubField
+         Returns:
+             alti_key of parent of this SubField
         """
         parent_alti_key = context.get("parent_alti_key")
         if parent_alti_key is None:

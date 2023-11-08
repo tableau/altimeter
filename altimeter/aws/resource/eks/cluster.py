@@ -14,7 +14,9 @@ class EKSClusterResourceSpec(EKSResourceSpec):
     """Resource for Clusters"""
 
     type_name = "cluster"
-    schema = Schema(ScalarField("Name"),)
+    schema = Schema(
+        ScalarField("Name"),
+    )
 
     @classmethod
     def list_from_aws(

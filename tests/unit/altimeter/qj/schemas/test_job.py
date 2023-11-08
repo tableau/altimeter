@@ -17,7 +17,10 @@ def test_job_update_from_create():
     )
     job_update = JobUpdate.from_job_create(job_create)
     expected_job_update = JobUpdate(
-        description="test", category=Category.gov, severity=Severity.debug, notify_if_results=False,
+        description="test",
+        category=Category.gov,
+        severity=Severity.debug,
+        notify_if_results=False,
     )
     print(job_update)  # False
     print(expected_job_update)  # None

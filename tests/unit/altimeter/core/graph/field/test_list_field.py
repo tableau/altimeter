@@ -245,7 +245,9 @@ class TestAnonymousListField(TestCase):
             multi_links=(
                 MultiLink(
                     pred="biota",
-                    obj=LinkCollection(simple_links=(SimpleLink(pred="biota", obj="tree"),),),
+                    obj=LinkCollection(
+                        simple_links=(SimpleLink(pred="biota", obj="tree"),),
+                    ),
                 ),
             )
         )

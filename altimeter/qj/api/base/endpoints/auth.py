@@ -9,6 +9,8 @@ ROUTER = APIRouter()
 
 
 @ROUTER.get("")
-def get_auth(api_key: str = Security(deps.api_key),) -> Any:
+def get_auth(
+    api_key: str = Security(deps.api_key),
+) -> Any:
     """Get the current auth token"""
     return api_key

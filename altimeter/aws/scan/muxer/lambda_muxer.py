@@ -88,7 +88,9 @@ def invoke_lambda(
     with logger.bind(lambda_name=lambda_name, lambda_timeout=lambda_timeout, account_id=account_id):
         logger.info(event=AWSLogEvents.RunAccountScanLambdaStart)
         boto_config = botocore.config.Config(
-            read_timeout=lambda_timeout + 10, retries={"max_attempts": 0}, tcp_keepalive=True,
+            read_timeout=lambda_timeout + 10,
+            retries={"max_attempts": 0},
+            tcp_keepalive=True,
         )
         session = boto3.Session()
         lambda_client = session.client("lambda", config=boto_config)

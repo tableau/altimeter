@@ -76,8 +76,7 @@ class ResultSet(ResultSetBase):
         orm_mode = True
 
     def to_csv(self) -> str:
-        """Create a CSV representation of the ResultSet.
-        """
+        """Create a CSV representation of the ResultSet."""
         with io.StringIO() as csv_buf:
             if self.results:
                 fieldnames = tuple(self._flatten_result(self.results[0]).keys())

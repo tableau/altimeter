@@ -29,12 +29,12 @@ class TagsField(Field):
     def parse(self, data: Dict[str, Any], context: Dict[str, Any]) -> LinkCollection:
         """Parse this field and return a list of Links.
 
-       Args:
-           data: dictionary of data to parse
-           context: context dict containing data from higher level parsing code.
+        Args:
+            data: dictionary of data to parse
+            context: context dict containing data from higher level parsing code.
 
-        Returns:
-            List of TagLink objects, one for each tag.
+         Returns:
+             List of TagLink objects, one for each tag.
         """
         links: List[TagLink] = []
         tag_dicts = data.get("Tags")

@@ -51,7 +51,12 @@ class TestIAMUser(TestCase):
         ) as mock_get_group_users:
             mock_get_group_users.side_effect = ClientError(
                 operation_name="GetAccessKeyLastUsed",
-                error_response={"Error": {"Code": "AccessDenied", "Message": "",}},
+                error_response={
+                    "Error": {
+                        "Code": "AccessDenied",
+                        "Message": "",
+                    }
+                },
             )
             resources = IAMUserResourceSpec.scan(scan_accessor=scan_accessor)
             self.assertEqual(len(resources), 1)

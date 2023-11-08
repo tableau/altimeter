@@ -121,7 +121,7 @@ class APIServiceConfig(APIConfig, DBConfig, LimitsConfig, SecurityConfig):
     @root_validator(pre=True)
     def check_result_expiration_sec(cls, values: Dict[str, Any]) -> Dict[str, Any]:
         """Validate that result_expiration_sec_default does not exceed
-         result_expiration_sec_limit"""
+        result_expiration_sec_limit"""
         result_expiration_sec_default = values.get(
             "result_expiration_sec_default", DEFAULT_RESULT_EXPIRATION_SEC_DEFAULT
         )
@@ -139,7 +139,7 @@ class APIServiceConfig(APIConfig, DBConfig, LimitsConfig, SecurityConfig):
     @root_validator(pre=True)
     def check_max_graph_age_sec(cls, values: Dict[str, Any]) -> Dict[str, Any]:
         """Validate that max_graph_age_sec_default does not exceed
-         max_graph_age_sec_limit"""
+        max_graph_age_sec_limit"""
         max_graph_age_sec_default = values.get(
             "max_graph_age_sec_default", DEFAULT_MAX_GRAPH_AGE_SEC_DEFAULT
         )
@@ -157,7 +157,7 @@ class APIServiceConfig(APIConfig, DBConfig, LimitsConfig, SecurityConfig):
     @root_validator(pre=True)
     def check_max_result_age_sec(cls, values: Dict[str, Any]) -> Dict[str, Any]:
         """Validate that max_result_age_sec_default does not exceed
-         max_result_age_sec_limit"""
+        max_result_age_sec_limit"""
         max_result_age_sec_default = values.get(
             "max_result_age_sec_default", DEFAULT_MAX_RESULT_AGE_SEC_DEFAULT
         )

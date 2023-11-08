@@ -158,7 +158,10 @@ def main(argv: Optional[List[str]] = None) -> int:
         artifact_path="./altimeter_runs",
         pruner_max_age_min=4320,
         graph_name="alti",
-        concurrency=ConcurrencyConfig(max_account_scan_threads=1, max_svc_scan_threads=64,),
+        concurrency=ConcurrencyConfig(
+            max_account_scan_threads=1,
+            max_svc_scan_threads=64,
+        ),
         scan=ScanConfig(
             accounts=[current_account],
             regions=[current_region],

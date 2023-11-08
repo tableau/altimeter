@@ -1,6 +1,6 @@
 """Dict Fields represent fields which consist of dict-like data."""
 from copy import deepcopy
-from typing import Dict, Any
+from typing import Dict, Any, Optional
 
 from altimeter.core.graph.field.exceptions import (
     DictFieldValueNotADictException,
@@ -34,7 +34,11 @@ class DictField(Field):
     """
 
     def __init__(
-        self, source_key: str, *fields: Field, alti_key: str = None, optional: bool = False
+        self,
+        source_key: str,
+        *fields: Field,
+        alti_key: Optional[str] = None,
+        optional: bool = False,
     ) -> None:
         self.source_key = source_key
         self.alti_key = alti_key if alti_key else camel_case_to_snake_case(self.source_key)
@@ -44,16 +48,16 @@ class DictField(Field):
     def parse(self, data: Dict[str, Any], context: Dict[str, Any]) -> LinkCollection:
         """Parse this field and return a LinkCollection.
 
-       Args:
-           data: dictionary of data to parse
-           context: context dict containing data from higher level parsing code.
+        Args:
+            data: dictionary of data to parse
+            context: context dict containing data from higher level parsing code.
 
-        Returns:
-            LinkCollection
+         Returns:
+             LinkCollection
 
-        Raises:
-            DictFieldSourceKeyNotFoundException if self.source_key is not in data.
-            DictFieldValueNotADictException if the data does not appear to represent a dict.
+         Raises:
+             DictFieldSourceKeyNotFoundException if self.source_key is not in data.
+             DictFieldValueNotADictException if the data does not appear to represent a dict.
         """
         if self.source_key not in data:
             if self.optional:
@@ -111,16 +115,16 @@ class AnonymousDictField(Field):
     def parse(self, data: Dict[str, Any], context: Dict[str, Any]) -> LinkCollection:
         """Parse this field and return a LinkCollection.
 
-       Args:
-           data: dictionary of data to parse
-           context: context dict containing data from higher level parsing code.
+        Args:
+            data: dictionary of data to parse
+            context: context dict containing data from higher level parsing code.
 
-        Returns:
-            LinkCollection
+         Returns:
+             LinkCollection
 
-        Raises:
-            DictFieldSourceKeyNotFoundException if self.source_key is not in data.
-            DictFieldValueNotADictException if the data does not appear to represent a dict.
+         Raises:
+             DictFieldSourceKeyNotFoundException if self.source_key is not in data.
+             DictFieldValueNotADictException if the data does not appear to represent a dict.
         """
         if self.source_key in data:
             field_data = data.get(self.source_key, None)

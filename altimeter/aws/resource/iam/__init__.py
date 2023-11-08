@@ -12,7 +12,10 @@ class IAMResourceSpec(AWSResourceSpec):
 
     @classmethod
     def generate_arn(
-        cls: Type[AWSResourceSpec], resource_id: str, account_id: str = "", region: str = "",
+        cls: Type[AWSResourceSpec],
+        resource_id: str,
+        account_id: str = "",
+        region: str = "",
     ) -> str:
         """Generate an ARN for this resource
 

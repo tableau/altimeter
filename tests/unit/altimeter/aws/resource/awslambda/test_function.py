@@ -37,7 +37,8 @@ class TestLambdaFunctionResourceSpec(TestCase):
             ],
         }
         iam_role_resp = iam_client.create_role(
-            RoleName="testrole", AssumeRolePolicyDocument=json.dumps(test_assume_role_policy_doc),
+            RoleName="testrole",
+            AssumeRolePolicyDocument=json.dumps(test_assume_role_policy_doc),
         )
         iam_role_arn = iam_role_resp["Role"]["Arn"]
 

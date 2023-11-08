@@ -84,7 +84,9 @@ class ClassicLoadBalancerResourceSpec(ELBV1ResourceSpec):
 
     @classmethod
     def get_lb_attrs(
-        cls: Type["ClassicLoadBalancerResourceSpec"], client: BaseClient, lb_name: str,
+        cls: Type["ClassicLoadBalancerResourceSpec"],
+        client: BaseClient,
+        lb_name: str,
     ) -> Dict[str, str]:
         """Get lb attributes that Altimeter graphs."""
         lb_attrs = {}
