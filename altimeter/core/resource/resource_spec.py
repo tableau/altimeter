@@ -4,7 +4,7 @@ Fields defining the transformation."""
 import abc
 from collections import defaultdict
 import inspect
-from typing import Any, DefaultDict, Dict, List, Set, Type
+from typing import Any, DefaultDict, Dict, List, Set, Tuple, Type
 
 from altimeter.core.resource.exceptions import (
     MultipleResourceSpecClassesFoundException,
@@ -39,11 +39,16 @@ class ResourceSpec(abc.ABC):
 
     @classmethod
     @abc.abstractmethod
-    def scan(cls: Type["ResourceSpec"], scan_accessor: Any) -> List[Resource]:
+    def scan(
+        cls: Type["ResourceSpec"],
+        scan_accessor: Any,
+        all_resource_spec_classes: Tuple[Type["ResourceSpec"], ...],
+    ) -> List[Resource]:
         """Scan for this ResourceSpec using scan_accessor and return a list of Resource objects
 
         Args:
             scan_accessor: scan accessor object for accessing required APIs
+            all_resource_spec_classes: tuple of all resource spec types which are being scanned by altimeter
 
         Returns:
             List of Resource objects

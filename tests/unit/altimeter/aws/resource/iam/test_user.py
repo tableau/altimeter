@@ -5,6 +5,7 @@ from moto import mock_iam
 from unittest.mock import patch
 from altimeter.aws.resource.iam.user import IAMUserResourceSpec
 from altimeter.aws.scan.aws_accessor import AWSAccessor
+from altimeter.aws.scan.settings import ALL_RESOURCE_SPEC_CLASSES
 
 
 class TestIAMUser(TestCase):
@@ -31,7 +32,10 @@ class TestIAMUser(TestCase):
                     }
                 },
             )
-            resources = IAMUserResourceSpec.scan(scan_accessor=scan_accessor)
+            resources = IAMUserResourceSpec.scan(
+                scan_accessor=scan_accessor,
+                all_resource_spec_classes=ALL_RESOURCE_SPEC_CLASSES,
+            )
             self.assertEqual(resources, [])
 
     @mock_iam
@@ -58,7 +62,10 @@ class TestIAMUser(TestCase):
                     }
                 },
             )
-            resources = IAMUserResourceSpec.scan(scan_accessor=scan_accessor)
+            resources = IAMUserResourceSpec.scan(
+                scan_accessor=scan_accessor,
+                all_resource_spec_classes=ALL_RESOURCE_SPEC_CLASSES,
+            )
             self.assertEqual(len(resources), 1)
             self.assertEqual(resources[0].resource_id, "arn:aws:iam::123456789012:user/foo")
 
@@ -85,7 +92,10 @@ class TestIAMUser(TestCase):
                     }
                 },
             )
-            resources = IAMUserResourceSpec.scan(scan_accessor=scan_accessor)
+            resources = IAMUserResourceSpec.scan(
+                scan_accessor=scan_accessor,
+                all_resource_spec_classes=ALL_RESOURCE_SPEC_CLASSES,
+            )
             self.assertEqual(resources, [])
 
     @mock_iam
@@ -111,5 +121,8 @@ class TestIAMUser(TestCase):
                     }
                 },
             )
-            resources = IAMUserResourceSpec.scan(scan_accessor=scan_accessor)
+            resources = IAMUserResourceSpec.scan(
+                scan_accessor=scan_accessor,
+                all_resource_spec_classes=ALL_RESOURCE_SPEC_CLASSES,
+            )
             self.assertEqual(resources, [])

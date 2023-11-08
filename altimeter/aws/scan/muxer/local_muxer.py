@@ -6,7 +6,6 @@ from altimeter.aws.resource.resource_spec import AWSResourceSpec
 from altimeter.aws.scan.account_scanner import AccountScanner, AccountScanResult
 from altimeter.aws.scan.scan_plan import AccountScanPlan
 from altimeter.aws.scan.muxer import AWSScanMuxer
-from altimeter.aws.scan.settings import DEFAULT_RESOURCE_SPEC_CLASSES
 from altimeter.core.artifact_io.writer import ArtifactWriter
 from altimeter.core.config import AWSConfig
 
@@ -43,7 +42,7 @@ class LocalAWSScanMuxer(AWSScanMuxer):
         self,
         scan_id: str,
         config: AWSConfig,
-        resource_spec_classes: Tuple[Type[AWSResourceSpec], ...] = DEFAULT_RESOURCE_SPEC_CLASSES,
+        resource_spec_classes: Tuple[Type[AWSResourceSpec], ...],
     ):
         super().__init__(scan_id=scan_id, config=config)
         self.resource_spec_classes = resource_spec_classes

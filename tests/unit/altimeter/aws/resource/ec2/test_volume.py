@@ -5,6 +5,7 @@ from moto import mock_ec2
 
 from altimeter.aws.resource.ec2.volume import EBSVolumeResourceSpec
 from altimeter.aws.scan.aws_accessor import AWSAccessor
+from altimeter.aws.scan.settings import ALL_RESOURCE_SPEC_CLASSES
 from altimeter.core.graph.links import LinkCollection, ResourceLink, SimpleLink
 from altimeter.core.resource.resource import Resource
 
@@ -24,7 +25,10 @@ class TestEBSVolumeResourceSpec(TestCase):
         created_volume_arn = f"arn:aws:ec2:us-east-1:123456789012:volume/{created_volume_id}"
 
         scan_accessor = AWSAccessor(session=session, account_id=account_id, region_name=region_name)
-        resources = EBSVolumeResourceSpec.scan(scan_accessor=scan_accessor)
+        resources = EBSVolumeResourceSpec.scan(
+            scan_accessor=scan_accessor,
+            all_resource_spec_classes=ALL_RESOURCE_SPEC_CLASSES,
+        )
 
         expected_resources = [
             Resource(

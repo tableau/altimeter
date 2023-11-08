@@ -65,7 +65,6 @@ def aws2n(scan_id: str, config: AWSConfig, muxer: AWSScanMuxer, load_neptune: bo
         reader=str(artifact_reader.__class__),
         writer=str(artifact_writer.__class__),
     )
-
     scan_manifest, graph_set = run_scan(
         muxer=muxer,
         config=config,

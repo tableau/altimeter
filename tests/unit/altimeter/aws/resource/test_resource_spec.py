@@ -52,7 +52,7 @@ class TestSkipResourceScanFlag(TestCase):
                 return True
 
         accessor = TestSkipResourceScanFlag.TestAWSAccessor(None, None, None)
-        TestResource.scan(scan_accessor=accessor)
+        TestResource.scan(scan_accessor=accessor, all_resource_spec_classes=[TestResource])
 
     def test_false(self):
         class TestResource(AWSResourceSpec):
@@ -61,4 +61,4 @@ class TestSkipResourceScanFlag(TestCase):
 
         accessor = TestSkipResourceScanFlag.TestAWSAccessor(None, None, None)
         with self.assertRaises(AttributeError):
-            TestResource.scan(scan_accessor=accessor)
+            TestResource.scan(scan_accessor=accessor, all_resource_spec_classes=[TestResource])

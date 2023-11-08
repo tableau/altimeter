@@ -10,6 +10,7 @@ from pydantic import ValidationError
 from altimeter.aws.aws2n import AWS2NConfig, generate_scan_id, aws2n
 from altimeter.aws.scan.account_scanner import AccountScanner
 from altimeter.aws.scan.muxer.lambda_muxer import AccountScanLambdaEvent, LambdaAWSScanMuxer
+from altimeter.aws.scan.settings import DEFAULT_RESOURCE_SPEC_CLASSES
 from altimeter.core.artifact_io.writer import ArtifactWriter
 from altimeter.core.config import AWSConfig, GraphPrunerConfig
 from altimeter.core.pruner import prune_graph
@@ -29,6 +30,10 @@ def lambda_handler(event: Dict[str, Any], __: Any) -> Dict[str, Any]:
     try:
         aws2n_config = AWS2NConfig()
         config = AWSConfig.from_path(path=aws2n_config.config_path)
+        if config.scan.ignored_resources:
+            raise NotImplementedError(
+                "The ignored_resources directive is not yet implemented in altimeter_lambda"
+            )
         scan_id = generate_scan_id()
         muxer = LambdaAWSScanMuxer(
             scan_id=scan_id,
@@ -50,6 +55,7 @@ def lambda_handler(event: Dict[str, Any], __: Any) -> Dict[str, Any]:
             artifact_writer=artifact_writer,
             max_svc_scan_threads=account_scan_input.max_svc_scan_threads,
             scan_sub_accounts=account_scan_input.scan_sub_accounts,
+            resource_spec_classes=DEFAULT_RESOURCE_SPEC_CLASSES,
         )
         scan_results = account_scanner.scan()
         return scan_results.dict()

@@ -11,12 +11,11 @@ from typing import DefaultDict, Dict, List, Tuple, Type
 import boto3
 
 from altimeter.aws.log_events import AWSLogEvents
-from altimeter.aws.resource.resource_spec import ScanGranularity, AWSResourceSpec
+from altimeter.aws.resource.resource_spec import AWSResourceSpec
 from altimeter.aws.resource.unscanned_account import UnscannedAccountResourceSpec
 from altimeter.aws.scan.scan_plan import AccountScanPlan
 from altimeter.aws.scan.aws_accessor import AWSAccessor
 from altimeter.aws.scan.settings import (
-    DEFAULT_RESOURCE_SPEC_CLASSES,
     INFRA_RESOURCE_SPEC_CLASSES,
     ORG_RESOURCE_SPEC_CLASSES,
 )
@@ -71,6 +70,7 @@ class ScanUnit:
     secret_key: str
     token: str
     resource_spec_classes: Tuple[Type[AWSResourceSpec], ...]
+    all_resource_spec_classes: Tuple[Type[AWSResourceSpec], ...]
 
 
 class AccountScanner:
@@ -90,9 +90,9 @@ class AccountScanner:
         artifact_writer: ArtifactWriter,
         max_svc_scan_threads: int,
         scan_sub_accounts: bool,
+        resource_spec_classes: Tuple[Type[AWSResourceSpec], ...],
         graph_name: str = GRAPH_NAME,
         graph_version: str = GRAPH_VERSION,
-        resource_spec_classes: Tuple[Type[AWSResourceSpec], ...] = DEFAULT_RESOURCE_SPEC_CLASSES,
     ) -> None:
         self.account_scan_plan = account_scan_plan
         self.artifact_writer = artifact_writer
@@ -185,6 +185,7 @@ class AccountScanner:
                                     secret_key=region_creds.secret_key,
                                     token=region_creds.token,
                                     resource_spec_classes=(parallel_svc_resource_spec_class,),
+                                    all_resource_spec_classes=self.resource_spec_classes,
                                 )
                                 futures.append(parallel_future)
                             serial_future = schedule_scan(
@@ -198,6 +199,7 @@ class AccountScanner:
                                 secret_key=region_creds.secret_key,
                                 token=region_creds.token,
                                 resource_spec_classes=tuple(serial_svc_resource_spec_classes),
+                                all_resource_spec_classes=self.resource_spec_classes,
                             )
                             futures.append(serial_future)
                 except Exception as ex:
@@ -294,6 +296,7 @@ def scan_scan_unit(scan_unit: ScanUnit) -> GraphSet:
             name=scan_unit.graph_name,
             version=scan_unit.graph_version,
             resource_spec_classes=scan_unit.resource_spec_classes,
+            all_resource_spec_classes=scan_unit.all_resource_spec_classes,
             scan_accessor=scan_accessor,
         )
         start_time = int(time.time())
@@ -335,6 +338,7 @@ def schedule_scan(
     secret_key: str,
     token: str,
     resource_spec_classes: Tuple[Type[AWSResourceSpec], ...],
+    all_resource_spec_classes: Tuple[Type[AWSResourceSpec], ...],
 ) -> Future:
     scan_unit = ScanUnit(
         graph_name=graph_name,
@@ -346,6 +350,7 @@ def schedule_scan(
         secret_key=secret_key,
         token=token,
         resource_spec_classes=resource_spec_classes,
+        all_resource_spec_classes=all_resource_spec_classes,
     )
     future = executor.submit(lambda: scan_scan_unit(scan_unit=scan_unit))
     return future

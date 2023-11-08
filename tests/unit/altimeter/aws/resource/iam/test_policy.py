@@ -6,6 +6,7 @@ from moto import mock_iam
 from unittest.mock import patch
 from altimeter.aws.resource.iam.policy import IAMPolicyResourceSpec
 from altimeter.aws.scan.aws_accessor import AWSAccessor
+from altimeter.aws.scan.settings import ALL_RESOURCE_SPEC_CLASSES
 
 
 class TestIAMPolicy(TestCase):
@@ -42,5 +43,8 @@ class TestIAMPolicy(TestCase):
                     }
                 },
             )
-            resources = IAMPolicyResourceSpec.scan(scan_accessor=scan_accessor)
+            resources = IAMPolicyResourceSpec.scan(
+                scan_accessor=scan_accessor,
+                all_resource_spec_classes=ALL_RESOURCE_SPEC_CLASSES,
+            )
             self.assertEqual(resources, [])

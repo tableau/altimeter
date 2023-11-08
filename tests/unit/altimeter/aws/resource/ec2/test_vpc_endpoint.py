@@ -5,6 +5,7 @@ from dateutil.tz import tzutc
 from altimeter.core.graph.links import LinkCollection, ResourceLink, SimpleLink
 from altimeter.core.resource.resource import Resource
 from altimeter.aws.resource.ec2.vpc_endpoint import VpcEndpointResourceSpec
+from altimeter.aws.scan.settings import ALL_RESOURCE_SPEC_CLASSES
 
 
 class TestVpcEndpointResourceSpec(unittest.TestCase):
@@ -35,7 +36,12 @@ class TestVpcEndpointResourceSpec(unittest.TestCase):
         }
 
         link_collection = VpcEndpointResourceSpec.schema.parse(
-            data=aws_resource_dict, context={"account_id": "111122223333", "region": "us-west-2"}
+            data=aws_resource_dict,
+            context={
+                "account_id": "111122223333",
+                "region": "us-west-2",
+                "all_resource_spec_classes": ALL_RESOURCE_SPEC_CLASSES,
+            },
         )
         resource = Resource(
             resource_id=resource_arn,

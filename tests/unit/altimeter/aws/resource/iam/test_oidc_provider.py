@@ -7,6 +7,7 @@ from moto import mock_iam
 
 from altimeter.aws.resource.iam.iam_oidc_provider import IAMOIDCProviderResourceSpec
 from altimeter.aws.scan.aws_accessor import AWSAccessor
+from altimeter.aws.scan.settings import ALL_RESOURCE_SPEC_CLASSES
 from altimeter.core.graph.links import LinkCollection, ResourceLink, SimpleLink
 from altimeter.core.resource.resource import Resource
 
@@ -30,7 +31,10 @@ class TestIAMOIDCProvider(TestCase):
         )
 
         scan_accessor = AWSAccessor(session=session, account_id=account_id, region_name=region_name)
-        resources = IAMOIDCProviderResourceSpec.scan(scan_accessor=scan_accessor)
+        resources = IAMOIDCProviderResourceSpec.scan(
+            scan_accessor=scan_accessor,
+            all_resource_spec_classes=ALL_RESOURCE_SPEC_CLASSES,
+        )
 
         expected_resources = [
             Resource(
@@ -96,5 +100,8 @@ class TestIAMOIDCProvider(TestCase):
                     }
                 },
             )
-            resources = IAMOIDCProviderResourceSpec.scan(scan_accessor=scan_accessor)
+            resources = IAMOIDCProviderResourceSpec.scan(
+                scan_accessor=scan_accessor,
+                all_resource_spec_classes=ALL_RESOURCE_SPEC_CLASSES,
+            )
             self.assertEqual(resources, [])

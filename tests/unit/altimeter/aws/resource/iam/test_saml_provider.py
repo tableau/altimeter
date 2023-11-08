@@ -5,6 +5,7 @@ from moto import mock_iam
 from unittest.mock import patch
 from altimeter.aws.resource.iam.iam_saml_provider import IAMSAMLProviderResourceSpec
 from altimeter.aws.scan.aws_accessor import AWSAccessor
+from altimeter.aws.scan.settings import ALL_RESOURCE_SPEC_CLASSES
 
 
 class TestIAMSAMLProvider(TestCase):
@@ -36,5 +37,8 @@ class TestIAMSAMLProvider(TestCase):
                     }
                 },
             )
-            resources = IAMSAMLProviderResourceSpec.scan(scan_accessor=scan_accessor)
+            resources = IAMSAMLProviderResourceSpec.scan(
+                scan_accessor=scan_accessor,
+                all_resource_spec_classes=ALL_RESOURCE_SPEC_CLASSES,
+            )
             self.assertEqual(resources, [])

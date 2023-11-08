@@ -5,6 +5,7 @@ from moto import mock_events
 from unittest.mock import patch
 from altimeter.aws.resource.events.cloudwatchevents_rule import EventsRuleResourceSpec
 from altimeter.aws.scan.aws_accessor import AWSAccessor
+from altimeter.aws.scan.settings import ALL_RESOURCE_SPEC_CLASSES
 
 
 class TestEventsRule(TestCase):
@@ -36,5 +37,8 @@ class TestEventsRule(TestCase):
                     }
                 },
             )
-            resources = EventsRuleResourceSpec.scan(scan_accessor=scan_accessor)
+            resources = EventsRuleResourceSpec.scan(
+                scan_accessor=scan_accessor,
+                all_resource_spec_classes=ALL_RESOURCE_SPEC_CLASSES,
+            )
             self.assertEqual(resources, [])

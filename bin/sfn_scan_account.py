@@ -9,6 +9,7 @@ from pydantic import BaseModel
 from altimeter.aws.resource_service_region_mapping import AWSResourceRegionMappingRepository
 from altimeter.aws.scan.account_scanner import AccountScanner
 from altimeter.aws.scan.scan_plan import AccountScanPlan
+from altimeter.aws.scan.settings import DEFAULT_RESOURCE_SPEC_CLASSES
 from altimeter.core.artifact_io.writer import ArtifactWriter
 from altimeter.core.config import AWSConfig
 
@@ -41,6 +42,7 @@ def lambda_handler(event: Dict[str, Any], _: Any) -> Dict[str, Any]:
         artifact_writer=artifact_writer,
         max_svc_scan_threads=account_scan_input.config.concurrency.max_svc_scan_threads,
         scan_sub_accounts=account_scan_input.config.scan.scan_sub_accounts,
+        resource_spec_classes=DEFAULT_RESOURCE_SPEC_CLASSES,
     )
     scan_results = account_scanner.scan()
     return scan_results.dict()

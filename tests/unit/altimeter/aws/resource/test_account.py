@@ -5,6 +5,7 @@ from moto import mock_sts
 
 from altimeter.aws.resource.account import AccountResourceSpec
 from altimeter.aws.scan.aws_accessor import AWSAccessor
+from altimeter.aws.scan.settings import ALL_RESOURCE_SPEC_CLASSES
 from altimeter.core.graph.links import (
     LinkCollection,
     SimpleLink,
@@ -20,7 +21,10 @@ class TestEBSVolumeResourceSpec(TestCase):
 
         session = boto3.Session()
         scan_accessor = AWSAccessor(session=session, account_id=account_id, region_name=region_name)
-        resources = AccountResourceSpec.scan(scan_accessor=scan_accessor)
+        resources = AccountResourceSpec.scan(
+            scan_accessor=scan_accessor,
+            all_resource_spec_classes=ALL_RESOURCE_SPEC_CLASSES,
+        )
 
         expected_resources = [
             Resource(
@@ -42,7 +46,10 @@ class TestEBSVolumeResourceSpec(TestCase):
         session = boto3.Session()
         scan_accessor = AWSAccessor(session=session, account_id=account_id, region_name=region_name)
         with self.assertRaises(ValueError):
-            AccountResourceSpec.scan(scan_accessor=scan_accessor)
+            AccountResourceSpec.scan(
+                scan_accessor=scan_accessor,
+                all_resource_spec_classes=ALL_RESOURCE_SPEC_CLASSES,
+            )
 
     def test_generate_arn(self):
         account_id = "234567890121"
