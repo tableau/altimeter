@@ -1,5 +1,5 @@
 """Scalar Fields represent field that contain strings, bools or numbers."""
-from typing import Any, Dict, Union
+from typing import Any, Dict, Optional, Union
 
 from altimeter.core.graph import SCALAR_TYPES
 from altimeter.core.graph.field.exceptions import (
@@ -55,9 +55,9 @@ class ScalarField(Field):
     def __init__(
         self,
         source_key: str,
-        alti_key: str = None,
+        alti_key: Optional[str] = None,
         optional: bool = False,
-        default_value: Union[str, bool, int, float] = None,
+        default_value: Optional[Union[str, bool, int, float]] = None,
     ):
         self.source_key = source_key
         self.alti_key = alti_key if alti_key else camel_case_to_snake_case(self.source_key)

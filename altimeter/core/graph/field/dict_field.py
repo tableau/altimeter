@@ -1,6 +1,6 @@
 """Dict Fields represent fields which consist of dict-like data."""
 from copy import deepcopy
-from typing import Dict, Any
+from typing import Dict, Any, Optional
 
 from altimeter.core.graph.field.exceptions import (
     DictFieldValueNotADictException,
@@ -34,7 +34,11 @@ class DictField(Field):
     """
 
     def __init__(
-        self, source_key: str, *fields: Field, alti_key: str = None, optional: bool = False
+        self,
+        source_key: str,
+        *fields: Field,
+        alti_key: Optional[str] = None,
+        optional: bool = False,
     ) -> None:
         self.source_key = source_key
         self.alti_key = alti_key if alti_key else camel_case_to_snake_case(self.source_key)

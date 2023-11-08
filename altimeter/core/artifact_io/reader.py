@@ -15,6 +15,7 @@ from altimeter.core.log_events import LogEvent
 class ArtifactReader(abc.ABC):
     """ArtifactReaders read JSON artifacts from locations - e.g. s3, filesystem, etc."""
 
+    @abc.abstractmethod
     def read_json(self, path: str) -> Dict[str, Any]:
         """Read a json artifact
 

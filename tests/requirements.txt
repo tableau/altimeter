@@ -6,11 +6,11 @@
 #
 alembic==1.4.2
     # via -r requirements.in
-boto3==1.26.149
+boto3==1.28.80
     # via
     #   -r requirements.in
     #   moto
-botocore==1.29.149
+botocore==1.31.80
     # via
     #   boto3
     #   moto
@@ -88,7 +88,7 @@ requests==2.31.0
     #   responses
 responses==0.19.0
     # via moto
-s3transfer==0.6.0
+s3transfer==0.7.0
     # via boto3
 six==1.16.0
     # via python-dateutil

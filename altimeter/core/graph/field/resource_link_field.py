@@ -1,6 +1,6 @@
 """Resource Link Fields represent field containing ids of other top level resources in the graph.
 For example, an EC2 instance has a ResourceLinkField with source_key 'VpcId' pointing to a VPC."""
-from typing import Dict, Any, Type, Union
+from typing import Dict, Any, Optional, Type, Union
 
 from altimeter.core.graph.field.exceptions import (
     ResourceLinkFieldSourceKeyNotFoundException,
@@ -50,7 +50,7 @@ class ResourceLinkField(Field):
         self,
         source_key: str,
         resource_spec_class: Union[Type[ResourceSpec], str],
-        alti_key: str = None,
+        alti_key: Optional[str] = None,
         optional: bool = False,
         value_is_id: bool = False,
     ):
@@ -127,7 +127,7 @@ class EmbeddedResourceLinkField(SubField):
     def __init__(
         self,
         resource_spec_class: Union[Type[ResourceSpec], str],
-        alti_key: str = None,
+        alti_key: Optional[str] = None,
         optional: bool = False,
         value_is_id: bool = False,
     ):
@@ -196,7 +196,7 @@ class TransientResourceLinkField(Field):
         self,
         source_key: str,
         resource_spec_class: Union[Type[ResourceSpec], str],
-        alti_key: str = None,
+        alti_key: Optional[str] = None,
         optional: bool = False,
         value_is_id: bool = False,
     ):
@@ -266,7 +266,7 @@ class TransientEmbeddedResourceLinkField(SubField):
     def __init__(
         self,
         resource_spec_class: Union[Type[ResourceSpec], str],
-        alti_key: str = None,
+        alti_key: Optional[str] = None,
         optional: bool = False,
         value_is_id: bool = False,
     ):

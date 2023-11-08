@@ -1,6 +1,6 @@
 """List Fields represent fields which consist of list data."""
 from copy import deepcopy
-from typing import Dict, Any
+from typing import Dict, Any, Optional
 
 from altimeter.core.graph.exceptions import (
     ListFieldSourceKeyNotFoundException,
@@ -50,7 +50,7 @@ class ListField(Field):
         self,
         source_key: str,
         sub_field: SubField,
-        alti_key: str = None,
+        alti_key: Optional[str] = None,
         optional: bool = False,
         allow_scalar: bool = False,
     ):

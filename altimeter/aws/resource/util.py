@@ -1,6 +1,6 @@
 """Utilty grab-bag"""
 import json
-from typing import Dict, Any, Callable, List
+from typing import Dict, Any, Callable, List, Optional
 
 from botocore.exceptions import ClientError
 
@@ -67,7 +67,7 @@ def binary_aws_list_op(
     aws_op: Callable,
     resource_ids: List[str],
     resource_id_kwarg_field: str,
-    aws_op_kwargs: dict = None,
+    aws_op_kwargs: Optional[Dict[str, List[str]]] = None,
 ) -> List[Dict[str, Any]]:
     responses = []
     if aws_op_kwargs:
