@@ -71,7 +71,9 @@ def publish(event: Dict[str, Any]) -> None:
                         inserter.add_row(row)
                     inserter.execute()
         tableau_auth = TSC.PersonalAccessTokenAuth(
-            config.tableau_token_name, config.tableau_token_value, config.tableau_site_id
+            config.tableau_token_name,
+            config.tableau_token_value.get_secret_value(),
+            config.tableau_site_id,
         )
         if config.verify_ssl:
             server = TSC.Server(

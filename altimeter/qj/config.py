@@ -1,7 +1,7 @@
 """Global Settings"""
 from typing import Any, Dict
 
-from pydantic import BaseSettings, root_validator
+from pydantic import BaseSettings, SecretStr, root_validator
 
 
 from altimeter.qj.settings import (
@@ -98,7 +98,7 @@ class PublishConfig(APIConfig):
     tableau_server_hostname: str
     tableau_site_id: str
     tableau_token_name: str
-    tableau_token_value: str
+    tableau_token_value: SecretStr
     verify_ssl: bool = True
 
 
