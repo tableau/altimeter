@@ -51,7 +51,7 @@ def publish(event: Dict[str, Any]) -> None:
         ).as_posix()
         with HyperProcess(
             Telemetry.DO_NOT_SEND_USAGE_DATA_TO_TABLEAU,
-            parameters={"default_database_version": "2"},
+            parameters={"default_database_version": "2", "log_config": ""},
         ) as hyper:
             with Connection(
                 hyper.endpoint, hyper_filepath, CreateMode.CREATE_AND_REPLACE
