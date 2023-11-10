@@ -19,8 +19,10 @@ certifi==2023.7.22
     # via
     #   -r requirements.in
     #   requests
-cffi==1.15.0
-    # via cryptography
+cffi==1.16.0
+    # via
+    #   -r requirements.in
+    #   cryptography
 charset-normalizer==2.0.12
     # via requests
 colorama==0.4.1

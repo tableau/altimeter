@@ -7,6 +7,7 @@ from typing import Any, Dict
 from altimeter.qj.config import QJHandlerConfig
 from altimeter.qj.lambdas.executor import executor
 from altimeter.qj.lambdas.pruner import pruner
+from altimeter.qj.lambdas.publish import publish
 from altimeter.qj.lambdas.query import query
 from altimeter.qj.lambdas.remediator import remediator
 
@@ -26,6 +27,8 @@ def lambda_handler(event: Dict[str, Any], _: Any) -> Any:
         return pruner()
     elif handler.mode == "remediator":
         return remediator(event)
+    elif handler.mode == "publish":
+        return publish(event)
     else:
         raise InvalidLambdaModeException(
             f"Invalid lambda MODE value.\nENV: {os.environ}\nEvent: {event}"

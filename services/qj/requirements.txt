@@ -16,6 +16,12 @@ botocore==1.31.80
     # via
     #   boto3
     #   s3transfer
+certifi==2023.7.22
+    # via requests
+cffi==1.16.0
+    # via tableauhyperapi
+charset-normalizer==2.0.12
+    # via requests
 click==8.0.4
     # via uvicorn
 fastapi==0.96.0
@@ -23,7 +29,9 @@ fastapi==0.96.0
 h11==0.13.0
     # via uvicorn
 idna==3.3
-    # via anyio
+    # via
+    #   anyio
+    #   requests
 jmespath==0.10.0
     # via
     #   boto3
@@ -36,6 +44,8 @@ markupsafe==2.1.1
     #   mako
 psycopg2-binary==2.9.2
     # via -r requirements.in
+pycparser==2.21
+    # via cffi
 pydantic==1.9.0
     # via fastapi
 python-dateutil==2.8.2
@@ -44,6 +54,10 @@ python-dateutil==2.8.2
     #   botocore
 python-editor==1.0.4
     # via alembic
+requests==2.31.0
+    # via
+    #   -r requirements.in
+    #   tableauserverclient
 s3transfer==0.7.0
     # via boto3
 six==1.16.0
@@ -56,6 +70,10 @@ sqlalchemy==1.3.24
     #   alembic
 starlette==0.27.0
     # via fastapi
+tableauhyperapi==0.0.18161
+    # via -r requirements.in
+tableauserverclient==0.17.0
+    # via -r requirements.in
 typing-extensions==4.1.1
     # via
     #   pydantic
@@ -64,5 +82,6 @@ urllib3==1.26.18
     # via
     #   -r requirements.in
     #   botocore
+    #   requests
 uvicorn==0.16.0
     # via -r requirements.in

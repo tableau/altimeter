@@ -90,6 +90,18 @@ class DBConfig(BaseSettings):
 
 
 # pylint: disable=too-few-public-methods
+class PublishConfig(APIConfig):
+    """Configuration for the Publish lambda"""
+
+    env_name: str
+    tableau_project_name: str
+    tableau_server_hostname: str
+    tableau_site_id: str
+    tableau_token_name: str
+    tableau_token_value: str
+
+
+# pylint: disable=too-few-public-methods
 class LimitsConfig(BaseSettings):
     """Limit configurations"""
 

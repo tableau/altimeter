@@ -36,6 +36,8 @@ setup(
             "fastapi==0.96.0",
             "psycopg2-binary==2.9.2",
             "sqlalchemy==1.3.24",
+            "tableauhyperapi==0.0.18161",
+            "tableauserverclient==0.17.0",
             "uvicorn==0.16.0",
             "urllib3==1.26.18",
         ],
