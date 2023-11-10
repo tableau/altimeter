@@ -60,9 +60,9 @@ def query(event: Dict[str, Any]) -> None:
 
     api_key = get_api_key(region_name=query_config.region)
     qj_client = QJAPIClient(host=query_config.api_host, port=query_config.api_port, api_key=api_key)
-    logger.info(event=QJLogEvents.CreateResultSetStart)
+    logger.info(event=QJLogEvents.PublishResultSetToQJAPIStart)
     qj_client.create_result_set(result_set=result_set)
-    logger.info(event=QJLogEvents.CreateResultSetEnd)
+    logger.info(event=QJLogEvents.PublishResultSetToQJAPIEnd)
 
 
 def run_query(job: schemas.Job, config: QueryConfig) -> QueryResult:

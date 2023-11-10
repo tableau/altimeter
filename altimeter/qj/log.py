@@ -32,8 +32,14 @@ class QJLogEvents(BaseLogEvent):
     RunQueryStart: EventName
     RunQueryEnd: EventName
     RunQueryError: EventName
-    CreateResultSetStart: EventName
-    CreateResultSetEnd: EventName
+    PublishResultSetToQJAPIStart: EventName
+    PublishResultSetToQJAPIEnd: EventName
+
+    # Publish
+    GetLatestResultSetStart: EventName
+    GetLatestResultSetEnd: EventName
+    PublishResultSetToTableauStart: EventName
+    PublishResultSetToTableauEnd: EventName
 
     # Notifications
     NotifyNewResultsStart: EventName

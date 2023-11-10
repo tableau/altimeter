@@ -1,7 +1,7 @@
 """Global Settings"""
 from typing import Any, Dict
 
-from pydantic import BaseSettings, root_validator
+from pydantic import BaseSettings, SecretStr, root_validator
 
 
 from altimeter.qj.settings import (
@@ -87,6 +87,19 @@ class DBConfig(BaseSettings):
     def get_db_uri(self) -> str:
         """Get a db uri for this DBConfig"""
         return f"postgres://{self.db_user}:{self.db_password}@{self.db_host}/{self.db_name}"
+
+
+# pylint: disable=too-few-public-methods
+class PublishConfig(APIConfig):
+    """Configuration for the Publish lambda"""
+
+    env_name: str
+    tableau_project_name: str
+    tableau_server_hostname: str
+    tableau_site_id: str
+    tableau_token_name: str
+    tableau_token_value: SecretStr
+    verify_ssl: bool = True
 
 
 # pylint: disable=too-few-public-methods
