@@ -46,7 +46,9 @@ def publish(event: Dict[str, Any]) -> None:
     ]
     columns.append(TableDefinition.Column("result_created", SqlType.timestamp()))
     with tempfile.TemporaryDirectory() as temp_dir_name:
-        hyper_filepath = Path(temp_dir_name, f"AltiHyper-{config.env_name}-{job_name}.hyper").as_posix()
+        hyper_filepath = Path(
+            temp_dir_name, f"AltiHyper-{config.env_name}-{job_name}.hyper"
+        ).as_posix()
         with HyperProcess(
             Telemetry.DO_NOT_SEND_USAGE_DATA_TO_TABLEAU,
             parameters={"default_database_version": "2"},
