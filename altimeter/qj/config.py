@@ -99,6 +99,7 @@ class PublishConfig(APIConfig):
     tableau_site_id: str
     tableau_token_name: str
     tableau_token_value: str
+    verify_ssl: bool = True
 
 
 # pylint: disable=too-few-public-methods

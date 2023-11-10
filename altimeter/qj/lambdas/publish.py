@@ -74,6 +74,7 @@ def publish(event: Dict[str, Any]) -> None:
             config.tableau_token_name, config.tableau_token_value, config.tableau_site_id
         )
         server = TSC.Server(f"https://{config.tableau_server_hostname}", use_server_version=True)
+        server.add_http_options({"verify": config.verify_ssl})
         publish_mode = TSC.Server.PublishMode.Overwrite
         with server.auth.sign_in(tableau_auth):
             get_projects_options = TSC.RequestOptions()
