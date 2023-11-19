@@ -111,7 +111,7 @@ urllib3==1.26.18
     #   responses
 websocket-client==1.5.2
     # via docker
-werkzeug==2.2.3
+werkzeug==3.0.1
     # via
     #   -r requirements.in
     #   moto
