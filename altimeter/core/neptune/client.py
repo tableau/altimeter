@@ -686,10 +686,8 @@ class AltimeterNeptuneClient:
         try:
             results_json = resp.json()
         except json.decoder.JSONDecodeError as jde:
-            neptune_status = resp.headers.get("X-Neptune-Status", "unknown")
-            neptune_detail = resp.headers.get("X-Neptune-Detail", "unknown")
             raise NeptuneQueryException(
-                f"Error running query {query}: {neptune_status}: {neptune_detail}"
+                f"Error running query {query}:\nResponse headers: {resp.headers}\nRoot cause: {jde}\n"
             ) from jde
         return QueryResultSet.from_sparql_endpoint_json(results_json)
 
