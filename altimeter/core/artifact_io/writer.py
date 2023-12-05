@@ -5,6 +5,7 @@ import io
 import gzip
 import os
 from pathlib import Path
+import tempfile
 from typing import Optional, Type
 
 import boto3
@@ -35,7 +36,11 @@ class ArtifactWriter(abc.ABC):
 
     @abc.abstractmethod
     def write_graph_set(
-        self, name: str, graph_set: ValidatedGraphSet, compression: Optional[str] = None
+        self,
+        name: str,
+        graph_set: ValidatedGraphSet,
+        compression: Optional[str] = None,
+        high_mem: bool = True,
     ) -> str:
         """Write a graph artifact
 
@@ -94,7 +99,11 @@ class FileArtifactWriter(ArtifactWriter):
         return artifact_path
 
     def write_graph_set(
-        self, name: str, graph_set: ValidatedGraphSet, compression: Optional[str] = None
+        self,
+        name: str,
+        graph_set: ValidatedGraphSet,
+        compression: Optional[str] = None,
+        high_mem: bool = True,
     ) -> str:
         """Write a graph artifact
 
@@ -165,7 +174,11 @@ class S3ArtifactWriter(ArtifactWriter):
         return f"s3://{self.bucket}/{output_key}"
 
     def write_graph_set(
-        self, name: str, graph_set: ValidatedGraphSet, compression: Optional[str] = None
+        self,
+        name: str,
+        graph_set: ValidatedGraphSet,
+        compression: Optional[str] = None,
+        high_mem: bool = True,
     ) -> str:
         """Write a graph artifact
 
@@ -187,19 +200,34 @@ class S3ArtifactWriter(ArtifactWriter):
         graph = graph_set.to_rdf()
         with logger.bind(bucket=self.bucket, key_prefix=self.key_prefix, key=key):
             logger.info(event=LogEvent.WriteToS3Start)
-            with io.BytesIO() as rdf_bytes_buf:
-                if compression is None:
-                    graph.serialize(rdf_bytes_buf, format="xml")
-                elif compression == GZIP:
-                    with gzip.GzipFile(fileobj=rdf_bytes_buf, mode="wb") as gz:
-                        graph.serialize(gz, format="xml")
-                else:
-                    raise ValueError(f"Unknown compression arg {compression}")
-                rdf_bytes_buf.flush()
-                rdf_bytes_buf.seek(0)
-                session = boto3.Session()
-                s3_client = session.client("s3")
-                s3_client.upload_fileobj(rdf_bytes_buf, self.bucket, output_key)
+            if high_mem:
+                with io.BytesIO() as rdf_bytes_buf:
+                    if compression is None:
+                        graph.serialize(rdf_bytes_buf, format="xml")
+                    elif compression == GZIP:
+                        with gzip.GzipFile(fileobj=rdf_bytes_buf, mode="wb") as gz:
+                            graph.serialize(gz, format="xml")
+                    else:
+                        raise ValueError(f"Unknown compression arg {compression}")
+                    rdf_bytes_buf.flush()
+                    rdf_bytes_buf.seek(0)
+                    session = boto3.Session()
+                    s3_client = session.client("s3")
+                    s3_client.upload_fileobj(rdf_bytes_buf, self.bucket, output_key)
+            else:
+                with tempfile.TemporaryDirectory() as graph_dir:
+                    graph_path = Path(graph_dir, "graph.rdf")
+                    with graph_path.open("wb") as graph_fp:
+                        if compression is None:
+                            graph.serialize(graph_fp, format="xml")
+                        elif compression == GZIP:
+                            with gzip.GzipFile(fileobj=graph_fp, mode="wb") as gz:
+                                graph.serialize(gz, format="xml")
+                        else:
+                            raise ValueError(f"Unknown compression arg {compression}")
+                    session = boto3.Session()
+                    s3_client = session.client("s3")
+                    s3_client.upload_file(str(graph_path), self.bucket, output_key)
             s3_client.put_object_tagging(
                 Bucket=self.bucket,
                 Key=output_key,

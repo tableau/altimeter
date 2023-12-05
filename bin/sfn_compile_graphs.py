@@ -18,6 +18,7 @@ class CompileGraphsInput(BaseImmutableModel):
     config: AWSConfig
     scan_id: str
     account_scan_manifests: Tuple[AccountScanManifest, ...]
+    high_mem: bool = True
 
 
 class CompileGraphsOutput(BaseImmutableModel):
@@ -60,21 +61,25 @@ def lambda_handler(event: Dict[str, Any], _: Any) -> Dict[str, Any]:
     if not graph_sets:
         raise Exception("BUG: No graph_sets generated.")
     validated_graph_set = ValidatedGraphSet.from_graph_set(GraphSet.from_graph_sets(graph_sets))
-    master_artifact_path = artifact_writer.write_json(name="master", data=validated_graph_set)
-    start_time = validated_graph_set.start_time
-    end_time = validated_graph_set.end_time
-    scan_manifest = ScanManifest(
-        scanned_accounts=scanned_accounts,
-        master_artifact=master_artifact_path,
-        artifacts=artifacts,
-        errors=errors,
-        unscanned_accounts=list(unscanned_accounts),
-        start_time=start_time,
-        end_time=end_time,
-    )
-    artifact_writer.write_json("manifest", data=scan_manifest)
+    if compile_graphs_input.high_mem:
+        master_artifact_path = artifact_writer.write_json(name="master", data=validated_graph_set)
+        start_time = validated_graph_set.start_time
+        end_time = validated_graph_set.end_time
+        scan_manifest = ScanManifest(
+            scanned_accounts=scanned_accounts,
+            master_artifact=master_artifact_path,
+            artifacts=artifacts,
+            errors=errors,
+            unscanned_accounts=list(unscanned_accounts),
+            start_time=start_time,
+            end_time=end_time,
+        )
+        artifact_writer.write_json("manifest", data=scan_manifest)
     rdf_path = artifact_writer.write_graph_set(
-        name="master", graph_set=validated_graph_set, compression=GZIP
+        name="master",
+        graph_set=validated_graph_set,
+        compression=GZIP,
+        high_mem=compile_graphs_input.high_mem,
     )
 
     return CompileGraphsOutput(
