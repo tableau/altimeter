@@ -122,7 +122,9 @@ class FileArtifactWriter(ArtifactWriter):
             artifact_path = os.path.join(self.output_dir, f"{name}.rdf.gz")
         else:
             raise ValueError(f"Unknown compression arg {compression}")
+        logger.info(event=LogEvent.GraphSetToRDFStart)
         graph = graph_set.to_rdf()
+        logger.info(event=LogEvent.GraphSetToRDFEnd)
         with logger.bind(artifact_path=artifact_path):
             logger.info(event=LogEvent.WriteToFSStart)
             with open(artifact_path, "wb") as fp:

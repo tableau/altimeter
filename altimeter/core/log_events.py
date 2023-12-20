@@ -11,8 +11,14 @@ class LogEvent(BaseLogEvent):
     AuthToAccountEnd: EventName
     AuthToAccountFailure: EventName
 
+    CompileGraphsStart: EventName
+    CompileGraphsEnd: EventName
+
     GraphLoadedSNSNotificationStart: EventName
     GraphLoadedSNSNotificationEnd: EventName
+
+    GraphSetToRDFStart: EventName
+    GraphSetToRDFEnd: EventName
 
     MetadataGraphUpdateStart: EventName
     MetadataGraphUpdateEnd: EventName
@@ -47,6 +53,9 @@ class LogEvent(BaseLogEvent):
 
     ScanResourceTypeStart: EventName
     ScanResourceTypeEnd: EventName
+
+    ValidateGraphStart: EventName
+    ValidateGraphEnd: EventName
 
     WriteToFSStart: EventName
     WriteToFSEnd: EventName
