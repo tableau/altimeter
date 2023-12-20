@@ -2,10 +2,11 @@
 """ScanAccount StepFunction Lambda
 Scan a single AWS account and write output to S3."""
 import logging
-from typing import Any, Dict
+from typing import Any, Dict, List, Type
 
 from pydantic import BaseModel
 
+from altimeter.aws.resource.resource_spec import AWSResourceSpec
 from altimeter.aws.resource_service_region_mapping import AWSResourceRegionMappingRepository
 from altimeter.aws.scan.account_scanner import AccountScanner
 from altimeter.aws.scan.scan_plan import AccountScanPlan
@@ -37,12 +38,23 @@ def lambda_handler(event: Dict[str, Any], _: Any) -> Dict[str, Any]:
         aws_resource_region_mapping_repo=account_scan_input.aws_resource_region_mapping_repo,
         accessor=account_scan_input.config.accessor,
     )
+    if account_scan_input.config.scan.ignored_resources:
+        resource_spec_classes_list: List[Type[AWSResourceSpec]] = []
+        for resource_spec_class in DEFAULT_RESOURCE_SPEC_CLASSES:
+            if (
+                resource_spec_class.get_full_type_name()
+                not in account_scan_input.config.scan.ignored_resources
+            ):
+                resource_spec_classes_list.append(resource_spec_class)
+        resource_spec_classes = tuple(resource_spec_classes_list)
+    else:
+        resource_spec_classes = DEFAULT_RESOURCE_SPEC_CLASSES
     account_scanner = AccountScanner(
         account_scan_plan=account_scan_plan,
         artifact_writer=artifact_writer,
         max_svc_scan_threads=account_scan_input.config.concurrency.max_svc_scan_threads,
         scan_sub_accounts=account_scan_input.config.scan.scan_sub_accounts,
-        resource_spec_classes=DEFAULT_RESOURCE_SPEC_CLASSES,
+        resource_spec_classes=resource_spec_classes,
     )
     scan_results = account_scanner.scan()
     return scan_results.dict()
