@@ -41,7 +41,10 @@ def lambda_handler(event: Dict[str, Any], _: Any) -> Dict[str, Any]:
     if account_scan_input.config.scan.ignored_resources:
         resource_spec_classes_list: List[Type[AWSResourceSpec]] = []
         for resource_spec_class in DEFAULT_RESOURCE_SPEC_CLASSES:
-            if resource_spec_class.get_full_type_name() not in account_scan_input.config.scan.ignored_resources:
+            if (
+                resource_spec_class.get_full_type_name()
+                not in account_scan_input.config.scan.ignored_resources
+            ):
                 resource_spec_classes_list.append(resource_spec_class)
         resource_spec_classes = tuple(resource_spec_classes_list)
     else:
