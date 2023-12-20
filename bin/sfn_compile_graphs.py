@@ -12,6 +12,8 @@ from altimeter.core.artifact_io.writer import GZIP, ArtifactWriter
 from altimeter.core.base_model import BaseImmutableModel
 from altimeter.core.config import AWSConfig
 from altimeter.core.graph.graph_set import GraphSet, ValidatedGraphSet
+from altimeter.core.log import Logger
+from altimeter.core.log_events import LogEvent
 
 
 class CompileGraphsInput(BaseImmutableModel):
@@ -31,6 +33,7 @@ def lambda_handler(event: Dict[str, Any], _: Any) -> Dict[str, Any]:
     if root.handlers:
         for handler in root.handlers:
             root.removeHandler(handler)
+    logger = Logger()
     compile_graphs_input = CompileGraphsInput(**event)
 
     scanned_accounts: List[str] = []
@@ -45,6 +48,7 @@ def lambda_handler(event: Dict[str, Any], _: Any) -> Dict[str, Any]:
         scan_id=compile_graphs_input.scan_id,
     )
 
+    logger.info(event=LogEvent.CompileGraphsStart)
     for account_scan_manifest in compile_graphs_input.account_scan_manifests:
         account_id = account_scan_manifest.account_id
         if account_scan_manifest.errors:
@@ -60,7 +64,12 @@ def lambda_handler(event: Dict[str, Any], _: Any) -> Dict[str, Any]:
             unscanned_accounts.add(account_id)
     if not graph_sets:
         raise Exception("BUG: No graph_sets generated.")
+    logger.info(event=LogEvent.CompileGraphsEnd)
+
+    logger.info(event=LogEvent.ValidateGraphStart)
     validated_graph_set = ValidatedGraphSet.from_graph_set(GraphSet.from_graph_sets(graph_sets))
+    logger.info(event=LogEvent.ValidateGraphEnd)
+
     if compile_graphs_input.high_mem:
         master_artifact_path = artifact_writer.write_json(name="master", data=validated_graph_set)
         start_time = validated_graph_set.start_time
