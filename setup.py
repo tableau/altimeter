@@ -20,7 +20,7 @@ setup(
         "rdflib==6.0.2",
         "structlog==20.2.0",
         "boto3==1.28.80",
-        "jinja2==3.0.3",
+        "jinja2==3.1.3",
         "pydantic==1.9.0",
         "toml==0.10.2",
         "gremlinpython==3.4.12",
